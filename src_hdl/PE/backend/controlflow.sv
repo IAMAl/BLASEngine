@@ -1,22 +1,22 @@
 module CTRLFlow (
 	input						clock,
 	input						reset,
-	input						I_Req,
-	input						I_Stall,
-	input						I_Sel_CondValid;
-	input						I_CondValid1,
-	input						I_CondValid2,
-	input						I_Jump,
-	input						I_Branch,
-	input	count_t				I_Timing_MY,
-	input	count_t				I_Timing_WB,
-	input	state_t				I_State,
-	input	cond_t				I_Cond,
-	output	address_t			I_Src1,
-	output	address_t			I_Src2,
-	output						O_Ld,
-	output	address_t			O_Address
-	output						O_StallReq
+	input						I_Req,							//Request from Pipeline
+	input						I_Stall,						//Force Stalling
+	input						I_Sel_CondValid;				//Selector for CondValid-1/2
+	input						I_CondValid1,					//Condition Valid
+	input						I_CondValid2,					//Condition Valid
+	input						I_Jump,							//Jump Instruction
+	input						I_Branch,						//Branch Instruction
+	input	count_t				I_Timing_MY,					//Count Value for This Instruction
+	input	count_t				I_Timing_WB,					//Count Value for Write-Back Instr
+	input	state_t				I_State,						//Status Register
+	input	cond_t				I_Cond,							//Flag: Condition
+	output	address_t			I_Src1,							//Source Value
+	output	address_t			I_Src2,							//Source Value
+	output						O_IFetch,						//Instruction Fetch
+	output	address_t			O_Address						//Address
+	output						O_StallReq						//Stall Request
 );
 
 	logic						Cond_Valid;
@@ -39,7 +39,7 @@ module CTRLFlow (
 	assign Address				= ( Taken ) ? R_Address + I_Src1 : R_Address + 1'b1;
 	assign StallReq				= R_Req & ~R_Cond; ;
 
-	assign O_Ld					= R_Req;
+	assign O_IFetch				= R_Req;
 	assign O_Address			= R_Address;
 	assign O_StallReq			= StallReq;
 

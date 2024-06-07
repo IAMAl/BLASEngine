@@ -1,17 +1,18 @@
 module Index (
 	input						clock,
 	input						reset,
-	input						I_Stall,
-	input						I_Req,
-	input						I_Slice,
-	input	index_t				I_Index,
-	input	index_t				I_Length,
-	input	id_t				I_ThreadID_Scalar,
-	input	id_t				I_ThreadID_SIMT,
-	input	id_t				I_Constant,
-	input						I_Sign,
-	output						O_Slice,
-	output						O_Index
+	input						I_Stall,						//Force Stalling
+	input						I_Req,							//Request from Previous Stage
+	input						I_Slice,						//Flag: Index-Slicing
+	input	index_t				I_Index,						//Index Value
+	input	index_t				I_Length,						//Length for Slicing
+	input	id_t				I_ThreadID_Scalar,				//Scalar Thread ID
+	input	id_t				I_ThreadID_SIMT,				//SIMT Thread ID
+	input	id_t				I_Constant,						//Constant
+	input						I_Sign,							//Config: Sign
+	output						O_Req,							//Request to Next Stage
+	output						O_Slice,						//Flag: Index-Slicing
+	output						O_Index							//Index Value
 );
 	index_t						Index;
 	logic						En_Slice;
@@ -30,6 +31,7 @@ module Index (
 	index_t						Index_s2;
 	index_t						Index_val;
 
+	logic						R_Req;
 	logic						R_Sel;
 	index_t						R_Index;
 
@@ -59,8 +61,18 @@ module Index (
 	assign index_s2				= ( I_Constant ) ?				index_c : index_m;
 	assign index_val			= ( sign ) ?					index_s1 - index2 : index_s1 + index_s2;
 
+	assign O_Req				= R_Req | R_Sel;
 	assign O_Slice				= R_Sel;
 	assign O_Index				= R_Index;
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Req				<= 1'b0;
+		end
+		else begin
+			R_Req				= I_Req;
+		end
+	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -69,7 +81,7 @@ module Index (
 		else if ( End_Count ) begin
 			R_Sel				<= 1'b0;
 		end
-		else if (I_Req & ~I_Stall & I_Slice ) begin
+		else if ( I_Req & ~I_Stall & I_Slice ) begin
 			R_Sel				<= 1'b1;
 		end
 	end
