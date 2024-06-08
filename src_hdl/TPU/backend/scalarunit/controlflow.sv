@@ -1,4 +1,6 @@
-module CTRLFlow (
+module CTRLFlow 
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_Req,							//Request from Pipeline

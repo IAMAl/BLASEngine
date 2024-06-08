@@ -1,4 +1,7 @@
-module St_InstrWindow (
+module St_InstrWindow 
+	import pkg_pcu::*;
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_Req,							//Request to Work

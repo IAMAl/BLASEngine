@@ -1,6 +1,6 @@
-module BareRegFile #(
+module BareRegFile
 	import pkg_tpu::*;
-)(
+(
 	input						clock,
 	input						reset,
 	input						I_We,							//Flag: Write=Enable

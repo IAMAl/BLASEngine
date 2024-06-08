@@ -1,6 +1,6 @@
-module Index #(
+module Index
 	import pkg_tpu::*;
-)(
+(
 	input						clock,
 	input						reset,
 	input						I_Stall,						//Force Stalling
