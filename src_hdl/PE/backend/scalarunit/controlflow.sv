@@ -12,10 +12,9 @@ module CTRLFlow (
 	input	count_t				I_Timing_WB,					//Count Value for Write-Back Instr
 	input	state_t				I_State,						//Status Register
 	input	cond_t				I_Cond,							//Flag: Condition
-	output	address_t			I_Src1,							//Source Value
-	output	address_t			I_Src2,							//Source Value
+	output	address_t			I_Src,							//Source Value
 	output						O_IFetch,						//Instruction Fetch
-	output	address_t			O_Address						//Address
+	output	address_t			O_Address						//Address (Program COunter)
 	output						O_StallReq						//Stall Request
 );
 
@@ -36,8 +35,8 @@ module CTRLFlow (
 	assign Valid				= ( I_Timing_MY == ( I_Timing_WB + 1'b1 ) )
 	assign Taken				= Valid & I_State[ I_Cond ] & I_Branch;
 	assign Update				= ~I_Stall & I_Req;
-	assign Address				= ( Taken ) ? R_Address + I_Src1 : R_Address + 1'b1;
-	assign StallReq				= R_Req & ~R_Cond; ;
+	assign Address				= ( Taken ) ? R_Address + I_Src : R_Address + 1'b1;
+	assign StallReq				= R_Req & ~R_Cond;
 
 	assign O_IFetch				= R_Req;
 	assign O_Address			= R_Address;
@@ -78,7 +77,7 @@ module CTRLFlow (
 			R_Address			<= 0;
 		end
 		else if ( I_Req & ~I_Stall & I_Jump ) begin
-			R_Address			<= I_Src2;
+			R_Address			<= I_Src;
 		end
 		else if ( Update ) begin
 			R_Address			<= Address;

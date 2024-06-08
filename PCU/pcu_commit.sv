@@ -1,17 +1,27 @@
-module Commit(
-	input						clock,
-	input						reset,
-	input									I_Req_Issue,
-	input [$clocg(NUM_ENTRY_SCALAR)-1:0]	I_Issue_No,
-	input									I_Req_Commit,
-	input [$clocg(NUM_ENTRY_SCALAR)-1:0]	I_CommitNo,
-	output									O_Req_Commit,
-	output [$clocg(NUM_ENTRY_SCALAR)-1:0]	O_CommitNo
+module Commi #(
+	import pkg_pcu::*;
+)(
+	input							clock,
+	input							reset,
+	input							I_Req_Issue,
+	input	[WIDTH_ENTRY_STH-1:0]	I_Issue_No,
+	input							I_Req_Commit,
+	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,
+	output							O_Req_Commit,
+	output	[WIDTH_ENTRY_STH-1:0]	O_CommitNo
 );
 
-	pcu_tab_commit							IssueInfo	[NUM_ENTRY_SCALAR-1:0];
-	logic	[$clog(NUM_ENTRY_SCALAR)-1:0]	R_Commit_No;
-	logic									R_Commit;
+	logic							We;
+	logic							Re;
+	logic	[WIDTH_ENTRY_STH-1:0]	WNo;
+	logic	[WIDTH_ENTRY_STH-1:0]	RNo;
+
+	logic							Full;
+	logic							Empty;
+
+	pcu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
+	logic	[WIDTH_ENTRY_STH-1:0]	R_Commit_No;
+	logic							R_Commit;
 
 	assign Commit			= Valid[ RNo ] & IssedInfo[ RNo ].Commit;
 
@@ -55,7 +65,21 @@ module Commit(
 
 
 	//// Module: Ring-Buffer Controller
-	// Write-Enable		: I_Req_Issue & ~Full;
-	// Read-Enable		: Commit & ~Empty
+	assign We				= I_Req & ~Full;
+	assign Re				= Commit & ~Empty;
+	RingBuffCTRL #(
+		.NUM_ENTRY(		NUM_ENTRY_STH		)
+	) HazardTab_Ptr
+	(
+		.clock(			clock				),
+		.reset(			reset				),
+		.I_We(			We					),
+		.I_Re(			Re					),
+		.O_WAddr(		WNo					),
+		.O_RAddr(		RNo					),
+		.O_Full(							),
+		.O_Empty(		Empty				),
+		.O_Num(			Num					)
+	);
 
 endmodule

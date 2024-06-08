@@ -1,4 +1,6 @@
-module RegFile (
+module BareRegFile #(
+	import pkg_tpu::*;
+)(
 	input						clock,
 	input						reset,
 	input						I_We,							//Flag: Write=Enable
@@ -15,7 +17,7 @@ module RegFile (
 	index_t						Index_Src1;
 	index_t						Index_Src2;
 
-	data_t						RegFile	[NUM_RF_ENTRY-1:0];
+	data_t						RegFile	[NUM_ENTRY_REGFILE-1:0];
 
 	assign Index_Src1			= ( I_Re1 ) ? I_Index_Src1 : 0;
 	assign Index_Src2			= ( I_Re2 ) ? I_Index_Src2 : 0;

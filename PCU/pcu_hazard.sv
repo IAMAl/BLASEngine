@@ -1,23 +1,25 @@
-module HazardCheck (
-	input						clock,
-	input						reset,
-	input						I_Ack,
-	input						I_Commit,
-	input	[$clog2(NUM_ENTRY_SCALAR)-1:0]	I_CommitNo,
-	input						I_Req,
-	input	id_t				I_ThreadID_Scalar,
-	output						O_Req,
-	output	id_t				O_ThreadID_Scalar,
-	output	[$clog2(NUM_ENTRY_SCALAR)-1:0]	O_IssueNo,
+module HazardCheck #(
+	import pkg_pcu::*;
+)(
+	input							clock,
+	input							reset,
+	input							I_Ack,
+	input							I_Commit,
+	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,
+	input							I_Req,
+	input	id_t					I_ThreadID_Scalar,
+	output							O_Req,
+	output	id_t					O_ThreadID_Scalar,
+	output	[WIDTH_ENTRY_STH-1:0]	O_IssueNo,
 );
 
-	logic	[NUM_ENTRY_SCALAR-1:0]	Valid;
-	logic	[NUM_ENTRY_SCALAR-1:0]	Commit;
+	logic	[NUM_ENTRY_STH-1:0]		Valid;
+	logic	[NUM_ENTRY_STH-1:0]		Commit;
 
 	logic							R_Req;
 	logic							R_Req_Issue;
-	logic	[NUM_ENTRY_SCALAR-1:0]	R_Issue_No;
-	pcu_tab_hazard_t				ThreadID [NUM_ENTRY_SCALAR-1:0];
+	logic	[NUM_ENTRY_STH-1:0]		R_Issue_No;
+	pcu_tab_hazard_t				ThreadID		[NUM_ENTRY_STH-1:0];
 
 
 	//// Issue Sequence
@@ -30,7 +32,7 @@ module HazardCheck (
 
 	// Generate Mask Flags
 	always_comb begin
-		for ( int=0; i<NUM_ENTRY_SCALAR; ++i ) begin
+		for ( int=0; i<NUM_ENTRY_STH; ++i ) begin
 			assign Mask[ i ]		=  ThreadID[ i ].Src;
 		end
 	end
@@ -40,8 +42,8 @@ module HazardCheck (
 	// Issue__No:	Pointer for Read
 	// WNo:			Pointer for Write
 	always_comb begin
-		for ( int i=0; i<NUM_ENTRY_SCALAR; ++i ) begin
-			assign is_Matched[ i ]	= ~( ( Valid[ i ] & ThreadID[ i ].Commit & ( ThreadID[ i ].Src_ID == ThreadID[ Issue_No ].ID ) & ( i != Issue_No ) ) ^ Mask[ i ] );
+		for ( int i=0; i<NUM_ENTRY_STH; ++i ) begin
+			assign is_Matched[ i ]	= ~( ( Valid[ i ] & ~ThreadID[ i ].Commit & ( ThreadID[ i ].Src_ID == ThreadID[ Issue_No ].ID ) & ( i != Issue_No ) ) ^ Mask[ i ] );
 		end
 	end
 
@@ -108,7 +110,22 @@ module HazardCheck (
 
 
 	//// Module: Ring-Buffer Controller
-	// Write-Enable		: I_Req & ~Full;
-	// Read-Enable		: Issueable & ~Empty
+	assign Full				= Num == (NUM_ENTRY_STH-1);
+	assign We				= I_Req & ~Full;
+	assign Re				= Issueable & ~Empty;
+	RingBuffCTRL #(
+		.NUM_ENTRY(		NUM_ENTRY_STH		)
+	) HazardTab_Ptr
+	(
+		.clock(			clock				),
+		.reset(			reset				),
+		.I_We(			We					),
+		.I_Re(			Re					),
+		.O_WAddr(		WNo					),
+		.O_RAddr(		Issue_No			),
+		.O_Full(							),
+		.O_Empty(		Empty				),
+		.O_Num(			Num					)
+	);
 
 endmodule
