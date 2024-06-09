@@ -7,7 +7,7 @@ module Hazard
 	input	iw_t				I_Index_Entry,					//Set of Indeces
 	input						I_Slice,						//Flaag: Index-Sllicing
 	output						O_Req_Issue,					//Request to Next Stage
-	output						O_No_Issue,
+	output						O_Issue_No,						//Issue(Dispatch) No
 	output						O_RAR_Hzard						//RAR-Hazard
 );
 
@@ -62,7 +62,7 @@ module Hazard
 
 
 	assign O_Req_Issue			= R_Req;
-	assign O_No_Issue			= R_No_Issue;
+	assign O_Issue_No			= R_No_Issue;
 	assign O_RAR_Hzard			= R_RAR_Hzard;
 
 	assign RAW_Hazard_Src1		= |is_Matched_i_src1_i_dst;

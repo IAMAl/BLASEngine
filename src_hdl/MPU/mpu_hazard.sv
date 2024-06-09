@@ -1,16 +1,16 @@
 module HazardCheck #(
-	import pkg_pcu::*;
+	import pkg_mpu::*;
 )(
 	input							clock,
 	input							reset,
-	input							I_Ack,
-	input							I_Commit,
-	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,
-	input							I_Req,
-	input	id_t					I_ThreadID_Scalar,
-	output							O_Req,
-	output	id_t					O_ThreadID_Scalar,
-	output	[WIDTH_ENTRY_STH-1:0]	O_IssueNo,
+	input							I_Ack,						//Ack from Dispatch Unit
+	input							I_Commit,					//Commit Signal from Commit Unit
+	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,					//Commit No. from Commit Unit
+	input							I_Req,						//Request from Previous Stage
+	input	id_t					I_ThreadID_S,				//Scalar Thread-ID
+	output							O_Req,						//Request to Next Stage
+	output	id_t					O_ThreadID_S,				//Scalar Thread-ID to Commit Unit
+	output	[WIDTH_ENTRY_STH-1:0]	O_IssueNo,					//Issue No to Commit Unit
 );
 
 	logic	[NUM_ENTRY_STH-1:0]		Valid;
@@ -19,12 +19,12 @@ module HazardCheck #(
 	logic							R_Req;
 	logic							R_Req_Issue;
 	logic	[NUM_ENTRY_STH-1:0]		R_Issue_No;
-	pcu_tab_hazard_t				ThreadID		[NUM_ENTRY_STH-1:0];
+	mpu_tab_hazard_t				ThreadID		[NUM_ENTRY_STH-1:0];
 
 
 	//// Issue Sequence
 	assign O_Req					= R_Req_Issue;
-	assign O_ThreadID_Scalar		= ThreadID[ Issue_No ].ID;
+	assign O_ThreadID_S				= ThreadID[ Issue_No ].ID;
 	assign O_IssueNo				= R_Issue_No;
 
 	// Check Issable or Not
@@ -95,12 +95,12 @@ module HazardCheck #(
 			if ( I_Req & R_Req ) begin
 				Valid[ WNo ]			<= 1'b1;
 				ThreadID[ WNo ].Src		<= 1'b1;
-				ThreadID[ WNo ].Src_ID	<= I_ThreadID_Scalar;
+				ThreadID[ WNo ].Src_ID	<= I_ThreadID_S;
 				ThreadID[ WNo ].Commmit	<= 1'b0;
 			end
 			else if ( I_Req & ~R_Req ) begin
 				Valid[ WNo ]			<= 1'b1;
-				ThreadID[ WNo ].ID		<= I_ThreadID_Scalar;
+				ThreadID[ WNo ].ID		<= I_ThreadID_S;
 				ThreadID[ WNo ].Src		<= 1'b0;
 				ThreadID[ WNo ].Src_ID	<= 0;
 				ThreadID[ WNo ].Commmit	<= 1'b0;

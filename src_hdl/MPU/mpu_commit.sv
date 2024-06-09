@@ -1,14 +1,14 @@
-module Commi #(
-	import pkg_pcu::*;
+module Commit #(
+	import pkg_mpu::*;
 )(
 	input							clock,
 	input							reset,
-	input							I_Req_Issue,
-	input	[WIDTH_ENTRY_STH-1:0]	I_Issue_No,
-	input							I_Req_Commit,
-	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,
-	output							O_Req_Commit,
-	output	[WIDTH_ENTRY_STH-1:0]	O_CommitNo
+	input							I_Req_Issue,				//Request from Dispatch Unit
+	input	[WIDTH_ENTRY_STH-1:0]	I_Issue_No,					//Issue No. from Dispatch Unit
+	input							I_Req_Commit,				//Commit from Coomit-Agregator Unit
+	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,					//Commit No from Commit-Agregator Unit
+	output							O_Req_Commit,				//Request to Next-Stage
+	output	[WIDTH_ENTRY_STH-1:0]	O_CommitNo					//Commit No to Next-Stage
 );
 
 	logic							We;
@@ -19,7 +19,7 @@ module Commi #(
 	logic							Full;
 	logic							Empty;
 
-	pcu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
+	mpu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
 	logic	[WIDTH_ENTRY_STH-1:0]	R_Commit_No;
 	logic							R_Commit;
 

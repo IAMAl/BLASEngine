@@ -18,19 +18,19 @@ module St_InstrWindow
 
 	localparam WIDTH_ENTRY		= $clog2(NUM_IW_ENTRY);
 
-	logic							Set_Index;
+	logic						Set_Index;
 
-	logic							R_Valid_Dst;
-	logic							R_Valid_Src1;
-	logic							R_Valid_Src2;
-	logic							R_Valid_Src3;
+	logic						R_Valid_Dst;
+	logic						R_Valid_Src1;
+	logic						R_Valid_Src2;
+	logic						R_Valid_Src3;
 
-	index_t							R_Index_Dst;
-	index_t							R_Index_Src1;
-	index_t							R_Index_Src2;
-	index_t							R_Index_Src3;
+	index_t						R_Index_Dst;
+	index_t						R_Index_Src1;
+	index_t						R_Index_Src2;
+	index_t						R_Index_Src3;
 
-	iw_t							R_Indeces;
+	iw_t						R_Indeces;
 
 	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
 

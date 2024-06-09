@@ -1,17 +1,17 @@
 module InstrMem
 	import pkg_mpu::*;
 (
-	input							clock,
-	input							reset,
-	input							I_Req_St,
-	input							O_Ack_St,
-	input	instr_t					I_St_Instr,
-	input							I_Req_Ld,
-	input	st_address_t			I_Ld_Address,
-	input	instr_t					OLdt_Instr
+	input						clock,
+	input						reset,
+	input						I_Req_St,						//Request Storing
+	input						O_Ack_St,						//Ack for Storing
+	input	instr_t				I_St_Instr,						//Storing Instruction
+	input						I_Req_Ld,						//Request Loading
+	input	st_address_t		I_Ld_Address,					//Load Address
+	input	instr_t				O_Ld_Instr						//Loaded Instruction
 );
 
-	instr_t							InstrMem	[SIZE_THREAD_MEM-1:0];
+	instr_t						InstrMem	[SIZE_THREAD_MEM-1:0];
 
 	assign O_Ld_Instr			= R_Instr;
 

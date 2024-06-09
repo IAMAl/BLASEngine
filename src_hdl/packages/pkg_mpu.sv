@@ -17,7 +17,7 @@ package pkg_mpu;
 		logic								Src;
 		logic	[WIDTH_THREADID_SIMT-1:0]	Src_ID;
 		logic								Commmit;
-	} pcu_tab_hazard_t;
+	} mpu_tab_hazard_t;
 
 	typedef struct enum logic [1:0] {
 		FSM_DPC_INIT			= 2'h0,
@@ -30,6 +30,6 @@ package pkg_mpu;
 		logic								Valid;
 		logic	[WIDTH_ENTRY_STH-1:0]		IsseNo;
 		logic								Commmit;
-	} pcu_tab_commit_t;
+	} mpu_tab_commit_t;
 
 endpackage

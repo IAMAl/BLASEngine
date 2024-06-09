@@ -1,19 +1,19 @@
 module Dispatch
-	import pkg_pcu::*;
+	import pkg_mpu::*;
 (
-	input							clock,
-	input							reset,
-	input							I_Req,
-	input	id_t					I_ThreadID,
-	output							O_Req_Lookup,
-	output	id_t					O_ThreadID,
-	input							I_Ack,
-	input	lookup_t				I_ThreadInfo,
-	output							O_Ld,
-	output	st_address_t			O_Address,
-	input	instr_t					I_Instr,
-	output	instr_t					O_Instr,
-	output	stat_dispatch_t			O_Status
+	input						clock,
+	input						reset,
+	input						I_Req,							//Request from Previous Stage
+	input	id_t				I_ThreadID,						//Scalar Thread-ID from Hazard Check Unit
+	output						O_Req_Lookup,					//Request to MapMan Unit
+	output	id_t				O_ThreadID,						//Scalar Thread-ID to Commit Unit
+	input						I_Ack,							//Ack from MapMan Unit
+	input	lookup_t			I_ThreadInfo,					//Instr Memory Info from MapMan Unit
+	output						O_Ld,							//Load Instruction
+	output	st_address_t		O_Address,						//Loading Address
+	input	instr_t				I_Instr,						//Loaded INstruction
+	output	instr_t				O_Instr,						//Send Loaded Instruction
+	output	stat_dispatch_t		O_Status						//Status
 );
 
 	logic							Loading;
@@ -30,8 +30,20 @@ module Dispatch
 	assign Set_Address		= I_Ack;
 	assign Loading			= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
 
+	assign O_Req_Lookup		= FSM_Dispatch == FSM_DPC_GETINFO;
+	assign O_ThreadID		= R_ThreadID;
+
 	assign O_Ld				= Loading;
 	assign O_Address		= R_Address;
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_ThreadID		<= 0;
+		end
+		else if ( I_Req ) begin
+			R_ThreadID		<= I_ThreadID;
+		end
+	end
 
 	assign Length			= I_ThreadInfo.length;
 	always_ff @( posedge clock ) begin
@@ -46,7 +58,7 @@ module Dispatch
 		end
 	end
 
-	assign Base_Addr		= I_ThreadInfo.base_addr;
+	assign Base_Addr		= I_ThreadInfo.address;
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Address		<= 0;
