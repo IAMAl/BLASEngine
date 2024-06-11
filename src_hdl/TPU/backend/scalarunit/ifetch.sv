@@ -10,6 +10,7 @@ module IFetch (
 	output						O_Re							//Read-Enabloe for Buffer
 );
 
+
 	logic						We_Instr;
 
 	logic						R_Req;
@@ -19,6 +20,7 @@ module IFetch (
 
 	instr_t						R_Insstr;
 	logic						Req;
+
 
 	assign O_Req				= R_Req_D1;
 	assign O_Instr				= R_Instr;

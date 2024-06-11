@@ -16,9 +16,10 @@ module CTRLFlow
 	input	cond_t				I_Cond,							//Flag: Condition
 	output	address_t			I_Src,							//Source Value
 	output						O_IFetch,						//Instruction Fetch
-	output	address_t			O_Address						//Address (Program COunter)
+	output	address_t			O_Address,						//Address (Program COunter)
 	output						O_StallReq						//Stall Request
 );
+
 
 	logic						Cond_Valid;
 	logic						Valid;
@@ -31,6 +32,7 @@ module CTRLFlow
 	logic						R_CondValid;
 
 	address_t					R_Address;
+
 
 	assign Cond_Valid			= ( I_Sel_CondValid ) ? I_CondValid2 : I_CondValid1;
 

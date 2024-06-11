@@ -1,25 +1,25 @@
 module scalar_unit (
 	input						clock,
 	input						reset,
-	input						I_Empty,
-	input	instr_t				I_instr,
-	input						I_En,
-	input	instr_t				I_ThreadID_Scalar,
-	input	instr_t				I_ThreadID_SIMT,
-	input	data_t				I_Scalar_Data,
-	output	data_t				O_Scalar_Data,
-	output	address_t			O_Address1,
-	output	address_t			O_Address2,
-	output						O_Ld_Req1,
-	output						O_Ld_Req2,
-	input	data_t				I_Ld_Data1,
-	input	data_t				I_Ld_Data2,
-	output						O_St_Req1,
-	output						O_St_Req2,
-	output	data_t				O_St_Data1,
-	output	data_t				O_St_Data2,
-	output						O_Re,
-	output	s_stat_t			O_Status
+	input						I_Empty,				//Empty on Buffer
+	input	instr_t				I_instr,				//Instruction from Buffer
+	input						I_En,					//Enable Execution
+	input	instr_t				I_ThreadID_Scalar,		//Scalar Thread-ID
+	input	instr_t				I_ThreadID_SIMT,		//SIMT Thread-ID
+	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
+	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
+	output	address_t			O_Address1,				//Data Memory Address
+	output	address_t			O_Address2,				//Data Memory Address
+	output						O_Ld_Req1,				//Load Request
+	output						O_Ld_Req2,				//Load Request
+	input	data_t				I_Ld_Data1,				//Loaded Data
+	input	data_t				I_Ld_Data2,				//Loaded Data
+	output						O_St_Req1,				//Store Request
+	output						O_St_Req2,				//Store Request
+	output	data_t				O_St_Data1,				//Store Data
+	output	data_t				O_St_Data2,				//Store Data
+	output						O_Re,					//Read-Enable for Buffer
+	output	s_stat_t			O_Status				//Scalar Unit Status
 );
 
 
@@ -35,11 +35,12 @@ module scalar_unit (
 
 
 	logic					Req_IW;
+	iw_t					Index_Entry;
 
 
 	logic					Slice;
 
-	
+
 	logic					Sign;
 	const_t					Constant;
 	logic					Stall_RegFile_Odd;

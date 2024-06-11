@@ -15,6 +15,7 @@ module FrontEnd (
 	output						O_Nack							//Nack to Allocator
 );
 
+
 	logic						Set_We;
 	logic						is_FSM_PE_RUN;
 
@@ -30,6 +31,7 @@ module FrontEnd (
 	instr_t						R_ThreadID_Scalar;
 	instr_t						R_ThreadID_SIMT;
 	instr_t						R_Instr;
+
 
 	assign is_FSM_PE_SCALAR		= R_FSM_PE_FRONTEND == FSM_PE_SCALAR;
 	assign is_FSM_PE_SIMT		= R_FSM_PE_FRONTEND == FSM_PE_SIMT;

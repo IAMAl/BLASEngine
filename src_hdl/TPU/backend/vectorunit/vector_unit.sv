@@ -12,6 +12,7 @@ module vector_unit (
 	output	v_stat				O_Status
 );
 
+
 	for ( genvar i=0; i<NUM_LANE; ++i ) begin
 		lane_unit (
 			.clock(				clock					),
@@ -19,7 +20,7 @@ module vector_unit (
 			.I_En(				Lane_En[ i ]			),
 			.I_ThreadID_Scalar(	i						),
 			.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
-			.I_Command(			Command					),
+			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),
 			.O_Scalar_Data(		Scalr_Data[ i ]			),
 			.I_Path_Odd(		Path[ i + 1 ]			),

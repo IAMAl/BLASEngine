@@ -11,6 +11,7 @@ module Hazard
 	output						O_RAR_Hzard						//RAR-Hazard
 );
 
+
 	logic						v_Issue;
 	logic						RAR_Hazard;
 	logic						RAW_Hazard_Src1;

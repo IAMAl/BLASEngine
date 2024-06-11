@@ -1,26 +1,27 @@
 module lane_unit (
 	input						clock,
 	input						reset,
-	input						I_En,
-	input	instr_t				I_ThreadID_Scalar,
-	input	instr_t				I_ThreadID_SIMT,
-	input	command_t			I_Command,
-	input	data_t				I_Scalar_Data,
-	output	data_t				O_Scalar_Data,
-	input	data_t				I_Path_Odd,
-	input	data_t				I_Path_Even,
-	output	address_t			O_Address1,
-	output	address_t			O_Address2,
-	output						O_Ld_Req1,
-	output						O_Ld_Req2,
-	input	data_t				I_Ld_Data1,
-	input	data_t				I_Ld_Data2,
-	output						O_St_Req1,
-	output						O_St_Req2,
-	output	data_t				O_St_Data1,
-	output	data_t				O_St_Data2,
-	output	stat_t				O_Status
+	input						I_En,					//Enable Execution
+	input	instr_t				I_ThreadID_Scalar,		//Scalar Thread-ID
+	input	instr_t				I_ThreadID_SIMT,		//SIMT Thread-ID
+	input	command_t			I_Command,				//Execution Command
+	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
+	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
+	input	data_t				I_Path_Odd,				//Neighbor Lane
+	input	data_t				I_Path_Even,			//Neighbor Lane
+	output	address_t			O_Address1,				//Data Memory Address
+	output	address_t			O_Address2,				//Data Memory Address
+	output						O_Ld_Req1,				//Load Request
+	output						O_Ld_Req2,				//Load Request
+	input	data_t				I_Ld_Data1,				//Loaded Data
+	input	data_t				I_Ld_Data2,				//Loaded Data
+	output						O_St_Req1,				//Store Request
+	output						O_St_Req2,				//Store Request
+	output	data_t				O_St_Data1,				//Store Data
+	output	data_t				O_St_Data2,				//Store Data
+	output	stat_t				O_Status				//Lane Status
 );
+
 
 	logic					Sign;
 	const_t					Constant;

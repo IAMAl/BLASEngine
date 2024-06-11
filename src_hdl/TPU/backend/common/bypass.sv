@@ -11,7 +11,6 @@ module Bypass (
 	input	data_t				I_Src_Data1,					//From RegFile after Rotation Path
 	input	data_t				I_Src_Data2,					//From RegFile after Rotation Path
 	input	data_t				I_Src_Data3,					//From RegFile after Rotation Path
-	input	data_t				I_Src_Data4,					//From RegFile after Rotation Path
 	output	data_t				O_Src_Data1,					//To Exec Unit
 	output	data_t				O_Src_Data2,					//To Exec Unit
 	output	data_t				O_Src_Data3,					//To Exec Unit
@@ -23,18 +22,43 @@ module Bypass (
 	output	address_t			O_Length						//To Load/Store Unit
 );
 
+
 	logic						Sel_Path_Odd;
 	logic						Sel_Data2;
 	logic						Sel_Data3;
 	logic						Sel_Bypass1;
 	logic						Sel_Bypass2;
 	logic						Sel_Bypass3;
-	logic						Sel_Bypass4;
 	logic						Sel_Scalar1;
 	logic						Sel_Scalar2;
 	logic						Sel_Scalar3;
-	logic						Sel_Scalar4;
 	data_t						Path_Data;
+
+	logic						Sel_Addr_Data1;
+	logic						Sel_Addr_Data2;
+	logic						Sel_Addr_Data3;
+	logic						Sel_Stride_Data1;
+	logic						Sel_Stride_Data2;
+	logic						Sel_Stride_Data3;
+	logic						Sel_Length_Data1;
+	logic						Sel_Length_Data2;
+	logic						Sel_Length_Data3;
+
+	logic						Sel_WB_Data11;
+	logic						Sel_WB_Data12;
+	logic						Sel_WB_Data13;
+	logic						Sel_WB_Data21;
+	logic						Sel_WB_Data22;
+	logic						Sel_WB_Data23;
+	logic						Sel_WB_Bypass11;
+	logic						Sel_WB_Bypass12;
+	logic						Sel_WB_Bypass21;
+	logic						Sel_WB_Bypass22;
+	logic						Sel_Path_Odd1;
+	logic						Sel_Path_Odd2;
+	logic						Sel_Path_Even1;
+	logic						Sel_Path_Even2;
+
 
 	assign Sel_Data2			= I_Config_Path[0];
 	assign Sel_Data3			= I_Config_Path[1];
@@ -44,28 +68,23 @@ module Bypass (
 	assign Sel_Bypass11			= I_Bypass_Path == 4'h0;
 	assign Sel_Bypass12			= I_Bypass_Path == 4'h1;
 	assign Sel_Bypass13			= I_Bypass_Path == 4'h2;
-	assign Sel_Bypass14			= I_Bypass_Path == 4'h3;
 
 	assign Sel_Bypass21			= I_Bypass_Path == 4'h4;
 	assign Sel_Bypass22			= I_Bypass_Path == 4'h5;
 	assign Sel_Bypass23			= I_Bypass_Path == 4'h6;
-	assign Sel_Bypass24			= I_Bypass_Path == 4'h7;
 
 
 	assign Sel_Addr_Data1		= ( I_Bypass_Path == 4'h8 ) | ( I_Bypass_Path == 4'hc );
 	assign Sel_Addr_Data2		= ( I_Bypass_Path == 4'h9 ) | ( I_Bypass_Path == 4'hd );
 	assign Sel_Addr_Data3		= ( I_Bypass_Path == 4'ha ) | ( I_Bypass_Path == 4'he );
-	assign Sel_Addr_Data4		= ( I_Bypass_Path == 4'hb ) | ( I_Bypass_Path == 4'hf );
 
 	assign Sel_Stride_Data1		= ( I_Bypass_Path == 4'hb ) | ( I_Bypass_Path == 4'he );
 	assign Sel_Stride_Data2		= ( I_Bypass_Path == 4'h8 ) | ( I_Bypass_Path == 4'hf );
 	assign Sel_Stride_Data3		= ( I_Bypass_Path == 4'h9 ) | ( I_Bypass_Path == 4'hc );
-	assign Sel_Stride_Data4		= ( I_Bypass_Path == 4'ha ) | ( I_Bypass_Path == 4'hd );
 
 	assign Sel_Length_Data1		= ( I_Bypass_Path == 4'ha ) | ( I_Bypass_Path == 4'hf );
 	assign Sel_Length_Data2		= ( I_Bypass_Path == 4'hb ) | ( I_Bypass_Path == 4'he );
 	assign Sel_Length_Data3		= ( I_Bypass_Path == 4'h8 ) | ( I_Bypass_Path == 4'hd );
-	assign Sel_Length_Data4		= ( I_Bypass_Path == 4'h9 ) | ( I_Bypass_Path == 4'hc );
 
 
 	assign Sel_WB_Data11		= I_WB_Path1 == 3'h1;
@@ -106,11 +125,6 @@ module Bypass (
 									( Sel_Scalar3 ) ?	I_Scalar_Data :
 														Path_Data;
 
-	assign O_Src_Data4			= ( Sel_Bypass14 ) ?	I_Bypass_data1 :
-									( Sel_Bypass24 ) ?	I_Bypass_data2 :
-									( Sel_Scalar4 ) ?	I_Scalar_Data :
-														I_Src_Data4;
-
 
 	assign O_WB_Data1			= ( Sel_WB_Data11 ) ?		I_Src_Data1 :
 									( Sel_WB_Data12 ) ?		I_Src_Data2 :
@@ -134,18 +148,15 @@ module Bypass (
 	assign O_Address			= ( Sel_Addr_Data1 ) ?		I_Src_Data1 :
 									( Sel_Addr_Data2 ) ?	I_Src_Data2 :
 									( Sel_Addr_Data3 ) ?	I_Src_Data3 :
-									( Sel_Addr_Data4 ) ?	I_Src_Data4 :
 															0;
 	assign O_Stride				= ( Sel_Stride_Data1 ) ?	I_Src_Data1 :
 									( Sel_Stride_Data2 ) ?	I_Src_Data2 :
 									( Sel_Stride_Data3 ) ?	I_Src_Data3 :
-									( Sel_Stride_Data4 ) ?	I_Src_Data4 :
 															0;
 
 	assign O_Length				= ( Sel_Length_Data1 ) ?	I_Src_Data1 :
 									( Sel_Length_Data2 ) ?	I_Src_Data2 :
 									( Sel_Length_Data3 ) ?	I_Src_Data3 :
-									( Sel_Length_Data4 ) ?	I_Src_Data4 :
 															0;
 
 endmodule

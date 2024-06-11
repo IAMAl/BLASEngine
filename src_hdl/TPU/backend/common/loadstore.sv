@@ -17,6 +17,7 @@ module LoadStoreUnit(
 	output						O_Done							//Flag* Service is Done
 );
 
+
 	logic						End_Access;
 
 	logic						R_Run;
@@ -30,6 +31,7 @@ module LoadStoreUnit(
 	address_t					R_Address;
 	data_t						St_Data;
 	data_t						Ld_Data;
+
 
 	assign End_Access			= R_Address == 0;
 

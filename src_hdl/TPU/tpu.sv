@@ -8,7 +8,7 @@ module tpu (
 	output	v_address_t			O_V_Address,
 	output	v_store_t			O_V_St,
 	output	v_load_req_t		O_V_Ld,
-	input	v_load_t			I_V_Ld,
+	input	v_load_t			I_V_Ld
 );
 
 
@@ -50,7 +50,7 @@ module tpu (
 		.reset(					reset					),
 		.I_Empty(				Empty					),
 		.I_instr(				instr_t					),
-		.I_En(),
+		.I_En(					),
 		.I_ThreadID_Scalar(		ThreadID_Scalar			),
 		.I_ThreadID_SIMT(		ThreadID_SIMT			),
 		.I_Scalar_Data(			In_Scalar_Data			),

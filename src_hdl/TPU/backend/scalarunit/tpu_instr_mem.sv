@@ -11,6 +11,7 @@ module InstrMem
 	input	instr_t				O_Ld_Instr						//Loaded Instruction
 );
 
+
 	instr_t						InstrMem	[SIZE_THREAD_MEM-1:0];
 
 	assign O_Ld_Instr			= R_Instr;

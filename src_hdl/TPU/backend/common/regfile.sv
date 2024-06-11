@@ -15,6 +15,17 @@ module RegFile (
 	output						O_Req							//Request to Next Stage
 );
 
+
+	logic						Re1;
+	logic						Re2;
+	data_t						Data_Src1;
+	data_t						Data_Src2;
+
+	logic						R_Req;
+	data_t						R_Data_Src1;
+	data_t						R_Data_Src2;
+
+
 	assign Re1					= I_Req & I_Re1;
 	assign Re2					= I_Req & I_Re2;
 

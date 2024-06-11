@@ -16,6 +16,7 @@ module St_InstrWindow
 	output	iw_t				O_Index_Entry					//Entry for Instruction Window
 );
 
+
 	localparam WIDTH_ENTRY		= $clog2(NUM_IW_ENTRY);
 
 	logic						Set_Index;
@@ -31,6 +32,12 @@ module St_InstrWindow
 	index_t						R_Index_Src3;
 
 	iw_t						R_Indeces;
+
+	logic						We_Valid_Dst;
+	logic						We_Valid_Src1;
+	logic						We_Valid_Src2;
+	logic						We_Valid_Src3;
+
 
 	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
 
