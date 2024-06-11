@@ -1,4 +1,4 @@
-module PE_FrontEnd (
+module FrontEnd (
 	input						clock,
 	input						reset,
 	input						I_En_Exe,						7yb//Enable Execution

@@ -1,0 +1,87 @@
+module tpu (
+	input						clock,
+	input						reset,
+	input	instr_t				I_Instr,
+	output	s_load_req_t		O_S_Ld_Req,
+	input	s_load_t			I_S_Ld_Data,
+	output	s_store_t			O_S_St,
+	output	v_address_t			O_V_Address,
+	output	v_store_t			O_V_St,
+	output	v_load_req_t		O_V_Ld,
+	input	v_load_t			I_V_Ld,
+);
+
+
+	FrontEnd FrontEnd (
+		.clock(					clock					),
+		.reset(					reset					),
+		.I_En_Exe(				),
+		.I_Req(					),
+		.I_Full(				Full					),
+		.I_Term(				),
+		.I_Nack(				),
+		.I_Instr(				I_Instr					),
+		.O_We(					Buff_We					),
+		.O_ThreadID_Scalar(		ThreadID_Scalar			),
+		.O_ThreadID_SIMT(		ThreadID_SIMT			),
+		.O_Instr(				Buff_Instr				),
+		.O_Term(				),
+		.O_Nack(				)
+	);
+
+
+	buff #(
+		.NUM_ENTRY(				)
+	) instr_buff
+	(
+		.clock(					clock					),
+		.reset(					reset					),
+		.I_We(					Buff_We					),
+		.I_Re(					Buff_Re					),
+		.I_Instr(				Buff_Instr				),
+		.I_Instr(				Instr					),
+		.O_Full(				Full					),
+		.Empty(					Empty					)
+	);
+
+
+	scalar_unit scalar_unit (
+		.clock(					clock					),
+		.reset(					reset					),
+		.I_Empty(				Empty					),
+		.I_instr(				instr_t					),
+		.I_En(),
+		.I_ThreadID_Scalar(		ThreadID_Scalar			),
+		.I_ThreadID_SIMT(		ThreadID_SIMT			),
+		.I_Scalar_Data(			In_Scalar_Data			),
+		.O_Scalar_Data(			Out_Scalar_Data			),
+		.O_Address1(			S_Address[0]			),
+		.O_Address2(			S_Address[1]			),
+		.O_Ld_Req1(				O_S_Ld_Req[0]			),
+		.O_Ld_Req2(				O_S_Ld_Req[1]			),
+		.I_Ld_Data1(			I_S_Ld_Data[0]			),
+		.I_Ld_Data2(			I_S_Ld_Data[1]			),
+		.O_St_Req1(				O_S_St[0].Req			),
+		.O_St_Req2(				O_S_St[1].Req			),
+		.O_St_Data1(			O_S_St[0].Data			),
+		.O_St_Data2(			O_S_St[0].Data			),
+		.O_Re(					Buff_Re					),
+		.O_Status(				S_Status				)
+	);
+
+
+	vector_unit vector_unit (
+		.clock(					clock					),
+		.reset(					reset					),
+		.I_Command(				V_Command				),
+		.I_ThreadID_SIMT(		ThreadID_SIMT			),
+		.I_Scalar_Data(			Out_Scalar_Data			),
+		.O_Scalar_Data(			In_Scalar_Data			),
+		.O_Address(				O_V_Address				),
+		.O_St(					O_V_St					),
+		.O_Ld(					O_V_Ld					),
+		.I_Ld(					I_V_Ld					),
+		.O_Status(				V_Status				)
+	);
+
+endmodule

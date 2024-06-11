@@ -16,6 +16,7 @@ module Index
 	output						O_Slice,						//Flag: Index-Slicing
 	output						O_Index							//Index Value
 );
+
 	index_t						Index;
 	logic						En_Slice;
 	logic						End_Count;

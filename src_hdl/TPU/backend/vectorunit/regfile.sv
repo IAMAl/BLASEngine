@@ -3,7 +3,6 @@ module RegFile (
 	input						clock,
 	input						reset,
 	input						I_Req,							//Request from Previous Stage
-	input						I_Net,							///Bypass Network
 	input						I_We,							//Flag: Write=Enable
 	input						I_Re1,							//Flag: Read-Enable for Source-1
 	input						I_Re2,							//Flag: Read-Enable for Source-2
@@ -21,11 +20,11 @@ module RegFile (
 
 	assign O_Req				= R_Req;
 
-	assign O_Data_Src1			= () ?	R_Data_Src1 :
-										0;
+	assign O_Data_Src1			= ( R_Req ) ?	R_Data_Src1 :
+												0;
 
-	assign O_Data_Src2			= () ?	R_Data_Src2 :
-										0;
+	assign O_Data_Src2			= ( R_Req ) ?	R_Data_Src2 :
+												0;
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
