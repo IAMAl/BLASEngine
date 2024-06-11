@@ -22,37 +22,124 @@ module scalar_unit (
 	output	s_stat_t			O_Status
 );
 
+
+	address_t				PC;
+	instr_t					Instruction;
+
+
+	logic					Req_PCU;
+	logic					Stall_PCU;
+
+
+	logic					Req_IFetch;
+
+
+	logic					Req_IW;
+
+
+	logic					Slice;
+
+	
+	logic					Sign;
+	const_t					Constant;
+	logic					Stall_RegFile_Odd;
+	logic					Stall_RegFile_Even;
+	logic					Req_RegFile_Odd1;
+	logic					Req_RegFile_Odd2;
+	logic					Req_RegFile_Even1;
+	logic					Req_RegFile_Even2;
+	logic					Index_Slice_Odd1;
+	logic					Index_Slice_Odd2;
+	logic					Index_Slice_Even1;
+	logic					Index_Slice_Even2;
+	index_t					Index_Odd1;
+	index_t					Index_Odd2;
+	index_t					Index_Even1;
+	index_t					Index_Even2;
+
+
+	logic					Req_RegFile_Odd;
+	logic					Req_RegFile_Even;
+	logic					We_RegFile_Odd;
+	logic					We_RegFile_Even;
+	logic					Re_RegFile_Odd1;
+	logic					Re_RegFile_Odd2;
+	logic					Re_RegFile_Even1;
+	logic					Re_RegFile_Even2;
+	data_t					Pre_Src_Data1;
+	data_t					Pre_Src_Data2;
+	data_t					Pre_Src_Data3;
+	data_t					Pre_Src_Data4;
+
+
+	data_t					Bypass_Data1;
+	data_t					Bypass_Data2;
+	data_t					Src_Data1;
+	data_t					Src_Data2;
+	data_t					Src_Data3;
+	data_t					Src_Data4;
+
+
+	index_t					Dst_Index1;
+	index_t					Dst_Index2;
+	index_t					WB_Index1;
+	index_t					WB_Index2;
+	data_t					WB_Data1;
+	data_t					WB_Data2;
+	logic					Condition;
+
+
+	logic					Req_LdSt_Odd;
+	logic					Req_LdSt_Even;
+	logic					LdSt_Odd;
+	logic					LdSt_Even;
+	logic					Stall_LdSt_Odd;
+	logic					Stall_LdSt_Even;
+	address_t				Address;
+	address_t				Stride;
+	address_t				Length;
+	data_t					Ld_Data1;
+	data_t					Ld_Data2;
+	logic					LdSt_Done1;
+	logic					LdSt_Done2;
+
+
+	//// Instruction Memory
 	InstrMem IMem (
-		.clock,
-		.reset,
-		.I_Req_St,
-		.O_Ack_St,
-		.I_St_Instr,
-		.I_Req_Ld,
-		.I_Ld_Address(		Address					),
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req_St(			),
+		.O_Ack_St(			),
+		.I_St_Instr(		),
+		.I_Req_Ld(			),
+		.I_Ld_Address(		PC						),
 		.O_Ld_Instr(		Instruction				)
 	);
 
+
+	//// Program Address Control
 	CTRL PCU (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				),
-		.I_Stall(			),
+		.I_Req(				Req_PCU					),
+		.I_Stall(			Stall_PCU				),
 		.I_Sel_CondValid(	);
-		.I_CondValid1(		),
-		.I_CondValid2(		),
+		.I_CondValid1(		CondValid1				),
+		.I_CondValid2(		CondValid2				),
 		.I_Jump(			),
 		.I_Branch(			),
 		.I_Timing_MY(		),
 		.I_Timing_WB(		),
 		.I_State(			),
-		.I_Cond(			),
+		.I_Cond(			Condition				),
 		.I_Src(				),
 		.O_IFetch(			),
-		.O_Address(			Address					)
+		.O_Address(			PC						)
 		.O_StallReq(		)
 	);
 
+
+	//// Instruction Fetch Stage
 	IFetch IFetch (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -85,7 +172,7 @@ module scalar_unit (
 	Hazard IW (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_Issue(),
+		.I_Req_Issue(		),
 		.I_Index_Entry(		Index_Entry				),
 		.I_Slice(			Slice					),
 		.O_Req_Issue(		),
@@ -136,7 +223,7 @@ module scalar_unit (
 		.I_Req(				Req_Index_Even1			),
 		.I_Slice(			Slice_Even1				),
 		.I_Index(			Index_Even1				),
-		.I_Length(			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
@@ -172,8 +259,8 @@ module scalar_unit (
 		.I_We(				),
 		.I_Re1(				),
 		.I_Re2(				),
-		.I_Index_Dst(		),
-		.I_Data(			),
+		.I_Index_Dst(		WB_Index1				),
+		.I_Data(			WB_Data1				),
 		.I_Index_Src1(		Index_Odd1				),
 		.I_Index_Src2(		Index_Odd2				),
 		.O_Data_Src1(		Pre_Src_Data1			),
@@ -188,8 +275,8 @@ module scalar_unit (
 		.I_We(				),
 		.I_Re1(				),
 		.I_Re2(				),
-		.I_Index_Dst(		),
-		.I_Data(			),
+		.I_Index_Dst(		WB_Index2				),
+		.I_Data(			WB_Data2				),
 		.I_Index_Src1(		Index_Even1				),
 		.I_Index_Src2(		Index_Even2				),
 		.O_Data_Src1(		Pre_Src_Data3			),
@@ -198,8 +285,57 @@ module scalar_unit (
 	);
 
 
+	//// Bypass Path
+	Bypass Bypass (
+		.I_Config_Path(		Config_Path				),
+		.I_I_WB_Path1(		I_WB_Path1				),
+		.I_I_WB_Path2(		I_WB_Path2				),
+		.I_Odd_Path(		I_Path_Odd				),
+		.I_Even_Path(		I_Path_Even				),
+		.I_Scalar_Data(		I_Scalar_Data			),
+		.I_Bypass_Data1(	Bypass_Data1			),
+		.I_Bypass_Data2(	Bypass_Data2			),
+		.I_Src_Data1(		Pre_Src_Data1			),
+		.I_Src_Data2(		Pre_Src_Data2			),
+		.I_Src_Data3(		Pre_Src_Data3			),
+		.I_Src_Data3(		Pre_Src_Data4			),
+		.O_Src_Data1(		Src_Data1				),
+		.O_Src_Data2(		Src_Data2				),
+		.O_Src_Data3(		Src_Data3				),
+		.O_Src_Data4(		Src_Data4				),
+		.O_WB_Data1(		WB_Data1				),
+		.O_WB_Data2(		WB_Data2				),
+		.O_Address(			Address					),
+		.O_Stride(			Stride					),
+		.O_Length(			Length					)
+	);
+
+
 	//// Execution Stage
-	//	 Bypass Path
+	//	 Math Unit
+	SMathUnit SMathUnit (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall1(			Stall1					),
+		.I_Stall2(			Stall2					),
+		.I_CEn1(			CEn1					),
+		.I_CEn2(			CEn2					),
+		.I_Command1(		Command1				),
+		.I_Command2(		Command2				),
+		.I_WB_Index1(		Dst_Index1				),
+		.I_WB_Index2(		Dst_Index2				),
+		.I_Src_Src_Data1(	Src_Data1				),
+		.I_Src_Src_Data2(	Src_Data2				),
+		.I_Src_Src_Data3(	Src_Data3				),
+		.I_Src_Src_Data4(	Src_Data4				),
+		.O_WB_Index1(		WB_Index1				),
+		.O_WB_Index2(		WB_Index2				),
+		.O_WB_Data1(		WB_Data1				),
+		.O_WB_Data2(		WB_Data2				),
+		.O_CondValid1(		CondValid1				),
+		.O_CondValid2(		CondValid2				),
+		.O_Cond(			Condition				)
+	);
 
 
 	//	 Load/Store Unit
@@ -209,7 +345,7 @@ module scalar_unit (
 		.I_Req(				Req_LdSt_Odd			),
 		.I_Store(			),
 		.I_Stall(			Stall_LdSt_Odd			),
-		.I_Address(			Address1				),
+		.I_Address(			Address					),
 		.I_Stride(			Stride					),
 		.I_Length(			Length					),
 		.O_St(				O_St_Req1				),
@@ -219,7 +355,7 @@ module scalar_unit (
 		.O_St_Data(			O_St_Data1				),
 		.I_Ld_Data(			I_Ld_Data1				),
 		.O_Ld_Data(			Ld_Data1				),
-		.O_Done(			)
+		.O_Done(			LdSt_Done1				)
 	);
 
 	LoadStoreUnit LdSt_Even (
@@ -228,7 +364,7 @@ module scalar_unit (
 		.I_Req(				Req_LdSt_Even			),
 		.I_Store(			),
 		.I_Stall(			Stall_LdSt_Even			),
-		.I_Address(			Address1				),
+		.I_Address(			Address					),
 		.I_Stride(			Stride					),
 		.I_Length(			Length					),
 		.O_St(				O_St_Req2				),
@@ -238,7 +374,7 @@ module scalar_unit (
 		.O_St_Data(			O_St_Data2				),
 		.I_Ld_Data(			I_Ld_Data2				),
 		.O_Ld_Data(			Ld_Data2				),
-		.O_Done(			)
+		.O_Done(			LdSt_Done2				)
 	);
 
 endmodule
