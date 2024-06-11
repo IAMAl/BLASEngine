@@ -9,6 +9,7 @@ module mpu (
 	output	tpu_stat_t			O_Status
 );
 
+
 	InstrMem InstrMem (
 		.clock(					clock					),
 		.reset(					reset					),

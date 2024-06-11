@@ -16,6 +16,7 @@ module InstrMem
 	output						O_Wait							//Wait: Exceeding Memory Size
 );
 
+
 	logic						Store;
 	logic						End_Store;
 
@@ -26,6 +27,7 @@ module InstrMem
 
 	st_address_t				R_Length_St;
 	st_address_t				R_Adddress_St;
+
 
 	assign O_Req_St				= FSM_Instr_St == FSM_INSTR_ST_STORE;
 	assign O_ThreadID_St		= R_ThreadID_St;

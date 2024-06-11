@@ -16,6 +16,7 @@ module Dispatch
 	output	stat_dispatch_t		O_Status						//Status
 );
 
+
 	logic							Loading;
 
 	fsm_dispatch_t					FSM_Dispatch;
@@ -26,6 +27,7 @@ module Dispatch
 
 	st_address_t					R_Length;
 	st_address_t					R_Address;
+
 
 	assign Set_Address		= I_Ack;
 	assign Loading			= FSM_Dispatch == FSM_DPC_SEND_INSTRS;

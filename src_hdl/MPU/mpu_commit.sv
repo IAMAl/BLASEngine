@@ -11,6 +11,7 @@ module Commit #(
 	output	[WIDTH_ENTRY_STH-1:0]	O_CommitNo					//Commit No to Next-Stage
 );
 
+
 	logic							We;
 	logic							Re;
 	logic	[WIDTH_ENTRY_STH-1:0]	WNo;
@@ -22,6 +23,7 @@ module Commit #(
 	mpu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
 	logic	[WIDTH_ENTRY_STH-1:0]	R_Commit_No;
 	logic							R_Commit;
+
 
 	assign Commit			= Valid[ RNo ] & IssedInfo[ RNo ].Commit;
 

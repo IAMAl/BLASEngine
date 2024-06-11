@@ -13,6 +13,7 @@ module HazardCheck #(
 	output	[WIDTH_ENTRY_STH-1:0]	O_IssueNo,					//Issue No to Commit Unit
 );
 
+
 	logic	[NUM_ENTRY_STH-1:0]		Valid;
 	logic	[NUM_ENTRY_STH-1:0]		Commit;
 
