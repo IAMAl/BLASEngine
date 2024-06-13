@@ -3,12 +3,11 @@ module HazardCheck #(
 )(
 	input							clock,
 	input							reset,
-	input							I_Ack,						//Ack from Dispatch Unit
-	input							I_Commit,					//Commit Signal from Commit Unit
+	input							I_Req_Commit,				//Commit Signal from Commit Unit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,					//Commit No. from Commit Unit
 	input							I_Req,						//Request from Previous Stage
 	input	id_t					I_ThreadID_S,				//Scalar Thread-ID
-	output							O_Req,						//Request to Next Stage
+	output							O_Req_Issue,				//Request to Next Stage
 	output	id_t					O_ThreadID_S,				//Scalar Thread-ID to Commit Unit
 	output	[WIDTH_ENTRY_STH-1:0]	O_IssueNo,					//Issue No to Commit Unit
 );
@@ -24,7 +23,7 @@ module HazardCheck #(
 
 
 	//// Issue Sequence
-	assign O_Req					= R_Req_Issue;
+	assign O_Req_Issue				= R_Req_Issue;
 	assign O_ThreadID_S				= ThreadID[ Issue_No ].ID;
 	assign O_IssueNo				= R_Issue_No;
 
@@ -61,11 +60,8 @@ module HazardCheck #(
 		if ( reset ) begin
 			R_Req_Issue		<= 1'b0;
 		end
-		else if ( I_Ack ) begin
-			R_Req_Issue		<= 1'b0;
-		end
-		else if ( Issueable ) begin
-			R_Req_Issue		<= 1'b1;
+		else begin
+			R_Req_Issue		<= Issueable;
 		end
 	end
 
@@ -88,8 +84,8 @@ module HazardCheck #(
 		if ( reset ) begin
 			ThreadID		<= '0;
 		end
-		else if ( I_Commit | I_Req ) begin
-			if ( I_Commit ) begin
+		else if ( I_Req_Commit | I_Req ) begin
+			if ( I_Rq_Commit ) begin
 				ThreadID[ I_CommitNo ].Commmit	<= 1'b1;
 			end
 

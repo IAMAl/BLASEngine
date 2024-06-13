@@ -4,7 +4,7 @@ module InstrMem
 	input						clock,
 	input						reset,
 	input						I_Req_St,						//Store Request
-	input						O_Req_St,						//Send Store State
+	input						O_Req_St,						//Send Store Request to MamMan Uni
 	output	instr_t				O_ThreadID_St,					//Send Scalar Thread-ID to MapMan Unit
 	output	st_address_t		O_Length_St,					//Send Storing Length to MapMan Unit
 	input						I_Ack_St,						//Ack from MapMan Unit
@@ -28,13 +28,19 @@ module InstrMem
 	st_address_t				R_Length_St;
 	st_address_t				R_Adddress_St;
 
+	//// Send Wait Signal to Host in order to Stall Its Sending
+	assign O_Wait				= R_Error_Size;
 
-	assign O_Req_St				= FSM_Instr_St == FSM_INSTR_ST_STORE;
+
+	//// Send Info to MapMan Unit
+	assign O_Req_St				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_LOOKUP );
 	assign O_ThreadID_St		= R_ThreadID_St;
 	assign O_Length_St			= R_Length_St;
 
-	assign O_Wait				= R_Error_Size;
+
+	//// Send Instructions to Dispatch Unit
 	assign O_Instr_Ld			= R_Instr_Ld;
+
 
 	assign End_Store			= R_Length_St == 0;
 	assign Store				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_STORE );

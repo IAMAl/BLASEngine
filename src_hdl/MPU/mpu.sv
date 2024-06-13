@@ -1,12 +1,14 @@
 module mpu (
-	input						clock,
-	input						reset,
-	input						I_Req_St,
-	output						O_Req_St,
-	input	instr_t				I_Instr,
-	output	instr_t				O_Instr,
-	output						O_Wait,
-	output	tpu_stat_t			O_Status
+	input							clock,
+	input							reset,
+	input							I_Req_St,
+	output							O_Req_St,
+	input	instr_t					I_Instr,
+	output	instr_t					O_Instr,
+	input							I_Req_Commit,
+	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,
+	output							O_Wait,
+	output	tpu_stat_t				O_Status
 );
 
 
@@ -14,15 +16,15 @@ module mpu (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_St(				I_Req_St				),
-		.O_Req_St(				O_Req_St				),
-		.O_ThreadID_St(			ThreadID_Scalar			),
-		.O_Length_St(			St_Length				),
-		.I_Ack_St(				St_Ack					),
+		.O_Req_St(				Req_St					),
+		.O_ThreadID_St(			ThreadID_S_St			),
+		.O_Length_St(			Length_St				),
+		.I_Ack_St(				Ack_St					),
 		.I_Instr_St(			I_Instr					),
-		.I_Used_Size(			),
-		.I_Req_Ld(				Ld_Req					),
-		.I_Adddress_Ld(			Ld_Address				),
-		.O_Instr_Ld(			Ld_Instr				),
+		.I_Used_Size(			Used_Size				),
+		.I_Req_Ld(				Req_Ld					),
+		.I_Adddress_Ld(			Address_Ld				),
+		.O_Instr_Ld(			Instr_Ld				),
 		.O_Wait(				O_Wait					)
 	);
 
@@ -30,12 +32,11 @@ module mpu (
 	HazardCheck HazardCheck (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_Ack(					Hazard_Ack	),////
-		.I_Commit(				Req_Commit				),
+		.I_Req_Commit(			Req_Commit				),
 		.I_CommitNo(			CommitNo				),
 		.I_Req(					),
-		.I_ThreadID_S(			ThreadID_Scalar			),
-		.O_Req(					Hazard_Req				),
+		.I_ThreadID_S(			),
+		.O_Req_Issue(			Req_Issue				),
 		.O_ThreadID_S(			ThreadID_S				),
 		.O_IssueNo(				IssueNo					),
 	);
@@ -44,15 +45,15 @@ module mpu (
 	Dispatch Dispatch (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_Req(					),
+		.I_Req_Issue(			Req_Issue				),
 		.I_ThreadID(			ThreadID_S				),
-		.O_Req_Lookup(			Hazard_Req				),
-		.O_ThreadID(			Ld_ThreadID				),
-		.I_Ack(					Ld_Ack					),
+		.O_Req_Lookup(			Req_Lookup				),
+		.O_ThreadID(			ThreadID_S_Ld			),
+		.I_Ack_LookUp(			Ack_Lookup				),
 		.I_ThreadInfo(			ThreadInfo				),
-		.O_Ld(					Ld_Req					),
-		.O_Address(				Ld_Address				),
-		.I_Instr(				Ld_Instr				),
+		.O_Ld(					Req_Ld					),
+		.O_Address(				Address_Ld				),
+		.I_Instr(				Instr_Ld				),
 		.O_Instr(				O_Instr					),
 		.O_Status(				)
 	);
@@ -61,14 +62,14 @@ module mpu (
 	MapMan MapMan (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_Req_St(				St_Req					),
-		.I_ThreadID_St(			ThreadID_Scalar			),
-		.I_Length_St(			St_Length				),
-		.O_Ack_St(				St_Ack					),
-		.I_ThreadID_Ld(			Ld_ThreadID				),
-		.O_Address_St(			),////Unnecessary?
-		.I_Req_Ld(				Ld_Req					),
-		.O_Ack_Ld(				Ld_Ack					),
+		.I_Req_St(				Req_St					),
+		.I_ThreadID_St(			ThreadID_S_St			),
+		.I_Length_St(			Length_St				),
+		.O_Ack_St(				Ack_St					),
+		.I_ThreadID_Ld(			ThreadID_S_Ld			),
+		.O_Used_Size(			Used_Size				),
+		.I_Req_Lookup(			Req_Lookup				),
+		.O_Ack_Lookup(			Ack_Lookup				),
 		.O_ThreadInfo(			ThreadInfo				),
 		.O_Full(				)
 	);

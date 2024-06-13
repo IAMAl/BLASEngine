@@ -3,7 +3,7 @@ module Dispatch
 (
 	input						clock,
 	input						reset,
-	input						I_Req,							//Request from Previous Stage
+	input						I_Req_Issue,					//Request from Previous Stage
 	input	id_t				I_ThreadID,						//Scalar Thread-ID from Hazard Check Unit
 	output						O_Req_Lookup,					//Request to MapMan Unit
 	output	id_t				O_ThreadID,						//Scalar Thread-ID to Commit Unit

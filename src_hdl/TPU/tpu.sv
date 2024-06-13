@@ -1,6 +1,8 @@
 module tpu (
 	input						clock,
 	input						reset,
+	input						I_En_Exe,
+	input						I_Req,
 	input	instr_t				I_Instr,
 	output	s_load_req_t		O_S_Ld_Req,
 	input	s_load_t			I_S_Ld_Data,
@@ -8,15 +10,17 @@ module tpu (
 	output	v_address_t			O_V_Address,
 	output	v_store_t			O_V_St,
 	output	v_load_req_t		O_V_Ld,
-	input	v_load_t			I_V_Ld
+	input	v_load_t			I_V_Ld,
+	output						O_Term,
+	output						O_Nack
 );
 
 
 	FrontEnd FrontEnd (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_En_Exe(				),
-		.I_Req(					),
+		.I_En_Exe(				I_En_Exe				),
+		.I_Req(					I_Req					),
 		.I_Full(				Full					),
 		.I_Term(				),
 		.I_Nack(				),
@@ -25,8 +29,8 @@ module tpu (
 		.O_ThreadID_Scalar(		ThreadID_Scalar			),
 		.O_ThreadID_SIMT(		ThreadID_SIMT			),
 		.O_Instr(				Buff_Instr				),
-		.O_Term(				),
-		.O_Nack(				)
+		.O_Term(				O_Term					),
+		.O_Nack(				O_Nack					)
 	);
 
 

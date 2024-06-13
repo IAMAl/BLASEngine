@@ -8,9 +8,9 @@ module MapMan
 	input	st_address_t		I_Length_St,					//Storing Size of Program
 	output						O_Ack_St,						//Ack to Instr Mem
 	input	id_t				I_ThreadID_Ld,					//Scalar Thread-ID from Dispat Unit
-	output	st_address_t		O_Address_St,					//Base-Address fro Storing (Unnecessary?)
-	input						I_Req_Ld,						//Request from Dispatch Unit
-	output						O_Ack_Ld,						//Ack to Dispatch Unit
+	output	st_address_t		O_Used_Size,					//Already Used Instr Mem Size
+	input						I_Req_Lookup,					//Request from Dispatch Unit
+	output						O_Ack_Lookup,					//Ack to Dispatch Unit
 	output	lookup_t			O_ThreadInfo,					//Thread Info to Dispatch Unit
 	output						O_Full							//Flag: Map-Table if Fully Used
 );
@@ -39,17 +39,17 @@ module MapMan
 	assign Found			= |(~Valid)
 
 	assign O_Ack_St			= ~FSM_St & Found;
-	assign O_Address_St		= R_Used_Size;
+	assign O_Used_Size		= R_Used_Size;
 
-	assign O_Ack_Ld			=  FSM_Ld;
+	assign O_Ack_Lookup			=  FSM_Ld;
 	assign O_ThreadInfo.length	= R_Length_Ld;
 	assign O_ThreadInfo.address	= R_Address_ld;
 
 	assign Update           = O_Ack_St | FSM_Ld;
-	assign UpdateAmount     = ( O_Ack_St & O_Ack_Ld ) ?		I_Length_St - O_Length_Ld :
-								( O_Ack_St & ~O_Ack_Ld ) ?	I_Length_St :
-								( ~O_Ack_St & O_Ack_Ld ) ?	0-O_Length_Ld :
-															0;
+	assign UpdateAmount     = ( O_Ack_St & O_Ack_Lookup ) ?		I_Length_St - O_Length_Ld :
+								( O_Ack_St & ~O_Ack_Lookup ) ?	I_Length_St :
+								( ~O_Ack_St & O_Ack_Lookup ) ?	0-O_Length_Ld :
+																0;
 
 	always_comb begin
 		for ( int i=0; SIZE_TAB_MAPMAN; ++i ) begin
@@ -62,7 +62,7 @@ module MapMan
 		if ( reset ) begin
 			R_Length_Ld		<= 0;
 		end
-		else if ( I_Req_Ld & ~FSM_Ld ) begin
+		else if ( I_Req_Lookup & ~FSM_Ld ) begin
 			R_Length_Ld		<= TabInstr[ RNo ].Length
 		end
 	end
@@ -71,7 +71,7 @@ module MapMan
 		if ( reset ) begin
 			R_Length_Ld		<= 0;
 		end
-		else if ( I_Req_Ld & ~FSM_Ld ) begin
+		else if ( I_Req_Lookup & ~FSM_Ld ) begin
 			R_Address_Ld	<= TabInstr[ RNo ].Address
 		end
 	end
@@ -89,7 +89,7 @@ module MapMan
 		if ( reset ) begin
 			TabInstr			<= '0;
 		end
-		else if ( I_Req_St | I_Req_Ld ) begin
+		else if ( I_Req_St | I_Req_Lookup ) begin
 			if ( I_Req_St ) begin
 				TabInstr[ WNo ].Valid		<= 1'b1;
 				TanInstr[ WNo ].ThreadID	<= I_ThreadID_St;
@@ -97,7 +97,7 @@ module MapMan
 				TabInstr[ WNo ].Address		<= R_Used_Size;
 			end
 
-			if ( I_Req_Ld ) begin
+			if ( I_Req_Lookup ) begin
 				TabInstr[ RNo ].Valid		<= 1'b0;
 			end
 		end
@@ -133,7 +133,7 @@ module MapMan
 		end
 		else case ( FSM_Ld )
 			1'b0: begin
-				if ( I_Req_Ld ) begin
+				if ( I_Req_Lookup ) begin
 					FSM_Ld			<= 1'b1;
 				end
 				else begin
@@ -149,7 +149,7 @@ module MapMan
 	//// Module: Ring-Buffer Controller
 	assign WError			= I_Req_St & ~Full &  TabInstr[ WNo ].Valid;
 	assign We				= I_Req_St & ~Full & ~TabInstr[ WNo ].Valid;
-	assign Re				= I_Req_Ld & ~Empty;
+	assign Re				= I_Req_Lookup & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			DEPTH_BUFF				)
 	) IMemMan
