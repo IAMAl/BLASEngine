@@ -37,6 +37,7 @@ module RegFile (
 	assign O_Data_Src2			= ( R_Req ) ?	R_Data_Src2 :
 												0;
 
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Req				<= 1'b0;
@@ -63,6 +64,7 @@ module RegFile (
 			R_Data_Src2			<= Data_Src2;
 		end
 	end
+
 
 	BareRegFile RegFile (
 		.clock(					clock				),

@@ -6,8 +6,8 @@ module Bypass (
 	input	data_t				I_Odd_Path,						//From Odd_Path
 	input	data_t				I_Even_Path,					//From Even_Path
 	input	data_t				I_Scalar_Data,					//From Scalar Unit
-	input	data_t				I_Bypass_Data1,					//From ALU
-	input	data_t				I_Bypass_Data2,					//From ALU
+	input	data_t				I_WB_Data1,						//From ALU
+	input	data_t				I_WB_Data2,						//From ALU
 	input	data_t				I_Src_Data1,					//From RegFile after Rotation Path
 	input	data_t				I_Src_Data2,					//From RegFile after Rotation Path
 	input	data_t				I_Src_Data3,					//From RegFile after Rotation Path
@@ -108,20 +108,20 @@ module Bypass (
 														I_Even_Path;
 
 
-	assign O_Src_Data1			= ( Sel_Bypass11 ) ?	I_Bypass_data1 :
-									( Sel_Bypass21 ) ?	I_Bypass_data2 :
+	assign O_Src_Data1			= ( Sel_Bypass11 ) ?	I_WB_Data1 :
+									( Sel_Bypass21 ) ?	I_WB_Data2 :
 									( Sel_Scalar1 ) ?	I_Scalar_Data :
 														I_Src_Data1;
 
 	assign O_Src_Data2			= ( Sel_Data2 ) ? 		I_Src_Data2 :
-									( Sel_Bypass12 ) ?	I_Bypass_data1 :
-									( Sel_Bypass22 ) ?	I_Bypass_data2 :
+									( Sel_Bypass12 ) ?	I_WB_Data1 :
+									( Sel_Bypass22 ) ?	I_WB_Data2 :
 									( Sel_Scalar2 ) ?	I_Scalar_Data :
 														Path_Data;
 
 	assign O_Src_Data3			= ( Sel_Data3 ) ? 		I_Src_Data3 :
-									( Sel_Bypass13 ) ?	I_Bypass_data1 :
-									( Sel_Bypass23 ) ?	I_Bypass_data2 :
+									( Sel_Bypass13 ) ?	I_WB_Data1 :
+									( Sel_Bypass23 ) ?	I_WB_Data2 :
 									( Sel_Scalar3 ) ?	I_Scalar_Data :
 														Path_Data;
 
@@ -129,8 +129,8 @@ module Bypass (
 	assign O_WB_Data1			= ( Sel_WB_Data11 ) ?		I_Src_Data1 :
 									( Sel_WB_Data12 ) ?		I_Src_Data2 :
 									( Sel_WB_Data13 ) ?		I_Src_Data3 :
-									( Sel_WB_Bypass11 ) ?	I_Bypass_data1 :
-									( Sel_WB_Bypass12 ) ?	I_Bypass_data2 :
+									( Sel_WB_Bypass11 ) ?	I_WB_Data1 :
+									( Sel_WB_Bypass12 ) ?	I_WB_Data2 :
 									( Sel_Path_Odd1 ) ?		I_Odd_Path :
 									( Sel_Path_Even1 ) ?	I_Even_Path :
 															0;
@@ -138,8 +138,8 @@ module Bypass (
 	assign O_WB_Data2			= ( Sel_WB_Data23 ) ?		I_Src_Data3 :
 									( Sel_WB_Data22 ) ?		I_Src_Data2 :
 									( Sel_WB_Data21 ) ?		I_Src_Data1 :
-									( Sel_WB_Bypass21 ) ?	I_Bypass_data1 :
-									( Sel_WB_Bypass22 ) ?	I_Bypass_data2 :
+									( Sel_WB_Bypass21 ) ?	I_WB_Data1 :
+									( Sel_WB_Bypass22 ) ?	I_WB_Data2 :
 									( Sel_Path_Odd2 ) ?		I_Odd_Path :
 									( Sel_Path_Even2 ) ?	I_Even_Path :
 															0;

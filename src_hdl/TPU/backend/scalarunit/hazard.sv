@@ -104,8 +104,9 @@ module Hazard
 		end
 	end
 
-	assign v_Issue			= I_Req_Issue & ~( RAW_Hazard_Src1 | RAW_Hazard_Src2 | RAW_Hazard_Src3 | WAR_Hazard_Src1 | WAR_Hazard_Src2 | WAR_Hazard_Src3 | WAW_Hazard );
+	assign v_Issue				= I_Req_Issue & ~( RAW_Hazard_Src1 | RAW_Hazard_Src2 | RAW_Hazard_Src3 | WAR_Hazard_Src1 | WAR_Hazard_Src2 | WAR_Hazard_Src3 | WAW_Hazard );
 	assign RAR_Hazard			= I_Slice & ( RAR_Hazard_Src1 | RAR_Hazard_Src2 | RAR_Hazard_Src3 );
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -250,6 +251,7 @@ module Hazard
 			end
 		end
 	end
+
 
 	//// Module: Ring-Buffer Controller
 	assign We				= I_Req_Issue & ~Full;

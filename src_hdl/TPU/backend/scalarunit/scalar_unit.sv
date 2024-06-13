@@ -4,8 +4,8 @@ module scalar_unit (
 	input						I_Empty,				//Empty on Buffer
 	input	instr_t				I_instr,				//Instruction from Buffer
 	input						I_En,					//Enable Execution
-	input	instr_t				I_ThreadID_Scalar,		//Scalar Thread-ID
-	input	instr_t				I_ThreadID_SIMT,		//SIMT Thread-ID
+	input	issue_no_t			I_ThreadID_Scalar,		//Scalar Thread-ID
+	input	id_t				I_ThreadID_SIMT,		//SIMT Thread-ID
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
 	output	address_t			O_Address1,				//Data Memory Address
@@ -148,7 +148,7 @@ module scalar_unit (
 		.I_Empty(			I_Empty					),
 		.I_Term(			),
 		.I_Instr(			Instruction				),
-		.O_Req(				),
+		.O_Req(				Req_IW					),
 		.O_Instr(			),
 		.O_Re(				O_Re					)
 	);
@@ -191,7 +191,6 @@ module scalar_unit (
 		.I_Slice(			Slice_Odd1				),
 		.I_Index(			Index_Odd1				),
 		.I_Length(			Index_Length			),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -208,7 +207,6 @@ module scalar_unit (
 		.I_Slice(			Slice_Odd2				),
 		.I_Index(			Index_Odd2				),
 		.I_Length(			Index_Length			),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -225,7 +223,6 @@ module scalar_unit (
 		.I_Slice(			Slice_Even1				),
 		.I_Index(			Index_Even1				),
 		.I_Length(			Index_Length			),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -242,7 +239,6 @@ module scalar_unit (
 		.I_Slice(			Slice_Even2				),
 		.I_Index(			Index_Even2				),
 		.I_Length(			Index_Length			),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -260,8 +256,8 @@ module scalar_unit (
 		.I_We(				),
 		.I_Re1(				),
 		.I_Re2(				),
-		.I_Index_Dst(		WB_Index1				),
-		.I_Data(			WB_Data1				),
+		.I_Index_Dst(		WB_RF_Index1			),
+		.I_Data(			WB_RF_Data1				),
 		.I_Index_Src1(		Index_Odd1				),
 		.I_Index_Src2(		Index_Odd2				),
 		.O_Data_Src1(		Pre_Src_Data1			),
@@ -276,8 +272,8 @@ module scalar_unit (
 		.I_We(				),
 		.I_Re1(				),
 		.I_Re2(				),
-		.I_Index_Dst(		WB_Index2				),
-		.I_Data(			WB_Data2				),
+		.I_Index_Dst(		WB_RF_Index2			),
+		.I_Data(			WB_RF_Data2				),
 		.I_Index_Src1(		Index_Even1				),
 		.I_Index_Src2(		Index_Even2				),
 		.O_Data_Src1(		Pre_Src_Data3			),
@@ -289,13 +285,15 @@ module scalar_unit (
 	//// Bypass Path
 	Bypass Bypass (
 		.I_Config_Path(		Config_Path				),
-		.I_I_WB_Path1(		I_WB_Path1				),
-		.I_I_WB_Path2(		I_WB_Path2				),
-		.I_Odd_Path(		I_Path_Odd				),
-		.I_Even_Path(		I_Path_Even				),
+		.I_WB_Path1(		WB_Path1				),
+		.I_WB_Path2(		WB_Path2				),
+		.I_Odd_Path(		I_Path_Odd				),//Unnecessary
+		.I_Even_Path(		I_Path_Even				),//Unnecessary
 		.I_Scalar_Data(		I_Scalar_Data			),
-		.I_Bypass_Data1(	Bypass_Data1			),
-		.I_Bypass_Data2(	Bypass_Data2			),
+		.I_WB_Index1(		WB_Index1				),
+		.I_WB_Index2(		WB_Index2				),
+		.I_WB_Data2(		WB_Data1				),
+		.I_WB_Data2(		WB_Data2				),
 		.I_Src_Data1(		Pre_Src_Data1			),
 		.I_Src_Data2(		Pre_Src_Data2			),
 		.I_Src_Data3(		Pre_Src_Data3			),
@@ -304,8 +302,10 @@ module scalar_unit (
 		.O_Src_Data2(		Src_Data2				),
 		.O_Src_Data3(		Src_Data3				),
 		.O_Src_Data4(		Src_Data4				),
-		.O_WB_Data1(		WB_Data1				),
-		.O_WB_Data2(		WB_Data2				),
+		.O_WB_Index1(		WB_RF_Index1			),
+		.O_WB_Index2(		WB_RF_Index2			),
+		.O_WB_Data1(		WB_RF_Data1				),
+		.O_WB_Data2(		WB_RF_Data2				),
 		.O_Address(			Address					),
 		.O_Stride(			Stride					),
 		.O_Length(			Length					)
@@ -328,7 +328,6 @@ module scalar_unit (
 		.I_Src_Src_Data1(	Src_Data1				),
 		.I_Src_Src_Data2(	Src_Data2				),
 		.I_Src_Src_Data3(	Src_Data3				),
-		.I_Src_Src_Data4(	Src_Data4				),
 		.O_WB_Index1(		WB_Index1				),
 		.O_WB_Index2(		WB_Index2				),
 		.O_WB_Data1(		WB_Data1				),

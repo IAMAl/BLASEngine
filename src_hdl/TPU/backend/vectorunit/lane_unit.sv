@@ -2,7 +2,7 @@ module lane_unit (
 	input						clock,
 	input						reset,
 	input						I_En,					//Enable Execution
-	input	instr_t				I_ThreadID_Scalar,		//Scalar Thread-ID
+	input	instr_t				I_LaneID,				//Lane-ID
 	input	instr_t				I_ThreadID_SIMT,		//SIMT Thread-ID
 	input	command_t			I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
@@ -96,7 +96,7 @@ module lane_unit (
 		.I_Slice(			IDec_Slice_Odd1			),
 		.I_Index(			IDec_Index_Odd1			),
 		.I_Length(			IDec_Index_Length		),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
+		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -113,7 +113,7 @@ module lane_unit (
 		.I_Slice(			IDec_Slice_Odd2			),
 		.I_Index(			IDec_Index_Odd2			),
 		.I_Length(			IDec_Index_Length		),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
+		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -130,7 +130,7 @@ module lane_unit (
 		.I_Slice(			IDec_Slice_Even1		),
 		.I_Index(			IDec_Index_Even1		),
 		.I_Length(			IDec_Index_Length		),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
+		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -147,7 +147,7 @@ module lane_unit (
 		.I_Slice(			IDec_Slice_Even2		),
 		.I_Index(			IDec_Index_Even2		),
 		.I_Length(			IDec_Index_Length		),
-		.I_ThreadID_Scalar(	I_ThreadID_Scalar		),
+		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -194,13 +194,15 @@ module lane_unit (
 	//// Bypass Path
 	Bypass Bypass (
 		.I_Config_Path(		Config_Path				),
-		.I_I_WB_Path1(		I_WB_Path1				),
-		.I_I_WB_Path2(		I_WB_Path2				),
+		.I_WB_Path1(		WB_Path1				),
+		.I_WB_Path2(		WB_Path2				),
 		.I_Odd_Path(		I_Path_Odd				),
 		.I_Even_Path(		I_Path_Even				),
 		.I_Scalar_Data(		I_Scalar_Data			),
-		.I_Bypass_Data1(	Bypass_Data1			),
-		.I_Bypass_Data2(	Bypass_Data2			),
+		.I_WB_Index1(		WB_Index1				),
+		.I_WB_Index2(		WB_Index2				),
+		.I_WB_Data2(		WB_Data1				),
+		.I_WB_Data2(		WB_Data2				),
 		.I_Src_Data1(		Pre_Src_Data1			),
 		.I_Src_Data2(		Pre_Src_Data2			),
 		.I_Src_Data3(		Pre_Src_Data3			),
@@ -209,8 +211,10 @@ module lane_unit (
 		.O_Src_Data2(		Src_Data2				),
 		.O_Src_Data3(		Src_Data3				),
 		.O_Src_Data4(		Src_Data4				),
-		.O_WB_Data1(		WB_Data1				),
-		.O_WB_Data2(		WB_Data2				),
+		.O_WB_Index1(		WB_RF_Index1			),
+		.O_WB_Index2(		WB_RF_Index2			),
+		.O_WB_Data1(		WB_RF_Data1				),
+		.O_WB_Data2(		WB_RF_Data2				),
 		.O_Address(			Address					),
 		.O_Stride(			Stride					),
 		.O_Length(			Length					)

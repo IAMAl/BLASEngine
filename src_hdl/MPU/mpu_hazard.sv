@@ -4,12 +4,12 @@ module HazardCheck #(
 	input							clock,
 	input							reset,
 	input							I_Req_Commit,				//Commit Signal from Commit Unit
-	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,					//Commit No. from Commit Unit
+	input	issue_no_t				I_CommitNo,					//Commit No. from Commit Unit
 	input							I_Req,						//Request from Previous Stage
 	input	id_t					I_ThreadID_S,				//Scalar Thread-ID
 	output							O_Req_Issue,				//Request to Next Stage
 	output	id_t					O_ThreadID_S,				//Scalar Thread-ID to Commit Unit
-	output	[WIDTH_ENTRY_STH-1:0]	O_IssueNo,					//Issue No to Commit Unit
+	output	issue_no_t				O_IssueNo,					//Issue No to Commit Unit
 );
 
 

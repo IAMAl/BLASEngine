@@ -1,4 +1,4 @@
-module CTRLFlow 
+module CTRLFlow
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -45,6 +45,7 @@ module CTRLFlow
 	assign O_IFetch				= R_Req;
 	assign O_Address			= R_Address;
 	assign O_StallReq			= StallReq;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

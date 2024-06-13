@@ -18,7 +18,7 @@ module vector_unit (
 			.clock(				clock					),
 			.reset(				reset					),
 			.I_En(				Lane_En[ i ]			),
-			.I_ThreadID_Scalar(	i						),
+			.I_LaneID(			i						),
 			.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),

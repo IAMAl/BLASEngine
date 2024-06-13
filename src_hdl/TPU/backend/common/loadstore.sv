@@ -14,7 +14,7 @@ module LoadStoreUnit(
 	output	data_t				O_St_Data,						//Store Data to Local Memory
 	input	data_t				I_Ld_Data,						//Loaded Data
 	output	data_t				O_Ld_Data,						//Loading Data from Local Memory
-	output						O_Done							//Flag* Service is Done
+	output						O_Done							//Flag: Service is Done
 );
 
 
@@ -41,6 +41,7 @@ module LoadStoreUnit(
 	assign O_St_Data			= St_Data;
 	assign O_Ld_Data			= Ld_Data;
 	assign O_Done				= ( R_Store | R_We ) & End_Access;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

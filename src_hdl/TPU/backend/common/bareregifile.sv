@@ -20,11 +20,13 @@ module BareRegFile
 
 	data_t						RegFile	[NUM_ENTRY_REGFILE-1:0];
 
+
 	assign Index_Src1			= ( I_Re1 ) ? I_Index_Src1 : 0;
 	assign Index_Src2			= ( I_Re2 ) ? I_Index_Src2 : 0;
 
 	assign O_Data_Src1			= ( I_Re1 ) ? RegFile[ Index_Src1 ] : 0;
 	assign O_Data_Src2			= ( I_Re2 ) ? RegFile[ Index_Src2 ] : 0;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset) begin

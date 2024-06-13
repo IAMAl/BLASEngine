@@ -5,7 +5,7 @@ module IFetch (
 	input						I_Empty,						//Flag: State in Empty for Buffer
 	input						I_Term,							//Flag: Termination
 	input	instr_t				I_Instr,						//Instruction
-	output						O_Req,							//Request
+	output						O_Req,							//Request to Next Stage
 	output	instr_t				O_Instr,						//Instruction
 	output						O_Re							//Read-Enabloe for Buffer
 );
@@ -69,7 +69,7 @@ module IFetch (
 		if ( reset ) begin
 			Req				<= 1'b0;
 		end
-		else if ( R_Tderm ) begin
+		else if ( R_Term ) begin
 			Req				<= 1'b0;
 		end
 		else if ( R_Req & ~R_Empty ) begin

@@ -8,7 +8,7 @@ module Index
 	input						I_Slice,						//Flag: Index-Slicing
 	input	index_t				I_Index,						//Index Value
 	input	index_t				I_Length,						//Length for Slicing
-	input	id_t				I_ThreadID_Scalar,				//Scalar Thread ID
+	input	id_t				I_LaneID,						//Lane ID
 	input	id_t				I_ThreadID_SIMT,				//SIMT Thread ID
 	input	id_t				I_Constant,						//Constant
 	input						I_Sign,							//Config: Sign
@@ -39,6 +39,7 @@ module Index
 	logic						R_Sel;
 	index_t						R_Index;
 
+
 	assign En_Slice				= ( I_Req & I_Slice ) | ( R_Sel & ~I_Stall );
 	assign End_Count			= CountVal == R_Length;
 	assign Index				= ( R_Sel ) ? CountVal + R_Index + 1'b1 : I_Index;
@@ -50,12 +51,12 @@ module Index
 									( Sel_a == INDEX_ORIG ) ?	Index :
 																0;
 
-	assign Index_b				= ( Sel_b == INDEX_SCALAR ) ?	I_ThreadID_Scalar :
+	assign Index_b				= ( Sel_b == INDEX_LANE ) ?		I_LaneID :
 									( Sle_b == INDEX_CONST ) ? 	I_Constant :
 									( Sel_b == INDEX_ORIG ) ?	Index :
 																0;
 
-	assign Index_c				= ( Sel_c == INDEX_SCALAR ) ?	I_ThreadID_Scalar :
+	assign Index_c				= ( Sel_c == INDEX_LANE ) ?		I_LaneID :
 									( Sle_c == INDEX_CONST ) ? 	I_Constant :
 									( Sel_c == INDEX_ORIG ) ?	Index :
 																I_ThreadID_SIMT;
@@ -68,6 +69,7 @@ module Index
 	assign O_Req				= R_Req | R_Sel;
 	assign O_Slice				= R_Sel;
 	assign O_Index				= R_Index;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -102,11 +104,13 @@ module Index
 		end
 	end
 
+
 	Counter SliceVal (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Clr(				End_Count				),
 		.I_En(				En_Slice				),
 		.O_Val(				Countval				)
-	)
+	);
+
 endmodule

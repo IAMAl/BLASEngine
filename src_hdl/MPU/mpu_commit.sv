@@ -4,24 +4,24 @@ module Commit #(
 	input							clock,
 	input							reset,
 	input							I_Req_Issue,				//Request from Dispatch Unit
-	input	[WIDTH_ENTRY_STH-1:0]	I_Issue_No,					//Issue No. from Dispatch Unit
+	input	issue_no_t				I_Issue_No,					//Issue No. from Dispatch Unit
 	input							I_Req_Commit,				//Commit from Coomit-Agregator Unit
-	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,					//Commit No from Commit-Agregator Unit
+	input	issue_no_t				I_CommitNo,					//Commit No from Commit-Agregator Unit
 	output							O_Req_Commit,				//Request to Next-Stage
-	output	[WIDTH_ENTRY_STH-1:0]	O_CommitNo					//Commit No to Next-Stage
+	output	issue_no_t				O_CommitNo					//Commit No to Next-Stage
 );
 
 
 	logic							We;
 	logic							Re;
-	logic	[WIDTH_ENTRY_STH-1:0]	WNo;
-	logic	[WIDTH_ENTRY_STH-1:0]	RNo;
+	issue_no_t						WNo;
+	issue_no_t						RNo;
 
 	logic							Full;
 	logic							Empty;
 
 	mpu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
-	logic	[WIDTH_ENTRY_STH-1:0]	R_Commit_No;
+	issue_no_t						R_Commit_No;
 	logic							R_Commit;
 
 

@@ -1,17 +1,18 @@
 module FrontEnd (
 	input						clock,
 	input						reset,
-	input						I_En_Exe,						7yb//Enable Execution
+	input						I_En_Exe,						//Enable Execution
 	input						I_Req,							//Request to Work
 	input						I_Full,							//Flag: State in Full in Buffer
-	input						I_Term,							//Flag: Termination
+	input						I_Term,							//Flag: Termination from Scalar Unit
 	input						I_Nack,							//Nack from Back-End
 	input	instr_t				I_Instr,						//Instruction
 	output						O_We,							//Write-Enable for Buffer
-	output	instr_t				O_ThreadID_Scalar,				//Scalar Thread-ID
-	output	instr_t				O_ThreadID_SIMT,				//SIMT ThreadID
-	output	instr_t				O_Instr,						//Instruction
-	output						O_Term,							//Termination
+	output						O_Term,							//Terimnation Notification
+	output	issue_no_t			O_IssueNo,						//Issue No at MPU, used for Commit
+	output	id_t				O_ThreadID_SIMT,				//SIMT ThreadID to Buffer
+	output	instr_t				O_Instr,						//Instruction to Buffer
+	output						O_Term,							//Flag: Termination
 	output						O_Nack							//Nack to Allocator
 );
 
@@ -28,7 +29,7 @@ module FrontEnd (
 
 	fsm_pe_frontend_t			R_FSM_PE_FRONTEND;
 
-	instr_t						R_ThreadID_Scalar;
+	instr_t						R_IssueNo;
 	instr_t						R_ThreadID_SIMT;
 	instr_t						R_Instr;
 
@@ -37,12 +38,12 @@ module FrontEnd (
 	assign is_FSM_PE_SIMT		= R_FSM_PE_FRONTEND == FSM_PE_SIMT;
 	assign is_FSM_PE_INSTR		= R_FSM_PE_FRONTEND == FSM_PE_INSTR;
 
-	assign Set_We               = ~R_Full & ( ( R_ThreadID_Scalar.v & R_Thread_SIMT.v & R_Req ) |
+	assign Set_We               = ~R_Full & ( ( R_IssueNo.v & R_Thread_SIMT.v & R_Req ) |
 									( R_En_Exe & R_Req ) );
 
 	assign O_We					= R_We;
 	assign O_Instr				= R_Instr;
-	assign O_ThreadID_Scalar	= R_ThreadID_Scalar;
+	assign O_IssueNo			= R_IssueNo;
 	assign O_ThreadID_SIMT		= R_ThreadID_SIMT;
 	assign O_Nack				= R_Full | R_Nack;
 	assign O_Term				= is_FSM_PE_RUN & ~R_Req;
@@ -70,13 +71,13 @@ module FrontEnd (
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_ThreadID_Scalar	<= '0;
+			R_IssueNo			<= '0;
 		end
 		else if ( R_Term ) begin
-			R_ThreadID_Scalar	<= '0;
+			R_IssueNo			<= '0;
 		end
 		else if ( R_Instr.v & is_FSM_PE_SCALAR ) begin
-			R_ThreadID_Scalar	<= R_Instr;
+			R_IssueNo			<= R_Instr;
 		end
 	end
 
