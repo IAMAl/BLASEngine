@@ -1,13 +1,12 @@
 module mpu (
 	input							clock,
 	input							reset,
-	input							I_Req_St,
-	output							O_Req_St,
-	input	instr_t					I_Instr,
-	output	instr_t					O_Instr,
-	input							I_Req_Commit,
-	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,
-	output							O_Wait,
+	input							I_Req_St,			//Request to Store Thread Program
+	input	instr_t					I_Instr,			//Thread Program Port
+	output	instr_t					O_Instr,			//Send Thread Program to TPUs
+	input							I_Req_Commit,		//Request of Commit
+	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
+	output							O_Wait,				//Wait Signal to Host tring the store
 	output	tpu_stat_t				O_Status
 );
 

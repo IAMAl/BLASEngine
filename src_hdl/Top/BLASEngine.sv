@@ -15,9 +15,10 @@ module BLASEngine (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_St(				I_St_Req				),
-		.O_Req_St(				O_St_Ack				),
 		.I_Instr(				I_Instr					),
 		.O_Instr(				Instr					),
+		.I_Req_Commit(			),
+		.I_CommitNo(			),
 		.O_Wait(				O_Wait					),
 		.O_Status(				O_Status				)
 	);
