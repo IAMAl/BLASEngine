@@ -112,7 +112,7 @@ module scalar_unit (
 		.I_Req_St(			),
 		.O_Ack_St(			),
 		.I_St_Instr(		),
-		.I_Req_Ld(			),
+		.I_Req_Ld(			IFetch					),
 		.I_Ld_Address(		PC						),
 		.O_Ld_Instr(		Instruction				)
 	);
@@ -131,10 +131,10 @@ module scalar_unit (
 		.I_Branch(			),
 		.I_Timing_MY(		),
 		.I_Timing_WB(		),
-		.I_State(			),
+		.I_State(			State					),
 		.I_Cond(			Condition				),
 		.I_Src(				),
-		.O_IFetch(			),
+		.O_IFetch(			IFetch					),
 		.O_Address(			PC						)
 		.O_StallReq(		)
 	);
@@ -334,7 +334,7 @@ module scalar_unit (
 		.O_WB_Data2(		WB_Data2				),
 		.O_CondValid1(		CondValid1				),
 		.O_CondValid2(		CondValid2				),
-		.O_Cond(			Condition				)
+		.O_State(			State					)
 	);
 
 

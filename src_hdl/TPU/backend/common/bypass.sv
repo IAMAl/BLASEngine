@@ -6,6 +6,8 @@ module Bypass (
 	input	data_t				I_Odd_Path,						//From Odd_Path
 	input	data_t				I_Even_Path,					//From Even_Path
 	input	data_t				I_Scalar_Data,					//From Scalar Unit
+	input	index_t				I_WB_Index1,					//From ALU
+	input	index_t				I_WB_Index2,					//From ALU
 	input	data_t				I_WB_Data1,						//From ALU
 	input	data_t				I_WB_Data2,						//From ALU
 	input	data_t				I_Src_Data1,					//From RegFile after Rotation Path
@@ -15,6 +17,8 @@ module Bypass (
 	output	data_t				O_Src_Data2,					//To Exec Unit
 	output	data_t				O_Src_Data3,					//To Exec Unit
 	output	data_t				O_Src_Data4,					//To Exec Unit
+	output	index_t				O_WB_Index1,					//To RegFile
+	output	index_t				O_WB_Index2,					//To RegFile
 	output	data_t				O_WB_Data1,						//To RegFile
 	output	data_t				O_WB_Data2,						//To RegFile
 	output	address_t			O_Address,						//To Load/Store Unit
@@ -104,6 +108,12 @@ module Bypass (
 	assign Sel_Path_Even2		= I_WB_Path2 == 3'h7;
 
 
+	assign Sel_WB_Index1_Idx1	=;
+	assign Sel_WB_Index1_Idx2	=;
+	assign Sel_WB_Index2_Idx1	=;
+	assign Sel_WB_Index2_Idx2	=;
+
+
 	assign Path_Data			= ( Sel_Path_Odd ) ?	I_Odd_Path :
 														I_Even_Path;
 
@@ -124,6 +134,15 @@ module Bypass (
 									( Sel_Bypass23 ) ?	I_WB_Data2 :
 									( Sel_Scalar3 ) ?	I_Scalar_Data :
 														Path_Data;
+
+
+	assign O_WB_Index1			= ( Sel_WB_Index1_Idx1 ) ?	I_WB_Index1 :
+									( Sel_WB_Index1_Idx2 ) ?I_WB_Index2 :
+															0;
+
+	assign O_WB_Index2			= ( Sel_WB_Index2_Idx2 ) ?	I_WB_Index2 :
+									( Sel_WB_Index2_Idx1 ) ?I_WB_Index1 :
+															0;
 
 
 	assign O_WB_Data1			= ( Sel_WB_Data11 ) ?		I_Src_Data1 :
@@ -149,6 +168,7 @@ module Bypass (
 									( Sel_Addr_Data2 ) ?	I_Src_Data2 :
 									( Sel_Addr_Data3 ) ?	I_Src_Data3 :
 															0;
+
 	assign O_Stride				= ( Sel_Stride_Data1 ) ?	I_Src_Data1 :
 									( Sel_Stride_Data2 ) ?	I_Src_Data2 :
 									( Sel_Stride_Data3 ) ?	I_Src_Data3 :

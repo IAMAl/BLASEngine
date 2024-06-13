@@ -76,7 +76,7 @@ module Index
 			R_Req				<= 1'b0;
 		end
 		else begin
-			R_Req				= I_Req;
+			R_Req				<= I_Req;
 		end
 	end
 

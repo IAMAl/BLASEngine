@@ -16,6 +16,7 @@ module InstrMem
 
 	assign O_Ld_Instr			= R_Instr;
 
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Instr					<= 0;

@@ -1,4 +1,4 @@
-module St_InstrWindow 
+module St_InstrWindow
 	import pkg_pcu::*;
 	import pkg_tpu::*;
 (
@@ -42,6 +42,7 @@ module St_InstrWindow
 	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
 
 	assign O_Index_Entry		= R_Indeces;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
