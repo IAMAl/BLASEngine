@@ -105,6 +105,9 @@ module scalar_unit (
 	logic					LdSt_Done2;
 
 
+	assign O_State			= State;
+
+
 	//// Instruction Memory
 	InstrMem IMem (
 		.clock(				clock					),
@@ -176,6 +179,8 @@ module scalar_unit (
 		.I_Req_Issue(		),
 		.I_Index_Entry(		Index_Entry				),
 		.I_Slice(			Slice					),
+		.I_Req_Commit(		),
+		.I_Commit_No(		),
 		.O_Req_Issue(		),
 		.O_Issue_No(		),
 		.O_RAR_Hzard(		)

@@ -6,11 +6,22 @@ module Hazard
 	input						I_Req_Issue,					//Request from Previous Stage
 	input	iw_t				I_Index_Entry,					//Set of Indeces
 	input						I_Slice,						//Flaag: Index-Sllicing
+	input						I_Req_Commit,					//Request to Commit 
+	input	[WIDTH_BUFF-1:0]	I_Commit_No,					//Commit (Issued) No.
 	output						O_Req_Issue,					//Request to Next Stage
 	output						O_Issue_No,						//Issue(Dispatch) No
 	output						O_RAR_Hzard						//RAR-Hazard
 );
 
+
+	localparam WIDTH_BUFF		= $clog2(DEPTH_BUFF);
+
+	logic						We;
+	logic						Re;
+	logic						Full,
+	logic						Empty;
+	logic	[WIDTH_BUFF-1:0]	WNo;
+	logic	[WIDTH_BUFF-1:0]	RNo;
 
 	logic						v_Issue;
 	logic						RAR_Hazard;

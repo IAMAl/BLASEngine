@@ -23,6 +23,7 @@ module CTRLFlow
 
 	logic						Cond_Valid;
 	logic						Valid;
+	logic						Taken;
 	logic						Update;
 	address_t					Address;
 	logic						StallReq;

@@ -19,7 +19,7 @@ module lane_unit (
 	output						O_St_Req2,				//Store Request
 	output	data_t				O_St_Data1,				//Store Data
 	output	data_t				O_St_Data2,				//Store Data
-	output	stat_t				O_Status				//Lane Status
+	output	v_stat_t			O_Status				//Lane Status
 );
 
 

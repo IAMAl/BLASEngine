@@ -4,9 +4,10 @@ module tpu (
 	input						I_En_Exe,
 	input						I_Req,
 	input	instr_t				I_Instr,
+	output	s_address_t			O_S_Address,
+	output	s_store_t			O_S_St,
 	output	s_load_req_t		O_S_Ld_Req,
 	input	s_load_t			I_S_Ld_Data,
-	output	s_store_t			O_S_St,
 	output	v_address_t			O_V_Address,
 	output	v_store_t			O_V_St,
 	output	v_load_req_t		O_V_Ld,
@@ -14,6 +15,27 @@ module tpu (
 	output						O_Term,
 	output						O_Nack
 );
+
+	instr_t						Buff_Instr;
+	logic						Buff_We;
+	logic						Buff_Re;
+	logic 						Buff_Full;
+	logic						Buff_Empty;
+	instr_t						Instr;
+
+	id_t						Buff_ThreadID_SIMT;
+	logic						IDBuff_We;
+	logic						IDBuff_Re;
+	logic						IDBuff_Full;
+	logic						IDBuff_Empty;
+	id_t						ThreadID_SIMT;
+
+	data_t						In_Scalar_Data;
+	data_t						Out_Scalar_Data;
+
+	s_stat_t					S_Status;
+	command_t					V_Command;
+	v_stat_t					V_Status;
 
 
 	FrontEnd FrontEnd (
@@ -74,8 +96,8 @@ module tpu (
 		.I_ThreadID_SIMT(		ThreadID_SIMT			),
 		.I_Scalar_Data(			In_Scalar_Data			),
 		.O_Scalar_Data(			Out_Scalar_Data			),
-		.O_Address1(			S_Address[0]			),
-		.O_Address2(			S_Address[1]			),
+		.O_Address1(			O_S_Address[0]			),
+		.O_Address2(			O_S_Address[1]			),
 		.O_Ld_Req1(				O_S_Ld_Req[0]			),
 		.O_Ld_Req2(				O_S_Ld_Req[1]			),
 		.I_Ld_Data1(			I_S_Ld_Data[0]			),
