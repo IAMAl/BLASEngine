@@ -7,8 +7,36 @@ module mpu (
 	input							I_Req_Commit,		//Request of Commit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
 	output							O_Wait,				//Wait Signal to Host tring the store
-	output	tpu_stat_t				O_Status
+	output	mpu_stat_t				O_Status
 );
+
+
+	logic						Req_st;
+	id_t						ThreadID_S_St;
+	instr_t						Length_St;
+	logic						Ack_St;
+
+	st_address_t				Used_Size;
+	logic						Req_Ld;
+	st_address_t				Address_Ld;
+	instr_t						Instr_Ld;
+
+	logic						Req_HazardCheck;
+	id_t						ID_HazardCheck;
+
+
+	logic						Req_Commit;
+	issue_no_t					Issued_No;
+	logic						Req_HazardCheck;
+	logic						Req_Issue;
+	id_t						ThreadID_S;
+	issue_no_t					IssueNo;
+
+
+	logic						Req_Lookup;
+	id_t						ThreadID_S_Ld;
+	logic						Ack_Lookup;
+	lookup_t					ThreadInfo;
 
 
 	InstrMem InstrMem (
@@ -24,7 +52,9 @@ module mpu (
 		.I_Req_Ld(				Req_Ld					),
 		.I_Adddress_Ld(			Address_Ld				),
 		.O_Instr_Ld(			Instr_Ld				),
-		.O_Wait(				O_Wait					)
+		.O_Req(					Req_HazardCheck			),
+		.O_ThreadID(			ID_HazardCheck			),
+		.O_Wait(				O_Status.imem_wait		)
 	);
 
 
@@ -32,9 +62,9 @@ module mpu (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_Commit(			Req_Commit				),
-		.I_CommitNo(			CommitNo				),
-		.I_Req(					),
-		.I_ThreadID_S(			),
+		.I_Issued_No(			Issued_No				),
+		.I_Req(					Req_HazardCheck			),
+		.I_ThreadID_S(			ID_HazardCheck			),
 		.O_Req_Issue(			Req_Issue				),
 		.O_ThreadID_S(			ThreadID_S				),
 		.O_IssueNo(				IssueNo					),
@@ -54,7 +84,8 @@ module mpu (
 		.O_Address(				Address_Ld				),
 		.I_Instr(				Instr_Ld				),
 		.O_Instr(				O_Instr					),
-		.O_Status(				)
+		.I_IssueNo(				IssueNo					),
+		.O_Send_Thread(			O_Status.send_thread	)
 	);
 
 
@@ -70,19 +101,20 @@ module mpu (
 		.I_Req_Lookup(			Req_Lookup				),
 		.O_Ack_Lookup(			Ack_Lookup				),
 		.O_ThreadInfo(			ThreadInfo				),
-		.O_Full(				)
+		.O_Full(				O_Status.full_mapman	)
 	);
 
 
 	Commit Commit (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_Req_Issue(			Hazard_Req				),
+		.I_Req_Issue(			Req_Issue				),
 		.I_Issue_No(			IssueNo					),
 		.I_Req_Commit(			I_Req_Commit			),
 		.I_CommitNo(			I_CommitNo				),
 		.O_Req_Commit(			Req_Commit				),
-		.O_CommitNo(			CommitNo				)
+		.O_Issue_No(			Issued_No				),
+		.O_Full(				O_Status.full_commit	)
 	);
 
 endmodule

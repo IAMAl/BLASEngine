@@ -13,23 +13,46 @@ module InstrMem
 	input						I_Req_Ld,						//Load Request
 	input	st_address_t		I_Adddress_Ld,					//Load Address
 	input	instr_t				O_Instr_Ld,						//Loaded Instruction
+	output						O_Req,							//Request to Next Stage
+	output	id_t				O_ThreadID,						//Scalar Thread-ID to Next Stage
 	output						O_Wait							//Wait: Exceeding Memory Size
 );
+
+
+	localparam WIDTH_THREAD_MEM	= $clog2(SIZE_THREAD_MEM);
+	localparam NUM_ENTRY_ID_MEM = SIZE_THREAD_MEM/32;
+	localparam WIDTH_ID_MEM 	= $clog2(NUM_ENTRY_ID_MEM);
 
 
 	logic						Store;
 	logic						End_Store;
 
+	logic						We;
+	logic						Re;
+	logic						Full;
+	logic 						Empty;
+	logic	[WIDTH_ID_MEM-1:0]	WNo;
+	logic	[WIDTH_ID_MEM-1:0]	RNo;
+
 	logic						R_Error_Size;
 	instr_t						R_Instr_St;
 	instr_t						R_Instr_Ld;
 	instr_t						InstrMem		[SIZE_THREAD_MEM-1:0];
+	id_t						SThreadIDs		[SIZE_THREAD_MEM/32-1:0];
 
 	st_address_t				R_Length_St;
 	st_address_t				R_Adddress_St;
 
+	logic	[WIDTH_THREAD_MEM-1:0]	R_Count;
+	logic						R_Req;
+
 	//// Send Wait Signal to Host in order to Stall Its Sending
 	assign O_Wait				= R_Error_Size;
+
+
+	//// Request to Next Stage
+	assign O_Req				= R_Req;
+	assign O_ThreadID			= SThreadIDs[ RNo ];
 
 
 	//// Send Info to MapMan Unit
@@ -39,11 +62,43 @@ module InstrMem
 
 
 	//// Send Instructions to Dispatch Unit
-	assign O_Instr_Ld			= R_Instr_Ld;
+	assign O_Instr_Ld.valid		= R_Req_Ld;
+	assign O_Instr_Ld.instr		= R_Instr_Ld;
 
 
-	assign End_Store			= R_Length_St == 0;
+	assign End_Store			= ( R_Length_St == 0 ) & ( FSM_Instr_St == FSM_INSTR_ST_STORE );
 	assign Store				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_STORE );
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Count				<= 0;
+		end
+		else if ( ( R_Count > 0 ) & I_Req_Ld & ~R_Req_Ld ) begin
+			R_Count				<= R_Count - 1'b1;
+		end
+		else if ( ( R_Count != (SIZE_THREAD_MEM-1) ) & End_Store ) begin
+			R_Count				<= R_Count + 1'b1;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Req				<= 1'b0;
+		end
+		else begin
+			R_Req				<= ( ( R_Count == 0 ) & End_Store ) | ( ( R_Count != 0 ) & I_Req_Ld & ~R_Req_Ld );
+		end
+	end
+
+	always_ff @( posedfe clock ) begin
+		if ( reset ) begin
+			R_Req_Ld			<= 1'b0
+		end
+		else begin
+			R_Req_Ld			<= I_Req_Ld;
+		end
+	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -113,7 +168,7 @@ module InstrMem
 				end
 			end
 			FSM_INSTR_ST_CHECK: begin
-				if ( I_Req_St ) begin
+				if ( I_Req_St & ~R_Error_Size ) begin
 					FSM_Instr_St	<= FSM_INSTR_ST_SETUP;
 				end
 				else begin
@@ -153,4 +208,31 @@ module InstrMem
 		endcase
 	end
 
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			SThreadIDs		<= '0;
+		end
+		else if ( We ) begin
+			SThreadIDs[ WNo ]	<= R_ThreadID_St;
+		end
+	end
+
+	assign We				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_LOOKUP );
+	assign Re				= R_Req;
+	RingBuffCTRL #(
+		.NUM_ENTRY(			NUM_ENTRY_ID_MEM		)
+	) IMemMan
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.I_Offset(			0						),
+		.O_WAddr(			WNo						),
+		.O_RAddr(			RNo						),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(										)
+	);
 endmodule

@@ -20,6 +20,8 @@ module MapMan
 
 	logic							We;
 	logic							Re;
+	logic							Full;
+	logic							Empty;
 
 	logic	[SIZE_TAB_MAPMAN-1:0]	Valid;
 	logic	[SIZE_TAB_MAPMAN-1:0]	is_Matched;
@@ -158,6 +160,7 @@ module MapMan
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
+		.I_Offset(			0						),
 		.O_WAddr(			WNo						),
 		.O_RAddr(									),
 		.O_Full(			Full					),

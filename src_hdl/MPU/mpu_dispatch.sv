@@ -13,11 +13,13 @@ module Dispatch
 	output	st_address_t		O_Address,						//Loading Address
 	input	instr_t				I_Instr,						//Loaded INstruction
 	output	instr_t				O_Instr,						//Send Loaded Instruction
-	output	stat_dispatch_t		O_Status						//Status
+	input	id_t				I_IssueNo,						//Issue No
+	output						O_Send_Thread					//Status
 );
 
 
 	logic							Loading;
+	logic							End_Load;
 
 	fsm_dispatch_t					FSM_Dispatch;
 
@@ -28,9 +30,15 @@ module Dispatch
 	st_address_t					R_Length;
 	st_address_t					R_Address;
 
+	id_t							R_ThreadID;
+	id_t							R_IssueNo;
+
+
 
 	assign Set_Address		= I_Ack;
 	assign Loading			= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
+
+	assign End_Load			= R_Length == 0;
 
 	assign O_Req_Lookup		= FSM_Dispatch == FSM_DPC_GETINFO;
 	assign O_ThreadID		= R_ThreadID;
@@ -38,12 +46,38 @@ module Dispatch
 	assign O_Ld				= Loading;
 	assign O_Address		= R_Address;
 
+	assign O_Instr.valid	= R_LdD1;
+	assign O_Instr.instr	= R_Instr;
+
+	assign O_Send_Thread	= FSM_Dispatch	== FSM_DPC_SEND_INSTRS;
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Ld			<= 1'b0;
+			R_LdD1			<= 1'b0;
+			R_Instr			<= 0;
+		end
+		else begin
+			R_Ld			<= Loading;
+			R_LdD1			<= ( FSM_Dispatch == FSM_DPC_SEND_THREADID ) | 
+								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) | 
+								( FSM_Dispatch == FSM_DPC_SEND_ILENGTH ) |
+								R_Ld;
+			R_Instr			<= ( FSM_Dispatch == FSM_DPC_SEND_THREADID ) ?	R_ThreadID : 
+								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) ?	R_IssueNo : 
+								( FSM_Dispatch == FSM_DPC_SEND_ILENGTH ) ?	R_PLength : 
+																			I_Instr;
+		end
+	end	
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_ThreadID		<= 0;
+			R_IssueNo		<= 0;
 		end
 		else if ( I_Req ) begin
 			R_ThreadID		<= I_ThreadID;
+			R_IssueNo		<= I_IssueNo;
 		end
 	end
 
@@ -57,6 +91,15 @@ module Dispatch
 		end
 		else if ( Set_Address ) begin
 			R_Length		<= Length;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_PLength		<= 0;
+		end
+		else if ( Set_Address ) begin
+			R_PLength		<= Length;
 		end
 	end
 
@@ -95,12 +138,13 @@ module Dispatch
 				end
 			end
 			FSM_DPC_SEND_THREADID: begin
-				if ( I_Ack ) begin
-					FSM_Dispatch	<= FSM_DPC_SEND_INSTRS;
-				end
-				else begin
-					FSM_Dispatch	<= FSM_DPC_SEND_THREADID;
-				end
+				FSM_Dispatch	<= FSM_DPC_SEND_ISSUENO;
+			end
+			FSM_DPC_SEND_ISSUENO: begin
+				FSM_Dispatch	<= FSM_DPC_SEND_ILENGTH;
+			end
+			FSM_DPC_SEND_ILENGTH: begin
+				FSM_Dispatch	<= FSM_DPC_SEND_INSTRS;
 			end
 			FSM_DPC_SEND_INSTRS: begin
 				if ( End_Load ) begin

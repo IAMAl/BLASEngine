@@ -4,7 +4,7 @@ module HazardCheck #(
 	input							clock,
 	input							reset,
 	input							I_Req_Commit,				//Commit Signal from Commit Unit
-	input	issue_no_t				I_CommitNo,					//Commit No. from Commit Unit
+	input	issue_no_t				I_Issued_No,				//Commit No. from Commit Unit
 	input							I_Req,						//Request from Previous Stage
 	input	id_t					I_ThreadID_S,				//Scalar Thread-ID
 	output							O_Req_Issue,				//Request to Next Stage
@@ -13,12 +13,15 @@ module HazardCheck #(
 );
 
 
+	localparam WIDTH_ENTRY			= $clog2(NUM_ENTRY_STH);
+
 	logic	[NUM_ENTRY_STH-1:0]		Valid;
 	logic	[NUM_ENTRY_STH-1:0]		Commit;
+	logic	[WIDTH_ENTRY-1:0]		Offset;
 
 	logic							R_Req;
 	logic							R_Req_Issue;
-	logic	[NUM_ENTRY_STH-1:0]		R_Issue_No;
+	issue_no_t						R_Issue_No;
 	mpu_tab_hazard_t				ThreadID		[NUM_ENTRY_STH-1:0];
 
 
@@ -27,13 +30,21 @@ module HazardCheck #(
 	assign O_ThreadID_S				= ThreadID[ Issue_No ].ID;
 	assign O_IssueNo				= R_Issue_No;
 
-	// Check Issable or Not
+	// Check Issuable or Not
 	assign Issueable				= &is_Matched;
 
 	// Generate Mask Flags
 	always_comb begin
 		for ( int=0; i<NUM_ENTRY_STH; ++i ) begin
-			assign Mask[ i ]		=  ThreadID[ i ].Src;
+			assign Mask[ i ]		= ThreadID[ i ].Src;
+		end
+	end
+
+
+	// Generate Retire Flags
+	always_comb begin
+		for ( int=0; i<NUM_ENTRY_STH; ++i ) begin
+			assign Retire[ i ]		= Valid[ i ] & ThreadID[ i ].Commit & ( i != Issue_No );
 		end
 	end
 
@@ -43,7 +54,7 @@ module HazardCheck #(
 	// WNo:			Pointer for Write
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY_STH; ++i ) begin
-			assign is_Matched[ i ]	= ~( ( Valid[ i ] & ~ThreadID[ i ].Commit & ( ThreadID[ i ].Src_ID == ThreadID[ Issue_No ].ID ) & ( i != Issue_No ) ) ^ Mask[ i ] );
+			assign is_Matched[ i ]	=  ~( ( Retire[ i ] & ( ThreadID[ i ].Src_ID == ThreadID[ Issue_No ].ID ) ) ^ Mask[ i ] );
 		end
 	end
 
@@ -86,7 +97,13 @@ module HazardCheck #(
 		end
 		else if ( I_Req_Commit | I_Req ) begin
 			if ( I_Rq_Commit ) begin
-				ThreadID[ I_CommitNo ].Commmit	<= 1'b1;
+				ThreadID[ I_Issued_No ].Commmit	<= 1'b1;
+			end
+
+			if ( Issueable ) begin
+				for ( i=0: i<NUMENTRY_STH; ++i ) begin
+					valid[ i ]				<= Valid[ i ] ^ ThreadID[ i ].Commit;
+				end
 			end
 
 			if ( I_Req & R_Req ) begin
@@ -94,6 +111,7 @@ module HazardCheck #(
 				ThreadID[ WNo ].Src		<= 1'b1;
 				ThreadID[ WNo ].Src_ID	<= I_ThreadID_S;
 				ThreadID[ WNo ].Commmit	<= 1'b0;
+				ThreadID[ WNo ].Count	<= ThreadID[ WNo - 1'b1 ].Count + 1'b1
 			end
 			else if ( I_Req & ~R_Req ) begin
 				Valid[ WNo ]			<= 1'b1;
@@ -101,9 +119,11 @@ module HazardCheck #(
 				ThreadID[ WNo ].Src		<= 1'b0;
 				ThreadID[ WNo ].Src_ID	<= 0;
 				ThreadID[ WNo ].Commmit	<= 1'b0;
+				ThreadID[ WNo ].Count	<= 1;
 			end
 		end
 	end
+
 
 
 	//// Module: Ring-Buffer Controller
@@ -118,6 +138,7 @@ module HazardCheck #(
 		.reset(			reset				),
 		.I_We(			We					),
 		.I_Re(			Re					),
+		.I_Offset(		Offset				),
 		.O_WAddr(		WNo					),
 		.O_RAddr(		Issue_No			),
 		.O_Full(							),

@@ -6,6 +6,7 @@ module RingBuffCTRL
 	input							reset,
 	input							I_We,				//Write-Enable
 	input							I_Re,				//Read-Enable
+	input	[$clog2(NUM_ENTRY)-1:0]	I_Offset,			//Write Address
 	output	[$clog2(NUM_ENTRY)-1:0]	O_WAddr,			//Write Address
 	output	[$clog2(NUM_ENTRY)-1:0]	O_RAddr,			//Read Address
 	output	logic					O_Full,				//Flag: Full
@@ -75,7 +76,7 @@ module RingBuffCTRL
 				R_RCNT  	<= '0;
 			end
 			else begin
-				R_RCNT  	<= R_RCNT + 1'b1;
+				R_RCNT  	<= R_RCNT + 1'b1 + I_Offset;
 			end
 		end
 	end

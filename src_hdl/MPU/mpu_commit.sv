@@ -8,7 +8,8 @@ module Commit #(
 	input							I_Req_Commit,				//Commit from Coomit-Agregator Unit
 	input	issue_no_t				I_CommitNo,					//Commit No from Commit-Agregator Unit
 	output							O_Req_Commit,				//Request to Next-Stage
-	output	issue_no_t				O_CommitNo					//Commit No to Next-Stage
+	output	issue_no_t				O_Issue_No,					//Commit No to Next-Stage
+	output							O_Full						//Flag: State in Full of Table
 );
 
 
@@ -21,14 +22,15 @@ module Commit #(
 	logic							Empty;
 
 	mpu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
-	issue_no_t						R_Commit_No;
+	issue_no_t						R_Issue_No;
 	logic							R_Commit;
 
 
 	assign Commit			= Valid[ RNo ] & IssedInfo[ RNo ].Commit;
 
 	assign O_Req_Commit		= R_Commit;
-	assign O_CommitNo		= R_Commit_No;
+	assign O_Issue_No		= R_Commit_No;
+	assign O_Full			= Full;
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -41,10 +43,10 @@ module Commit #(
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Commit_No		<= 1'b0;
+			R_Issue_No		<= 1'b0;
 		end
-		else begin
-			R_Commit_No		<= IssedInfo[ RNo ].IsseNo;
+		else if ( Commit ) begin
+			R_Issue_No		<= IssedInfo[ RNo ].IsseNo;
 		end
 	end
 
@@ -67,7 +69,7 @@ module Commit #(
 
 
 	//// Module: Ring-Buffer Controller
-	assign We				= I_Req & ~Full;
+	assign We				= I_Req_Issue & ~Full;
 	assign Re				= Commit & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(		NUM_ENTRY_STH		)
@@ -77,9 +79,10 @@ module Commit #(
 		.reset(			reset				),
 		.I_We(			We					),
 		.I_Re(			Re					),
+		.I_Offset(		0					),
 		.O_WAddr(		WNo					),
 		.O_RAddr(		RNo					),
-		.O_Full(							),
+		.O_Full(		Full				),
 		.O_Empty(		Empty				),
 		.O_Num(			Num					)
 	);
