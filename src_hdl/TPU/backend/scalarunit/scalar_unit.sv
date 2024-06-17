@@ -127,13 +127,13 @@ module scalar_unit (
 		.reset(				reset					),
 		.I_Req(				Req_PCU					),
 		.I_Stall(			Stall_PCU				),
-		.I_Sel_CondValid(	);
+		.I_Sel_CondValid(	WB_Sel_CondValid		);
 		.I_CondValid1(		CondValid1				),
 		.I_CondValid2(		CondValid2				),
-		.I_Jump(			),
-		.I_Branch(			),
-		.I_Timing_MY(		),
-		.I_Timing_WB(		),
+		.I_Jump(			Instr_Jump				),
+		.I_Branch(			Instr_Branch			),
+		.I_Timing_MY(		Bypass_IssueNo			),
+		.I_Timing_WB(		WB_IssueNo				),
 		.I_State(			State					),
 		.I_Cond(			Condition				),
 		.I_Src(				),
@@ -157,19 +157,183 @@ module scalar_unit (
 	);
 
 
+	//// Instruction Decoder
+	logic					Valid_Dst;
+	logic					Valid_Src1;
+	logic					Valid_Src2;
+	logic					Valid_Src3;
+	index_t					Index_Dst;
+	index_t					Index_Src1;
+	index_t					Index_Src2;
+	index_t					Index_Src3;
+
+	//// Bit-Field
+	// Unit Selector [2:0]
+	// [2]
+	//	0		Select Scalr Unit
+	//	1		Select Vector Unit
+	// [1:0]
+	//	00		Arithmetic Unit
+	//	01		Conditional (Scalar: Jump/Branch, Vector Masked Arithmetic Unit)
+	//	10		Logic/Shift/Rotate
+	//	11		Load/Store
+	//Arithmetic Unit	[1:0]
+	//  Scalar Unit
+	//	00		Adder
+	//		OpCode [1:0]
+	//		00		Unsiged Addition
+	//		01		Unsigned Subtruction
+	//		10		Signed Addition
+	//		11		Signed Addition
+	//	01		Multiplier
+	//		OpCode [1:0]
+	//		00		Unsigned Multiplication
+	//		01		Signed Multiplication
+	//		1x		Reserved
+	//	10		Divider
+	//		OpCode [1:0]
+	//		00		Unsigned Division
+	//		01		Signed Division
+	//		1x		Reserved
+	//	11		Convert
+	//		OpCode [1:0]
+	//		00		Int32 to Float32
+	//		01		Move
+	//		10		Bit-Reverse
+	//		11		Rese
+	//  Vector Unit
+	//	00		Adder
+	//		OpCode [1:0]
+	//		00		Addition
+	//		01		Subtraction
+	//		10		Compare
+	//		11		Reserved
+	//	01		Multiplier
+	//		OpCode [1:0]
+	//		00		Multiplication
+	//		01		Reserved
+	//		1x		Reserved
+	//	10		Specials
+	//		OpCode [1:0]
+	//		00		Power of Any
+	//		01		Exponential
+	//		10		Logarithm of Two
+	//		11		Reserved
+	//	11		Convert
+	//		OpCode [1:0]
+	//		00		Float32 to Int32
+	//		01		Move
+	//		1x		Reserved
+	//
+	//
+	//Conditional		[1:0]
+	//	Scalar Unit
+	//	00		Compare
+	//		OpCode [1:0]
+	//		00		Equal
+	//		01		Greater than
+	//		10		Lesser than or Equal
+	//		11		Not Equal
+	//	01		Jump
+	//		OpCode [1:0]
+	//		00		Relative Jump width Source
+	//		01		Relative Jump width Constant
+	//		1x		Reserved
+	//	10		Branch
+	//		OpCode [1:0]
+	//		00		Relative Branch width Source
+	//		01		Relative Branch width Constant
+	//		1x		Reserved
+	//	11		Reserved
+	//	Vector Unit
+	//	00		Compare
+	//		OpCode [1:0]
+	//		00		Equal
+	//		01		Greater than
+	//		10		Lesser than or Equal
+	//		11		Not Equal
+	//	01		Reserved
+	//	1x		Reserved
+	//
+	//
+	//Logic/Shift/Rotate	[1:0]
+	//	Scalar Unit
+	//	00		Logic
+	//		OpCode [1:0]
+	//		00		NOT
+	//		01		AND
+	//		10		OR
+	//		11		XOR
+	//	01		Shift
+	//		OpCode [1:0]
+	//		00		Logic Left-Shift
+	//		01		Arithmetic Left-Shift
+	//		10		Logic Right-Shift
+	//		11		Arithmetic Right-Shift
+	//	10		Rotate
+	//		OpCode [1:0]
+	//		00		Left-Rotate
+	//		01		Reserved
+	//		10		Right-Rotate
+	//		11		Reserved
+	//	11		Reserved
+	//	Vector Unit
+	//	xx		Reserved
+	//
+	//
+	//Load/Store		[1:0]
+	//	Scalar Unit
+	//	00		Load with Zero Extension to 4-Byte
+	//		OpCode	[1:0]
+	//		00		Byte Load
+	//		01		Short Load
+	//		10		Word Load
+	//		11		Reserved
+	//	01		Load with Sign Extension to 4-Byte
+	//		OpCode	[1:0]
+	//		01		Byte Load 
+	//		01		Short Load
+	//		10		Word Load
+	//		11		Reserved
+	//	10		Normal Store
+	//		OpCode	[1:0]
+	//		00		Byte Store
+	//		01		Short Store
+	//		10		Word Store
+	//		11		Reserved
+	//	11		Trancate from 4-Byte
+	//		OpCode	[1:0]
+	//		00		Byte Store
+	//		01		Short Store
+	//		10		Word Store
+	//		11		Reserved
+	//	Vector Unit
+	//	00		Normal Word-Load
+	//		OpCode	[1:0]
+	//		0x		Reserved
+	//		10		Word Load
+	//		11		Reserved
+	//	01		Reserved
+	//	10		Normal Word Store
+	//		0x		Reserved
+	//		10		Word Store
+	//		11		Reserved
+	//	11		Reserved
+
+
 	//// Hazard Check Stage
 	St_InstrWindow  St_IW (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_IW					),
-		.I_Valid_Dst(		),
-		.I_Valid_Src1(		),
-		.I_Valid_Src2(		),
-		.I_Valid_Src3(		),
-		.I_Index_Dst(		),
-		.I_Index_Src1(		),
-		.I_Index_Src2(		),
-		.I_Index_Src3(		),
+		.I_Valid_Dst(		Valid_Dst				),
+		.I_Valid_Src1(		Valid_Src1				),
+		.I_Valid_Src2(		Valid_Src2				),
+		.I_Valid_Src3(		Valid_Src3				),
+		.I_Index_Dst(		Index_Dst				),
+		.I_Index_Src1(		Index_Src1				),
+		.I_Index_Src2(		Index_Src2				),
+		.I_Index_Src3(		Index_Src3				),
 		.O_Index_Entry(		Index_Entry				)
 	);
 
@@ -182,7 +346,7 @@ module scalar_unit (
 		.I_Req_Commit(		),
 		.I_Commit_No(		),
 		.O_Req_Issue(		),
-		.O_Issue_No(		),
+		.O_Issue_No(		IW_IssueNo				),
 		.O_RAR_Hzard(		)
 	);
 

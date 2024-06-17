@@ -5,7 +5,7 @@ module CTRLFlow
 	input						reset,
 	input						I_Req,							//Request from Pipeline
 	input						I_Stall,						//Force Stalling
-	input						I_Sel_CondValid;				//Selector for CondValid-1/2
+	input						I_Sel_CondValid,				//Selector for CondValid-1/2
 	input						I_CondValid1,					//Condition Valid
 	input						I_CondValid2,					//Condition Valid
 	input						I_Jump,							//Jump Instruction
@@ -37,6 +37,13 @@ module CTRLFlow
 
 	assign Cond_Valid			= ( I_Sel_CondValid ) ? I_CondValid2 : I_CondValid1;
 
+	// Conditional Branch Instruction should be
+	//	next instruction of evaluation (ex. compare instruction)
+	//	The I_Timing_xx holds unique value generated at
+	//	issueing the instruction.
+	//	The I_Timing_WB is the evaluation instruction
+	//	The I_Timing_MY is the branch (this) instruction
+	//	This module works as execution unit, entering after network stage
 	assign Valid				= ( I_Timing_MY == ( I_Timing_WB + 1'b1 ) )
 	assign Taken				= Valid & I_State[ I_Cond ] & I_Branch;
 	assign Update				= ~I_Stall & I_Req;
