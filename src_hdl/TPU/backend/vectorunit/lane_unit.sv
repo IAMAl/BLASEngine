@@ -99,6 +99,34 @@ module lane_unit
 	assign Req_Index_Dst	= I_Command.v_dst & Req_Issue;
 	assign Slice_Dst		= I_Command.slice1 | I_Command.slice2 | I_Command.slice3;
 	assign Index_Dst		= I_Command.Dst;
+
+	assign Req_Index_Odd1	= I_Command.v_src1 & Req_Issue;
+	assign Slice_Odd1		= I_Command.slice1;
+	assign Index_Orig_Odd1	= I_Command.SrcIdx1;
+
+	assign Req_Index_Odd2	= I_Command.v_src2 & Req_Issue;
+	assign Slice_Odd2		= I_Command.slice2;
+	assign Index_Odd2		= I_Command.SrcIdx2;
+
+	assign Req_Index_Even1	= I_Command.v_src3 & Req_Issue;
+	assign Slice_Even1		= I_Command.slice2;
+	assign Index_Even1		= I_Command.SrcIdx2;
+
+	assign Req_Index_Even2	= I_Command.v_src4 & Req_Issue;
+	assign Slice_Even2		= I_Command.slice3;
+	assign Index_Even2		= I_Command.SrcIdx3;
+
+
+	//// Register Read/Write Stage
+	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
+
+	//// Network Stage
+	//	 Rotate Path
+	assign Pre_Src_Data1 	= I_Rotate_Src_Data1;
+	assign Pre_Src_Data3 	= I_Rotate_Src_Data2;
+
+
+	//// Index Update Stage
 	Index Index_Dst (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -115,9 +143,6 @@ module lane_unit
 		.O_Index(			Index_Dst				)
 	);
 
-	assign Req_Index_Odd1	= I_Command.v_src1 & Req_Issue;
-	assign Slice_Odd1		= I_Command.slice1;
-	assign Index_Orig_Odd1	= I_Command.SrcIdx1;
 	Index Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -135,9 +160,6 @@ module lane_unit
 		.O_Index(			Index_Odd1				)
 	);
 
-	assign Req_Index_Odd2	= I_Command.v_src2 & Req_Issue;
-	assign Slice_Odd2		= I_Command.slice2;
-	assign Index_Odd2		= I_Command.SrcIdx2;
 	Index Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -155,9 +177,6 @@ module lane_unit
 		.O_Index(			Index_Odd2				)
 	);
 
-	assign Req_Index_Even1	= I_Command.v_src3 & Req_Issue;
-	assign Slice_Even1		= I_Command.slice2;
-	assign Index_Even1		= I_Command.SrcIdx2;
 	Index Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -175,9 +194,6 @@ module lane_unit
 		.O_Index(			Index_Even1				)
 	);
 
-	assign Req_Index_Even2	= I_Command.v_src4 & Req_Issue;
-	assign Slice_Even2		= I_Command.slice3;
-	assign Index_Even2		= I_Command.SrcIdx3;
 	Index Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -203,7 +219,7 @@ module lane_unit
 		.O_Op(				Pipe_OP_RFile			)
 	);
 
-	//// Register Read/Write-Back Stage
+	//// Register Read/Write Stage
 	RegFile RegFile_Odd (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -236,8 +252,6 @@ module lane_unit
 		.O_Req(										)
 	);
 
-
-	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
 	pipereg_be PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -250,12 +264,7 @@ module lane_unit
 
 
 	//// Network Stage
-	// Rotate Path
-	aasign Pre_Src_Data1 = I_Rotate_Src_Data1;
-	aasign Pre_Src_Data4 = I_Rotate_Src_Data2;
-
-	// Bypass Path
-	Bypass Bypass (
+	network v_network (
 		.I_Config_Path(		Config_Path				),
 		.I_WB_Path1(		WB_Path1				),
 		.I_WB_Path2(		WB_Path2				),

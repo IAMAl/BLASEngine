@@ -1,4 +1,4 @@
-module Bypass
+module network
 	import pkg_tpu::*;
 #(
 	parameter int NUM_LANES		= 16,
@@ -112,6 +112,7 @@ module Bypass
 	assign Sel_Path_Even2		= I_WB_Path2 == 3'h7;
 
 
+	//ToDo
 	assign Sel_WB_Index1_Idx1	=;
 	assign Sel_WB_Index1_Idx2	=;
 	assign Sel_WB_Index2_Idx1	=;
@@ -121,22 +122,22 @@ module Bypass
 	assign Path_Data			=I_Path_Hop[ Sel_Path ];
 
 
-	assign O_Src_Data1			= ( Sel_Bypass11 ) ?	I_WB_Data1 :
-									( Sel_Bypass21 ) ?	I_WB_Data2 :
-									( Sel_Scalar1 ) ?	I_Scalar_Data :
-														I_Src_Data1;
+	assign O_Src_Data1			= ( Sel_Bypass11 ) ?		I_WB_Data1 :
+									( Sel_Bypass21 ) ?		I_WB_Data2 :
+									( Sel_Scalar1 ) ?		I_Scalar_Data :
+															I_Src_Data1;
 
-	assign O_Src_Data2			= ( Sel_Data2 ) ? 		I_Src_Data2 :
-									( Sel_Bypass12 ) ?	I_WB_Data1 :
-									( Sel_Bypass22 ) ?	I_WB_Data2 :
-									( Sel_Scalar2 ) ?	I_Scalar_Data :
-														Path_Data;
+	assign O_Src_Data2			= ( Sel_Data2 ) ? 			I_Src_Data2 :
+									( Sel_Bypass12 ) ?		I_WB_Data1 :
+									( Sel_Bypass22 ) ?		I_WB_Data2 :
+									( Sel_Scalar2 ) ?		I_Scalar_Data :
+															Path_Data;
 
-	assign O_Src_Data3			= ( Sel_Data3 ) ? 		I_Src_Data3 :
-									( Sel_Bypass13 ) ?	I_WB_Data1 :
-									( Sel_Bypass23 ) ?	I_WB_Data2 :
-									( Sel_Scalar3 ) ?	I_Scalar_Data :
-														Path_Data;
+	assign O_Src_Data3			= ( Sel_Data3 ) ? 			I_Src_Data3 :
+									( Sel_Bypass13 ) ?		I_WB_Data1 :
+									( Sel_Bypass23 ) ?		I_WB_Data2 :
+									( Sel_Scalar3 ) ?		I_Scalar_Data :
+															Path_Data;
 
 
 	assign O_WB_Index1			= ( Sel_WB_Index1_Idx1 ) ?	I_WB_Index1 :
