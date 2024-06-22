@@ -160,27 +160,27 @@ module scalar_unit
 
 
 	//// Index Update Stage
-	assign Index_Length		 Command.IdxLength;
+	assign Index_Length		= S_Command.IdxLength;
 
-	assign Req_Index_Dst	= Command.v_dst & Req_Issue;
-	assign Slice_Dst		= Command.slice1 | Command.slice2 | Command.slice3;
-	assign Index_Dst		= Command.SrcDst;
+	assign Req_Index_Dst	= S_Command.v_dst & Req_Issue;
+	assign Slice_Dst		= S_Command.slice1 | S_Command.slice2 | S_Command.slice3;
+	assign Index_Dst		= S_Command.SrcDst;
 
-	assign Req_Index_Odd1	= Command.v_src1 & Req_Issue;
-	assign Slice_Odd1		= Command.slice1;
-	assign Index_Orig_Odd1	= Command.SrcIdx1;
+	assign Req_Index_Odd1	= S_Command.v_src1 & Req_Issue;
+	assign Slice_Odd1		= S_Command.slice1;
+	assign Index_Orig_Odd1	= S_Command.SrcIdx1;
 
-	assign Req_Index_Odd2	= Command.v_src2 & Req_Issue;
-	assign Slice_Odd2		= Command.slice2;
-	assign Index_Odd2		= Command.SrcIdx2;
+	assign Req_Index_Odd2	= S_Command.v_src2 & Req_Issue;
+	assign Slice_Odd2		= S_Command.slice2;
+	assign Index_Odd2		= S_Command.SrcIdx2;
 
-	assign Req_Index_Even1	= Command.v_src3 & Req_Issue;
-	assign Slice_Even1		= Command.slice2;
-	assign Index_Even1		= Command.SrcIdx2;
+	assign Req_Index_Even1	= S_Command.v_src3 & Req_Issue;
+	assign Slice_Even1		= S_Command.slice2;
+	assign Index_Even1		= S_Command.SrcIdx2;
 
-	assign Req_Index_Even2	= Command.v_src4 & Req_Issue;
-	assign Slice_Even2		= Command.slice3;
-	assign Index_Even2		= Command.SrcIdx3;
+	assign Req_Index_Even2	= S_Command.v_src4 & Req_Issue;
+	assign Slice_Even2		= S_Command.slice3;
+	assign Index_Even2		= S_Command.SrcIdx3;
 
 
 	//// Register-Read Stage
@@ -260,6 +260,15 @@ module scalar_unit
 		.O_Commmand(		Pre_Command				),
 		.O_Issue_No(		IW_IssueNo				),
 		.O_RAR_Hzard(		RAR_Hazard				)
+	);
+
+
+	//// Select Scalar-Unit Back-End or Vector Unit Back-End
+	Issue_Command (
+		.I_Sel_Unit(		);//ToDO
+		.I_Command(			Pre_Command				),
+		.O_S_Command(		S_Command				),
+		.O_V_Command(		O_V_Command				)
 	);
 
 
