@@ -8,6 +8,7 @@ module pipereg
 	output	op_t				O_Op
 );
 
+
 	op_t						R_Op;
 
 

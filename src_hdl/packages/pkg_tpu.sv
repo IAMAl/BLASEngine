@@ -31,7 +31,7 @@ package pkg_tpu;
 
 	typedef data_t [NUM_LANES-1:0]				rot_srcs_t;
 
-	//// Bit-Field
+	//// Bit-Field in Operation Code
 	// Unit Selector [2:0]
 	// [2]
 	//	0		Select Scalr Unit
@@ -190,6 +190,8 @@ package pkg_tpu;
 	//		0x		Reserved
 	//		10		Word Store
 	//		11		Reserved
+
+
 	typedef struct packed {
 		logic								Sel_Unit;
 		logic		[1:0]					OpType;
@@ -211,10 +213,12 @@ package pkg_tpu;
 		logic		[64-7-7*4-6-1:0]		Constant;
 	} instruction_t;
 
+
 	typedef struct packed {
 		logic								v;
 		instruction_t						instr;
 	} instr_t;
+
 
 	typedef struct packed {
 		logic								v_dst;

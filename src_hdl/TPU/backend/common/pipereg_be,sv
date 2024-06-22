@@ -10,6 +10,7 @@ module pipereg_be
 	input   index_t             O_Slice_Idx
 );
 
+
 	op_t						R_Op;
 	index_t						R_Idx;
 
