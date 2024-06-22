@@ -39,7 +39,7 @@ module scalar_unit
 
 	logic					Req_IW;
 	command_t				Pre_Command;
-	command_t				IW_Command;
+	command_t				HZD_Command;
 	command_t				Command;
 	iw_t					Index_Entry;
 
@@ -224,10 +224,11 @@ module scalar_unit
 	);
 
 
-	//// Hazard Check Stage
-	St_InstrWindow  St_IW (
+	//// Hazard Detect Stage
+	Hazard_Detect Hazard_Detect (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Req_Issue(		Req_Issue				),
 		.I_Req(				Req_IW					),
 		.I_Command(			Pre_Command				),
 		.I_Valid_Dst(		Valid_Dst				),
@@ -238,16 +239,7 @@ module scalar_unit
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
-		.O_Index_Entry(		Index_Entry				),
-		.O_Command(			IW_Command				)
-	);
-
-
-	Hazard_Detect Hazard_Detect (
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_Req_Issue(		Req_Issue				),
-		.I_Command(			IW_Command				),
+		.I_Command(			HZD_Command				),
 		.I_Index_Entry(		Index_Entry				),
 		.I_Slice(			Slice					),
 		.I_Req_Commit(		),

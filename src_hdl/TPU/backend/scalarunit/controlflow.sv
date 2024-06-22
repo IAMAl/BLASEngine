@@ -1,4 +1,4 @@
-module CTRLFlow
+module PAC
 	import pkg_tpu::*;
 (
 	input						clock,
