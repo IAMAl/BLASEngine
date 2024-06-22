@@ -43,10 +43,17 @@ module scalar_unit
 	command_t				Command;
 	iw_t					Index_Entry;
 
+	logic					Valid_Dst;
+	logic					Valid_Src1;
+	logic					Valid_Src2;
+	logic					Valid_Src3;
+	logic					Valid_Src4;
+	index_s_t				Index_Dst;
+	index_s_t				Index_Src1;
+	index_s_t				Index_Src2;
+	index_s_t				Index_Src3;
 
 	logic					Slice;
-
-
 	logic					Sign;
 	const_t					Constant;
 	logic					Stall_RegFile_Odd;
@@ -118,6 +125,56 @@ module scalar_unit
 	assign O_State			= State;
 
 
+	//// Instruction Fetch Stage
+	assign Req_IFetch		= ~Stall_IF;
+
+	//// Hazard Check Stage
+	assign Req_IW			= ~Stall_IW_St;
+	assign Req_Issue		= ~Stall_IW_Ld;
+
+
+	//// Instruction Separation
+	assign Valid_Dst		= Inst.Valid_Dst;
+	assign Valid_Src1		= Inst.Valid_src1;
+	assign Valid_Src2		= Inst.Valid_src2;
+	assign Valid_Src3		= Inst.Valid_src3;
+	assign Index_Dst		= Instr.IdxDst;
+	assign Index_Src1		= Instr.SrcIdx1;
+	assign Index_Src2		= Instr.SrcIdx2;
+	assign Index_Src3		= Instr.SrcIdx3;
+
+
+	//// Stall Control
+	assign Slice			= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2 | Slice_Dst;
+
+
+	//// Index Update Stage
+	assign Index_Length		= Command.IdxLength;
+
+	assign Req_Index_Dst	= Command.v_dst & Req_Issue;
+	assign Slice_Dst		= Command.slice1 | Command.slice2 | Command.slice3;
+	assign Index_Dst		= Command.Dst;
+
+	assign Req_Index_Odd1	= Command.v_src1 & Req_Issue;
+	assign Slice_Odd1		= Command.slice1;
+	assign Index_Orig_Odd1	= Command.SrcIdx1;
+
+	assign Req_Index_Odd2	= Command.v_src2 & Req_Issue;
+	assign Slice_Odd2		= Command.slice2;
+	assign Index_Odd2		= Command.SrcIdx2;
+
+	assign Req_Index_Even1	= Command.v_src3 & Req_Issue;
+	assign Slice_Even1		= Command.slice2;
+	assign Index_Even1		= Command.SrcIdx2;
+
+	assign Req_Index_Even2	= Command.v_src4 & Req_Issue;
+	assign Slice_Even2		= Command.slice3;
+	assign Index_Even2		= Command.SrcIdx3;
+
+
+	//// Register-Read Stage
+	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
+
 	//// Instruction Memory
 	InstrMem IMem (
 		.clock(				clock					),
@@ -132,7 +189,7 @@ module scalar_unit
 
 
 	//// Program Address Control
-	CTRL PCU (
+	PAC PAC (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_PCU					),
@@ -154,7 +211,6 @@ module scalar_unit
 
 
 	//// Instruction Fetch Stage
-	assign Req_IFetch		= ~Stall_IF;
 	IFetch IFetch (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -168,29 +224,7 @@ module scalar_unit
 	);
 
 
-	//// Instruction Decoder
-	logic					Valid_Dst;
-	logic					Valid_Src1;
-	logic					Valid_Src2;
-	logic					Valid_Src3;
-	logic					Valid_Src4;
-	index_s_t				Index_Dst;
-	index_s_t				Index_Src1;
-	index_s_t				Index_Src2;
-	index_s_t				Index_Src3;
-
-	assign Valid_Dst		= Inst.Valid_Dst;
-	assign Valid_Src1		= Inst.Valid_src1;
-	assign Valid_Src2		= Inst.Valid_src2;
-	assign Valid_Src3		= Inst.Valid_src3;
-	assign Index_Dst		= Instr.IdxDst;
-	assign Index_Src1		= Instr.SrcIdx1;
-	assign Index_Src2		= Instr.SrcIdx2;
-	assign Index_Src3		= Instr.SrcIdx3;
-
-
 	//// Hazard Check Stage
-	assign Req_IW			= ~Stall_IW_St;
 	St_InstrWindow  St_IW (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -208,8 +242,8 @@ module scalar_unit
 		.O_Command(			IW_Command				)
 	);
 
-	assign Req_Issue		= ~Stall_IW_Ld;
-	Hazard IW (
+
+	Hazard_Detect Hazard_Detect (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req_Issue(		Req_Issue				),
@@ -226,8 +260,7 @@ module scalar_unit
 
 
 	//// Stall Control
-	assign Slice			= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2 | Slice_Dst;
-	stall_ctrl stall_ctrl (
+	Stall_Ctrl Stall_Ctrl (
 		.I_PCU_Wait(		),
 		.I_Hazard(			RAR_Hazard				)
 		.I_Slice(			Slice					),
@@ -239,11 +272,6 @@ module scalar_unit
 
 
 	//// Index Update Stage
-	assign Index_Length		= Command.IdxLength;
-
-	assign Req_Index_Dst	= Command.v_dst & Req_Issue;
-	assign Slice_Dst		= Command.slice1 | Command.slice2 | Command.slice3;
-	assign Index_Dst		= Command.Dst;
 	Index Index_Dst (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -260,9 +288,6 @@ module scalar_unit
 		.O_Index(			Index_Dst				)
 	);
 
-	assign Req_Index_Odd1	= Command.v_src1 & Req_Issue;
-	assign Slice_Odd1		= Command.slice1;
-	assign Index_Orig_Odd1	= Command.SrcIdx1;
 	Index Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -279,9 +304,6 @@ module scalar_unit
 		.O_Index(			Index_Odd1				)
 	);
 
-	assign Req_Index_Odd2	= Command.v_src2 & Req_Issue;
-	assign Slice_Odd2		= Command.slice2;
-	assign Index_Odd2		= Command.SrcIdx2;
 	Index Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -298,9 +320,6 @@ module scalar_unit
 		.O_Index(			Index_Odd2				)
 	);
 
-	assign Req_Index_Even1	= Command.v_src3 & Req_Issue;
-	assign Slice_Even1		= Command.slice2;
-	assign Index_Even1		= Command.SrcIdx2;
 	Index Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -317,9 +336,6 @@ module scalar_unit
 		.O_Index(			Index_Even1				)
 		);
 
-	assign Req_Index_Even2	= Command.v_src4 & Req_Issue;
-	assign Slice_Even2		= Command.slice3;
-	assign Index_Even2		= Command.SrcIdx3;
 	Index Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -377,8 +393,6 @@ module scalar_unit
 		.O_Req(				)
 	);
 
-
-	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
 	pipereg_be PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -390,8 +404,8 @@ module scalar_unit
 	);
 
 
-	//// Bypass Path
-	Bypass Bypass (
+	//// Network Stage
+	network network (
 		.I_Config_Path(		Config_Path				),
 		.I_WB_Path1(		WB_Path1				),
 		.I_WB_Path2(		WB_Path2				),

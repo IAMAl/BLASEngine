@@ -1,4 +1,4 @@
-module stall_ctrl (
+module Stall_Ctrl (
 	input						I_PCU_Wait,
 	input						I_Hazard
 	input						I_Slice,
@@ -8,8 +8,9 @@ module stall_ctrl (
 	output logic				O_Stall_IW_Ld
 );
 
-assign O_Stall_IF			= I_PCU_Wait | I_Hazard | I_Slice | I_Ld_NoReady;
-assign O_Stall_IW_St		= I_PCU_Wait | I_Hazard | I_Slice | I_Ld_NoReady;
-assign O_Stall_IW_Ld		= I_PCU_Wait | I_Hazard | I_Slice | I_Ld_NoReady;
+
+	assign O_Stall_IF			= I_PCU_Wait | I_Hazard | I_Slice | I_Ld_NoReady;
+	assign O_Stall_IW_St		= I_PCU_Wait | I_Hazard | I_Slice | I_Ld_NoReady;
+	assign O_Stall_IW_Ld		= I_PCU_Wait | I_Hazard | I_Slice | I_Ld_NoReady;
 
 endmodule
