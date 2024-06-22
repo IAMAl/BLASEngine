@@ -1,4 +1,4 @@
-module Hazard
+module Hazard_Detect
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -57,7 +57,7 @@ module Hazard
 	logic [NUM_ENTRY_HAZARD-1:0]	is_Matched_i_src3_i_src3;
 
 	logic						R_Req;
-	logic						R_No_Issue;
+	logic						R_Issue_No;
 	logic						R_RAR_Hazard;
 	logic						R_WAW_Hazard;
 	logic						R_RAW_Hazard_Src1;
@@ -74,9 +74,11 @@ module Hazard
 
 
 	assign O_Req_Issue			= R_Req;
-	assign O_Issue_No			= R_No_Issue;
+	assign O_Issue_No			= R_Issue_No;
 	assign O_RAR_Hzard			= R_RAR_Hzard;
 
+
+	//// Hazard Detections
 	assign RAW_Hazard_Src1		= |is_Matched_i_src1_i_dst;
 	assign RAW_Hazard_Src2		= |is_Matched_i_src2_i_dst;
 	assign RAW_Hazard_Src3		= |is_Matched_i_src3_i_dst;
@@ -115,8 +117,16 @@ module Hazard
 		end
 	end
 
-	assign v_Issue				= I_Req_Issue & ~( RAW_Hazard_Src1 | RAW_Hazard_Src2 | RAW_Hazard_Src3 | WAR_Hazard_Src1 | WAR_Hazard_Src2 | WAR_Hazard_Src3 | WAW_Hazard );
 	assign RAR_Hazard			= I_Slice & ( RAR_Hazard_Src1 | RAR_Hazard_Src2 | RAR_Hazard_Src3 );
+
+
+	//// Issueable Detection
+	assign v_Issue				= I_Req_Issue & ~( RAW_Hazard_Src1 | RAW_Hazard_Src2 | RAW_Hazard_Src3 | WAR_Hazard_Src1 | WAR_Hazard_Src2 | WAR_Hazard_Src3 | WAW_Hazard );
+
+
+	//// Buffer Control
+	assign We				= I_Req_Issue & ~Full;
+	assign Re				= Valud_Issue & ~Empty;
 
 
 	always_ff @( posedge clock ) begin
@@ -211,15 +221,6 @@ module Hazard
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_RAR_Hazard_Src3	<= 1'b0;
-		end
-		else begin
-			R_RAR_Hazard_Src3	<= RAR_Hazard_Src3;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
 			R_RAR_Hazard		<= 1'b0;
 		end
 		else begin
@@ -238,10 +239,10 @@ module Hazard
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_No_Issue			<= '0;
+			R_Issue_No			<= '0;
 		end
 		else begin
-			R_No_Issue			<= WNo;
+			R_Issue_No			<= WNo;
 		end
 	end
 
@@ -265,8 +266,6 @@ module Hazard
 
 
 	//// Module: Ring-Buffer Controller
-	assign We				= I_Req_Issue & ~Full;
-	assign Re				= Valud_Issue & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			DEPTH_BUFF					)
 	) RingBuffCTRL
