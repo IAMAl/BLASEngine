@@ -6,6 +6,7 @@ module Index
 	input						I_Stall,						//Force Stalling
 	input						I_Req,							//Request from Previous Stage
 	input						I_Slice,						//Flag: Index-Slicing
+	input	[5:0]				I_Sel,							//Select Sources
 	input	index_s_t			I_Index,						//Index Value
 	input	index_t				I_Length,						//Length for Slicing
 	input	id_t				I_LaneID,						//Lane ID
@@ -14,7 +15,7 @@ module Index
 	input						I_Sign,							//Config: Sign
 	output						O_Req,							//Request to Next Stage
 	output						O_Slice,						//Flag: Index-Slicing
-	output						O_Index							//Index Value
+	output	index_t				O_Index							//Index Value
 );
 
 
@@ -38,7 +39,12 @@ module Index
 	logic						R_Req;
 	logic						R_Sel;
 	index_t						R_Index;
+	index_t						R_Length;
 
+
+	assign Sel_a				= I_Sel[1:0];
+	assign Sel_b				= I_Sel[3:2];
+	assign Sel_c				= I_Sel[5:4];
 
 	assign En_Slice				= ( I_Req & I_Slice ) | ( R_Sel & ~I_Stall );
 	assign End_Count			= CountVal == R_Length;
@@ -101,6 +107,15 @@ module Index
 		end
 		else if ( I_Req & ~I_Stall ) begin
 			R_Index				<= I_Index;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Length			<= 0;
+		end
+		else if ( I_Req & ~I_Stall ) begin
+			R_Length			<= I_Length;
 		end
 	end
 
