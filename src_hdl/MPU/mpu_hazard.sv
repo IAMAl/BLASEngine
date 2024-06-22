@@ -1,6 +1,6 @@
-module HazardCheck #(
+module HazardCheck
 	import pkg_mpu::*;
-)(
+(
 	input							clock,
 	input							reset,
 	input							I_Req_Commit,				//Commit Signal from Commit Unit

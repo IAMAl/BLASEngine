@@ -1,4 +1,6 @@
-module Rotate #(
+module Rotate
+	import pkg_tpu::*;
+#(
 	import int	NUM_ENTRY	= 8,
 	import int	WIDTH_ENTRY = $clog2(NUM_ENTRY)
 )(

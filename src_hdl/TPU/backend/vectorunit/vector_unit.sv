@@ -1,7 +1,11 @@
-module vector_unit (
+module vector_unit
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input	v_commant_t			I_Command,
+	input	[WIDTH_LANE-1:0]	I_Rotate_Amount1,
+	input	[WIDTH_LANE-1:0]	I_Rotate_Amount2,
 	input	instr_t				I_ThreadID_SIMT,
 	input	data_t				I_Scalar_Data,
 	output	data_t				O_Scalar_Data,
@@ -13,6 +17,24 @@ module vector_unit (
 );
 
 
+	rot_srcs_t					RotSrc_Data1;
+	rot_srcs_t					RotSrc_Data2;
+	rot_srcs_t					RotDst_Data1;
+	rot_srcs_t					RotDst_Data2;
+
+
+	Rotate Rotate1 (
+		.I_Rotate_Amount(		I_Rotate_Amount1		),
+		.I_Srcs(				RotSrc_Data1			),
+		.O_Srcs(				RotDst_Data1			)
+	);
+
+	Rotate Rotate1 (
+		.I_Rotate_Amount(		I_Rotate_Amoun2			),
+		.I_Srcs(				RotSrc_Data2			),
+		.O_Srcs(				RotDst_Data2			)
+	);
+
 	for ( genvar i=0; i<NUM_LANE; ++i ) begin
 		lane_unit (
 			.clock(				clock					),
@@ -23,6 +45,10 @@ module vector_unit (
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),
 			.O_Scalar_Data(		Scalr_Data[ i ]			),
+			.O_Rotate_Src_Data1(RotSrc_Data1[ i ]		),
+			.O_Rotate_Src_Data2(RotSrc_Data2[ i ]		),
+			.I_Rotate_Src_Data1(RotDat_Data1[ i ]		),
+			.I_Rotate_Src_Data2(RotDst_Data2[ i ]		),
 			.I_Path_Odd(		Path[ i + 1 ]			),
 			.I_Path_Even(		Path[ i + 2 ]			),
 			.O_Address1(		O_Address[0][ i ]		),

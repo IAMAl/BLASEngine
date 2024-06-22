@@ -1,4 +1,6 @@
-module DMem (
+module DMem
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_Req1,							//Request Access

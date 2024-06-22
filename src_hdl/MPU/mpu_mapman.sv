@@ -53,6 +53,7 @@ module MapMan
 								( ~O_Ack_St & O_Ack_Lookup ) ?	0-O_Length_Ld :
 																0;
 
+
 	always_comb begin
 		for ( int i=0; SIZE_TAB_MAPMAN; ++i ) begin
 			assign Valid[ i ]		= TabInstr[ i ].Valid;

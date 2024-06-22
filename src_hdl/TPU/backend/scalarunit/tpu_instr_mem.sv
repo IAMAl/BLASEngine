@@ -1,5 +1,6 @@
 module InstrMem
 	import pkg_mpu::*;
+	import pkg_tpu::*;
 (
 	input						clock,
 	input						reset,

@@ -6,7 +6,7 @@ module Hazard
 	input						I_Req_Issue,					//Request from Previous Stage
 	input	iw_t				I_Index_Entry,					//Set of Indeces
 	input						I_Slice,						//Flaag: Index-Sllicing
-	input						I_Req_Commit,					//Request to Commit 
+	input						I_Req_Commit,					//Request to Commit
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,					//Commit (Issued) No.
 	output						O_Req_Issue,					//Request to Next Stage
 	output						O_Issue_No,						//Issue(Dispatch) No

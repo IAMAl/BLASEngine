@@ -1,6 +1,6 @@
-module Commit #(
+module Commit
 	import pkg_mpu::*;
-)(
+(
 	input							clock,
 	input							reset,
 	input							I_Req_Issue,				//Request from Dispatch Unit

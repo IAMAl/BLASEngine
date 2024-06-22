@@ -6,7 +6,7 @@ module Index
 	input						I_Stall,						//Force Stalling
 	input						I_Req,							//Request from Previous Stage
 	input						I_Slice,						//Flag: Index-Slicing
-	input	index_t				I_Index,						//Index Value
+	input	index_s_t			I_Index,						//Index Value
 	input	index_t				I_Length,						//Length for Slicing
 	input	id_t				I_LaneID,						//Lane ID
 	input	id_t				I_ThreadID_SIMT,				//SIMT Thread ID
@@ -42,7 +42,7 @@ module Index
 
 	assign En_Slice				= ( I_Req & I_Slice ) | ( R_Sel & ~I_Stall );
 	assign End_Count			= CountVal == R_Length;
-	assign Index				= ( R_Sel ) ? CountVal + R_Index + 1'b1 : I_Index;
+	assign Index				= ( R_Sel ) ? CountVal + R_Index + 1'b1 : I_Index[WIDTH_INDEX-1:0];
 
 	assign sign					= I_Sign;
 

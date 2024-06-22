@@ -1,5 +1,7 @@
 
-module RegFile (
+module RegFile
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_Req,							//Request from Previous Stage

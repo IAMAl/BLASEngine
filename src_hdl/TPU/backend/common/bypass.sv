@@ -1,10 +1,14 @@
-module Bypass (
-	input	[3:0]				I_Config_Path,					//Path Selects
+module Bypass
+	import pkg_tpu::*;
+#(
+	parameter int NUM_LANES		= 16,
+	parameter int WIDTH_LANES	= $clog2(NUM_LANES);
+)(
+	input	[NUM_LANES+2-1:0]	I_Config_Path,					//Path Selects
 	input	[2:0]				I_Bypass_Path,					//Path Selects
 	input	[2:0]				I_WB_Path1,						//Path Selects
 	input	[2:0]				I_WB_Path2,						//Path Selects
-	input	data_t				I_Odd_Path,						//From Odd_Path
-	input	data_t				I_Even_Path,					//From Even_Path
+	input	hop_data_t			I_Path_Hop,						//From Odd_Path
 	input	data_t				I_Scalar_Data,					//From Scalar Unit
 	input	index_t				I_WB_Index1,					//From ALU
 	input	index_t				I_WB_Index2,					//From ALU
@@ -27,7 +31,7 @@ module Bypass (
 );
 
 
-	logic						Sel_Path_Odd;
+	logic	[WIDTH_LANES-1:0]	Sel_Path;
 	logic						Sel_Data2;
 	logic						Sel_Data3;
 	logic						Sel_Bypass1;
@@ -66,7 +70,7 @@ module Bypass (
 
 	assign Sel_Data2			= I_Config_Path[0];
 	assign Sel_Data3			= I_Config_Path[1];
-	assign Sel_Path_Odd			= I_Config_Path[2];
+	assign Sel_Path				= I_Config_Path[WIDTH_LANES+2-1:2];
 
 
 	assign Sel_Bypass11			= I_Bypass_Path == 4'h0;
@@ -114,8 +118,7 @@ module Bypass (
 	assign Sel_WB_Index2_Idx2	=;
 
 
-	assign Path_Data			= ( Sel_Path_Odd ) ?	I_Odd_Path :
-														I_Even_Path;
+	assign Path_Data			=I_Path_Hop[ Sel_Path ];
 
 
 	assign O_Src_Data1			= ( Sel_Bypass11 ) ?	I_WB_Data1 :

@@ -1,10 +1,13 @@
-module scalar_unit (
+module scalar_unit 
+	import pkg_mpu::*;
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_Empty,				//Empty on Buffer
 	input	instr_t				I_instr,				//Instruction from Buffer
 	input						I_En,					//Enable Execution
-	input	issue_no_t			I_ThreadID_Scalar,		//Scalar Thread-ID
+	input	issue_no_t			I_IssueNo,				//Issued Thread-ID
 	input	id_t				I_ThreadID_SIMT,		//SIMT Thread-ID
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
@@ -35,6 +38,9 @@ module scalar_unit (
 
 
 	logic					Req_IW;
+	command_t				Pre_Command;
+	command_t				IW_Command;
+	command_t				Command;
 	iw_t					Index_Entry;
 
 
@@ -53,6 +59,10 @@ module scalar_unit (
 	logic					Index_Slice_Odd2;
 	logic					Index_Slice_Even1;
 	logic					Index_Slice_Even2;
+	index_t					Index_Orig_Odd1;
+	index_t					Index_Orig_Odd2;
+	index_t					Index_Orig_Even1;
+	index_t					Index_Orig_Even2;
 	index_t					Index_Odd1;
 	index_t					Index_Odd2;
 	index_t					Index_Even1;
@@ -81,10 +91,10 @@ module scalar_unit (
 	data_t					Src_Data4;
 
 
-	index_t					Dst_Index1;
-	index_t					Dst_Index2;
-	index_t					WB_Index1;
-	index_t					WB_Index2;
+	index_s_t				Dst_Index1;
+	index_s_t				Dst_Index2;
+	index_s_t				WB_Index1;
+	index_s_t				WB_Index2;
 	data_t					WB_Data1;
 	data_t					WB_Data2;
 	logic					Condition;
@@ -144,6 +154,7 @@ module scalar_unit (
 
 
 	//// Instruction Fetch Stage
+	assign Req_IFetch		= ~Stall_IF;
 	IFetch IFetch (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -152,7 +163,7 @@ module scalar_unit (
 		.I_Term(			),
 		.I_Instr(			Instruction				),
 		.O_Req(				Req_IW					),
-		.O_Instr(			),
+		.O_Instr(			Instr					),
 		.O_Re(				O_Re					)
 	);
 
@@ -162,170 +173,29 @@ module scalar_unit (
 	logic					Valid_Src1;
 	logic					Valid_Src2;
 	logic					Valid_Src3;
-	index_t					Index_Dst;
-	index_t					Index_Src1;
-	index_t					Index_Src2;
-	index_t					Index_Src3;
+	logic					Valid_Src4;
+	index_s_t				Index_Dst;
+	index_s_t				Index_Src1;
+	index_s_t				Index_Src2;
+	index_s_t				Index_Src3;
 
-	//// Bit-Field
-	// Unit Selector [2:0]
-	// [2]
-	//	0		Select Scalr Unit
-	//	1		Select Vector Unit
-	// [1:0]
-	//	00		Arithmetic Unit
-	//	01		Conditional (Scalar: Jump/Branch, Vector Masked Arithmetic Unit)
-	//	10		Logic/Shift/Rotate
-	//	11		Load/Store
-	//Arithmetic Unit	[1:0]
-	//  Scalar Unit
-	//	00		Adder
-	//		OpCode [1:0]
-	//		00		Unsiged Addition
-	//		01		Unsigned Subtruction
-	//		10		Signed Addition
-	//		11		Signed Addition
-	//	01		Multiplier
-	//		OpCode [1:0]
-	//		00		Unsigned Multiplication
-	//		01		Signed Multiplication
-	//		1x		Reserved
-	//	10		Divider
-	//		OpCode [1:0]
-	//		00		Unsigned Division
-	//		01		Signed Division
-	//		1x		Reserved
-	//	11		Convert
-	//		OpCode [1:0]
-	//		00		Int32 to Float32
-	//		01		Move
-	//		10		Bit-Reverse
-	//		11		Rese
-	//  Vector Unit
-	//	00		Adder
-	//		OpCode [1:0]
-	//		00		Addition
-	//		01		Subtraction
-	//		10		Compare
-	//		11		Reserved
-	//	01		Multiplier
-	//		OpCode [1:0]
-	//		00		Multiplication
-	//		01		Reserved
-	//		1x		Reserved
-	//	10		Specials
-	//		OpCode [1:0]
-	//		00		Power of Any
-	//		01		Exponential
-	//		10		Logarithm of Two
-	//		11		Reserved
-	//	11		Convert
-	//		OpCode [1:0]
-	//		00		Float32 to Int32
-	//		01		Move
-	//		1x		Reserved
-	//
-	//
-	//Conditional		[1:0]
-	//	Scalar Unit
-	//	00		Compare
-	//		OpCode [1:0]
-	//		00		Equal
-	//		01		Greater than
-	//		10		Lesser than or Equal
-	//		11		Not Equal
-	//	01		Jump
-	//		OpCode [1:0]
-	//		00		Relative Jump width Source
-	//		01		Relative Jump width Constant
-	//		1x		Reserved
-	//	10		Branch
-	//		OpCode [1:0]
-	//		00		Relative Branch width Source
-	//		01		Relative Branch width Constant
-	//		1x		Reserved
-	//	11		Reserved
-	//	Vector Unit
-	//	00		Compare
-	//		OpCode [1:0]
-	//		00		Equal
-	//		01		Greater than
-	//		10		Lesser than or Equal
-	//		11		Not Equal
-	//	01		Reserved
-	//	1x		Reserved
-	//
-	//
-	//Logic/Shift/Rotate	[1:0]
-	//	Scalar Unit
-	//	00		Logic
-	//		OpCode [1:0]
-	//		00		NOT
-	//		01		AND
-	//		10		OR
-	//		11		XOR
-	//	01		Shift
-	//		OpCode [1:0]
-	//		00		Logic Left-Shift
-	//		01		Arithmetic Left-Shift
-	//		10		Logic Right-Shift
-	//		11		Arithmetic Right-Shift
-	//	10		Rotate
-	//		OpCode [1:0]
-	//		00		Left-Rotate
-	//		01		Reserved
-	//		10		Right-Rotate
-	//		11		Reserved
-	//	11		Reserved
-	//	Vector Unit
-	//	xx		Reserved
-	//
-	//
-	//Load/Store		[1:0]
-	//	Scalar Unit
-	//	00		Load with Zero Extension to 4-Byte
-	//		OpCode	[1:0]
-	//		00		Byte Load
-	//		01		Short Load
-	//		10		Word Load
-	//		11		Reserved
-	//	01		Load with Sign Extension to 4-Byte
-	//		OpCode	[1:0]
-	//		01		Byte Load 
-	//		01		Short Load
-	//		10		Word Load
-	//		11		Reserved
-	//	10		Normal Store
-	//		OpCode	[1:0]
-	//		00		Byte Store
-	//		01		Short Store
-	//		10		Word Store
-	//		11		Reserved
-	//	11		Trancate from 4-Byte
-	//		OpCode	[1:0]
-	//		00		Byte Store
-	//		01		Short Store
-	//		10		Word Store
-	//		11		Reserved
-	//	Vector Unit
-	//	00		Normal Word-Load
-	//		OpCode	[1:0]
-	//		0x		Reserved
-	//		10		Word Load
-	//		11		Reserved
-	//	01		Reserved
-	//	10		Normal Word Store
-	//		0x		Reserved
-	//		10		Word Store
-	//		11		Reserved
-	//	11		Reserved
+	assign Valid_Dst		= Inst.Valid_Dst;
+	assign Valid_Src1		= Inst.Valid_src1;
+	assign Valid_Src2		= Inst.Valid_src2;
+	assign Valid_Src3		= Inst.Valid_src3;
+	assign Index_Dst		= Instr.IdxDst;
+	assign Index_Src1		= Instr.SrcIdx1;
+	assign Index_Src2		= Instr.SrcIdx2;
+	assign Index_Src3		= Instr.SrcIdx3;
 
 
 	//// Hazard Check Stage
+	assign Req_IW			= ~Stall_IW_St;
 	St_InstrWindow  St_IW (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_IW					),
+		.I_Command(			Pre_Command				),
 		.I_Valid_Dst(		Valid_Dst				),
 		.I_Valid_Src1(		Valid_Src1				),
 		.I_Valid_Src2(		Valid_Src2				),
@@ -334,88 +204,145 @@ module scalar_unit (
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
-		.O_Index_Entry(		Index_Entry				)
+		.O_Index_Entry(		Index_Entry				),
+		.O_Command(			IW_Command				)
 	);
 
+	assign Req_Issue		= ~Stall_IW_Ld;
 	Hazard IW (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_Issue(		),
+		.I_Req_Issue(		Req_Issue				),
+		.I_Command(			IW_Command				),
 		.I_Index_Entry(		Index_Entry				),
 		.I_Slice(			Slice					),
 		.I_Req_Commit(		),
 		.I_Commit_No(		),
-		.O_Req_Issue(		),
+		.O_Req_Issue(		Req_Issue				),
+		.O_Commmand(		Command					),
 		.O_Issue_No(		IW_IssueNo				),
-		.O_RAR_Hzard(		)
+		.O_RAR_Hzard(		RAR_Hazard				)
+	);
+
+
+	//// Stall Control
+	assign Slice			= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2 | Slice_Dst;
+	stall_ctrl stall_ctrl (
+		.I_PCU_Wait(		),
+		.I_Hazard(			RAR_Hazard				)
+		.I_Slice(			Slice					),
+		.I_Ld_NoReady(		),
+		.O_Stall_IF(		Stall_IF				),
+		.O_Stall_IW_St(		Stall_IW_St				),
+		.O_Stall_IW_Ld(		Stall_IW_Ld				)
 	);
 
 
 	//// Index Update Stage
+	assign Index_Length		= Command.IdxLength;
+
+	assign Req_Index_Dst	= Command.v_dst & Req_Issue;
+	assign Slice_Dst		= Command.slice1 | Command.slice2 | Command.slice3;
+	assign Index_Dst		= Command.Dst;
+	Index Index_Dst (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			Stall_RegFile_Odd		),
+		.I_Req(				Req_Index_Dst			),
+		.I_Slice(			Slice_Dst				),
+		.I_Index(			Index_Dst				),
+		.I_Length(			Index_Length			),
+		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
+		.I_Constant(		Constant				),
+		.I_Sign(			Sign					),
+		.O_Req(				Req_RegFile_Dst			),
+		.O_Slice(			Slice_Idx_Dst			),
+		.O_Index(			Index_Dst				)
+	);
+
+	assign Req_Index_Odd1	= Command.v_src1 & Req_Issue;
+	assign Slice_Odd1		= Command.slice1;
+	assign Index_Orig_Odd1	= Command.SrcIdx1;
 	Index Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
-		.I_Req(				Req_RegFile_Odd1		),
+		.I_Req(				Req_Index_Odd1			),
 		.I_Slice(			Slice_Odd1				),
-		.I_Index(			Index_Odd1				),
+		.I_Index(			Index_Orig_Odd1			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.O_Req(				),
-		.O_Slice(			),
+		.O_Req(				Req_RegFile_Odd1		),
+		.O_Slice(			Slice_Idx_Odd1			),
 		.O_Index(			Index_Odd1				)
 	);
 
+	assign Req_Index_Odd2	= Command.v_src2 & Req_Issue;
+	assign Slice_Odd2		= Command.slice2;
+	assign Index_Odd2		= Command.SrcIdx2;
 	Index Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
-		.I_Req(				Req_RegFile_Odd2		),
+		.I_Req(				Req_Index_Odd2			),
 		.I_Slice(			Slice_Odd2				),
-		.I_Index(			Index_Odd2				),
+		.I_Index(			Index_Orig_Odd2			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.O_Req(				),
-		.O_Slice(			),
+		.O_Req(				Req_RegFile_Odd2		),
+		.O_Slice(			Slice_Idx_Odd2			),
 		.O_Index(			Index_Odd2				)
 	);
 
+	assign Req_Index_Even1	= Command.v_src3 & Req_Issue;
+	assign Slice_Even1		= Command.slice2;
+	assign Index_Even1		= Command.SrcIdx2;
 	Index Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
 		.I_Req(				Req_Index_Even1			),
 		.I_Slice(			Slice_Even1				),
-		.I_Index(			Index_Even1				),
+		.I_Index(			Index_Orig_Even1		),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.O_Req(				),
-		.O_Slice(			),
+		.O_Req(				Req_RegFile_Even1		),
+		.O_Slice(			Slice_Idx_Enen1			),
 		.O_Index(			Index_Even1				)
-	);
+		);
 
+	assign Req_Index_Even2	= Command.v_src4 & Req_Issue;
+	assign Slice_Even2		= Command.slice3;
+	assign Index_Even2		= Command.SrcIdx3;
 	Index Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
 		.I_Req(				Req_Index_Even2			),
 		.I_Slice(			Slice_Even2				),
-		.I_Index(			Index_Even2				),
+		.I_Index(			Index_Orig_Even2		),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.O_Req(				),
-		.O_Slice(			),
+		.O_Req(				Req_RegFile_Even2		),
+		.O_Slice(			Slice_Idx_Enen2			),
 		.O_Index(			Index_Even2				)
 	);
 
+	pipereg PReg_Index (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			),
+		.I_Op(				Pipe_OP_Index			),
+		.O_Op(				Pipe_OP_RFile			)
+	);
 
 	//// Register Read/Write-Back Stage
 	RegFile RegFile_Odd (
@@ -423,8 +350,8 @@ module scalar_unit (
 		.reset(				reset					),
 		.I_Req(				Req_RegFile_Odd			),
 		.I_We(				),
-		.I_Re1(				),
-		.I_Re2(				),
+		.I_Re1(				Req_RegFile_Odd1		),
+		.I_Re2(				Req_RegFile_Odd2		),
 		.I_Index_Dst(		WB_RF_Index1			),
 		.I_Data(			WB_RF_Data1				),
 		.I_Index_Src1(		Index_Odd1				),
@@ -439,8 +366,8 @@ module scalar_unit (
 		.reset(				reset					),
 		.I_Req(				Req_RegFile_Even		),
 		.I_We(				),
-		.I_Re1(				),
-		.I_Re2(				),
+		.I_Re1(				Req_RegFile_Even1		),
+		.I_Re2(				Req_RegFile_Even2		),
 		.I_Index_Dst(		WB_RF_Index2			),
 		.I_Data(			WB_RF_Data2				),
 		.I_Index_Src1(		Index_Even1				),
@@ -451,13 +378,24 @@ module scalar_unit (
 	);
 
 
+	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
+	pipereg_be PReg_RFile (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			),
+		.I_Op(				Pipe_OP_RFile			),
+		.O_Op(				Pipe_OP_Net				),
+		.I_Slice_Idx(		Slixe_Idx_RFile			),
+		.I_Slice_Idx(		Slixe_Idx_Net			)
+	);
+
+
 	//// Bypass Path
 	Bypass Bypass (
 		.I_Config_Path(		Config_Path				),
 		.I_WB_Path1(		WB_Path1				),
 		.I_WB_Path2(		WB_Path2				),
-		.I_Odd_Path(		I_Path_Odd				),//Unnecessary
-		.I_Even_Path(		I_Path_Even				),//Unnecessary
+		.I_Path_Hop(		'0						),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.I_WB_Index1(		WB_Index1				),
 		.I_WB_Index2(		WB_Index2				),
@@ -480,20 +418,26 @@ module scalar_unit (
 		.O_Length(			Length					)
 	);
 
+	pipereg_be PReg_Net (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			),
+		.I_Op(				Pipe_OP_RFile			),
+		.O_Op(				Pipe_OP_Net				),
+		.I_Slice_Idx(		Slixe_Idx_Net			),
+		.I_Slice_Idx(		Slixe_Idx_Math			)
+	);
+
 
 	//// Execution Stage
 	//	 Math Unit
 	SMathUnit SMathUnit (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall1(			Stall1					),
-		.I_Stall2(			Stall2					),
-		.I_CEn1(			CEn1					),
-		.I_CEn2(			CEn2					),
-		.I_Command1(		Command1				),
-		.I_Command2(		Command2				),
-		.I_WB_Index1(		Dst_Index1				),
-		.I_WB_Index2(		Dst_Index2				),
+		.I_Stall(			Stall					),
+		.I_CEn(				CEn						),
+		.I_Command(			Command					),
+		.I_WB_Index(		Dst_Index				),
 		.I_Src_Src_Data1(	Src_Data1				),
 		.I_Src_Src_Data2(	Src_Data2				),
 		.I_Src_Src_Data3(	Src_Data3				),

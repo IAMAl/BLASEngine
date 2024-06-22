@@ -1,4 +1,6 @@
-module FrontEnd (
+module FrontEnd
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_En_Exe,						//Enable Execution

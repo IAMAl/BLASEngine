@@ -1,4 +1,6 @@
-module tpu (
+module tpu
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_En_Exe,
@@ -36,6 +38,8 @@ module tpu (
 	s_stat_t					S_Status;
 	command_t					V_Command;
 	v_stat_t					V_Status;
+	logic	{WIDTH_LANES-1:0}	Rotate_Amount1;
+	logic	{WIDTH_LANES-1:0}	Rotate_Amount2;
 
 
 	FrontEnd FrontEnd (
@@ -105,9 +109,11 @@ module tpu (
 		.O_St_Req1(				O_S_St[0].Req			),
 		.O_St_Req2(				O_S_St[1].Req			),
 		.O_St_Data1(			O_S_St[0].Data			),
-		.O_St_Data2(			O_S_St[0].Data			),
+		.O_St_Data2(			O_S_St[1].Data			),
 		.O_Re(					Buff_Re					),
 		.O_V_Command(			V_Command				),
+		.O_Rotate_Amount1(		Rotate_Amount1			),
+		.O_Rotate_Amount2(		Rotate_Amount2			),
 		.O_Status(				S_Status				)
 	);
 
@@ -116,6 +122,8 @@ module tpu (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Command(				V_Command				),
+		.I_Rotate_Amount1(		Rotate_Amount1			),
+		.I_Rotate_Amount2(		Rotate_Amount2			),
 		.I_Scalar_Data(			Out_Scalar_Data			),
 		.O_Scalar_Data(			In_Scalar_Data			),
 		.O_Address(				O_V_Address				),

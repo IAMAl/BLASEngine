@@ -1,4 +1,7 @@
-module mpu (
+module mpu
+	import pkg_mpu::*;
+	import pkg_tpu::*;
+(
 	input							clock,
 	input							reset,
 	input							I_Req_St,			//Request to Store Thread Program

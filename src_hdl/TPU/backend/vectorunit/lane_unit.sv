@@ -1,4 +1,6 @@
-module lane_unit (
+module lane_unit
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_En,					//Enable Execution
@@ -7,8 +9,11 @@ module lane_unit (
 	input	command_t			I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
-	input	data_t				I_Path_Odd,				//Neighbor Lane
-	input	data_t				I_Path_Even,			//Neighbor Lane
+	input	hop_data_t			I_Path_Hop,				//Neighbor Lane
+	input	data_t				I_Rotate_Src_Data1,		//Roattion Path at Net Stage
+	input	data_t				I_Rotate_Src_Data2,		//Roattion Path at Net Stage
+	output	data_t				O_Rotate_Src_Data1,		//Roattion Path at Net Stage
+	output	data_t				O_Rotate_Src_Dataw,		//Roattion Path at Net Stage
 	output	address_t			O_Address1,				//Data Memory Address
 	output	address_t			O_Address2,				//Data Memory Address
 	output						O_Ld_Req1,				//Load Request
@@ -88,6 +93,31 @@ module lane_unit (
 
 
 	//// Index Update Stage
+	assign Index_Length		= I_Command.IdxLength;
+	assign Constant			= I_Command.Imm_Data[WIDTH_INDEX-1:0];
+
+	assign Req_Index_Dst	= I_Command.v_dst & Req_Issue;
+	assign Slice_Dst		= I_Command.slice1 | I_Command.slice2 | I_Command.slice3;
+	assign Index_Dst		= I_Command.Dst;
+	Index Index_Dst (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			Stall_RegFile_Odd		),
+		.I_Req(				Req_Index_Dst			),
+		.I_Slice(			Slice_Dst				),
+		.I_Index(			Index_Dst				),
+		.I_Length(			Index_Length			),
+		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
+		.I_Constant(		Constant				),
+		.I_Sign(			Sign					),
+		.O_Req(				Req_RegFile_Dst			),
+		.O_Slice(			Slice_Dst				),
+		.O_Index(			Index_Dst				)
+	);
+
+	assign Req_Index_Odd1	= I_Command.v_src1 & Req_Issue;
+	assign Slice_Odd1		= I_Command.slice1;
+	assign Index_Orig_Odd1	= I_Command.SrcIdx1;
 	Index Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -105,6 +135,9 @@ module lane_unit (
 		.O_Index(			Index_Odd1				)
 	);
 
+	assign Req_Index_Odd2	= I_Command.v_src2 & Req_Issue;
+	assign Slice_Odd2		= I_Command.slice2;
+	assign Index_Odd2		= I_Command.SrcIdx2;
 	Index Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -122,6 +155,9 @@ module lane_unit (
 		.O_Index(			Index_Odd2				)
 	);
 
+	assign Req_Index_Even1	= I_Command.v_src3 & Req_Issue;
+	assign Slice_Even1		= I_Command.slice2;
+	assign Index_Even1		= I_Command.SrcIdx2;
 	Index Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -139,6 +175,9 @@ module lane_unit (
 		.O_Index(			Index_Even1				)
 	);
 
+	assign Req_Index_Even2	= I_Command.v_src4 & Req_Issue;
+	assign Slice_Even2		= I_Command.slice3;
+	assign Index_Even2		= I_Command.SrcIdx3;
 	Index Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -156,6 +195,13 @@ module lane_unit (
 		.O_Index(			Index_Even2				)
 	);
 
+	pipereg PReg_Index (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			),
+		.I_Op(				Pipe_OP_Index			),
+		.O_Op(				Pipe_OP_RFile			)
+	);
 
 	//// Register Read/Write-Back Stage
 	RegFile RegFile_Odd (
@@ -169,7 +215,7 @@ module lane_unit (
 		.I_Data(			WB_Data_Odd				),
 		.I_Index_Src1(		Index_Odd1				),
 		.I_Index_Src2(		Index_Odd2				),
-		.O_Data_Src1(		Pre_Src_Data1			),
+		.O_Data_Src1(		O_Rotate_Src_Data1		),
 		.O_Data_Src2(		Pre_Src_Data2			),
 		.O_Req(										)
 	);
@@ -185,19 +231,35 @@ module lane_unit (
 		.I_Data(			WB_Data_Even			),
 		.I_Index_Src1(		Index_Even1				),
 		.I_Index_Src2(		Index_Even2				),
-		.O_Data_Src1(		Pre_Src_Data3			),
+		.O_Data_Src1(		O_Rotate_Src_Data2		),
 		.O_Data_Src2(		Pre_Src_Data4			),
 		.O_Req(										)
 	);
 
 
-	//// Bypass Path
+	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
+	pipereg_be PReg_RFile (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			),
+		.I_Op(				Pipe_OP_RFile			),
+		.O_Op(				Pipe_OP_Net				),
+		.I_Slice_Idx(		Slixe_Idx_RFile			),
+		.I_Slice_Idx(		Slixe_Idx_Net			)
+	);
+
+
+	//// Network Stage
+	// Rotate Path
+	aasign Pre_Src_Data1 = I_Rotate_Src_Data1;
+	aasign Pre_Src_Data4 = I_Rotate_Src_Data2;
+
+	// Bypass Path
 	Bypass Bypass (
 		.I_Config_Path(		Config_Path				),
 		.I_WB_Path1(		WB_Path1				),
 		.I_WB_Path2(		WB_Path2				),
-		.I_Odd_Path(		I_Path_Odd				),
-		.I_Even_Path(		I_Path_Even				),
+		.I_Path_Hop(		I_Path_Hop				),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.I_WB_Index1(		WB_Index1				),
 		.I_WB_Index2(		WB_Index2				),
@@ -218,6 +280,16 @@ module lane_unit (
 		.O_Address(			Address					),
 		.O_Stride(			Stride					),
 		.O_Length(			Length					)
+	);
+
+	pipereg_be PReg_Net (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			),
+		.I_Op(				Pipe_OP_RFile			),
+		.O_Op(				Pipe_OP_Net				),
+		.I_Slice_Idx(		Slixe_Idx_Net			),
+		.I_Slice_Idx(		Slixe_Idx_Math			)
 	);
 
 
