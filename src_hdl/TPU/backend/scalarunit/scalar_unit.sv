@@ -1,4 +1,4 @@
-module scalar_unit 
+module scalar_unit
 	import pkg_mpu::*;
 	import pkg_tpu::*;
 (
@@ -22,6 +22,9 @@ module scalar_unit
 	output	data_t				O_St_Data1,				//Store Data
 	output	data_t				O_St_Data2,				//Store Data
 	output						O_Re,					//Read-Enable for Buffer
+	output	commant_t			O_V_Command,			//Command to Vector Unit
+	output	rotate_t			O_Rotate_Amount1,		//Rotation Amount Used in Network
+	output	rotate_t			O_Rotate_Amount2,		//Rotation Amount Used in Network
 	output	s_stat_t			O_Status				//Scalar Unit Status
 );
 
@@ -128,12 +131,11 @@ module scalar_unit
 	//// Instruction Fetch Stage
 	assign Req_IFetch		= ~Stall_IF;
 
-	//// Hazard Check Stage
+
+	//// Hazard Detect Stage
 	assign Req_IW			= ~Stall_IW_St;
 	assign Req_Issue		= ~Stall_IW_Ld;
 
-
-	//// Instruction Separation
 	assign Valid_Dst		= Inst.Valid_Dst;
 	assign Valid_Src1		= Inst.Valid_src1;
 	assign Valid_Src2		= Inst.Valid_src2;
@@ -144,16 +146,25 @@ module scalar_unit
 	assign Index_Src3		= Instr.SrcIdx3;
 
 
+	//// Command Issue
+	Issue_Command Issue_Command(
+		.I_Sel_Unit(		)
+		.I_Command(			Pre_Command				),
+		.O_S_Command(		Command					),
+		,.O_V_Command(		O_V_Command				)
+	);
+
+
 	//// Stall Control
 	assign Slice			= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2 | Slice_Dst;
 
 
 	//// Index Update Stage
-	assign Index_Length		= Command.IdxLength;
+	assign Index_Length		 Command.IdxLength;
 
 	assign Req_Index_Dst	= Command.v_dst & Req_Issue;
 	assign Slice_Dst		= Command.slice1 | Command.slice2 | Command.slice3;
-	assign Index_Dst		= Command.Dst;
+	assign Index_Dst		= Command.SrcDst;
 
 	assign Req_Index_Odd1	= Command.v_src1 & Req_Issue;
 	assign Slice_Odd1		= Command.slice1;
@@ -174,6 +185,7 @@ module scalar_unit
 
 	//// Register-Read Stage
 	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
+
 
 	//// Instruction Memory
 	InstrMem IMem (
@@ -245,7 +257,7 @@ module scalar_unit
 		.I_Req_Commit(		),
 		.I_Commit_No(		),
 		.O_Req_Issue(		Req_Issue				),
-		.O_Commmand(		Command					),
+		.O_Commmand(		Pre_Command				),
 		.O_Issue_No(		IW_IssueNo				),
 		.O_RAR_Hzard(		RAR_Hazard				)
 	);

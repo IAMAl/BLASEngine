@@ -5,6 +5,7 @@ module Hazard_Detect
 	input						reset,
 	input						I_Req_Issue,					//Request from Previous Stage
 	input						I_Req,							//Request to Work
+	input						I_Sel_Unit,						//Select Scalr/Vector Unit
 	input						I_Valid_Dst,					//Flag: Valid for Destination
 	input						I_Valid_Src1,					//Flag: Valid for Source-1
 	input						I_Valid_Src2,					//Flag: Valid for Source-2
@@ -277,6 +278,11 @@ module Hazard_Detect
 			else begin
 				R_Indeces.v_src3	<= 1'b0;
 			end
+
+			if ( R_Sel_Unit ) begin
+				R_Indeces.
+
+			end
 		end
 	end
 
@@ -411,7 +417,7 @@ module Hazard_Detect
 			end
 
 			if ( I_Req_Issue ) begin
-				TabHazard[ WNo ] <= I_Index_Entry;
+				TabHazard[ WNo ] <= Index_Entry;
 			end
 		end
 	end

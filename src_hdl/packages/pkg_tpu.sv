@@ -239,6 +239,7 @@ package pkg_tpu;
 	} iw_t;
 
 	typedef struct packed {
+		logic								valid;
 		logic		[1:0]					OpType;
 		logic		[1:0]					OpClass;
 		logic		[1:0]					OpCode;

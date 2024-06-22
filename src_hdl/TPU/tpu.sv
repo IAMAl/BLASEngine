@@ -61,7 +61,8 @@ module tpu
 
 
 	buff #(
-		.NUM_ENTRY(				)
+		.NUM_ENTRY(				SIZE_THREAD_MEM			),
+		.TYPE_DEF(				logic[WIDTH_DATA-1:0]	)
 	) instr_buff
 	(
 		.clock(					clock					),
@@ -76,7 +77,8 @@ module tpu
 
 
 	buff #(
-		.NUM_ENTRY(				)
+		.NUM_ENTRY(				SIZE_THREAD_MEM			),
+		.TYPE_DEF(				logic[WIDTH_THRDID-1:0]	)
 	) id_buff
 	(
 		.clock(					clock					),
