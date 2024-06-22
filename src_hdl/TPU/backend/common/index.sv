@@ -4,7 +4,7 @@ module Index
 	input						clock,
 	input						reset,
 	input						I_Stall,						//Force Stalling
-	input						I_Req,							//Request from Previous Stage
+	input						I_Req,							//Request from Hazard-Check Stage
 	input						I_Slice,						//Flag: Index-Slicing
 	input	[5:0]				I_Sel,							//Select Sources
 	input	index_s_t			I_Index,						//Index Value
@@ -13,7 +13,7 @@ module Index
 	input	id_t				I_ThreadID_SIMT,				//SIMT Thread ID
 	input	id_t				I_Constant,						//Constant
 	input						I_Sign,							//Config: Sign
-	output						O_Req,							//Request to Next Stage
+	output						O_Req,							//Request to Register-Read Stage
 	output						O_Slice,						//Flag: Index-Slicing
 	output	index_t				O_Index							//Index Value
 );

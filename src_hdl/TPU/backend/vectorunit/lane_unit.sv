@@ -120,6 +120,7 @@ module lane_unit
 	//// Register Read/Write Stage
 	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
 
+
 	//// Network Stage
 	//	 Rotate Path
 	assign Pre_Src_Data1 	= I_Rotate_Src_Data1;

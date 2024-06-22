@@ -4,7 +4,7 @@ module RegFile
 (
 	input						clock,
 	input						reset,
-	input						I_Req,							//Request from Previous Stage
+	input						I_Req,							//Request from Index Stage
 	input						I_We,							//Flag: Write=Enable
 	input						I_Re1,							//Flag: Read-Enable for Source-1
 	input						I_Re2,							//Flag: Read-Enable for Source-2
@@ -14,7 +14,7 @@ module RegFile
 	input	index_t				I_Index_Src2,					//Read Index for Source-2
 	output	data_t				O_Data_Src1,					//Data of Source-1
 	output	data_t				O_Data_Src2,					//Data of Source-2
-	output						O_Req							//Request to Next Stage
+	output						O_Req							//Request to Network Stage
 );
 
 

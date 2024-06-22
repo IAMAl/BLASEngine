@@ -1,4 +1,4 @@
-module network
+module Network
 	import pkg_tpu::*;
 #(
 	parameter int NUM_LANES		= 16,
