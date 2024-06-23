@@ -19,11 +19,17 @@ module FrontEnd
 );
 
 
-	logic						Set_We;
+
+	logic						is_FSM_PE_SCALAR;
+	logic						is_FSM_PE_SIMT;
+	logic						is_FSM_PE_INSTR;
 	logic						is_FSM_PE_RUN;
 
-	logic						R_En_Exe;
+	logic						Set_We;
+
+
 	logic						R_Req;
+	logic						R_En_Exe;
 	logic						R_Full;
 	logic						R_Term;
 	logic						R_We;
@@ -31,14 +37,15 @@ module FrontEnd
 
 	fsm_pe_frontend_t			R_FSM_PE_FRONTEND;
 
-	instr_t						R_IssueNo;
-	instr_t						R_ThreadID_SIMT;
+	issue_no_t					R_IssueNo;
 	instr_t						R_Instr;
+	id_t						R_ThreadID_SIMT;
 
 
 	assign is_FSM_PE_SCALAR		= R_FSM_PE_FRONTEND == FSM_PE_SCALAR;
 	assign is_FSM_PE_SIMT		= R_FSM_PE_FRONTEND == FSM_PE_SIMT;
 	assign is_FSM_PE_INSTR		= R_FSM_PE_FRONTEND == FSM_PE_INSTR;
+	assign is_FSM_PE_RUN		= R_FSM_PE_FRONTEND >  FSM_PE_FE_INIT;
 
 	assign Set_We               = ~R_Full & ( ( R_IssueNo.v & R_Thread_SIMT.v & R_Req ) |
 									( R_En_Exe & R_Req ) );
