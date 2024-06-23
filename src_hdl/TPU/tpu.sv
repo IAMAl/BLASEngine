@@ -3,19 +3,19 @@ module tpu
 (
 	input						clock,
 	input						reset,
-	input						I_En_Exe,
-	input						I_Req,
-	input	instr_t				I_Instr,
-	output	s_address_t			O_S_Address,
-	output	s_store_t			O_S_St,
-	output	s_load_req_t		O_S_Ld_Req,
-	input	s_load_t			I_S_Ld_Data,
-	output	v_address_t			O_V_Address,
-	output	v_store_t			O_V_St,
-	output	v_load_req_t		O_V_Ld,
-	input	v_load_t			I_V_Ld,
-	output						O_Term,
-	output						O_Nack
+	input						I_En_Exe,				//Enable Executing
+	input						I_Req,					//Request from MPU
+	input	instr_t				I_Instr,				//Instructions from MPU
+	output	s_address_t			O_S_Address,			//Addresses for Scalar Lane Data Memory
+	output	s_store_t			O_S_St,					//Store Request for Scalar Lane Data Memory
+	output	s_load_req_t		O_S_Ld_Req,				//Load Request to Scalar Lane Data Memory
+	input	s_load_t			I_S_Ld_Data,			//Loaded Data from Scalar Lane Data Memory
+	output	v_address_t			O_V_Address,			//Addresses for Vector Lane Data Memories
+	output	v_store_t			O_V_St,					//Store Requests for Vector Lane Data Memories
+	output	v_load_req_t		O_V_Ld,					//Load Requests to Vector Lane Data Memories
+	input	v_load_t			I_V_Ld,					//Loaded Data from Vector Lane Data Memories
+	output						O_Term,					//Flag: Termination
+	output						O_Nack					//Flag: Not-Acknowledge
 );
 
 	instr_t						Buff_Instr;
@@ -41,7 +41,7 @@ module tpu
 	logic	{WIDTH_LANES-1:0}	Rotate_Amount1;
 	logic	{WIDTH_LANES-1:0}	Rotate_Amount2;
 
-
+	//// Service Management UNit
 	FrontEnd FrontEnd (
 		.clock(					clock					),
 		.reset(					reset					),
@@ -60,9 +60,11 @@ module tpu
 	);
 
 
+	//// Buffers between FrontENd and Scalar Unit
+	//	 Buffer for Instructions
 	buff #(
 		.NUM_ENTRY(				SIZE_THREAD_MEM			),
-		.TYPE_DEF(				logic[WIDTH_DATA-1:0]	)
+		.TYPE_DEF(				instr_t					)
 	) instr_buff
 	(
 		.clock(					clock					),
@@ -75,10 +77,10 @@ module tpu
 		.O_Empty(				Buff_Empty				)
 	);
 
-
+	//	 Buffer for SIMT Thread-ID
 	buff #(
 		.NUM_ENTRY(				SIZE_THREAD_MEM			),
-		.TYPE_DEF(				logic[WIDTH_THRDID-1:0]	)
+		.TYPE_DEF(				id_t					)
 	) id_buff
 	(
 		.clock(					clock					),
@@ -97,7 +99,7 @@ module tpu
 		.reset(					reset					),
 		.I_Empty(				Buff_Empty				),
 		.I_Instr(				Instr					),
-		.I_En(					),
+		.I_En(					I_En_Exe				),
 		.I_IssueNo(				IssueNo					),
 		.I_ThreadID_SIMT(		ThreadID_SIMT			),
 		.I_Scalar_Data(			In_Scalar_Data			),
