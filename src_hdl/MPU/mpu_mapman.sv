@@ -108,7 +108,7 @@ module MapMan
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_St			<= 1'b0;
+			FSM_St			<= FSM_MAPMAN_ST_INIT;
 		end
 		else case ( FSM_St )
 			FSM_MAPMAN_ST_INIT: begin
@@ -132,7 +132,7 @@ module MapMan
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Ld			<= 1'b0;
+			FSM_Ld			<= FSM_MAPMAN_LD_INIT;
 		end
 		else case ( FSM_Ld )
 			FSM_MAPMAN_LD_RUN: begin
