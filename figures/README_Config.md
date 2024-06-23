@@ -1,7 +1,10 @@
 # TPU Architecture Note
 
+![Inline image alt text](<./RegisterMap.png> ""TPUレジスタマップ"")
+
+
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/figures/RegisterMap.png"
+  <img src="./RegisterMap.png"
        alt="HTML image alt text"
        title="TPUレジスタマップ"
        width="￥￥300px"
