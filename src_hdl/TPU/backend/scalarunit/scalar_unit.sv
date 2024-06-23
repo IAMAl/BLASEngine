@@ -115,6 +115,10 @@ module scalar_unit
 
 	logic					Req_LdSt_Odd;
 	logic					Req_LdSt_Even;
+	logic	[1:0]			OpClass_LdSt_Odd;
+	logic	[1:0]			OpClass_LdSt_Even;
+	logic	[1:0]			OpCode_LdSt_Odd;
+	logic	[1:0]			OpCode_LdSt_Even;
 	logic					LdSt_Odd;
 	logic					LdSt_Even;
 	logic					Stall_LdSt_Odd;
@@ -147,15 +151,6 @@ module scalar_unit
 	assign Index_Src1		= Instr.SrcIdx1;
 	assign Index_Src2		= Instr.SrcIdx2;
 	assign Index_Src3		= Instr.SrcIdx3;
-
-
-	//// Command Issue
-	Issue_Command Issue_Command(
-		.I_Sel_Unit(		)
-		.I_Command(			Pre_Command				),
-		.O_S_Command(		Command					),
-		,.O_V_Command(		O_V_Command				)
-	);
 
 
 	//// Stall Control
@@ -191,13 +186,20 @@ module scalar_unit
 	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
 
 
+	//// Execution Stage
+	//	 Load/Store Unit
+	assign OpClass_LdSt_Odd	= S_Command.OpClass;
+	assign OpClass_LdSt_Even= S_Command.OpClass;
+	assign OpCode_LdSt		= S_Command.OpCode;
+
+
 	//// Instruction Memory
 	InstrMem IMem (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_St(			),
-		.O_Ack_St(			),
-		.I_St_Instr(		),
+		.I_Req_St(			),//ToDo
+		.O_Ack_St(			),//ToDo
+		.I_St_Instr(		),//ToDo
 		.I_Req_Ld(			IFetch					),
 		.I_Ld_Address(		PC						),
 		.O_Ld_Instr(		Instruction				)
@@ -219,10 +221,10 @@ module scalar_unit
 		.I_Timing_WB(		WB_IssueNo				),
 		.I_State(			State					),
 		.I_Cond(			Condition				),
-		.I_Src(				),
+		.I_Src(				),//ToDo
 		.O_IFetch(			IFetch					),
 		.O_Address(			PC						)
-		.O_StallReq(		)
+		.O_StallReq(		)//ToDo
 	);
 
 
@@ -232,7 +234,7 @@ module scalar_unit
 		.reset(				reset					),
 		.I_Req(				Req_IFetch				),
 		.I_Empty(			I_Empty					),
-		.I_Term(			),
+		.I_Term(			),//ToDo
 		.I_Instr(			Instruction				),
 		.O_Req(				Req_IW					),
 		.O_Instr(			Instr					),
@@ -258,8 +260,8 @@ module scalar_unit
 		.I_Command(			HZD_Command				),
 		.I_Index_Entry(		Index_Entry				),
 		.I_Slice(			Slice					),
-		.I_Req_Commit(		),
-		.I_Commit_No(		),
+		.I_Req_Commit(		),//ToDo
+		.I_Commit_No(		),//ToDo
 		.O_Req_Issue(		Req_Issue				),
 		.O_Commmand(		Pre_Command				),
 		.O_Issue_No(		IW_IssueNo				),
@@ -268,7 +270,7 @@ module scalar_unit
 
 
 	//// Select Scalar-Unit Back-End or Vector Unit Back-End
-	Issue_Command (
+	Issue_Command Issue_Command (
 		.I_Sel_Unit(		);//ToDO
 		.I_Command(			Pre_Command				),
 		.O_S_Command(		S_Command				),
@@ -278,10 +280,10 @@ module scalar_unit
 
 	//// Stall Control
 	Stall_Ctrl Stall_Ctrl (
-		.I_PCU_Wait(		),
+		.I_PCU_Wait(		),//ToDo
 		.I_Hazard(			RAR_Hazard				)
 		.I_Slice(			Slice					),
-		.I_Ld_NoReady(		),
+		.I_Ld_NoReady(		),//ToDo
 		.O_Stall_IF(		Stall_IF				),
 		.O_Stall_IW_St(		Stall_IW_St				),
 		.O_Stall_IW_Ld(		Stall_IW_Ld				)
@@ -377,7 +379,7 @@ module scalar_unit
 	pipereg PReg_Index (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),
+		.I_Stall(			),//ToDo
 		.I_Op(				Pipe_OP_Index			),
 		.O_Op(				Pipe_OP_RFile			)
 	);
@@ -387,7 +389,7 @@ module scalar_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_RegFile_Odd			),
-		.I_We(				),
+		.I_We(				WB_RF_We1				),
 		.I_Re1(				Req_RegFile_Odd1		),
 		.I_Re2(				Req_RegFile_Odd2		),
 		.I_Index_Dst(		WB_RF_Index1			),
@@ -403,7 +405,7 @@ module scalar_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_RegFile_Even		),
-		.I_We(				),
+		.I_We(				WB_RF_We2				),
 		.I_Re1(				Req_RegFile_Even1		),
 		.I_Re2(				Req_RegFile_Even2		),
 		.I_Index_Dst(		WB_RF_Index2			),
@@ -418,7 +420,7 @@ module scalar_unit
 	pipereg_be PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),
+		.I_Stall(			),//ToDo
 		.I_Op(				Pipe_OP_RFile			),
 		.O_Op(				Pipe_OP_Net				),
 		.I_Slice_Idx(		Slixe_Idx_RFile			),
@@ -449,6 +451,8 @@ module scalar_unit
 		.O_WB_Index2(		WB_RF_Index2			),
 		.O_WB_Data1(		WB_RF_Data1				),
 		.O_WB_Data2(		WB_RF_Data2				),
+		.O_WB_We1(			WB_RF_We1				),
+		.O_WB_We2(			WB_RF_We2				),
 		.O_Address(			Address					),
 		.O_Stride(			Stride					),
 		.O_Length(			Length					)
@@ -457,7 +461,7 @@ module scalar_unit
 	pipereg_be PReg_Net (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),
+		.I_Stall(			),//ToDo
 		.I_Op(				Pipe_OP_RFile			),
 		.O_Op(				Pipe_OP_Net				),
 		.I_Slice_Idx(		Slixe_Idx_Net			),
@@ -492,7 +496,8 @@ module scalar_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_LdSt_Odd			),
-		.I_Store(			),
+		.I_OpClass(			OpClass_LdSt_Odd		),
+		.I_OpCode(			OpCode_LdSt				),
 		.I_Stall(			Stall_LdSt_Odd			),
 		.I_Address(			Address					),
 		.I_Stride(			Stride					),
@@ -511,7 +516,8 @@ module scalar_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_LdSt_Even			),
-		.I_Store(			),
+		.I_OpClass(			OpClass_LdSt_Even		),
+		.I_OpCode(			OpCode_LdSt				),
 		.I_Stall(			Stall_LdSt_Even			),
 		.I_Address(			Address					),
 		.I_Stride(			Stride					),
@@ -524,6 +530,24 @@ module scalar_unit
 		.I_Ld_Data(			I_Ld_Data2				),
 		.O_Ld_Data(			Ld_Data2				),
 		.O_Done(			LdSt_Done2				)
+	);
+
+
+	//// Commitment Stage
+	ReorderBuffer ReorderBuffer (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_IssueNo_LdSt1(	),//ToDo
+		.I_IssueNo_LdSt2(	),//ToDo
+		.I_IssueNo(			),//ToDo
+		.I_Ld_Data1(		Ld_Data1				),
+		.I_Ld_Data2(		Ld_Data2				),
+		.I_WB_Index1(		WB_Index1				),
+		.I_WB_Index2(		WB_Index2				),
+		.I_WB_Data1(		WB_Data1				),
+		.I_WB_Data2(		WB_Data2				),
+		.O_Commit_Req(		Commit_Req				),
+		.O_IssueNo(			Commit_No				)
 	);
 
 endmodule

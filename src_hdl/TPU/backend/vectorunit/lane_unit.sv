@@ -287,6 +287,8 @@ module lane_unit
 		.O_WB_Index2(		WB_RF_Index2			),
 		.O_WB_Data1(		WB_RF_Data1				),
 		.O_WB_Data2(		WB_RF_Data2				),
+		.O_WB_We1(			We_RegFile_Odd			),
+		.O_WB_We2(			We_RegFile_Even			),
 		.O_Address(			Address					),
 		.O_Stride(			Stride					),
 		.O_Length(			Length					)
