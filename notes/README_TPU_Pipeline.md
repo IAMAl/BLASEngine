@@ -9,7 +9,7 @@
 <div align="center">
   <img src="./TPU_Pipeline.png"
        alt="HTML image alt text"
-       title="TPUレジスタマップ"
+       title="TPUパイプライン構成"
        width="￥￥200px"
   />
 </div>
