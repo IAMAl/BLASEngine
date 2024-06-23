@@ -27,7 +27,7 @@ module Hazard_Detect
 	localparam int WIDTH_ENTRY	= $clog2(NUM_ENTRY_HAZARD);
 
 
-	iw_t						Index_Entry,	
+	iw_t						Index_Entry;
 
 	logic						We;
 	logic						Re;
@@ -86,11 +86,6 @@ module Hazard_Detect
 	iw_t						TabHazard [NUM_ENTRY_HAZARD-1:0];
 
 
-	assign O_Req_Issue			= R_Req;
-	assign O_Issue_No			= R_Issue_No;
-	assign O_RAR_Hzard			= R_RAR_Hzard;
-
-
 	//// Storing to Table
 	logic						Set_Index;
 
@@ -112,8 +107,13 @@ module Hazard_Detect
 	logic						We_Valid_Src3;
 
 
-	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
+	assign O_Req_Issue			= R_Req;
+	assign O_Issue_No			= R_Issue_No;
+	assign O_RAR_Hzard			= R_RAR_Hzard;
 
+
+	//// Storing to Table
+	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
 	assign Index_Entry			= R_Indeces;
 
 
