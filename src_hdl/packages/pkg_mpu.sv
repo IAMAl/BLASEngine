@@ -19,6 +19,13 @@ package pkg_mpu;
 		logic								Commmit;
 	} mpu_tab_hazard_t;
 
+	typedef struct packed {
+		logic								Valid;
+		logic	[WIDTH_ENTRY_STH-1:0]		IsseNo;
+		logic								Commmit;
+	} mpu_tab_commit_t;
+
+
 	typedef struct enum logic [1:0] {
 		FSM_DPC_INIT			= 2'h0,
 		FSM_DPC_GETINFO			= 2'h1,
@@ -26,10 +33,14 @@ package pkg_mpu;
 		FSM_DPC_SEND_INSTRS		= 2'h3
 	} fsm_dispatch_t;
 
-	typedef struct packed {
-		logic								Valid;
-		logic	[WIDTH_ENTRY_STH-1:0]		IsseNo;
-		logic								Commmit;
-	} mpu_tab_commit_t;
+	typedef struct enum logic {
+		FSM_MAPMAN_ST_INIT		= 1'h0,
+		FSM_MAPMAN_ST_RUN		= 1'h1
+	} fsm_mapman_st;
+
+	typedef struct enum logic {
+		FSM_MAPMAN_LD_RUN		= 1'h0,
+		FSM_MAPMAN_LD_INIT		= 1'h1
+	} fsm_mapman_ld;
 
 endpackage

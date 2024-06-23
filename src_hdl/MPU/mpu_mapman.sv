@@ -32,8 +32,8 @@ module MapMan
 	st_address_t					R_Length_Ld;
 	st_address_t					R_Used_Size;
 
-	logic							FSM_St;
-	logic							FSM_Ld;
+	fsm_mapman_st					FSM_St;
+	fsm_mapman_ld					FSM_Ld;
 
 
 	assign O_Full           = R_Used_Size >= (SIZE_THREAD_MEM-1);
@@ -50,7 +50,7 @@ module MapMan
 	assign Update           = O_Ack_St | FSM_Ld;
 	assign UpdateAmount     = ( O_Ack_St & O_Ack_Lookup ) ?		I_Length_St - O_Length_Ld :
 								( O_Ack_St & ~O_Ack_Lookup ) ?	I_Length_St :
-								( ~O_Ack_St & O_Ack_Lookup ) ?	0-O_Length_Ld :
+								( ~O_Ack_St & O_Ack_Lookup ) ?	-O_Length_Ld :
 																0;
 
 
@@ -111,20 +111,20 @@ module MapMan
 			FSM_St			<= 1'b0;
 		end
 		else case ( FSM_St )
-			1'b0: begin
+			FSM_MAPMAN_ST_INIT: begin
 				if ( Found ) begin
-					FSM_St			<= 1'b1;
+					FSM_St			<= FSM_MAPMAN_ST_RUN;
 				end
 				else begin
-					FSM_St			<= 1'b0;
+					FSM_St			<= FSM_MAPMAN_ST_INIT;
 				end
 			end
-			1'b1: begin
+			FSM_MAPMAN_ST_RUN: begin
 				if ( I_Req_St ) begin
-					FSM_St			<= 1'b0;
+					FSM_St			<= FSM_MAPMAN_ST_INIT;
 				end
 				else begin
-					FSM_St			<= 1'b1;
+					FSM_St			<= FSM_MAPMAN_ST_RUN;
 				end
 			end
 		endcase
@@ -135,16 +135,16 @@ module MapMan
 			FSM_Ld			<= 1'b0;
 		end
 		else case ( FSM_Ld )
-			1'b0: begin
+			FSM_MAPMAN_LD_RUN: begin
 				if ( I_Req_Lookup ) begin
-					FSM_Ld			<= 1'b1;
+					FSM_Ld			<= FSM_MAPMAN_LD_INIT;
 				end
 				else begin
-					FSM_Ld			<= 1'b0;
+					FSM_Ld			<= FSM_MAPMAN_LD_RUN;
 				end
 			end
-			1'b1: begin
-				FSM_Ld			<= 1'b0;
+			FSM_MAPMAN_LD_INIT: begin
+				FSM_Ld			<= FSM_MAPMAN_LD_RUN;
 			end
 		endcase
 	end
@@ -169,7 +169,7 @@ module MapMan
 		.O_Num(										)
 	);
 
-	//// Module Encoder
+	//// Module: Encoder
 	Encoder #(
 		.NUM_ENTRY(			SIZE_TAB_MAMAN			)
 	) LoadEntry

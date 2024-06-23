@@ -10,7 +10,7 @@ module mpu
 	input							I_Req_Commit,		//Request of Commit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
 	output							O_Wait,				//Wait Signal to Host tring the store
-	output	mpu_stat_t				O_Status
+	output	mpu_stat_t				O_Status			//Status Info to Host System
 );
 
 
