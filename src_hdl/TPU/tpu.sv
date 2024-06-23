@@ -19,8 +19,8 @@ module tpu
 );
 
 	instr_t						Buff_Instr;
-	logic						Buff_We;
-	logic						Buff_Re;
+	logic						We_Buff;
+	logic						Re_Buff;
 	logic 						Buff_Full;
 	logic						Buff_Empty;
 	instr_t						Instr;
@@ -51,7 +51,7 @@ module tpu
 		.I_Term(				),
 		.I_Nack(				),
 		.I_Instr(				I_Instr					),
-		.O_We(					Buff_We					),
+		.O_We(					We_Buff					),
 		.O_IssueNo(				IssueNo					),
 		.O_ThreadID_SIMT(		Buff_ThreadID_SIMT		),
 		.O_Instr(				Buff_Instr				),
@@ -67,8 +67,8 @@ module tpu
 	(
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_We(					Buff_We					),
-		.I_Re(					Buff_Re					),
+		.I_We(					We_Buff					),
+		.I_Re(					Re_Buff					),
 		.I_Data(				Buff_Instr				),
 		.O_Data(				Instr					),
 		.O_Full(				Buff_Full				),
@@ -112,7 +112,7 @@ module tpu
 		.O_St_Req2(				O_S_St[1].Req			),
 		.O_St_Data1(			O_S_St[0].Data			),
 		.O_St_Data2(			O_S_St[1].Data			),
-		.O_Re(					Buff_Re					),
+		.O_Re_Buff(				Re_Buff					),
 		.O_V_Command(			V_Command				),
 		.O_Rotate_Amount1(		Rotate_Amount1			),
 		.O_Rotate_Amount2(		Rotate_Amount2			),

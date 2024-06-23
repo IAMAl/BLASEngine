@@ -21,7 +21,7 @@ module scalar_unit
 	output						O_St_Req2,				//Store Request
 	output	data_t				O_St_Data1,				//Store Data
 	output	data_t				O_St_Data2,				//Store Data
-	output						O_Re,					//Read-Enable for Buffer
+	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	commant_t			O_V_Command,			//Command to Vector Unit
 	output	rotate_t			O_Rotate_Amount1,		//Rotation Amount Used in Network
 	output	rotate_t			O_Rotate_Amount2,		//Rotation Amount Used in Network
@@ -232,7 +232,7 @@ module scalar_unit
 		.I_Instr(			Instruction				),
 		.O_Req(				Req_IW					),
 		.O_Instr(			Instr					),
-		.O_Re(				O_Re					)
+		.O_Re_Buff(			O_Re_Buff				)
 	);
 
 

@@ -9,7 +9,7 @@ module IFetch
 	input	instr_t				I_Instr,						//Instruction
 	output						O_Req,							//Request to Next Stage
 	output	instr_t				O_Instr,						//Instruction
-	output						O_Re							//Read-Enabloe for Buffer
+	output						O_Re_Buff						//Read-Enabloe for Buffer
 );
 
 
