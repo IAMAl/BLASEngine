@@ -3,7 +3,7 @@ module PAC
 (
 	input						clock,
 	input						reset,
-	input						I_Req,							//Request from Pipeline
+	input						I_Req,							//Request from Network Stage
 	input						I_Stall,						//Force Stalling
 	input						I_Sel_CondValid,				//Selector for CondValid-1/2
 	input						I_CondValid1,					//Condition Valid

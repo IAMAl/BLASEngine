@@ -3,7 +3,7 @@ module BareRegFile
 (
 	input						clock,
 	input						reset,
-	input						I_We,							//Flag: Write=Enable
+	input						I_We,							//Flag: Write-Enable
 	input						I_Re1,							//Flag: Read-Enable for Source-1
 	input						I_Re2,							//Flag: Read-Enable for Source-2
 	input	index_t				I_Index_Dst,					//Write Index for Destination

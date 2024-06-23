@@ -8,7 +8,7 @@ module Network
 	input	[2:0]				I_Bypass_Path,					//Path Selects
 	input	[2:0]				I_WB_Path1,						//Path Selects
 	input	[2:0]				I_WB_Path2,						//Path Selects
-	input	hop_data_t			I_Path_Hop,						//From Odd_Path
+	input	hop_data_t			I_Path_Hop,						//From Multi-Hop Length Path
 	input	data_t				I_Scalar_Data,					//From Scalar Unit
 	input	index_t				I_WB_Index1,					//From ALU
 	input	index_t				I_WB_Index2,					//From ALU
