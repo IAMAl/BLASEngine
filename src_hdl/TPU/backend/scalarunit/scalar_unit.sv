@@ -56,6 +56,9 @@ module scalar_unit
 	index_s_t				Index_Src2;
 	index_s_t				Index_Src3;
 
+	index_t					Index_Length;
+	index_t					Window_Length;
+
 	logic					Slice;
 	logic					Sign;
 	const_t					Constant;
@@ -161,6 +164,7 @@ module scalar_unit
 
 	//// Index Update Stage
 	assign Index_Length		= S_Command.IdxLength;
+	assign Window_Length	= S_Command.IdxWindow;
 
 	assign Req_Index_Dst	= S_Command.v_dst & Req_Issue;
 	assign Slice_Dst		= S_Command.slice1 | S_Command.slice2 | S_Command.slice3;
@@ -292,6 +296,7 @@ module scalar_unit
 		.I_Req(				Req_Index_Dst			),
 		.I_Slice(			Slice_Dst				),
 		.I_Index(			Index_Dst				),
+		.I_Window(			Window_Length			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
@@ -308,6 +313,7 @@ module scalar_unit
 		.I_Req(				Req_Index_Odd1			),
 		.I_Slice(			Slice_Odd1				),
 		.I_Index(			Index_Orig_Odd1			),
+		.I_Window(			Window_Length			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
@@ -324,6 +330,7 @@ module scalar_unit
 		.I_Req(				Req_Index_Odd2			),
 		.I_Slice(			Slice_Odd2				),
 		.I_Index(			Index_Orig_Odd2			),
+		.I_Window(			Window_Length			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
@@ -340,6 +347,7 @@ module scalar_unit
 		.I_Req(				Req_Index_Even1			),
 		.I_Slice(			Slice_Even1				),
 		.I_Index(			Index_Orig_Even1		),
+		.I_Window(			Window_Length			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
@@ -356,6 +364,7 @@ module scalar_unit
 		.I_Req(				Req_Index_Even2			),
 		.I_Slice(			Slice_Even2				),
 		.I_Index(			Index_Orig_Even2		),
+		.I_Window(			Window_Length			),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
