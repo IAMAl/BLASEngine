@@ -38,6 +38,7 @@ module Index
 	index_t						Index_val;
 
 	logic						Next;
+	index_t						OffsetVal;
 
 	logic						R_Req;
 	logic						R_Sel;
@@ -55,7 +56,8 @@ module Index
 
 	assign En_Slice				= ( I_Req & I_Slice ) | ( R_Sel & ~I_Stall );
 	assign End_Count			= CountVal == R_Length;
-	assign Index				= ( R_Sel ) ? BaseVal + R_Index + 1'b1 : I_Index[WIDTH_INDEX-1:0];
+	assign Index				= ( R_Sel ) ?	R_Index + OffsetVal + 1'b1 :
+												I_Index[WIDTH_INDEX-1:0];
 
 	assign sign					= I_Sign;
 
@@ -150,7 +152,7 @@ module Index
 		.reset(				reset					),
 		.I_Clr(				En_Slice & Next			),
 		.I_En(				En_Slice				),
-		.O_Val(				BaseVal					)
+		.O_Val(				OffsetVal				)
 	);
 
 	Counter SliceVal (
