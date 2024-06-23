@@ -15,6 +15,12 @@ module HazardCheck
 
 	localparam WIDTH_ENTRY			= $clog2(NUM_ENTRY_STH);
 
+	logic	[NUM_ENTRY_STH-1:0]		Mask;
+	logic	[NUM_ENTRY_STH-1:0]		Retire;
+
+	logic							Full;
+	logic							Empty;
+
 	logic	[NUM_ENTRY_STH-1:0]		Valid;
 	logic	[NUM_ENTRY_STH-1:0]		Commit;
 	logic	[WIDTH_ENTRY-1:0]		Offset;
@@ -50,7 +56,7 @@ module HazardCheck
 
 	// One Set takes Seriese of Entries
 	// Ring-Buffer Controller
-	// Issue__No:	Pointer for Read
+	// Issue_No:	Pointer for Read
 	// WNo:			Pointer for Write
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY_STH; ++i ) begin
@@ -88,9 +94,9 @@ module HazardCheck
 
 	//// Hazard Check Table
 	// Valid[]			: Validation Flag for The Entry
-	// ThreadID[].ID	: Scalar Thread=ID of This
+	// ThreadID[].ID	: Scalar Thread-IID of This
 	// ThreadID[].Src	: Source ID Indication Flag
-	// ThreadID[].Src_ID: Source Scalar Thread=ID for This
+	// ThreadID[].Src_ID: Source Scalar Thread-ID for This
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			ThreadID		<= '0;
@@ -141,7 +147,7 @@ module HazardCheck
 		.I_Offset(		Offset				),
 		.O_WAddr(		WNo					),
 		.O_RAddr(		Issue_No			),
-		.O_Full(							),
+		.O_Full(		Full				),
 		.O_Empty(		Empty				),
 		.O_Num(			Num					)
 	);

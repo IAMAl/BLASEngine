@@ -43,7 +43,7 @@ module MapMan
 	assign O_Ack_St			= ~FSM_St & Found;
 	assign O_Used_Size		= R_Used_Size;
 
-	assign O_Ack_Lookup			=  FSM_Ld;
+	assign O_Ack_Lookup			= FSM_Ld;
 	assign O_ThreadInfo.length	= R_Length_Ld;
 	assign O_ThreadInfo.address	= R_Address_ld;
 
