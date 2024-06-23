@@ -8,6 +8,7 @@ module Index
 	input						I_Slice,						//Flag: Index-Slicing
 	input	[5:0]				I_Sel,							//Select Sources
 	input	index_s_t			I_Index,						//Index Value
+	input	index_t				I_Window,						//Window for Slicing
 	input	index_t				I_Length,						//Length for Slicing
 	input	id_t				I_LaneID,						//Lane ID
 	input	id_t				I_ThreadID_SIMT,				//SIMT Thread ID
@@ -36,11 +37,17 @@ module Index
 	index_t						Index_s2;
 	index_t						Index_val;
 
+	logic						Next;
+
 	logic						R_Req;
 	logic						R_Sel;
 	index_t						R_Index;
+	index_t						R_Base_Index;
 	index_t						R_Length;
+	index_t						R_Window;
 
+
+	assign Next					= R_Index == R_Window;
 
 	assign Sel_a				= I_Sel[1:0];
 	assign Sel_b				= I_Sel[3:2];
@@ -48,7 +55,7 @@ module Index
 
 	assign En_Slice				= ( I_Req & I_Slice ) | ( R_Sel & ~I_Stall );
 	assign End_Count			= CountVal == R_Length;
-	assign Index				= ( R_Sel ) ? CountVal + R_Index + 1'b1 : I_Index[WIDTH_INDEX-1:0];
+	assign Index				= ( R_Sel ) ? BaseVal + R_Index + 1'b1 : I_Index[WIDTH_INDEX-1:0];
 
 	assign sign					= I_Sign;
 
@@ -112,6 +119,15 @@ module Index
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
+			R_Base_Index		<= 0;
+		end
+		else if ( I_Req & ~I_Stall ) begin
+			R_Base_Index		<= I_Index;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
 			R_Length			<= 0;
 		end
 		else if ( I_Req & ~I_Stall ) begin
@@ -119,6 +135,23 @@ module Index
 		end
 	end
 
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Window			<= 0;
+		end
+		else if ( I_Req & ~I_Stall & ( I_Window != 0 ) ) begin
+			R_Window			<= I_Window;
+		end
+	end
+
+
+	Counter WindowCount (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Clr(				En_Slice & Next			),
+		.I_En(				En_Slice				),
+		.O_Val(				BaseVal					)
+	);
 
 	Counter SliceVal (
 		.clock(				clock					),
