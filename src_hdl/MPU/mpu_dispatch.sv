@@ -11,8 +11,8 @@ module Dispatch
 	input	lookup_t			I_ThreadInfo,					//Instr Memory Info from MapMan Unit
 	output						O_Ld,							//Load Instruction
 	output	st_address_t		O_Address,						//Loading Address
-	input	instr_t				I_Instr,						//Loaded INstruction
-	output	instr_t				O_Instr,						//Send Loaded Instruction
+	input	instr_t				I_Instr,						//Loaded Instruction
+	output	instr_t				O_Instr,						//Send Loaded Instructions to TPUs
 	input	id_t				I_IssueNo,						//Issue No
 	output						O_Send_Thread					//Status
 );
@@ -59,16 +59,16 @@ module Dispatch
 		end
 		else begin
 			R_Ld			<= Loading;
-			R_LdD1			<= ( FSM_Dispatch == FSM_DPC_SEND_THREADID ) | 
-								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) | 
+			R_LdD1			<= ( FSM_Dispatch == FSM_DPC_SEND_THREADID ) |
+								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) |
 								( FSM_Dispatch == FSM_DPC_SEND_ILENGTH ) |
 								R_Ld;
-			R_Instr			<= ( FSM_Dispatch == FSM_DPC_SEND_THREADID ) ?	R_ThreadID : 
-								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) ?	R_IssueNo : 
-								( FSM_Dispatch == FSM_DPC_SEND_ILENGTH ) ?	R_PLength : 
+			R_Instr			<= ( FSM_Dispatch == FSM_DPC_SEND_THREADID ) ?	R_ThreadID :
+								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) ?	R_IssueNo :
+								( FSM_Dispatch == FSM_DPC_SEND_ILENGTH ) ?	R_PLength :
 																			I_Instr;
 		end
-	end	
+	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

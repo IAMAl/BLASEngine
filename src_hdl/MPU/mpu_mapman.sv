@@ -3,16 +3,16 @@ module MapMan
 (
 	input						clock,
 	input						reset,
-	input						I_Req_St,						//Request from Instr Mem (Storing)
-	input	id_t				I_ThreadID_St,					//Scalar Thread-ID from Instr Mem
+	input						I_Req_St,						//Request from Instruction Memory (Storing)
+	input	id_t				I_ThreadID_St,					//Thread-ID from Instruction Memory
 	input	st_address_t		I_Length_St,					//Storing Size of Program
-	output						O_Ack_St,						//Ack to Instr Mem
-	input	id_t				I_ThreadID_Ld,					//Scalar Thread-ID from Dispat Unit
-	output	st_address_t		O_Used_Size,					//Already Used Instr Mem Size
+	output						O_Ack_St,						//Ack to Instruction Memory
+	input	id_t				I_ThreadID_Ld,					//Thread-ID from Dispatch Unit
+	output	st_address_t		O_Used_Size,					//Already Used Instruction Memory Size
 	input						I_Req_Lookup,					//Request from Dispatch Unit
 	output						O_Ack_Lookup,					//Ack to Dispatch Unit
 	output	lookup_t			O_ThreadInfo,					//Thread Info to Dispatch Unit
-	output						O_Full							//Flag: Map-Table if Fully Used
+	output						O_Full							//Flag: Map-Table is Fully Used
 );
 
 

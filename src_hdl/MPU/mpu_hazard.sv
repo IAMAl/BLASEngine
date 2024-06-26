@@ -133,7 +133,6 @@ module HazardCheck
 
 
 	//// Module: Ring-Buffer Controller
-	assign Full				= Num == (NUM_ENTRY_STH-1);
 	assign We				= I_Req & ~Full;
 	assign Re				= Issueable & ~Empty;
 	RingBuffCTRL #(
@@ -149,7 +148,7 @@ module HazardCheck
 		.O_RAddr(		Issue_No			),
 		.O_Full(		Full				),
 		.O_Empty(		Empty				),
-		.O_Num(			Num					)
+		.O_Num(								)
 	);
 
 endmodule

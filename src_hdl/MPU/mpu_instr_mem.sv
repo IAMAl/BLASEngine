@@ -4,17 +4,17 @@ module InstrMem
 	input						clock,
 	input						reset,
 	input						I_Req_St,						//Store Request
-	input						O_Req_St,						//Send Store Request to MamMan Uni
-	output	instr_t				O_ThreadID_St,					//Send Scalar Thread-ID to MapMan Unit
+	input						O_Req_St,						//Send Store Request to MapMan Unit
+	output	instr_t				O_ThreadID_St,					//Send Thread-ID to MapMan Unit
 	output	st_address_t		O_Length_St,					//Send Storing Length to MapMan Unit
 	input						I_Ack_St,						//Ack from MapMan Unit
-	input	instr_t				I_Instr_St,						//Instruction
-	input	st_address_t		I_Used_Size,					//Used Memory Size
-	input						I_Req_Ld,						//Load Request
-	input	st_address_t		I_Adddress_Ld,					//Load Address
-	input	instr_t				O_Instr_Ld,						//Loaded Instruction
+	input	instr_t				I_Instr_St,						//Storing Instructions
+	input	st_address_t		I_Used_Size,					//Used Instruction Memory Size
+	input						I_Req_Ld,						//Load Request from Dispatch Unit
+	input	st_address_t		I_Adddress_Ld,					//Load Address from Dispatch Unit
+	input	instr_t				O_Instr_Ld,						//Send Instructions to Dispatch Unit
 	output						O_Req,							//Request to Next Stage
-	output	id_t				O_ThreadID,						//Scalar Thread-ID to Next Stage
+	output	id_t				O_ThreadID,						//Thread-ID to Next Stage
 	output						O_Wait							//Wait: Exceeding Memory Size
 );
 
@@ -218,6 +218,7 @@ module InstrMem
 		end
 	end
 
+	//// Module: Ring-Buffer Controller
 	assign We				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_LOOKUP );
 	assign Re				= R_Req;
 	RingBuffCTRL #(
@@ -235,4 +236,5 @@ module InstrMem
 		.O_Empty(			Empty					),
 		.O_Num(										)
 	);
+
 endmodule

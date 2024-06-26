@@ -84,7 +84,7 @@ module Commit
 		.O_RAddr(		RNo					),
 		.O_Full(		Full				),
 		.O_Empty(		Empty				),
-		.O_Num(			Num					)
+		.O_Num(								)
 	);
 
 endmodule
