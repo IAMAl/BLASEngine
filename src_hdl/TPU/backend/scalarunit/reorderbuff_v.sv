@@ -5,8 +5,7 @@ module reorderbuff_v #(
 	input						reset,
 	input						I_Store,
 	input	issue_no_t			I_Issue_No,
-	input						I_Commmit_Req,
-	input	issue_no_t			I_Commit_No,
+	input						I_Commit_Req,
 	output	logic				O_Commit_Req,
 	output	issue_no_t			O_Commit_No,
 	output	logic				O_Full
@@ -40,13 +39,19 @@ module reorderbuff_v #(
 		end
 	end
 
+    always_comb: begin
+        for ( int i=0; i<NUM_ENTRY; ++i ) begin
+            assign Clr_Valid[i]     = Commit_V[i].Valid & Commit_V[i].Commit;
+        end
+    end
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
 				Commit_V[i]		<= '0;
 			end
 		end
-		else if ( I_Store | I_Commmit_Req ) begin
+		else if ( I_Store | I_Commit_Req | ( Set_Commit != 0 ) ) begin
 			if ( I_Store ) begin
 				Commit_V[i].Valid	<= 1'b1;
 				Commit_V[i].Issue_No<= I_Issue_No;
@@ -54,8 +59,17 @@ module reorderbuff_v #(
 				Commit_V[i].Commit	<= 0;
 			end
 
-			if ( I_Commmit_Req ) begin
+			if ( I_Commit_Req ) begin
 				Commit_V[i].Valid	<= 1'b0;
+			end
+
+			for ( int i=0; i<NUM_ENTRY; ++i ) begin
+				Commit_V[i].Commit	<= Set_Commit[i];
+			end
+
+			for ( int i=0; i<NUM_ENTRY; ++i ) begin
+				Commit_S[i].Valid	<= Commit_S[i].Valid & ~Clr_Valid[i];
+				Commit_S[i].Commit	<= Commit_S[i].Commit & ~Clr_Valid[i];
 			end
 		end
 	end

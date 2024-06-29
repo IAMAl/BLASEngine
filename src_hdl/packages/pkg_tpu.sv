@@ -81,7 +81,7 @@ package pkg_tpu;
 		index_t								SrcIdx2;
 		index_t								SrcIdx3;
 		issue_no_t							IsseNo;
-		logic								Commmit;
+		logic								Commit;
 	} iw_t;
 
 	typedef struct packed {
@@ -116,6 +116,22 @@ package pkg_tpu;
 		logic								slice2;
 		logic								slice3;
 	} op_t;
+
+
+	typedef struct packed {
+		logic					Valid;
+		issue_no_t				Issue_No;
+		logic					Commit;
+	} commit_tab_v;
+
+
+	typedef struct packed {
+		logic					Valid;
+		issue_no_t				Issue_No;
+		logic	[NUM_LANE-1:0]	En_Lane;
+		logic	[NUM_LANE-1:0]	En_Commit;
+		logic					Commit;
+	} commit_tab_v;
 
 
 	typedef struct enum logic [1:0] {

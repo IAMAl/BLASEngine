@@ -9,6 +9,7 @@ module scalar_unit
 	input						I_En,					//Enable Execution
 	input	issue_no_t			I_IssueNo,				//Issued Thread-ID
 	input	id_t				I_ThreadID_SIMT,		//SIMT Thread-ID
+	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
 	output	address_t			O_Address1,				//Data Memory Address
@@ -130,6 +131,25 @@ module scalar_unit
 	data_t					Ld_Data2;
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
+
+
+	logic					Commmit_Req_LdSt1;
+	logic					Commmit_Req_LdSt2;
+	logic					Commmit_Req_Math;
+	issue_no_t				Commit_No_LdSt1;
+	issue_no_t				Commit_No_LdSt2;
+	issue_no_t				Commit_No_Math;
+	logic					Commit_Req_S;
+	issue_no_t				Commit_No_S;
+	logic					Commited_LdSt1;
+	logic					Commited_LdSt2;
+	logic					Commited_Math;
+	logic					Full_RB_S;
+
+
+	logic					Commit_Req_V;
+	issue_no_t				Commit_No_V;
+	logic					Full_RB_V;
 
 
 	assign O_State			= State;
@@ -534,20 +554,44 @@ module scalar_unit
 
 
 	//// Commitment Stage
-	ReorderBuffer ReorderBuffer (
+
+
+
+	reorderbuff_s #(
+		.NUM_ENTRY(			NUM_ENTRY_RB_S			)
+	) ReorderBuff_S
+	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_IssueNo_LdSt1(	),//ToDo
-		.I_IssueNo_LdSt2(	),//ToDo
-		.I_IssueNo(			),//ToDo
-		.I_Ld_Data1(		Ld_Data1				),
-		.I_Ld_Data2(		Ld_Data2				),
-		.I_WB_Index1(		WB_Index1				),
-		.I_WB_Index2(		WB_Index2				),
-		.I_WB_Data1(		WB_Data1				),
-		.I_WB_Data2(		WB_Data2				),
-		.O_Commit_Req(		Commit_Req				),
-		.O_IssueNo(			Commit_No				)
+		.I_Store(			Store_S					),
+		.I_Issue_No(		IW_IssueNo				),
+		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
+		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
+		.I_Commit_Req_Math(	Commmit_Req_Math		),
+		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
+		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
+		.I_Commit_No_LMath(	Commit_No_Math			),
+		.O_Commit_Req(		Commit_Req_S			),
+		.O_Commit_No(		Commit_No_S				),
+		.O_Commited_LdSt1(	Commited_LdSt1			),
+		.O_Commited_LdSt2(	Commited_LdSt2			),
+		.O_Commited_Math(	Commited_Math			),
+		.O_Full(			Full_RB_S				)
+	);
+
+
+	reorderbuff_v #(
+		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
+	) ReorderBuff_V
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Store(			Store_V					),
+		.I_Issue_No(		IW_IssueNo				),
+		.I_Commmit_Req(		I_Commmit_Req_V			),
+		.O_Commit_Req(		Commit_Req_V			),
+		.O_Commit_No(		Commit_No_V				),
+		.O_Full(			Full_RB_V				)
 	);
 
 endmodule
