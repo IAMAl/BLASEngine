@@ -84,6 +84,7 @@ package pkg_tpu;
 		logic								Commit;
 	} iw_t;
 
+
 	typedef struct packed {
 		logic								valid;
 		logic		[1:0]					OpType;

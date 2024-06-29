@@ -33,11 +33,9 @@ module RegFile
 
 	assign O_Req				= R_Req;
 
-	assign O_Data_Src1			= ( R_Req ) ?	R_Data_Src1 :
-												0;
+	assign O_Data_Src1			= Data_Src1;
 
-	assign O_Data_Src2			= ( R_Req ) ?	R_Data_Src2 :
-												0;
+	assign O_Data_Src2			= Data_Src2;
 
 
 	always_ff @( posedge clock ) begin
@@ -46,24 +44,6 @@ module RegFile
 		end
 		else begin
 			R_Req				<= Re1 | Re2;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Data_Src1			<= 0;
-		end
-		else if ( Re1 ) begin
-			R_Data_Src1			<= Data_Src1;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Data_Src2			<= 0;
-		end
-		else if ( Re2 ) begin
-			R_Data_Src2			<= Data_Src2;
 		end
 	end
 

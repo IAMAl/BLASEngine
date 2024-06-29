@@ -18,15 +18,36 @@ module BareRegFile
 	index_t						Index_Src1;
 	index_t						Index_Src2;
 
+	data_t						src_data1;
+	data_t						src_data2;
+
 	data_t						RegFile	[NUM_ENTRY_REGFILE-1:0];
 
 
 	assign Index_Src1			= ( I_Re1 ) ? I_Index_Src1 : 0;
 	assign Index_Src2			= ( I_Re2 ) ? I_Index_Src2 : 0;
 
-	assign O_Data_Src1			= ( I_Re1 ) ? RegFile[ Index_Src1 ] : 0;
-	assign O_Data_Src2			= ( I_Re2 ) ? RegFile[ Index_Src2 ] : 0;
+	assign O_Data_Src1			= src_data1;
+	assign O_Data_Src2			= src_data2;
 
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			src_data1			<= 0;
+		end
+		else if ( I_Re1	) begin
+			src_data1			<= RegFile[ Index_Src1 ];
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			src_data2			<= 0;
+		end
+		else if ( I_Re2	) begin
+			src_data2			<= RegFile[ Index_Src2 ];
+		end
+	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
