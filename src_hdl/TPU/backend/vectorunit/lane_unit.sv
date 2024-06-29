@@ -16,14 +16,15 @@ module lane_unit
 	output	data_t				O_Rotate_Src_Dataw,		//Roattion Path at Net Stage
 	output	address_t			O_Address1,				//Data Memory Address
 	output	address_t			O_Address2,				//Data Memory Address
-	output						O_Ld_Req1,				//Load Request
-	output						O_Ld_Req2,				//Load Request
+	output	logic				O_Ld_Req1,				//Load Request
+	output	logic				O_Ld_Req2,				//Load Request
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
-	output						O_St_Req1,				//Store Request
-	output						O_St_Req2,				//Store Request
+	output	logic				O_St_Req1,				//Store Request
+	output	logic				O_St_Req2,				//Store Request
 	output	data_t				O_St_Data1,				//Store Data
 	output	data_t				O_St_Data2,				//Store Data
+	output	logic				O_Commit,				//Commit Request
 	output	v_stat_t			O_Status				//Lane Status
 );
 
@@ -74,6 +75,7 @@ module lane_unit
 	index_t					WB_Index2;
 	data_t					WB_Data1;
 	data_t					WB_Data2;
+	logic					Math_Done;
 	logic					Condition;
 
 
@@ -125,6 +127,10 @@ module lane_unit
 	//	 Rotate Path
 	assign Pre_Src_Data1 	= I_Rotate_Src_Data1;
 	assign Pre_Src_Data3 	= I_Rotate_Src_Data2;
+
+
+	//// Commit Request
+	assign O_Commit			= LdSt_Done1 | LdSt_Done2 | Math_Done;
 
 
 	//// Index Update Stage
@@ -326,6 +332,7 @@ module lane_unit
 		.O_WB_Index2(		WB_Index2				),
 		.O_WB_Data1(		WB_Data1				),
 		.O_WB_Data2(		WB_Data2				),
+		.O_Done(			Math_Done				),
 		.O_Cond(			Condition				)
 	);
 

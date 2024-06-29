@@ -41,6 +41,9 @@ module tpu
 	logic	{WIDTH_LANES-1:0}	Rotate_Amount1;
 	logic	{WIDTH_LANES-1:0}	Rotate_Amount2;
 
+	logic						Commmit_Req_V;
+
+
 	//// Service Management UNit
 	FrontEnd FrontEnd (
 		.clock(					clock					),
@@ -102,6 +105,7 @@ module tpu
 		.I_En(					I_En_Exe				),
 		.I_IssueNo(				IssueNo					),
 		.I_ThreadID_SIMT(		ThreadID_SIMT			),
+		.I_Commmit_Req_V(		Commmit_Req_V			),
 		.I_Scalar_Data(			In_Scalar_Data			),
 		.O_Scalar_Data(			Out_Scalar_Data			),
 		.O_Address1(			O_S_Address[0]			),
@@ -134,6 +138,7 @@ module tpu
 		.O_St(					O_V_St					),
 		.O_Ld(					O_V_Ld					),
 		.I_Ld(					I_V_Ld					),
+		.O_Commmit_Req(			Commmit_Req_V			),
 		.O_Status(				V_Status				)
 	);
 

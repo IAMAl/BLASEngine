@@ -3,6 +3,7 @@ module vector_unit
 (
 	input						clock,
 	input						reset,
+	input	[NUM_LANE-1:0]		I_En_Lane,
 	input	v_commant_t			I_Command,
 	input	[WIDTH_LANE-1:0]	I_Rotate_Amount1,
 	input	[WIDTH_LANE-1:0]	I_Rotate_Amount2,
@@ -13,6 +14,7 @@ module vector_unit
 	output	v_store_t			O_St,
 	output	v_load_req_t		O_Ld,
 	input	v_load_t			I_Ld,
+	output	logic				O_Commmit_Req,
 	output	v_stat				O_Status
 );
 
@@ -21,6 +23,11 @@ module vector_unit
 	rot_srcs_t					RotSrc_Data2;
 	rot_srcs_t					RotDst_Data1;
 	rot_srcs_t					RotDst_Data2;
+
+	logic	[NUM_LANE-1:0]		Commit;
+
+
+	assign O_Commmit_Req		= &( ~( I_En_Lane ^ Commit ) );
 
 
 	Rotate Rotate1 (
@@ -61,6 +68,7 @@ module vector_unit
 			.O_St_Req2(			O_St[1].Req[ i ]		),
 			.O_St_Data1(		O_St[0].Data[ i ]		),
 			.O_St_Data2(		O_St[0].Data[ i ]		),
+			.O_Commit(			Commit[ i ]				),
 			.O_Status(			O_Status[ i ]			)
 		);
 	end
