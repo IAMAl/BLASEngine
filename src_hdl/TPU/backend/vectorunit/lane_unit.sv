@@ -29,18 +29,29 @@ module lane_unit
 );
 
 
+	logic					IDec_Slice_Odd1;
+	logic					IDec_Slice_Odd2;
+	logic					IDec_Slice_Even1;
+	logic					IDec_Slice_Even2;
+	index_t					IDec_Index_Window;
+	index_t					IDec_Index_Length;
+
+
 	logic					Sign;
 	const_t					Constant;
+	logic					Slice_Dst;
 	logic					Stall_RegFile_Odd;
 	logic					Stall_RegFile_Even;
 	logic					Req_RegFile_Odd1;
 	logic					Req_RegFile_Odd2;
 	logic					Req_RegFile_Even1;
 	logic					Req_RegFile_Even2;
+	logic					Index_Slice_Dst;
 	logic					Index_Slice_Odd1;
 	logic					Index_Slice_Odd2;
 	logic					Index_Slice_Even1;
 	logic					Index_Slice_Even2;
+	index_t					Index_Dst;
 	index_t					Index_Odd1;
 	index_t					Index_Odd2;
 	index_t					Index_Even1;
@@ -141,12 +152,13 @@ module lane_unit
 		.I_Req(				Req_Index_Dst			),
 		.I_Slice(			Slice_Dst				),
 		.I_Index(			Index_Dst				),
+		.I_Window(			IDec_Index_Window		),
 		.I_Length(			Index_Length			),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.O_Req(				Req_RegFile_Dst			),
-		.O_Slice(			Slice_Dst				),
+		.O_Slice(			Index_Slice_Dst			),
 		.O_Index(			Index_Dst				)
 	);
 
@@ -157,6 +169,7 @@ module lane_unit
 		.I_Req(				Req_RegFile_Odd1		),
 		.I_Slice(			IDec_Slice_Odd1			),
 		.I_Index(			IDec_Index_Odd1			),
+		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
@@ -174,6 +187,7 @@ module lane_unit
 		.I_Req(				Req_RegFile_Odd2		),
 		.I_Slice(			IDec_Slice_Odd2			),
 		.I_Index(			IDec_Index_Odd2			),
+		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
@@ -191,6 +205,7 @@ module lane_unit
 		.I_Req(				Req_Index_Even1			),
 		.I_Slice(			IDec_Slice_Even1		),
 		.I_Index(			IDec_Index_Even1		),
+		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
@@ -208,6 +223,7 @@ module lane_unit
 		.I_Req(				Req_Index_Even2			),
 		.I_Slice(			IDec_Slice_Even2		),
 		.I_Index(			IDec_Index_Even2		),
+		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_LaneID(			I_LaneID				),
 		.I_ThreadID_SIMT(	I_ThreadID_SIMT			),
