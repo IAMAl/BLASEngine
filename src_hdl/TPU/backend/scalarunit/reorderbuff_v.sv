@@ -8,7 +8,8 @@ module reorderbuff_v #(
 	input						I_Commit_Req,			//Commit Request from Vector Unit
 	output	logic				O_Commit_Req,			//Commit Request
 	output	issue_no_t			O_Commit_No,			//Commit No
-	output	logic				O_Full					//State in Full
+	output	logic				O_Full,					//State in Full
+	output	logic				O_Empty					//State in Empty
 );
 
 
@@ -26,12 +27,16 @@ module reorderbuff_v #(
 	logic						Empty;
 	logic						Full;
 
+	logic						En_Commit;
+
 
 	assign O_Commit_Req			= Re;
 	assign O_Commit_No			= Commit_V[RNo].Issue_No;
 	assign O_Full				= Full;
+	assign O_Empty				= Empty;
 
-	assign Re					= Commit_V[RNo].Valid & Commit_V[RNo].Commit;
+	assign En_Commit			= Commit_V[RNo].Valid & Commit_V[RNo].Commit;
+	assign Re					= En_Commit & I_Commit_Grant;
 	assign We					= I_Store & ~Full;
 
 

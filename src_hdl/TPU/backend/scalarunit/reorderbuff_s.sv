@@ -11,12 +11,14 @@ module reorderbuff_v #(
     input   issue_no_t          I_Commit_No_LdSt1,		//Commit No from LdSt Unit-1
     input   issue_no_t          I_Commit_No_LdSt2,		//Commit No from LdSt Unit-2
     input   issue_no_t          I_Commit_No_Math,		//Commit No from Math Unit
+	input						I_Commit_Grant,			//Commit Grant
 	output	logic				O_Commit_Req,			//Commit Request to Hazard Unit
 	output	issue_no_t			O_Commit_No,			//Commiting No
 	output						O_Commited_LdSt1,		//Commit Grant to LdSt Unit-1
 	output						O_Commited_LdSt2,		//Commit Grant to LdSt Unit-2
 	output						O_Commited_Math,		//Commit Grant to Math Unit
-	output	logic				O_Full					//State in Full
+	output	logic				O_Full,					//State in Full
+	output	logic				O_Empty					//State in Empty
 );
 
 
@@ -26,6 +28,8 @@ module reorderbuff_v #(
 
 	logic	[NUM_ENTRY-1:0]		Clr_Valid;
 	logic	[NUM_ENTRY-1:0]		Set_Commit;
+
+	logic;						En_Commit
 
 	logic						We;
 	logic						Re;
@@ -42,8 +46,10 @@ module reorderbuff_v #(
 	assign O_Commit_Req			= Re;
 	assign O_Commit_No			= Commit_S[RNo].Issue_No;
 	assign O_Full				= Full;
+	assign O_Empty				= Empty;
 
-	assign Re					= Commit_S[RNo].Valid & Commit_S[RNo].Commit;
+	assign En_Commit			= Commit_S[RNo].Valid & Commit_S[RNo].Commit;
+	assign Re					= En_Commit & I_Commit_Grant;
 	assign We					= I_Store & ~Full;
 
 

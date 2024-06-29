@@ -144,12 +144,20 @@ module scalar_unit
 	logic					Commited_LdSt1;
 	logic					Commited_LdSt2;
 	logic					Commited_Math;
+	logic					Commit_Grant_S;
 	logic					Full_RB_S;
+	logic					Empty_RB_S;
 
 
 	logic					Commit_Req_V;
 	issue_no_t				Commit_No_V;
+	logic					Commit_Grant_V;
 	logic					Full_RB_V;
+	logic					Empty_RB_V;
+
+
+	logic					Commit_Req;
+	issue_no_t				Commit_No;
 
 
 	assign O_State			= State;
@@ -280,8 +288,8 @@ module scalar_unit
 		.I_Command(			HZD_Command				),
 		.I_Index_Entry(		Index_Entry				),
 		.I_Slice(			Slice					),
-		.I_Req_Commit(		),//ToDo
-		.I_Commit_No(		),//ToDo
+		.I_Req_Commit(		Commit_Req				),
+		.I_Commit_No(		Commit_No				),
 		.O_Req_Issue(		Req_Issue				),
 		.O_Commmand(		Pre_Command				),
 		.O_Issue_No(		IW_IssueNo				),
@@ -569,12 +577,14 @@ module scalar_unit
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
 		.I_Commit_No_LMath(	Commit_No_Math			),
+		.I_Commit_Grant(	Commit_Grant_S			)
 		.O_Commit_Req(		Commit_Req_S			),
 		.O_Commit_No(		Commit_No_S				),
 		.O_Commited_LdSt1(	Commited_LdSt1			),
 		.O_Commited_LdSt2(	Commited_LdSt2			),
 		.O_Commited_Math(	Commited_Math			),
-		.O_Full(			Full_RB_S				)
+		.O_Full(			Full_RB_S				),
+		.O_Empty(			Empty_RB_S				)
 	);
 
 	//	 Commit Unit for Vector Unit
@@ -587,9 +597,26 @@ module scalar_unit
 		.I_Store(			Store_V					),
 		.I_Issue_No(		IW_IssueNo				),
 		.I_Commmit_Req(		I_Commmit_Req_V			),
+		.I_Commit_Grant(	Commit_Grant_V			),
 		.O_Commit_Req(		Commit_Req_V			),
 		.O_Commit_No(		Commit_No_V				),
-		.O_Full(			Full_RB_V				)
+		.O_Full(			Full_RB_V				),
+		.O_Empty(			Empty_RB_V				)
+	);
+
+
+	commit_select Commit_Select (
+		.I_Rd_Ptr(			),
+		.I_RB_Empty_S(		Empty_RB_S				),
+		.I_RB_Empty_V(		Empty_RB_V				),
+		.I_Commit_Req_S(	Commit_Req_S			),
+		.I_Commit_Req_V(	Commit_Req_V			),
+		.I_Commit_No_S(		Commit_No_S				),
+		.I_Commit_No_V(		Commit_No_V				),
+		.O_Commit_Grant_S(	Commit_Grant_S			),
+		.O_Commit_Grant_V(	Commit_Grant_V			),
+		.O_Commit_Req(		Commit_Req				),
+		.O_Commit_No(		Commit_No				)
 	);
 
 endmodule
