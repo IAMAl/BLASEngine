@@ -5,6 +5,7 @@ module Hazard_Detect
 	input						reset,
 	input						I_Req_Issue,					//Request from Previous Stage
 	input						I_Req,							//Request to Work
+	input						I_is_Vec,						//Request is for Vector Unit
 	input						I_Sel_Unit,						//Select Scalr/Vector Unit
 	input						I_Valid_Dst,					//Flag: Valid for Destination
 	input						I_Valid_Src1,					//Flag: Valid for Source-1
@@ -28,6 +29,11 @@ module Hazard_Detect
 
 
 	iw_t						Index_Entry;
+
+	index_s_t					Index_Dst;
+	index_s_t					Index_Src1;
+	index_s_t					Index_Src2;
+	index_s_t					Index_Src3;
 
 	logic						We;
 	logic						Re;
@@ -94,10 +100,10 @@ module Hazard_Detect
 	logic						R_Valid_Src2;
 	logic						R_Valid_Src3;
 
-	index_t						R_Index_Dst;
-	index_t						R_Index_Src1;
-	index_t						R_Index_Src2;
-	index_t						R_Index_Src3;
+	index_s_t					R_Index_Dst;
+	index_s_t					R_Index_Src1;
+	index_s_t					R_Index_Src2;
+	index_s_t					R_Index_Src3;
 
 	iw_t						R_Indeces;
 
@@ -110,6 +116,13 @@ module Hazard_Detect
 	assign O_Req_Issue			= R_Req;
 	assign O_Issue_No			= R_Issue_No;
 	assign O_RAR_Hzard			= R_RAR_Hzard;
+
+
+	//// Forming Indeces for Mixing Scalar and Vector Units
+	assign Index_Dst			= { I_is_Vec, I_Index_Dst };
+	assign Index_Src1			= { I_is_Vec, I_Index_Src1 };
+	assign Index_Src2			= { I_is_Vec, I_Index_Src2 };
+	assign Index_Src3			= { I_is_Vec, I_Index_Src3 };
 
 
 	//// Storing to Table
@@ -211,7 +224,7 @@ module Hazard_Detect
 			R_Index_Dst		<= '0;
 		end
 		else begin
-			R_Index_Dst		<= I_Index_Dst;
+			R_Index_Dst		<= Index_Dst;
 		end
 	end
 
@@ -220,7 +233,7 @@ module Hazard_Detect
 			R_Index_Src1	<= '0;
 		end
 		else begin
-			R_Index_Src1	<= I_Index_Src1;
+			R_Index_Src1	<= Index_Src1;
 		end
 	end
 
@@ -229,7 +242,7 @@ module Hazard_Detect
 			R_Index_Src2	<= '0;
 		end
 		else begin
-			R_Index_Src2	<= I_Index_Src2;
+			R_Index_Src2	<= Index_Src2;
 		end
 	end
 
@@ -238,7 +251,7 @@ module Hazard_Detect
 			R_Index_Src3	<= '0;
 		end
 		else begin
-			R_Index_Src3	<= I_Index_Src3;
+			R_Index_Src3	<= Index_Src3;
 		end
 	end
 
