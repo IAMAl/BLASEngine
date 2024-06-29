@@ -554,9 +554,7 @@ module scalar_unit
 
 
 	//// Commitment Stage
-
-
-
+	//	 Commit Unit for Scalar Unit
 	reorderbuff_s #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_S			)
 	) ReorderBuff_S
@@ -579,7 +577,7 @@ module scalar_unit
 		.O_Full(			Full_RB_S				)
 	);
 
-
+	//	 Commit Unit for Vector Unit
 	reorderbuff_v #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
 	) ReorderBuff_V

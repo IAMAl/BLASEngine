@@ -3,20 +3,20 @@ module reorderbuff_v #(
 )(
 	input						clock,
 	input						reset,
-	input						I_Store,
-	input	issue_no_t			I_Issue_No,
-	input						I_Commit_Req_LdSt1,
-	input						I_Commit_Req_LdSt2,
-	input						I_Commit_Req_Math,
-    input   issue_no_t          I_Commit_No_LdSt1,
-    input   issue_no_t          I_Commit_No_LdSt2,
-    input   issue_no_t          I_Commit_No_Math,
-	output	logic				O_Commit_Req,
-	output	issue_no_t			O_Commit_No,
-	output						O_Commited_LdSt1,
-	output						O_Commited_LdSt2,
-	output						O_Commited_Math,
-	output	logic				O_Full
+	input						I_Store,				//Store Issue No
+	input	issue_no_t			I_Issue_No,				//Storing Issue Number
+	input						I_Commit_Req_LdSt1,		//Commit Request from LdSt Unit-1
+	input						I_Commit_Req_LdSt2,		//Commit Request from LdSt Unit-2
+	input						I_Commit_Req_Math,		//Commit Request from Math Unit
+    input   issue_no_t          I_Commit_No_LdSt1,		//Commit No from LdSt Unit-1
+    input   issue_no_t          I_Commit_No_LdSt2,		//Commit No from LdSt Unit-2
+    input   issue_no_t          I_Commit_No_Math,		//Commit No from Math Unit
+	output	logic				O_Commit_Req,			//Commit Request to Hazard Unit
+	output	issue_no_t			O_Commit_No,			//Commiting No
+	output						O_Commited_LdSt1,		//Commit Grant to LdSt Unit-1
+	output						O_Commited_LdSt2,		//Commit Grant to LdSt Unit-2
+	output						O_Commited_Math,		//Commit Grant to Math Unit
+	output	logic				O_Full					//State in Full
 );
 
 
@@ -45,6 +45,7 @@ module reorderbuff_v #(
 
 	assign Re					= Commit_S[RNo].Valid & Commit_S[RNo].Commit;
 	assign We					= I_Store & ~Full;
+
 
 	always_comb: begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
@@ -107,7 +108,6 @@ module reorderbuff_v #(
 			R_Commit_No_Math	<= I_Commit_No_Math;
 		end
 	end
-
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

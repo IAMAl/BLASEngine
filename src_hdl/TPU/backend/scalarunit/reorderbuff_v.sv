@@ -3,12 +3,12 @@ module reorderbuff_v #(
 )(
 	input						clock,
 	input						reset,
-	input						I_Store,
-	input	issue_no_t			I_Issue_No,
-	input						I_Commit_Req,
-	output	logic				O_Commit_Req,
-	output	issue_no_t			O_Commit_No,
-	output	logic				O_Full
+	input						I_Store,				//Store Issue No
+	input	issue_no_t			I_Issue_No,				//Storing Issue No
+	input						I_Commit_Req,			//Commit Request from Vector Unit
+	output	logic				O_Commit_Req,			//Commit Request
+	output	issue_no_t			O_Commit_No,			//Commit No
+	output	logic				O_Full					//State in Full
 );
 
 
@@ -26,12 +26,14 @@ module reorderbuff_v #(
 	logic						Empty;
 	logic						Full;
 
+
 	assign O_Commit_Req			= Re;
 	assign O_Commit_No			= Commit_V[RNo].Issue_No;
 	assign O_Full				= Full;
 
 	assign Re					= Commit_V[RNo].Valid & Commit_V[RNo].Commit;
 	assign We					= I_Store & ~Full;
+
 
 	always_comb: begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
