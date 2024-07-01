@@ -51,6 +51,7 @@ module Dispatch
 
 	assign O_Send_Thread	= FSM_Dispatch	== FSM_DPC_SEND_INSTRS;
 
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Ld			<= 1'b0;

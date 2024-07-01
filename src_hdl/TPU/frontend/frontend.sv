@@ -57,6 +57,7 @@ module FrontEnd
 	assign O_Nack				= R_Full | R_Nack;
 	assign O_Term				= is_FSM_PE_RUN & ~R_Req;
 
+
 	always_ff @ ( posedge clock ) begin
 		if ( reset ) begin
 			R_Instr				<= '0;

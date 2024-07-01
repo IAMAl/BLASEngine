@@ -77,7 +77,7 @@ module BLASEngine (
 
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
-		tpu_dmem tpu_vram (
+		tpu_dmem tpu_vram_e (
 			.clock(			clock						),
 			.reset(			reset						),
 			.I_S_Ld_Req(	RAM_S_Ld_Req[NUM_ROWS][clm]	),

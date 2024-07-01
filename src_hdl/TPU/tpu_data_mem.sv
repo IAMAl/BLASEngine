@@ -21,6 +21,7 @@ module DMem
 	output						O_Ack2							//Grant Ack
 );
 
+
 	data_t						DataMem	[SIZE_DATA_MEM-1:0];
 
 endmodule

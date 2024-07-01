@@ -6,7 +6,7 @@ module scalar_unit
 	input						reset,
 	input						I_Empty,				//Empty on Buffer
 	input						I_Req_St,				//Store Request for Instructions
-	input	logic				O_Ack_St,				//Acknowledge for Storing
+	output	logic				O_Ack_St,				//Acknowledge for Storing
 	input	instr_t				I_Instr,				//Instruction from Buffer
 	input						I_En,					//Enable Execution
 	input	issue_no_t			I_IssueNo,				//Issued Thread-ID
@@ -27,7 +27,7 @@ module scalar_unit
 	output	data_t				O_St_Data1,				//Store Data
 	output	data_t				O_St_Data2,				//Store Data
 	output						O_Re_Buff,				//Read-Enable for Buffer
-	output	commant_t			O_V_Command,			//Command to Vector Unit
+	output	command_t			O_V_Command,			//Command to Vector Unit
 	output	rotate_t			O_Rotate_Amount1,		//Rotation Amount Used in Network
 	output	rotate_t			O_Rotate_Amount2,		//Rotation Amount Used in Network
 	output	s_stat_t			O_Status				//Scalar Unit Status
@@ -307,7 +307,7 @@ module scalar_unit
 		.I_Req_Commit(		Commit_Req				),
 		.I_Commit_No(		Commit_No				),
 		.O_Req_Issue(		Req_Issue				),
-		.O_Commmand(		Pre_Command				),
+		.O_Command(			Pre_Command				),
 		.O_Issue_No(		IW_IssueNo				),
 		.O_RAR_Hzard(		RAR_Hazard				),
 		.O_Rd_Ptr(			Rd_Ptr					)

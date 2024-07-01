@@ -46,6 +46,7 @@ module InstrMem
 	logic	[WIDTH_THREAD_MEM-1:0]	R_Count;
 	logic						R_Req;
 
+
 	//// Send Wait Signal to Host in order to Stall Its Sending
 	assign O_Wait				= R_Error_Size;
 
@@ -217,6 +218,7 @@ module InstrMem
 			SThreadIDs[ WNo ]	<= R_ThreadID_St;
 		end
 	end
+
 
 	//// Module: Ring-Buffer Controller
 	assign We				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_LOOKUP );

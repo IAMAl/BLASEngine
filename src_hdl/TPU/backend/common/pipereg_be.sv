@@ -18,6 +18,7 @@ module pipereg_be
 	assign O_Op				= R_Op;
 	assign O_Slixe_Idx		= R_Idx;
 
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Op			<= '0;

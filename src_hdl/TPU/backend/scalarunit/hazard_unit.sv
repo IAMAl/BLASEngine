@@ -301,6 +301,7 @@ module Hazard_Detect
 		end
 	end
 
+
 	//// Hazard Detections
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

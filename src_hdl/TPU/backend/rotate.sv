@@ -9,7 +9,9 @@ module Rotate
 	output	rot_srcs_t			O_Srcs
 );
 
+
 	logic	[WIDTH_ENTRY-1:0]	Rotate_Amount	[WIDTH_ENTRY-1:0];
+
 
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin

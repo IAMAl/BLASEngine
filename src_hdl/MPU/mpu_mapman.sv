@@ -149,6 +149,7 @@ module MapMan
 		endcase
 	end
 
+
 	//// Module: Ring-Buffer Controller
 	assign WError			= I_Req_St & ~Full &  TabInstr[ WNo ].Valid;
 	assign We				= I_Req_St & ~Full & ~TabInstr[ WNo ].Valid;
@@ -168,6 +169,7 @@ module MapMan
 		.O_Empty(			Empty					),
 		.O_Num(										)
 	);
+
 
 	//// Module: Encoder
 	Encoder #(

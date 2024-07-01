@@ -14,6 +14,7 @@ module pipereg
 
 	assign O_Op				= R_Op;
 
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Op			<= '0;

@@ -4,7 +4,10 @@ module Issue_Command (
 	output	commit_t			O_V_Command
 );
 
+
 	logic						Sel_Unit;
+
+
 	assign Sel_Unit				= I_Command.Sel_Unit;
 
 	assign O_S_Command.valid	= I_Command.v &  ~Sel_Unit;

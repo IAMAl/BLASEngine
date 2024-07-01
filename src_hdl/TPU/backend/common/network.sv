@@ -72,6 +72,7 @@ module Network
 	logic						Sel_Path_Even1;
 	logic						Sel_Path_Even2;
 
+
 	assign O_Src_Data1			= ( Bypass_Data1 ) ? I_WB_Data1 : Src_Data1;
 	assign O_Src_Data2			= ( Bypass_Data2 ) ? I_WB_Data2 : Src_Data2;
 	assign O_Src_Data3			= ( Bypass_Data3 ) ? I_WB_Data1 : Src_Data3;
@@ -117,6 +118,7 @@ module Network
 									I_Scalar_Data,
 									I_Path_Data
 								};
+
 
 	always_comb: begin
 		if ( Sel_Data1 )			assign Sel_Src_Data1= 0;
@@ -215,6 +217,7 @@ module Network
 		default:assign Sel_Length_Data	= 0;
 		endcase
 	end
+
 
 	path_sel #(
 		.NUM_ENTRY(			NUM_ENTRY_ROUTE				),

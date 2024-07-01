@@ -32,6 +32,7 @@ module Commit
 	assign O_Issue_No		= R_Commit_No;
 	assign O_Full			= Full;
 
+
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Commit		<= 1'b0;
