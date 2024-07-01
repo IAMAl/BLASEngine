@@ -316,7 +316,6 @@ module scalar_unit
 
 	//// Select Scalar-Unit Back-End or Vector Unit Back-End
 	Issue_Command Issue_Command (
-		.I_Sel_Unit(		);//ToDO
 		.I_Command(			Pre_Command				),
 		.O_S_Command(		S_Command				),
 		.O_V_Command(		O_V_Command				)
@@ -428,6 +427,7 @@ module scalar_unit
 		.I_Op(				Pipe_OP_Index			),
 		.O_Op(				Pipe_OP_RFile			)
 	);
+
 
 	//// Register Read/Write-Back Stage
 	RegFile RegFile_Odd (

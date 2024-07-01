@@ -148,10 +148,10 @@ package pkg_tpu;
 
 	//Enum for Index Select
 	typedef struct enum logic [1:0] {
-		INDEX_ORIG			= 2'h0,
-		INDEX_CONST			= 2'h1,
-		INDEX_SCALAR		= 2'h2,
-		INDEX_SIMT			= 2'h3
+		INDEX_ORIG				= 2'h0,
+		INDEX_CONST				= 2'h1,
+		INDEX_SCALAR			= 2'h2,
+		INDEX_SIMT				= 2'h3
 	} index_sel_t;
 
 

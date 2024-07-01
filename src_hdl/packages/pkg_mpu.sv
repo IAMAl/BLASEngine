@@ -10,6 +10,7 @@ package pkg_mpu;
 	parameter int SIZE_THREAD_MEM		= 8192;
 	parameter int WIDTH_SIZE_TMEM		= $clog2(SIZE_THREAD_MEM);
 
+
 	//Scalar Thread Memory Address
 	typedef logic [WIDTH_SIZE_TMEM-1:0]			st_address_t;
 
@@ -30,6 +31,7 @@ package pkg_mpu;
 		logic	[WIDTH_ENTRY_STH-1:0]		IsseNo;
 		logic								Commmit;
 	} mpu_tab_commit_t;
+
 
 	//FSM for Distapch Control
 	typedef struct enum logic [1:0] {

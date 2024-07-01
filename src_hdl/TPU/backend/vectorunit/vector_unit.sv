@@ -3,20 +3,20 @@ module vector_unit
 (
 	input						clock,
 	input						reset,
-	input	[NUM_LANE-1:0]		I_En_Lane,
-	input	v_commant_t			I_Command,
-	input	[WIDTH_LANE-1:0]	I_Rotate_Amount1,
-	input	[WIDTH_LANE-1:0]	I_Rotate_Amount2,
-	input	instr_t				I_ThreadID_SIMT,
-	input	data_t				I_Scalar_Data,
-	input	ack_ld_t			I_Ack_Ld,
-	output	data_t				O_Scalar_Data,
-	output	v_address_t			O_Address,
-	output	v_store_t			O_St,
-	output	v_load_req_t		O_Ld,
-	input	v_load_t			I_Ld,
-	output	logic				O_Commmit_Req,
-	output	v_stat				O_Status
+	input	[NUM_LANE-1:0]		I_En_Lane,				//Enable to Execution on Lane
+	input	v_commant_t			I_Command,				//Comamnd to Execute
+	input	[WIDTH_LANE-1:0]	I_Rotate_Amount1,		//Rotation Amount
+	input	[WIDTH_LANE-1:0]	I_Rotate_Amount2,		//Rotation Amount
+	input	instr_t				I_ThreadID_SIMT,		//SIMT Thread-ID
+	input	data_t				I_Scalar_Data,			//Scalar Data
+	output	data_t				O_Scalar_Data,			//Scalar Data
+	input	ack_ld_t			I_Ack_Ld,				//Acknowledge fro Loading
+	output	v_address_t			O_Address,				//Data Memory Address
+	output	v_store_t			O_St,					//Store Request
+	output	v_load_req_t		O_Ld,					//Load Request
+	input	v_load_t			I_Ld,					//Loaded Data
+	output	logic				O_Commmit_Req,			//Commit Request
+	output	v_stat				O_Status				//Status on Lane
 );
 
 
