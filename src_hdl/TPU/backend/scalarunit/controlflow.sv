@@ -70,6 +70,7 @@ module PAC
 	assign O_StallReq			= StallReq;
 
 
+	// Capture Request
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Req				<= 1'b0;
@@ -79,6 +80,7 @@ module PAC
 		end
 	end
 
+	// Retime to Make Stall-Sinal
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Cond				<= 1'b1;
@@ -88,6 +90,7 @@ module PAC
 		end
 	end
 
+	// Validation of Branch
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_CondValid			<= 1'b0;
@@ -100,6 +103,7 @@ module PAC
 		end
 	end
 
+	// Program Address
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
 			R_Address			<= 0;
