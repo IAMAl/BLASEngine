@@ -4,7 +4,7 @@ module LoadStoreUnit
 	input						clock,
 	input						reset,
 	input						I_Req,							//Flag: Activate Load/Store Unit
-	input						I_Ack_Ld,
+	input						I_Ack_Ld,						//Acknowlefge from Loading
 	input						I_Store,						//Flag: Request is Store
 	input						I_Stall,						//Force Stalling by Local Memory
 	input	address_t			I_Address,						//Load/Store Base Address
@@ -17,7 +17,7 @@ module LoadStoreUnit
 	output	data_t				O_St_Data,						//Store Data to Local Memory
 	input	data_t				I_Ld_Data,						//Loaded Data
 	output	data_t				O_Ld_Data,						//Loading Data from Local Memory
-	output	logic				O_Ld_NoReady,
+	output	logic				O_Ld_NoReady,					//Flag: Not Ready for Loading
 	output						O_Done							//Flag: Service is Done
 );
 

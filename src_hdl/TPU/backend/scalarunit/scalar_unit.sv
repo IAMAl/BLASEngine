@@ -5,7 +5,9 @@ module scalar_unit
 	input						clock,
 	input						reset,
 	input						I_Empty,				//Empty on Buffer
-	input	instr_t				I_instr,				//Instruction from Buffer
+	input						I_Req_St,				//Store Request for Instructions
+	input	logic				O_Ack_St,				//Acknowledge for Storing
+	input	instr_t				I_Instr,				//Instruction from Buffer
 	input						I_En,					//Enable Execution
 	input	issue_no_t			I_IssueNo,				//Issued Thread-ID
 	input	id_t				I_ThreadID_SIMT,		//SIMT Thread-ID
@@ -16,8 +18,8 @@ module scalar_unit
 	output	address_t			O_Address2,				//Data Memory Address
 	output						O_Ld_Req1,				//Load Request
 	output						O_Ld_Req2,				//Load Request
-	input						I_Ack_Ld1,
-	input						I_Ack_Ld2,
+	input						I_Ack_Ld1,				//Acknowlefge from Loading
+	input						I_Ack_Ld2,				//Acknowlefge from Loading
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output						O_St_Req1,				//Store Request
@@ -234,13 +236,14 @@ module scalar_unit
 
 	assign Ld_NoReady		= Ld_NoReady1 | Ld_NoReady2;
 
+
 	//// Instruction Memory
 	InstrMem IMem (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_St(			),//ToDo
-		.O_Ack_St(			),//ToDo
-		.I_St_Instr(		),//ToDo
+		.I_Req_St(			I_Req_St				),
+		.O_Ack_St(			O_Ack_St				),
+		.I_St_Instr(		I_Instr					),
 		.I_Req_Ld(			IFetch					),
 		.I_Ld_Address(		PC						),
 		.O_Ld_Instr(		Instruction				)
@@ -421,7 +424,7 @@ module scalar_unit
 	pipereg PReg_Index (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),//ToDo
+		.I_Stall(			Stall					),
 		.I_Op(				Pipe_OP_Index			),
 		.O_Op(				Pipe_OP_RFile			)
 	);
@@ -462,7 +465,7 @@ module scalar_unit
 	pipereg_be PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),//ToDo
+		.I_Stall(			Stall					),
 		.I_Op(				Pipe_OP_RFile			),
 		.O_Op(				Pipe_OP_Net				),
 		.I_Slice_Idx(		Slixe_Idx_RFile			),
@@ -503,7 +506,7 @@ module scalar_unit
 	pipereg_be PReg_Net (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),//ToDo
+		.I_Stall(			Stall					),
 		.I_Op(				Pipe_OP_RFile			),
 		.O_Op(				Pipe_OP_Net				),
 		.I_Slice_Idx(		Slixe_Idx_Net			),

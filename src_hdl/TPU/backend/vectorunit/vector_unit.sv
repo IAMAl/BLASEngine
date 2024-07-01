@@ -43,6 +43,8 @@ module vector_unit
 		.O_Srcs(				RotDst_Data2			)
 	);
 
+
+	//Vector-Lane Generation
 	for ( genvar i=0; i<NUM_LANE; ++i ) begin
 		lane_unit (
 			.clock(				clock					),

@@ -18,8 +18,8 @@ module lane_unit
 	output	address_t			O_Address2,				//Data Memory Address
 	output	logic				O_Ld_Req1,				//Load Request
 	output	logic				O_Ld_Req2,				//Load Request
-	input						I_Ack_Ld1,
-	input						I_Ack_Ld2,
+	input						I_Ack_Ld1,				//Acknowlefge from Loading
+	input						I_Ack_Ld2,				//Acknowlefge from Loading
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output	logic				O_St_Req1,				//Store Request

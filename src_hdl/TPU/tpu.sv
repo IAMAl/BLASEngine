@@ -18,6 +18,9 @@ module tpu
 	output						O_Nack					//Flag: Not-Acknowledge
 );
 
+
+	logic						Ack_St;
+
 	instr_t						Buff_Instr;
 	logic						We_Buff;
 	logic						Re_Buff;
@@ -51,8 +54,8 @@ module tpu
 		.I_En_Exe(				I_En_Exe				),
 		.I_Req(					I_Req					),
 		.I_Full(				Buff_Full				),
-		.I_Term(				),
-		.I_Nack(				),
+		.I_Term(				),//ToDo
+		.I_Nack(				~Ack_St					),
 		.I_Instr(				I_Instr					),
 		.O_We(					We_Buff					),
 		.O_IssueNo(				IssueNo					),
@@ -101,6 +104,8 @@ module tpu
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Empty(				Buff_Empty				),
+		.I_Req_St(				IDBuff_Re				),
+		.O_Ack_St(				Ack_St					),
 		.I_Instr(				Instr					),
 		.I_En(					I_En_Exe				),
 		.I_IssueNo(				IssueNo					),
