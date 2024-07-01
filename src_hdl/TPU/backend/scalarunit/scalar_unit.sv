@@ -54,6 +54,7 @@ module scalar_unit
 	command_t				HZD_Command;
 	command_t				Command;
 	iw_t					Index_Entry;
+	issue_no_t				Rd_Ptr;
 
 	logic					Valid_Dst;
 	logic					Valid_Src1;
@@ -137,6 +138,7 @@ module scalar_unit
 	address_t				Length;
 	data_t					Ld_Data1;
 	data_t					Ld_Data2;
+	logic					Ld_NoReady;
 	logic					Ld_NoReady1;
 	logic					Ld_NoReady2;
 	logic					LdSt_Done1;
@@ -230,6 +232,7 @@ module scalar_unit
 	assign OpClass_LdSt_Even= S_Command.OpClass;
 	assign OpCode_LdSt		= S_Command.OpCode;
 
+	assign Ld_NoReady		= Ld_NoReady1 | Ld_NoReady2;
 
 	//// Instruction Memory
 	InstrMem IMem (
@@ -303,7 +306,8 @@ module scalar_unit
 		.O_Req_Issue(		Req_Issue				),
 		.O_Commmand(		Pre_Command				),
 		.O_Issue_No(		IW_IssueNo				),
-		.O_RAR_Hzard(		RAR_Hazard				)
+		.O_RAR_Hzard(		RAR_Hazard				),
+		.O_Rd_Ptr(			Rd_Ptr					)
 	);
 
 
@@ -321,7 +325,7 @@ module scalar_unit
 		.I_PCU_Wait(		PCU_Wait				),
 		.I_Hazard(			RAR_Hazard				)
 		.I_Slice(			Slice					),
-		.I_Ld_NoReady(		),//ToDo
+		.I_Ld_NoReady(		Ld_NoReady				),
 		.O_Stall_IF(		Stall_IF				),
 		.O_Stall_IW_St(		Stall_IW_St				),
 		.O_Stall_IW_Ld(		Stall_IW_Ld				)
@@ -620,7 +624,7 @@ module scalar_unit
 
 
 	commit_select Commit_Select (
-		.I_Rd_Ptr(			),
+		.I_Rd_Ptr(			Rd_Ptr					),
 		.I_RB_Empty_S(		Empty_RB_S				),
 		.I_RB_Empty_V(		Empty_RB_V				),
 		.I_Commit_Req_S(	Commit_Req_S			),

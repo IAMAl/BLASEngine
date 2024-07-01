@@ -20,7 +20,8 @@ module Hazard_Detect
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,					//Commit (Issued) No.
 	output						O_Req_Issue,					//Request to Next Stage
 	output						O_Issue_No,						//Issue(Dispatch) No
-	output						O_RAR_Hzard						//RAR-Hazard
+	output						O_RAR_Hzard,					//RAR-Hazard
+	output	issue_no_t			O_Rd_Ptr						//Read Pointer to Commit Unit
 );
 
 
@@ -116,6 +117,7 @@ module Hazard_Detect
 	assign O_Req_Issue			= R_Req;
 	assign O_Issue_No			= R_Issue_No;
 	assign O_RAR_Hzard			= R_RAR_Hzard;
+	assign O_Rd_Ptr				= RNo;
 
 
 	//// Forming Indeces for Mixing Scalar and Vector Units
