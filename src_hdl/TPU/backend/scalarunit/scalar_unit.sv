@@ -16,6 +16,8 @@ module scalar_unit
 	output	address_t			O_Address2,				//Data Memory Address
 	output						O_Ld_Req1,				//Load Request
 	output						O_Ld_Req2,				//Load Request
+	input						I_Ack_Ld1,
+	input						I_Ack_Ld2,
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output						O_St_Req1,				//Store Request
@@ -35,7 +37,13 @@ module scalar_unit
 
 
 	logic					Req_PCU;
+	logic					PCU_Wait;
+
+
 	logic					Stall_PCU;
+	logic					Stall_IF;
+	logic					Stall_IW_St;
+	logic					Stall_IW_Ld;
 
 
 	logic					Req_IFetch;
@@ -129,6 +137,8 @@ module scalar_unit
 	address_t				Length;
 	data_t					Ld_Data1;
 	data_t					Ld_Data2;
+	logic					Ld_NoReady1;
+	logic					Ld_NoReady2;
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
@@ -252,7 +262,7 @@ module scalar_unit
 		.I_Src(				),//ToDo
 		.O_IFetch(			IFetch					),
 		.O_Address(			PC						)
-		.O_StallReq(		)//ToDo
+		.O_StallReq(		PCU_Wait				)
 	);
 
 
@@ -308,7 +318,7 @@ module scalar_unit
 
 	//// Stall Control
 	Stall_Ctrl Stall_Ctrl (
-		.I_PCU_Wait(		),//ToDo
+		.I_PCU_Wait(		PCU_Wait				),
 		.I_Hazard(			RAR_Hazard				)
 		.I_Slice(			Slice					),
 		.I_Ld_NoReady(		),//ToDo
@@ -524,6 +534,7 @@ module scalar_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_LdSt_Odd			),
+		.I_Ack_Ld(			I_Ack_Ld1				),
 		.I_OpClass(			OpClass_LdSt_Odd		),
 		.I_OpCode(			OpCode_LdSt				),
 		.I_Stall(			Stall_LdSt_Odd			),
@@ -537,6 +548,7 @@ module scalar_unit
 		.O_St_Data(			O_St_Data1				),
 		.I_Ld_Data(			I_Ld_Data1				),
 		.O_Ld_Data(			Ld_Data1				),
+		.O_Ld_NoReady(		Ld_NoReady1				),
 		.O_Done(			LdSt_Done1				)
 	);
 
@@ -544,6 +556,7 @@ module scalar_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_LdSt_Even			),
+		.I_Ack_Ld(			I_Ack_Ld2				),
 		.I_OpClass(			OpClass_LdSt_Even		),
 		.I_OpCode(			OpCode_LdSt				),
 		.I_Stall(			Stall_LdSt_Even			),
@@ -557,6 +570,7 @@ module scalar_unit
 		.O_St_Data(			O_St_Data2				),
 		.I_Ld_Data(			I_Ld_Data2				),
 		.O_Ld_Data(			Ld_Data2				),
+		.O_Ld_NoReady(		Ld_NoReady2				),
 		.O_Done(			LdSt_Done2				)
 	);
 

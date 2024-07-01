@@ -27,6 +27,8 @@ module PAC
 	logic						Update;
 	address_t					Address;
 	logic						StallReq;
+	logic						Req;
+	logic						Ready;
 
 	logic						R_Req;
 	logic						R_Cond;
@@ -35,7 +37,10 @@ module PAC
 	address_t					R_Address;
 
 
+	assign Req					= ~I_Stall & I_Req;
+
 	assign Cond_Valid			= ( I_Sel_CondValid ) ? I_CondValid2 : I_CondValid1;
+
 
 	// Conditional Branch Instruction should be
 	//	next instruction of evaluation (ex. compare instruction)
@@ -45,9 +50,19 @@ module PAC
 	//	The I_Timing_MY is the branch (this) instruction
 	//	This module works as execution unit, entering after network stage
 	assign Valid				= ( I_Timing_MY == ( I_Timing_WB + 1'b1 ) )
-	assign Taken				= Valid & I_State[ I_Cond ] & I_Branch;
-	assign Update				= ~I_Stall & I_Req;
+	assign Ready				= Valid & I_Branch;
+
+
+	// Branch Evaluation
+	assign Taken				= Ready & I_State[ I_Cond ];
+
+
+	// Updating Address
+	assign Update				= Req & ( ~I_Branch | Ready );
 	assign Address				= ( Taken ) ? R_Address + I_Src : R_Address + 1'b1;
+
+
+	// Stall Request to Wait for ValidCond
 	assign StallReq				= R_Req & ~R_Cond;
 
 	assign O_IFetch				= R_Req;
@@ -60,7 +75,7 @@ module PAC
 			R_Req				<= 1'b0;
 		end
 		else begin
-			R_Req				<= I_Req & ~I_Stall;
+			R_Req				<= Req;
 		end
 	end
 
@@ -89,7 +104,7 @@ module PAC
 		if ( reset) begin
 			R_Address			<= 0;
 		end
-		else if ( I_Req & ~I_Stall & I_Jump ) begin
+		else if ( Req & I_Jump ) begin
 			R_Address			<= I_Src;
 		end
 		else if ( Update ) begin

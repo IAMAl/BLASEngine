@@ -18,6 +18,8 @@ module lane_unit
 	output	address_t			O_Address2,				//Data Memory Address
 	output	logic				O_Ld_Req1,				//Load Request
 	output	logic				O_Ld_Req2,				//Load Request
+	input						I_Ack_Ld1,
+	input						I_Ack_Ld2,
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output	logic				O_St_Req1,				//Store Request
@@ -101,6 +103,8 @@ module lane_unit
 	address_t				Length;
 	data_t					Ld_Data1;
 	data_t					Ld_Data2;
+	logic					Ld_NoReady1;
+	logic					Ld_NoReady2;
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
@@ -357,6 +361,7 @@ module lane_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_LdSt_Odd			),
+		.I_Ack_Ld(			I_Ack_Ld1				),
 		.I_Store(			LdSt_Odd				),
 		.I_Stall(			Stall_LdSt_Odd			),
 		.I_Address(			Address					),
@@ -369,6 +374,7 @@ module lane_unit
 		.O_St_Data(			O_St_Data1				),
 		.I_Ld_Data(			I_Ld_Data1				),
 		.O_Ld_Data(			Ld_Data1				),
+		.O_Ld_NoReady(		Ld_NoReady1				),
 		.O_Done(			LdSt_Done1				)
 	);
 
@@ -376,6 +382,7 @@ module lane_unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_LdSt_Even			),
+		.I_Ack_Ld(			I_Ack_Ld2				),
 		.I_Store(			LdSt_Even				),
 		.I_Stall(			Stall_LdSt_Even			),
 		.I_Address(			Address					),
@@ -388,6 +395,7 @@ module lane_unit
 		.O_St_Data(			O_St_Data2				),
 		.I_Ld_Data(			I_Ld_Data2				),
 		.O_Ld_Data(			Ld_Data2				),
+		.O_Ld_NoReady(		Ld_NoReady2				),
 		.O_Done(			LdSt_Done2				)
 	);
 
