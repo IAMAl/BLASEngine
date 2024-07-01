@@ -26,19 +26,19 @@ module BLASEngine (
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
 		for ( genvar row=0; row<NUM_ROWS; ++row ) begin
-			assign RAM_S_Ld_Req[row][clm][0]	= TPU_S_Ld_Req[row][clm];
+			assign RAM_S_Ld_Req[row][clm][0]	= TPU_S_Ld_Req[row+0][clm];
 			assign RAM_S_Ld_Req[row][clm][1]	= TPU_S_Ld_Req[row+1][clm];
-			assign RAM_S_St[row][clm][0]		= TPU_S_St[row][clm];
+			assign RAM_S_St[row][clm][0]		= TPU_S_St[row+0][clm];
 			assign RAM_S_St[row][clm][1]		= TPU_S_St[row+1][clm];
-			assign RAM_V_Address[row][clm][0]	= TPU_V_Address[row][clm];
+			assign RAM_V_Address[row][clm][0]	= TPU_V_Address[row+0][clm];
 			assign RAM_V_Address[row][clm][1]	= TPU_V_Address[row+1][clm];
-			assign RAM_V_St[row][clm][0]		= TPU_V_St[row][clm];
+			assign RAM_V_St[row][clm][0]		= TPU_V_St[row+0][clm];
 			assign RAM_V_St[row][clm][1]		= TPU_V_St[row+1][clm];
-			assign RAM_V_Ld_Req[row][clm][0]	= TPU_V_Ld_Req[row][clm];
+			assign RAM_V_Ld_Req[row][clm][0]	= TPU_V_Ld_Req[row+0][clm];
 			assign RAM_V_Ld_Req[row][clm][1]	= TPU_V_Ld_Req[row+1][clm];
-			assign TPU_S_Ld_Data[row][clm][0]	= RAM_S_Ld_Data[row][clm];
+			assign TPU_S_Ld_Data[row][clm][0]	= RAM_S_Ld_Data[row+0][clm];
 			assign TPU_S_Ld_Data[row][clm][1]	= RAM_S_Ld_Data[row+1][clm];
-			assign TPU_V_Ld[row][clm][0]		= RAM_V_Ld[row][clm];
+			assign TPU_V_Ld[row][clm][0]		= RAM_V_Ld[row+0][clm];
 			assign TPU_V_Ld[row][clm][1]		= RAM_V_Ld[row+1][clm];
 		end
 	end
