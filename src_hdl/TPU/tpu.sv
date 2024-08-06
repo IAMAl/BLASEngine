@@ -83,7 +83,7 @@ module TPU
 	buff #(
 		.NUM_ENTRY(				SIZE_THREAD_MEM			),
 		.TYPE_DEF(				instr_t					)
-	) instr_buff
+	) Instr_Buff
 	(
 		.clock(					clock					),
 		.reset(					reset					),
@@ -99,7 +99,7 @@ module TPU
 	buff #(
 		.NUM_ENTRY(				SIZE_THREAD_MEM			),
 		.TYPE_DEF(				id_t					)
-	) id_buff
+	) ID_Buff
 	(
 		.clock(					clock					),
 		.reset(					reset					),
@@ -112,7 +112,7 @@ module TPU
 	);
 
 
-	scalar_unit scalar_unit (
+	Scalar_Unit Scalar_Unit (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Empty(				Buff_Empty				),
@@ -143,7 +143,7 @@ module TPU
 	);
 
 
-	vector_unit vector_unit (
+	Vector_Unit Vector_Unit (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_En_Lane(				En_Lane					),

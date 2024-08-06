@@ -41,7 +41,7 @@ module Vector_Unit
 
 	//Vector-Lane Generation
 	for ( genvar i=0; i<NUM_LANE; ++i ) begin
-		Lane_Unit (
+		Lane_Unit Lane_Unit (
 			.clock(				clock					),
 			.reset(				reset					),
 			.I_En(				I_En_Lane[ i ]			),

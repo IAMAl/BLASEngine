@@ -53,7 +53,7 @@ module MPU
 	lookup_t					ThreadInfo;
 
 
-	ThreadMem ThreadMem (
+	ThrreadMem_MPU ThrreadMem_MPU (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_St(				I_Req_St				),
@@ -85,7 +85,7 @@ module MPU
 	);
 
 
-	Dispatch Dispatch (
+	Dispatch_MPU Dispatch_MPU (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_Issue(			Req_Issue				),
@@ -103,7 +103,7 @@ module MPU
 	);
 
 
-	MapMan MapMan (
+	MapMan_MPU MapMan_MPU (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_St(				Req_St					),
@@ -119,7 +119,7 @@ module MPU
 	);
 
 
-	Commit Commit (
+	Commit_MPU Commit_MPU (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_Issue(			Req_Issue				),

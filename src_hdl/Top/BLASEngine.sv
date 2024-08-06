@@ -22,7 +22,7 @@ module BLASEngine (
 );
 
 
-	mpu mpu (
+	MPU MPU (
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_Req_St(				I_St_Req				),
@@ -57,7 +57,7 @@ module BLASEngine (
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
 		for ( genvar row=0; row<NUM_ROWS; ++row ) begin
-			tpu tpu (
+			TPU TPU (
 				.clock(				clock					),
 				.reset(				reset					),
 				.I_Instr(			Instr					),
@@ -72,7 +72,7 @@ module BLASEngine (
 				.O_Nack(			TPU_Nack[row][clm]		)
 			);
 
-			tpu_dmem tpu_vram (
+			DMem_TPU DMem_TPU (
 				.clock(				clock					),
 				.reset(				reset					),
 				.I_S_Ld_Req(		RAM_S_Ld_Req[row][clm]	),
@@ -88,7 +88,7 @@ module BLASEngine (
 
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
-		tpu_dmem tpu_vram_e (
+		DMem_TPU DMem (
 			.clock(			clock						),
 			.reset(			reset						),
 			.I_S_Ld_Req(	RAM_S_Ld_Req[NUM_ROWS][clm]	),

@@ -9,7 +9,7 @@
 //	Module Name:	DMem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module DMem
+module DMem_TPU
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -170,7 +170,7 @@ module DMem
 	end
 
 
-	req_handle_st req_handle_st
+	ReqHandle_St ReqHandle_St
 	(
 		.clock(				clock						),
 		.reset(				reset						),
@@ -192,7 +192,7 @@ module DMem
 		.O_GrantNo(			St_GrantNo					)
 	);
 
-	req_handle_ld req_handle_ld
+	ReqHandle_Ld ReqHandle_Ld
 	(
 		.clock(				clock						),
 		.reset(				reset						),
@@ -214,9 +214,10 @@ module DMem
 		.O_GrantNo(			Ld_GrantNo					)
 	);
 
-	pub_domain_man #(
+	PubDomain_Man #(
 		.NUM_ENTRY(			32							)
-	)(
+	) PubDomain_Man
+	(
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_St_Base(			St_Base						),
@@ -239,7 +240,7 @@ module DMem
 		.O_Set_Config_Ld(	Set_Config_Ld				)
 	);
 
-	agu agu_st (
+	AGU AGU_St (
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Req(				Set_Cfg_St					),
@@ -252,7 +253,7 @@ module DMem
 		.O_End_Access(		End_St						)
 	);
 
-	agu agu_ld (
+	AGU AGU_Ld (
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Req(				Set_Cfg_Ld					),
