@@ -1,4 +1,15 @@
-module commit_select (
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	BLASEngine
+//	Copyright (C) 2024  Shigeyuki TAKANO
+//
+//  GNU AFFERO GENERAL PUBLIC LICENSE
+//	version 3.0
+//
+//	Module Name:	Commit_TPU
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Commit_TPU (
 	input	issue_no_t			I_Rd_Ptr,				//Read Pointer from Hazard Unit
 	input						I_RB_Empty_S,			//Empty in Reorder Buffer for Scalar Unit
 	input						I_RB_Empty_V,			//Empty in Reorder Buffer for Vector Unit

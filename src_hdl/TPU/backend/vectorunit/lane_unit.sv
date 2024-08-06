@@ -1,4 +1,15 @@
-module lane_unit
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	BLASEngine
+//	Copyright (C) 2024  Shigeyuki TAKANO
+//
+//  GNU AFFERO GENERAL PUBLIC LICENSE
+//	version 3.0
+//
+//	Module Name:	Lane_Unit
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Lane_Unit
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -259,7 +270,7 @@ module lane_unit
 
 
 	//// Index Update Stage
-	Index Index_Dst (
+	IndexUnit Index_Dst (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Dst		),
@@ -279,7 +290,7 @@ module lane_unit
 		.O_Index(			Index_Dst				)
 	);
 
-	Index Index_Odd1 (
+	IndexUnit Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -300,7 +311,7 @@ module lane_unit
 		.O_Index(			pipe_index.SrcIdx1		)
 	);
 
-	Index Index_Odd2 (
+	IndexUnit Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -321,7 +332,7 @@ module lane_unit
 		.O_Index(			pipe_index.SrcIdx2		)
 	);
 
-	Index Index_Even1 (
+	IndexUnit Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -342,7 +353,7 @@ module lane_unit
 		.O_Index(			pipe_index.SrcIdx3		)
 	);
 
-	Index Index_Even2 (
+	IndexUnit Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -407,7 +418,7 @@ module lane_unit
 	);
 
 
-	pipereg_be PReg_RFile (
+	PipeReg_BE PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			),
@@ -419,7 +430,7 @@ module lane_unit
 
 
 	//// Status Register
-	statusctrl statusctrl (
+	StatusCtrl StatusCtrl (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				WB_En					),
@@ -429,8 +440,8 @@ module lane_unit
 
 
 	//// Mask Register
-	//		I_Index: WB Dst-Index
-	maskreg MaskReg (
+	//		I_Index: WB Dst-IndexUnit
+	MaskReg MaskReg (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_We(				),//ToDo
@@ -443,7 +454,7 @@ module lane_unit
 
 
 	//// Network Stage
-	network v_network (
+	Network_V Network_V (
 		.I_Req(				),//ToDo
 		.I_Sel_Path(		Config_Path				),
 		.I_Scalar_Data(		I_Scalar_Data			),
@@ -476,7 +487,7 @@ module lane_unit
 	);
 
 
-	pipereg_be PReg_Net (
+	PipeReg_BE PReg_Net (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			),//ToDo

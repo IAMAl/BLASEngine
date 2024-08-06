@@ -1,4 +1,15 @@
-module vector_unit
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	BLASEngine
+//	Copyright (C) 2024  Shigeyuki TAKANO
+//
+//  GNU AFFERO GENERAL PUBLIC LICENSE
+//	version 3.0
+//
+//	Module Name:	Vector_Unit
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Vector_Unit
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -30,7 +41,7 @@ module vector_unit
 
 	//Vector-Lane Generation
 	for ( genvar i=0; i<NUM_LANE; ++i ) begin
-		lane_unit (
+		Lane_Unit (
 			.clock(				clock					),
 			.reset(				reset					),
 			.I_En(				I_En_Lane[ i ]			),

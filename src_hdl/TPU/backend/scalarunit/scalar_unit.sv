@@ -1,4 +1,15 @@
-module scalar_unit
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	BLASEngine
+//	Copyright (C) 2024  Shigeyuki TAKANO
+//
+//  GNU AFFERO GENERAL PUBLIC LICENSE
+//	version 3.0
+//
+//	Module Name:	Scalar_Unit
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module Scalar_Unit
 	import pkg_mpu::*;
 	import pkg_tpu::*;
 (
@@ -282,7 +293,7 @@ module scalar_unit
 
 
 	//// Program Address Control
-	PAC PAC (
+	PACUnit PACUnit (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_PCU					),
@@ -346,7 +357,7 @@ module scalar_unit
 
 
 	//// Select Scalar-Unit Back-End or Vector Unit Back-End
-	Issue_Command Issue_Command (
+	Dispatch_TPU Dispatch_TPU (
 		.I_Command(			Pre_Command				),
 		.O_S_Command(		S_Command				),
 		.O_V_Command(		O_V_Command				)
@@ -366,7 +377,7 @@ module scalar_unit
 
 
 	//// Index Update Stage
-	Index Index_Dst (
+	IndexUnit Index_Dst (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -384,7 +395,7 @@ module scalar_unit
 		.O_Index(			Index_Dst				)
 	);
 
-	Index Index_Odd1 (
+	IndexUnit Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -402,7 +413,7 @@ module scalar_unit
 		.O_Index(			Index_Odd1				)
 	);
 
-	Index Index_Odd2 (
+	IndexUnit Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -420,7 +431,7 @@ module scalar_unit
 		.O_Index(			Index_Odd2				)
 	);
 
-	Index Index_Even1 (
+	IndexUnit Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -438,7 +449,7 @@ module scalar_unit
 		.O_Index(			Index_Even1				)
 		);
 
-	Index Index_Even2 (
+	IndexUnit Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -456,7 +467,7 @@ module scalar_unit
 		.O_Index(			Index_Even2				)
 	);
 
-	pipereg PReg_Index (
+	PipeReg PReg_Index (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall					),
@@ -498,7 +509,7 @@ module scalar_unit
 		.O_Req(				)
 	);
 
-	pipereg_be PReg_RFile (
+	PipeReg_BE PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall					),
@@ -510,7 +521,7 @@ module scalar_unit
 
 
 	//// Lane Enable Register
-	lane_en Lane_En (
+	Lane_En Lane_En (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_We(				),
@@ -523,7 +534,7 @@ module scalar_unit
 
 
 	//// Network Stage
-	network_s network_s (
+	Network_S Network_S (
 		.I_Req(				),//ToDo
 		.I_Sel_Path(		Sel_Path				),
 		.I_Sel_ALU_Src1(	Sel_ALU_Src1			),
@@ -551,7 +562,7 @@ module scalar_unit
 	);
 
 
-	pipereg_be PReg_Net (
+	PipeReg_BE PReg_Net (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall					),
@@ -632,7 +643,7 @@ module scalar_unit
 
 	//// Commitment Stage
 	//	 Commit Unit for Scalar Unit
-	reorderbuff_s #(
+	ReorderBuff_S #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_S			)
 	) ReorderBuff_S
 	(
@@ -657,7 +668,7 @@ module scalar_unit
 	);
 
 	//	 Commit Unit for Vector Unit
-	reorderbuff_v #(
+	ReorderBuff_V #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
 	) ReorderBuff_V
 	(
@@ -674,7 +685,7 @@ module scalar_unit
 	);
 
 	// Commit Request Selecter
-	commit_select Commit_Select (
+	Commit_TPU Commit_TPU (
 		.I_Rd_Ptr(			Rd_Ptr					),
 		.I_RB_Empty_S(		Empty_RB_S				),
 		.I_RB_Empty_V(		Empty_RB_V				),
