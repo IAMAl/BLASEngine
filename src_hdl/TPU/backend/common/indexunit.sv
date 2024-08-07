@@ -18,7 +18,7 @@ module IndexUnit
 	input						I_Req,							//Request from Hazard-Check Stage
 	input						I_MaskedRead,					//Flag: Masked Access to Register File
 	input						I_Slice,						//Flag: Index-Slicing
-	input	[7:0]				I_Sel,							//Select Sources
+	input	[6:0]				I_Sel,							//Select Sources
 	input	index_s_t			I_Index,						//Index Value
 	input	index_t				I_Window,						//Window for Slicing
 	input	index_t				I_Length,						//Length for Slicing

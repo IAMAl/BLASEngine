@@ -74,7 +74,6 @@ module Network_S
 	assign Req					= I_Req;
 	assign Sel_Path				= I_Sel_Path;
 
-	//ToDo
 	assign Sel_Path_Src1		= I_Sel_ALU_Src1[1:0];
 	assign Sel_Path_Src2		= I_Sel_ALU_Src2[1:0];
 	assign Sel_Path_Src3		= I_Sel_ALU_Src3[1:0];
@@ -99,19 +98,19 @@ module Network_S
 									( Sel_Src1_Data2 ) ?	I_Src_Idx2 ;
 									( Sel_Src1_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src1_Data4 ) ?	I_Src_Idx4 ;
-															0;
+															'0;
 
 	assign Src_Index2			= ( Sel_Src2_Data1 ) ?		I_Src_Idx1 ;
 									( Sel_Src2_Data2 ) ?	I_Src_Idx2 ;
 									( Sel_Src2_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src2_Data4 ) ?	I_Src_Idx4 ;
-															0;
+															'0;
 
 	assign Src_Index3			= ( Sel_Src3_Data1 ) ?		I_Src_Idx1 ;
 									( Sel_Src3_Data2 ) ?	I_Src_Idx2 ;
 									( Sel_Src3_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src3_Data4 ) ?	I_Src_Idx4 ;
-															0;
+															'0;
 
 
 	assign Sel_WB_Data11		= Req & I_Sel_ALU_Src1[2] & ( Src_Index1 == I_WB_DstIdx1 );
@@ -169,6 +168,10 @@ module Network_S
 																				'0;
 
 
-	assign O_PAC_Src_Data		= ;//ToDo
+	assign O_PAC_Src_Data		= (   Sel_Path[1:0] == 2'h0 ) ?	I_Src_Data1 :
+									( Sel_Path[1:0] == 2'h1 ) ?	I_Src_Data2 :
+									( Sel_Path[1:0] == 2'h2 ) ?	I_Src_Data3 :
+									( Sel_Path[1:0] == 2'h3 ) ?	I_Src_Data4 :
+																'0;
 
 endmodule

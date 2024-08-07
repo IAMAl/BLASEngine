@@ -128,6 +128,7 @@ module HazardCheck_TPU
 
 
 	assign O_Req_Issue			= R_Req;
+
 	assign O_Issue_Instr.v_dst			= TabHazard[ RNo ].v_dst;
 	assign O_Issue_Instr.v_src1			= TabHazard[ RNo ].v_src1;
 	assign O_Issue_Instr.v_src2			= TabHazard[ RNo ].v_src2;

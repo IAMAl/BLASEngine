@@ -252,13 +252,13 @@ module Lane_Unit
 	//// Nwtwork
 	assign Config_Path		= ;//ToDo
 
-	assign Sel_ALU_Src1		= ;//ToDo
-	assign Sel_ALU_Src2		= ;//ToDo
-	assign Sel_ALU_Src3		= ;//ToDo
+	assign Sel_ALU_Src1		= Pipe_OP_Net.Sel_ALU_Src1;
+	assign Sel_ALU_Src2		= Pipe_OP_Net.Sel_ALU_Src2;
+	assign Sel_ALU_Src3		= Pipe_OP_Net.Sel_ALU_Src3;
 
-	assign Src_Idx1			= ;//ToDo
-	assign Src_Idx2			= ;//ToDo
-	assign Src_Idx3			= ;//ToDo
+	assign Src_Idx1			= Pipe_OP_Net.Src_Idx1;
+	assign Src_Idx2			= Pipe_OP_Net.Src_Idx2;
+	assign Src_Idx3			= Pipe_OP_Net.Src_Idx3;
 
 	assign pipe_net.valid	= pipe_rr_net.valid;
 	assign pipe_net.OpType	= pipe_rr_net.OpType;
@@ -422,14 +422,14 @@ module Lane_Unit
 		.I_Index_Src2(		pipe_rr.SrcIdx3			),
 		.O_Data_Src1(		Pre_Src_Data3			),
 		.O_Data_Src2(		pipe_rr.Src_Data3		),
-		.O_Req(										)
+		.O_Req(				)//ToDo
 	);
 
 
 	PipeReg_BE PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),
+		.I_Stall(			),//ToDo
 		.I_Op(				pipe_rr					),
 		.O_Op(				pipe_rr_net				),
 		.I_Slice_Idx(		Slixe_Idx_RFile			),

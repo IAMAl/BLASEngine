@@ -79,11 +79,11 @@ module Scalar_Unit
 	index_s_t				Index_Src1;
 	index_s_t				Index_Src2;
 	index_s_t				Index_Src3;
-	logic	[7:0]			Index_Sel_Dst;
-	logic	[7:0]			Index_Sel_Odd1;
-	logic	[7:0]			Index_Sel_Odd2;
-	logic	[7:0]			Index_Sel_Even1;
-	logic	[7:0]			Index_Sel_Even2;
+	logic	[6:0]			Index_Sel_Dst;
+	logic	[6:0]			Index_Sel_Odd1;
+	logic	[6:0]			Index_Sel_Odd2;
+	logic	[6:0]			Index_Sel_Even1;
+	logic	[6:0]			Index_Sel_Even2;
 
 	index_t					Index_Length;
 	index_t					Window_Length;
@@ -237,28 +237,28 @@ module Scalar_Unit
 
 	assign Req_Index_Dst	= S_Command.v_dst & Req_Issue;
 	assign Slice_Dst		= S_Command.slice1 | S_Command.slice2 | S_Command.slice3;
-	assign Index_Dst		= S_Command.SrcDst;
-	assign Index_Sel_Dst	= //ToDo;
+	assign Index_Dst		= S_Command.DstIdx;
+	assign Index_Sel_Dst	= S_Command.DstSel;
 
 	assign Req_Index_Odd1	= S_Command.v_src1 & Req_Issue;
 	assign Slice_Odd1		= S_Command.slice1;
 	assign Index_Orig_Odd1	= S_Command.SrcIdx1;
-	assign Index_Sel_Odd1	= ;//ToDo;
+	assign Index_Sel_Odd1	= S_Command.SrcSel_Odd1;
 
 	assign Req_Index_Odd2	= S_Command.v_src2 & Req_Issue;
 	assign Slice_Odd2		= S_Command.slice2;
 	assign Index_Odd2		= S_Command.SrcIdx2;
-	assign Index_Sel_Odd2	= ;//ToDo;
+	assign Index_Sel_Odd2	= S_Command.SrcSel_Odd2;
 
 	assign Req_Index_Even1	= S_Command.v_src3 & Req_Issue;
 	assign Slice_Even1		= S_Command.slice2;
 	assign Index_Even1		= S_Command.SrcIdx2;
-	assign Index_Sel_Even1	= ;//ToDo;
+	assign Index_Sel_Even1	= S_Command.SrcSel_Even1;
 
 	assign Req_Index_Even2	= S_Command.v_src4 & Req_Issue;
 	assign Slice_Even2		= S_Command.slice3;
 	assign Index_Even2		= S_Command.SrcIdx3;
-	assign Index_Sel_Even2	= ;//ToDo;
+	assign Index_Sel_Even2	= S_Command.SrcSel_Even2;
 
 
 	//// Register-Read Stage
@@ -270,22 +270,22 @@ module Scalar_Unit
 
 
 	//// Network
-	assign Sel_Path			= ;//ToDo
-	assign Sel_ALU_Src1		= ;//ToDo
-	assign Sel_ALU_Src2		= ;//ToDo
-	assign Sel_ALU_Src3		= ;//ToDo
+	assign Sel_Path			= Pipe_OP_Net.Sel_Path;
+	assign Sel_ALU_Src1		= Pipe_OP_Net.Sel_Src1;
+	assign Sel_ALU_Src2		= Pipe_OP_Net.Sel_Src2;
+	assign Sel_ALU_Src3		= Pipe_OP_Net.Sel_Src3;
 
-	assign Src_Idx1			= ;//ToDo
-	assign Src_Idx2			= ;//ToDo
-	assign Src_Idx3			= ;//ToDo
-	assign Src_Idx4			= ;//ToDo
+	assign Src_Idx1			= Pipe_OP_Net.Src_Idx1;
+	assign Src_Idx2			= Pipe_OP_Net.Src_Idx2;
+	assign Src_Idx3			= Pipe_OP_Net.Src_Idx3;
+	assign Src_Idx4			= Pipe_OP_Net.Src_Idx4;
 
 
 	//// Execution Stage
 	//	 Load/Store Unit
-	assign OpClass_LdSt_Odd	= S_Command.OpClass;
-	assign OpClass_LdSt_Even= S_Command.OpClass;
-	assign OpCode_LdSt		= S_Command.OpCode;
+	assign OpClass_LdSt_Odd	= Pipe_OP_SMath.OpClass;
+	assign OpClass_LdSt_Even= Pipe_OP_SMath.OpClass;
+	assign OpCode_LdSt		= Pipe_OP_SMath.OpCode;
 
 	assign Ld_NoReady		= Ld_NoReady1 | Ld_NoReady2;
 
@@ -501,7 +501,7 @@ module Scalar_Unit
 		.I_Index_Src2(		Index_Odd2				),
 		.O_Data_Src1(		Pre_Src_Data1			),
 		.O_Data_Src2(		Pre_Src_Data21			),
-		.O_Req(				)
+		.O_Req(				)//ToDo
 	);
 
 	RegFile RegFile_Even (
@@ -517,7 +517,7 @@ module Scalar_Unit
 		.I_Index_Src2(		Index_Even2				),
 		.O_Data_Src1(		Pre_Src_Data3			),
 		.O_Data_Src2(		Pre_Src_Data22			),
-		.O_Req(				)
+		.O_Req(				)//ToDo
 	);
 
 	PipeReg_BE PReg_RFile (
@@ -535,10 +535,10 @@ module Scalar_Unit
 	Lane_En Lane_En (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_We(				),
-		.I_Data(			),
-		.I_Re(				),
-		.I_We_V_State(		),
+		.I_We(				),//ToDo
+		.I_Data(			),//ToDo
+		.I_Re(				),//ToDo
+		.I_We_V_State(		),//ToDo
 		.I_V_State(			I_V_State				),
 		.O_Data(			V_State					)
 	);
@@ -577,8 +577,8 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall					),
-		.I_Op(				Pipe_OP_RFile			),
-		.O_Op(				Pipe_OP_Net				),
+		.I_Op(				Pipe_OP_Net				),
+		.O_Op(				Pipe_OP_SMath			),
 		.I_Slice_Idx(		Slixe_Idx_Net			),
 		.O_Slice_Idx(		Slixe_Idx_Math			)
 	);
