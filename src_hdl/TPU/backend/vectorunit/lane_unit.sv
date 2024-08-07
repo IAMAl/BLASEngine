@@ -11,7 +11,11 @@
 
 module Lane_Unit
 	import pkg_tpu::*;
-(
+#(
+	parameter int NUM_LANES		= 16,
+	parameter int WIDTH_LANES	= $clog2(NUM_LANES),
+	parameter int LANE_ID		= 0
+)(
 	input						clock,
 	input						reset,
 	input						I_En,					//Enable Execution
@@ -113,6 +117,8 @@ module Lane_Unit
 
 
 	mask_t					Mask_Data;
+
+	logic	[12:0]			Config_Path;
 
 
 	data_t					Bypass_Data1;
@@ -244,6 +250,8 @@ module Lane_Unit
 
 
 	//// Nwtwork
+	assign Config_Path		= ;//ToDo
+
 	assign Sel_ALU_Src1		= ;//ToDo
 	assign Sel_ALU_Src2		= ;//ToDo
 	assign Sel_ALU_Src3		= ;//ToDo
@@ -375,10 +383,10 @@ module Lane_Unit
 	);
 
 
-	pipereg PReg_Index (
+	PipeReg PReg_Index (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			),
+		.I_Stall(			),//ToDo
 		.I_Op(				pipe_index				),
 		.O_Op(				pipe_idx_rf				)
 	);
@@ -454,7 +462,11 @@ module Lane_Unit
 
 
 	//// Network Stage
-	Network_V Network_V (
+	Network_V #(
+		.NUM_LANES(			NUM_LANES				),
+		.LANE_ID(			LANE_ID					)
+	) Network_V
+	(
 		.I_Req(				),//ToDo
 		.I_Sel_Path(		Config_Path				),
 		.I_Scalar_Data(		I_Scalar_Data			),
@@ -493,8 +505,8 @@ module Lane_Unit
 		.I_Stall(			),//ToDo
 		.I_Op(				pipe_net				),
 		.O_Op(				Pipe_OP_Net				),
-		.I_Slice_Idx(		Slixe_Idx_Net			),
-		.O_Slice_Idx(		Slixe_Idx_Math			)
+		.I_Slice_Idx(		Slice_Idx_Net			),
+		.O_Slice_Idx(		Slice_Idx_Math			)
 	);
 
 

@@ -41,7 +41,11 @@ module Vector_Unit
 
 	//Vector-Lane Generation
 	for ( genvar i=0; i<NUM_LANE; ++i ) begin
-		Lane_Unit Lane_Unit (
+		Lane_Unit #(
+			.NUM_LANES(			NUM_LANES				),
+			.LANE_ID(			i						)
+		) Lane_Unit
+		(
 			.clock(				clock					),
 			.reset(				reset					),
 			.I_En(				I_En_Lane[ i ]			),
@@ -61,7 +65,7 @@ module Vector_Unit
 			.O_St_Req1(			O_St[0].Req[ i ]		),
 			.O_St_Req2(			O_St[1].Req[ i ]		),
 			.O_St_Data1(		O_St[0].Data[ i ]		),
-			.O_St_Data2(		O_St[0].Data[ i ]		),
+			.O_St_Data2(		O_St[1].Data[ i ]		),
 			.O_Commit(			Commit[ i ]				),
 			.I_Lane_Data_Src1(	Lane_Data_Src1			),
 			.I_Lane_Data_Src2(	Lane_Data_Src2			),

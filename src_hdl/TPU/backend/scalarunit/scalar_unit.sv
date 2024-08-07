@@ -151,6 +151,12 @@ module Scalar_Unit
 	logic					Condition;
 
 
+	logic	[1:0]			Sel_Path;
+	logic	[1:0]			Sel_ALU_Src1;
+	logic	[1:0]			Sel_ALU_Src2;
+	logic	[1:0]			Sel_ALU_Src3;
+
+
 	logic					Req_LdSt_Odd;
 	logic					Req_LdSt_Even;
 	logic	[1:0]			OpClass_LdSt_Odd;
@@ -264,6 +270,11 @@ module Scalar_Unit
 
 
 	//// Network
+	assign Sel_Path			= ;//ToDo
+	assign Sel_ALU_Src1		= ;//ToDo
+	assign Sel_ALU_Src2		= ;//ToDo
+	assign Sel_ALU_Src3		= ;//ToDo
+
 	assign Src_Idx1			= ;//ToDo
 	assign Src_Idx2			= ;//ToDo
 	assign Src_Idx3			= ;//ToDo

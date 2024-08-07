@@ -16,7 +16,7 @@ module Network_S
 	parameter int WIDTH_LANES	= $clog2(NUM_LANES);
 )(
 	input						I_Req,
-	input	[5:0]				I_Sel_Path,						//Path Selects
+	input	[1:0]				I_Sel_Path,						//Path Selects
 	input	[2:0]				I_Sel_ALU_Src1,					//Source Select
 	input	[2:0]				I_Sel_ALU_Src2,					//Source Select
 	input	[2:0]				I_Sel_ALU_Src3,					//Source Select
@@ -43,7 +43,7 @@ module Network_S
 
 
 	logic						Req;
-	logic	[4:0]				Sel_Path;
+	logic	[1:0]				Sel_Path;
 	logic	[1:0]				Sel_Path_Src1;
 	logic	[1:0]				Sel_Path_Src2;
 	logic	[1:0]				Sel_Path_Src3;
@@ -94,13 +94,6 @@ module Network_S
 	assign Sel_Src3_Data3		= Req & I_Sel_ALU_Src3[2] & ( Sel_Path_Src3 == 2'h2 );
 	assign Sel_Src3_Data4		= Req & I_Sel_ALU_Src3[2] & ( Sel_Path_Src3 == 2'h3 );
 
-	assign Sel_WB_Data11		= Req & I_Sel_ALU_Src1[2] & ( Src_Index1 == I_WB_DstIdx1 );
-	assign Sel_WB_Data12		= Req & I_Sel_ALU_Src1[2] & ( Src_Index1 == I_WB_DstIdx2 );
-	assign Sel_WB_Data21		= Req & I_Sel_ALU_Src2[2] & ( Src_Index2 == I_WB_DstIdx1 );
-	assign Sel_WB_Data22		= Req & I_Sel_ALU_Src2[2] & ( Src_Index2 == I_WB_DstIdx2 );
-	assign Sel_WB_Data31		= Req & I_Sel_ALU_Src3[2] & ( Src_Index3 == I_WB_DstIdx1 );
-	assign Sel_WB_Data32		= Req & I_Sel_ALU_Src3[2] & ( Src_Index3 == I_WB_DstIdx2 );
-
 
 	assign Src_Index1			= ( Sel_Src1_Data1 ) ?		I_Src_Idx1 ;
 									( Sel_Src1_Data2 ) ?	I_Src_Idx2 ;
@@ -119,6 +112,14 @@ module Network_S
 									( Sel_Src3_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src3_Data4 ) ?	I_Src_Idx4 ;
 															0;
+
+
+	assign Sel_WB_Data11		= Req & I_Sel_ALU_Src1[2] & ( Src_Index1 == I_WB_DstIdx1 );
+	assign Sel_WB_Data12		= Req & I_Sel_ALU_Src1[2] & ( Src_Index1 == I_WB_DstIdx2 );
+	assign Sel_WB_Data21		= Req & I_Sel_ALU_Src2[2] & ( Src_Index2 == I_WB_DstIdx1 );
+	assign Sel_WB_Data22		= Req & I_Sel_ALU_Src2[2] & ( Src_Index2 == I_WB_DstIdx2 );
+	assign Sel_WB_Data31		= Req & I_Sel_ALU_Src3[2] & ( Src_Index3 == I_WB_DstIdx1 );
+	assign Sel_WB_Data32		= Req & I_Sel_ALU_Src3[2] & ( Src_Index3 == I_WB_DstIdx2 );
 
 
 	assign Sel_LdST				= Req & ~I_Sel_ALU_Src1[2] & ~I_Sel_ALU_Src2[2] & ~I_Sel_ALU_Src3[2];
