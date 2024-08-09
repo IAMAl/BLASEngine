@@ -159,120 +159,88 @@ module Lane_Unit
 
 
 	//// Index Update Stage
-	assign Req_Issue		= I_Command..valid;
-
 	// Constant Value Extraction
-	assign Constant			= I_Command.Imm_Data;
-
-
-
-	// Write-Back Info Extraction
-	assign DstInfo.We_Odd	= I_Command.v_dst &  I_Command.DstIdx[WIDTH_INDEX] & Req_Issue;
-	assign DstInfo.We_Evn	= I_Command.v_dst & ~I_Command.DstIdx[WIDTH_INDEX] & Req_Issue;
-	assign DstInfo.Slice	= I_Command.slice1 | I_Command.slice2 | I_Command.slice3;
-	assign DstInfo.Index	= I_Command.Dst;
-	assign DstInfo.Sel		= I_Command.Dst_Sel;;
-
-	// Index Info Extraction
-	assign Index_Length		= I_Command.IdxLength;
-
-	assign Req_Index_Odd1	= I_Command.v_src1 & Req_Issue;
-	assign Slice_Odd1		= I_Command.slice1;
-	assign Index_Orig_Odd1	= I_Command.SrcIdx1;
-	assign Sel_Index_Odd1	= I_Command.Src1_Sel;
-
-	assign Req_Index_Odd2	= I_Command.v_src2 & Req_Issue;
-	assign Slice_Odd2		= I_Command.slice2;
-	assign Index_Odd2		= I_Command.SrcIdx2;
-	assign Sel_Index_Odd2	= I_Command.Src2_Sel;
-
-	assign Req_Index_Even1	= I_Command.v_src3 & Req_Issue;
-	assign Slice_Even1		= I_Command.slice2;
-	assign Index_Even1		= I_Command.SrcIdx2;
-	assign Sel_Index_Even1	= I_Command.Src2_Sel;
-
-	assign Req_Index_Even2	= I_Command.v_src4 & Req_Issue;
-	assign Slice_Even2		= I_Command.slice3;
-	assign Index_Even2		= I_Command.SrcIdx3;
-	assign Sel_Index_Even2	= I_Command.Src3_Sel;
-
 	// Capture Extracted Info
+	pipe_index_t			PipeReg_Index;
+
 	//	Command
-	assign PipeReg_Index.valid		= I_Command.valid;
-	assign PipeReg_Index.OpType		= I_Command.OpType;
-	assign PipeReg_Index.OpClass	= I_Command.OpClass;
-	assign PipeReg_Index.OpCode		= I_Command.OpCode;
-	assign PipeReg_Index.dst_info	= I_Command.dst_info;
+	assign PipeReg_Index.v			= I_Command.instr.v;
+	assign PipeReg_Index.op			= I_Command.instr.op;
 
 	//	Write-Back
-	assign PipeReg_Index.DstInfo	= DstInfo;
+	assign PipeReg_Index.sdt		= I_Command.dst
 
 	//	Indeces
-	assign PipeReg_Index.i_len		= Index_Length;
+	assign PipeReg_Index.slice_len	= I_Command.instr.slice_len;
 
-	assign PipeReg_Index.v_src1		= Req_Index_Odd1;
-	assign PipeReg_Index.v_src2		= Req_Index_Odd2;
-	assign PipeReg_Index.v_src3		= Req_Index_Even1;
-	assign PipeReg_Index.v_src4		= Req_Index_Even2;
-
-	assign PipeReg_Index.slice1		= IDec_Slice_Odd1;
-	assign PipeReg_Index.slice2		= IDec_Slice_Odd2;
-	assign PipeReg_Index.slice3		= IDec_Slice_Even1;
-	assign PipeReg_Index.slice4		= IDec_Slice_Even2;
-
-	assign PipeReg_Index.src_idx1	= Index_Orig_Odd1;
-	assign PipeReg_Index.src_idx2	= Index_Orig_Odd2;
-	assign PipeReg_Index.src_idx3	= Index_Orig_Even1;
-	assign PipeReg_Index.src_idx4	= Index_Orig_Even2;
-
-	assign PipeReg_Index.sel_idx1	= Sel_Index_Odd1;
-	assign PipeReg_Index.sel_idx2	= Sel_Index_Odd2;
-	assign PipeReg_Index.sel_idx3	= Sel_Index_Even1;
-	assign PipeReg_Index.sel_idx4	= Sel_Index_Evem2;
+	assign PipeReg_Index.src1		= I_Command.instr.src1;
+	assign PipeReg_Index.src2		= I_Command.instr.src2;
+	assign PipeReg_Index.src3		= I_Command.instr.src2;
+	assign PipeReg_Index.src4		= I_Command.instr.src4;
 
 	//	Issue-No
-	assign PipeReg_Index.Issue_No	= I_Command.Issue_No;
+	assign PipeReg_Index.issue_no	= I_Command.issue_no;
 
 
 	//// Register Read/Write Stage
-	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2;
+	pipe_rr_t			Slice_Idx_RR;
 
-	assign Re_RegFile_Odd1	= pipe_idx_rf.v_src1;
-	assign Re_RegFile_Odd2	= pipe_idx_rf.v_src2;
-	assign Re_RegFile_Even1	= pipe_idx_rf.v_src3;
-	assign Re_RegFile_Even2	= pipe_idx_rf.v_src4;
+	//	Command
+	assign Slice_Idx_RR.v		= pipe_idx_rf.v;
+	assign Slice_Idx_RR.op		= pipe_idx_rf.op;
 
-	assign Index_Odd1		= pipe_idx_rf.SrcIdx1;
-	assign Index_Odd2		= pipe_idx_rf.SrcIdx2;
-	assign Index_Even1		= pipe_idx_rf.SrcIdx3;
-	assign Index_Even2		= pipe_idx_rf.SrcIdx4;
+	//	Write-Back
+	assign Slice_Idx_RR.dst		= pipe_idx_rf.dst;
+
+	//	Indeces
+	assign Slice_Idx_RR.src1	= pipe_idx_rf.src1;
+	assign Slice_Idx_RR.src2	= pipe_idx_rf.src2;
+	assign Slice_Idx_RR.src3	= pipe_idx_rf.src3;
+	assign Slice_Idx_RR.src4	= pipe_idx_rf.src4;
+
+	//	Issue-No
+	assign Slice_Idx_RR.issue_no= pipe_idx_rf.issue_no;
 
 
-	assign pipe_rr.valid	= pipe_idx_rf.valid;
-	assign pipe_rr.OpType	= pipe_idx_rf.OpType;
-	assign pipe_rr.OpClass	= pipe_idx_rf.OpClass;
-	assign pipe_rr.OpCode	= pipe_idx_rf.OpCode;
-	assign pipe_rr.dst_info	= pipe_idx_rf.dst_info;
+	assign Slice_Idx_RR	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2;
 
-	assign pipe_rr.v_src1	= Re_RegFile_Odd1;
-	assign pipe_rr.v_src2	= Re_RegFile_Odd2;
-	assign pipe_rr.v_src3	= Re_RegFile_Even1;
-	assign pipe_rr.v_src4	= Re_RegFile_Even2;
+	assign Re_RegFile_Odd1	= Slice_Idx_RR.src1.v;
+	assign Re_RegFile_Odd2	= Slice_Idx_RR.src2.v;
+	assign Re_RegFile_Even1	= Slice_Idx_RR.src3.v;
+	assign Re_RegFile_Even2	= Slice_Idx_RR.src4.v;
 
-	assign pipe_rr.SrcIdx2	= ( Re_RegFile_Odd2 ) ?		Index_Odd2 :
-								( Re_RegFile_Even1 ) ?	Index_Even1 :
-														0;
+	assign Index_Odd1		= Slice_Idx_RR.src1.idx;
+	assign Index_Odd2		= Slice_Idx_RR.src2.idx;
+	assign Index_Even1		= Slice_Idx_RR.src3.idx;
+	assign Index_Even2		= Slice_Idx_RR.src4.idx;
 
-	assign pipe_rr.Src_Data2= ( Re_RegFile_Odd2 ) ?		Pre_Src_Data2 :
-								( Re_RegFile_Even1 ) ?	Pre_Src_Data3 :
-														0;
 
-	assign pipe_rr.slice1	= pipe_idx_rf.slice1;
-	assign pipe_rr.slice2	= pipe_idx_rf.slice2;
-	assign pipe_rr.slice3	= pipe_idx_rf.slice3;
-	assign pipe_rr.slice4	= pipe_idx_rf.slice4;
+	//	Capture Read Data
+	pipe_net_t			PipeReg_RR_Net;
+	//	Command
+	assign PipeReg_RR_Net.v		= Slice_Idx_RR.v;
+	assign PipeReg_RR_Net.op	= Slice_Idx_RR.op;
 
-	assign pipe_rr.Issue_No	= pipe_idx_rf.Issue_No;
+	//	Write-Back
+	assign PipeReg_RR_Net.dst	= Slice_Idx_RR.dst;
+
+	//	Read Data
+	assign PipeReg_RR_Net.src1.idx	= Index_Odd1;
+	assign PipeReg_RR_Net.src1.data	= Src_Data1;
+
+	assign PipeReg_RR_Net.src2.idx	= ( Slice_Idx_RR.src2.v ) ?			Index_Odd2 :
+										( Slice_Idx_RR.src1.src3.v ) ?	Index_Even1 :
+																		'0;
+
+	assign PipeReg_RR_Net.src2.data	= ( Slice_Idx_RR.src2.v ) ?			Pre_Src_Data2 :
+										( Slice_Idx_RR.src1.src3.v ) ?	Pre_Src_Data3 :
+																		'0;
+
+	assign PipeReg_RR_Net.src3.idx	= Index_Odd4;
+	assign PipeReg_RR_Net.src3.data	= Src_Data4;
+
+	//	Issue-No
+	assign PipeReg_RR_Net.issue_no	= Slice_Idx_RR.issue_no;
 
 
 	//// Nwtwork
