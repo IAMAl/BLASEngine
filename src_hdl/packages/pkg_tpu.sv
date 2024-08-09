@@ -35,6 +35,9 @@ package pkg_tpu;
 	parameter int SIZE_DATA_MEMORY		= 1024;
 	parameter int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEMORY);
 
+	//Constant in Instruction
+	parameter int WIDTH_CONSTANT		= 64-7-7*4-6-1;
+
 
 	//Logic Types
 	//	General Data Type
@@ -64,38 +67,40 @@ package pkg_tpu;
 	typedef logic	[NUM_ENTRY_REGFILE-1:0]	mask_t;
 
 
+
 	////Instruction-Set
 	//	Operation Bit-Field in Instruction
 	typedef struct packed {
-		logic							valid;
 		logic							Sel_Unit;
 		logic		[1:0]				OpType;
 		logic		[1:0]				OpClass;
 		logic		[1:0]				OpCode;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
 	} op_t;
+
+	typedef struct packed {
+		logic							v;
+		logic							slice;
+		index_s_t						idx;
+		logic		[6:0]				sel;
+	} idx_t;
+
+	typedef struct packed {
+		logic							v;
+		index_t							idx;
+	} reg_idx_t;
+
+	//	Constant Type
+	typedef logic 	[WIDTH_CONSTANT-1:0]	imm_t;
 
 	//	Instruction Bit Field
 	typedef struct packed {
-		logic							Sel_Unit;
-		logic		[1:0]				OpType;
-		logic		[1:0]				OpClass;
-		logic		[1:0]				OpCode;
-		logic							v_dst;
-		logic							v_src1;
-		logic							v_src2;
-		logic							v_src3;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
-		index_t							slice_length;
-		index_s_t						DstIdx;
-		index_s_t						SrcIdx1;
-		index_s_t						SrcIdx2;
-		index_s_t						SrcIdx3;
-		logic		[64-7-7*4-6-1:0]	Constant;
+		op_t							op;
+		idx_t							dst;
+		idx_t							src1;
+		idx_t							src2;
+		idx_t							src3;
+		index_t							slice_len;
+		imm_t							imm;
 	} instruction_t;
 
 	//	Instruction + Valid
@@ -108,156 +113,84 @@ package pkg_tpu;
 	////Execution Steering
 	//	Hazard Table used in Scalar unit
 	typedef struct packed {
-		logic							v_dst;
-		logic							v_src1;
-		logic							v_src2;
-		logic							v_src3;
-		logic							v_src4;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
-		index_t							slice_length,
-		index_t							DstIdx;
-		index_t							SrcIdx1;
-		index_t							SrcIdx2;
-		index_t							SrcIdx3;
-		data_t							Imm_Data;
-		logic							Commit;
+		logic							v;
+		idx_t							dst;
+		idx_t							src1;
+		idx_t							src2;
+		idx_t							src3;
+		index_t							slice_len;
+		issue_no_t						issue_no;
+		logic							commit;
 	} iw_t;
 
 	//	Commit Table for Scalar Unit
 	typedef struct packed {
-		logic							Valid;
-		issue_no_t						Issue_No;
-		logic							Commit;
+		logic							v;
+		issue_no_t						issue_no;
+		logic							commit;
 	} commit_tab_s;
 
 	//	Commit Table for Vector Unit
 	//		NOTE: Placed in Scalar Unit
 	typedef struct packed {
-		logic							Valid;
-		issue_no_t						Issue_No;
-		logic	[NUM_LANE-1:0]			En_Lane;
-		logic	[NUM_LANE-1:0]			En_Commit;
-		logic							Commit;
+		logic							v;
+		issue_no_t						issue_no;
+		logic							commit;
+		logic	[NUM_LANE-1:0]			en_lane;
+		logic	[NUM_LANE-1:0]			en_commit;
 	} commit_tab_v;
-
-
-	//	Destination Infor Type
-	typedef struct packed {
-		logic							We_Odd;
-		logic							We_Evn;
-		logic							Slice;
-		index_t 						Index;
-		logic	[1:0]					Sel;
-	} dst_info_t;
 
 
 	////Command for Vector Unit
 	typedef struct packed {
-		logic							valid;
-		logic		[1:0]				OpType;
-		logic		[1:0]				OpClass;
-		logic		[1:0]				OpCode;
-		dst_info_t						dst_info:
-		logic							v_src1;
-		logic							v_src2;
-		logic							v_src3;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
-		index_t							slice_length;
-		index_s_t						SrcIdx1;
-		index_s_t						SrcIdx2;
-		index_s_t						SrcIdx3;
-		logic		[1:0]				Src1_Sel;
-		logic		[1:0]				Src2_Sel;
-		logic		[1:0]				Src3_Sel;
-		data_t							Imm_Data;
+		instr_t							instr;
+		issue_no_t						issue_no;
 	} command_t;
 
 
 	////Pipeline Registers
 	//	Hazard Check Stage
-	typedef struct packed {
-		dst_info_t						dst_info:
-		logic							v_src1;
-		logic							v_src2;
-		logic							v_src3;
-		logic							v_src4;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
-		index_t							slice_length,
-		index_t							SrcIdx1;
-		index_t							SrcIdx2;
-		index_t							SrcIdx3;
-		data_t							Imm_Data;
-		issue_no_t						Issue_No;
-	} pipe_hazard_t;
+	typedef instr_t						pipe_hazard_t;
 
 	//	Index Stage
+	typedef command_t 					pipe_index_t;
+
+	//	Register-Read Stages
 	typedef struct packed {
-		logic							valid;
-		logic		[1:0]				OpType;
-		logic		[1:0]				OpClass;
-		logic		[1:0]				OpCode;
-		dst_info_t						dst_info:
-		logic							v_src1;
-		logic							v_src2;
-		logic							v_src3;
-		logic							v_src4;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
-		logic							slice4;
-		index_s_t						DstIdx;
-		index_s_t						SrcIdx1;
-		index_s_t						SrcIdx2;
-		index_s_t						SrcIdx3;
-		index_s_t						SrcIdx4;
-		data_t							Imm_Data;
-		issue_no_t						Issue_No;
-	} pipe_index_t;
+		logic							v;
+		op_t							op;
+		idx_t							dst:
+		reg_idx_t						src1;
+		reg_idx_t						src2;
+		reg_idx_t						src3;
+		reg_idx_t						src4;
+		issue_no_t						issue_no;
+	} pipe_rr_t;
 
 	//	Register-Read and Network Stages
 	typedef struct packed {
-		logic							valid;
-		logic		[1:0]				OpType;
-		logic		[1:0]				OpClass;
-		logic		[1:0]				OpCode;
-		dst_info_t						dst_info:
-		logic							v_src1;
-		logic							v_src2;
-		logic							v_src3;
-		logic							v_src4;
-		logic							slice1;
-		logic							slice2;
-		logic							slice3;
-		logic							slice4;
-		index_s_t						DstIdx;
-		index_s_t						SrcIdx1;
-		index_s_t						SrcIdx2;
-		index_s_t						SrcIdx3;
-		data_t							Src_Data1;
-		data_t							Src_Data2;
-		data_t							Src_Data3;
-		issue_no_t						Issue_No;
-	} pipe_rr_net_t;
+		logic							v;
+		op_t							op;
+		idx_t							dst:
+		data_t							data1;
+		data_t							data2;
+		data_t							data3;
+		issue_no_t						issue_no;
+	} pipe_net_t;
 
 	//	Execution Stage (Intermediate)
 	typedef struct packed {
-		logic							valid;
-		dst_info_t						dst_info:
-		issue_no_t						Issue_No;
+		logic							v;
+		idx_t							dst:
+		issue_no_t						issue_no;
 	} pipe_exe_tmp_t;
 
 	//	Execuution Stage (Last)
 	typedef struct packed {
-		logic							valid;
-		dst_info_t						dst_info:
-		data_t							WB_Data;
-		issue_no_t						Issue_No;
+		logic							v;
+		idx_t							dst:
+		data_t							data;
+		issue_no_t						issue_no;
 	} pipe_exe_end_t;
 
 

@@ -155,18 +155,26 @@ module Lane_Unit
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
+	logic					Req_Issue;
+
 
 	//// Index Update Stage
-	assign Index_Length		= I_Command.IdxLength;
-	assign Constant			= I_Command.Imm_Data[WIDTH_INDEX-1:0];
+	assign Req_Issue		= I_Command..valid;
+
+	// Constant Value Extraction
+	assign Constant			= I_Command.Imm_Data;
 
 
+
+	// Write-Back Info Extraction
 	assign DstInfo.We_Odd	= I_Command.v_dst &  I_Command.DstIdx[WIDTH_INDEX] & Req_Issue;
 	assign DstInfo.We_Evn	= I_Command.v_dst & ~I_Command.DstIdx[WIDTH_INDEX] & Req_Issue;
 	assign DstInfo.Slice	= I_Command.slice1 | I_Command.slice2 | I_Command.slice3;
 	assign DstInfo.Index	= I_Command.Dst;
 	assign DstInfo.Sel		= I_Command.Dst_Sel;;
 
+	// Index Info Extraction
+	assign Index_Length		= I_Command.IdxLength;
 
 	assign Req_Index_Odd1	= I_Command.v_src1 & Req_Issue;
 	assign Slice_Odd1		= I_Command.slice1;
@@ -188,24 +196,42 @@ module Lane_Unit
 	assign Index_Even2		= I_Command.SrcIdx3;
 	assign Sel_Index_Even2	= I_Command.Src3_Sel;
 
+	// Capture Extracted Info
+	//	Command
+	assign PipeReg_Index.valid		= I_Command.valid;
+	assign PipeReg_Index.OpType		= I_Command.OpType;
+	assign PipeReg_Index.OpClass	= I_Command.OpClass;
+	assign PipeReg_Index.OpCode		= I_Command.OpCode;
+	assign PipeReg_Index.dst_info	= I_Command.dst_info;
 
-	assign pipe_index.valid		= I_Command.valid;
-	assign pipe_index.OpType	= I_Command.OpType;
-	assign pipe_index.OpClass	= I_Command.OpClass;
-	assign pipe_index.OpCode	= I_Command.OpCode;
-	assign pipe_index.dst_info	= I_Command.dst_info;
+	//	Write-Back
+	assign PipeReg_Index.DstInfo	= DstInfo;
 
-	assign pipe_index.v_src1	= Req_Index_Odd1;
-	assign pipe_index.v_src2	= Req_Index_Odd2;
-	assign pipe_index.v_src3	= Req_Index_Even1;
-	assign pipe_index.v_src4	= Req_Index_Even2;
+	//	Indeces
+	assign PipeReg_Index.i_len		= Index_Length;
 
-	assign pipe_index.slice1	= IDec_Slice_Odd1;
-	assign pipe_index.slice2	= IDec_Slice_Odd2;
-	assign pipe_index.slice3	= IDec_Slice_Even1;
-	assign pipe_index.slice4	= IDec_Slice_Even2;
+	assign PipeReg_Index.v_src1		= Req_Index_Odd1;
+	assign PipeReg_Index.v_src2		= Req_Index_Odd2;
+	assign PipeReg_Index.v_src3		= Req_Index_Even1;
+	assign PipeReg_Index.v_src4		= Req_Index_Even2;
 
-	assign pipe_index.Issue_No	= ;//ToDo
+	assign PipeReg_Index.slice1		= IDec_Slice_Odd1;
+	assign PipeReg_Index.slice2		= IDec_Slice_Odd2;
+	assign PipeReg_Index.slice3		= IDec_Slice_Even1;
+	assign PipeReg_Index.slice4		= IDec_Slice_Even2;
+
+	assign PipeReg_Index.src_idx1	= Index_Orig_Odd1;
+	assign PipeReg_Index.src_idx2	= Index_Orig_Odd2;
+	assign PipeReg_Index.src_idx3	= Index_Orig_Even1;
+	assign PipeReg_Index.src_idx4	= Index_Orig_Even2;
+
+	assign PipeReg_Index.sel_idx1	= Sel_Index_Odd1;
+	assign PipeReg_Index.sel_idx2	= Sel_Index_Odd2;
+	assign PipeReg_Index.sel_idx3	= Sel_Index_Even1;
+	assign PipeReg_Index.sel_idx4	= Sel_Index_Evem2;
+
+	//	Issue-No
+	assign PipeReg_Index.Issue_No	= I_Command.Issue_No;
 
 
 	//// Register Read/Write Stage
@@ -314,9 +340,9 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				pipe_index.v_src1		),
-		.O_Slice(			pipe_index.slice1		),
-		.O_Index(			pipe_index.SrcIdx1		)
+		.O_Req(				PipeReg_Index.v_src1		),
+		.O_Slice(			PipeReg_Index.slice1		),
+		.O_Index(			PipeReg_Index.SrcIdx1		)
 	);
 
 	IndexUnit Index_Odd2 (
@@ -335,9 +361,9 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				pipe_index.v_src2		),
-		.O_Slice(			pipe_index.slice2		),
-		.O_Index(			pipe_index.SrcIdx2		)
+		.O_Req(				PipeReg_Index.v_src2		),
+		.O_Slice(			PipeReg_Index.slice2		),
+		.O_Index(			PipeReg_Index.SrcIdx2		)
 	);
 
 	IndexUnit Index_Even1 (
@@ -356,9 +382,9 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				pipe_index.v_src3		),
-		.O_Slice(			pipe_index.slice3		),
-		.O_Index(			pipe_index.SrcIdx3		)
+		.O_Req(				PipeReg_Index.v_src3		),
+		.O_Slice(			PipeReg_Index.slice3		),
+		.O_Index(			PipeReg_Index.SrcIdx3		)
 	);
 
 	IndexUnit Index_Even2 (
@@ -377,9 +403,9 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				pipe_index.v_src4		),
-		.O_Slice(			pipe_index.slice4		),
-		.O_Index(			pipe_index.SrcIdx4		)
+		.O_Req(				PipeReg_Index.v_src4		),
+		.O_Slice(			PipeReg_Index.slice4		),
+		.O_Index(			PipeReg_Index.SrcIdx4		)
 	);
 
 
@@ -387,7 +413,7 @@ module Lane_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			),//ToDo
-		.I_Op(				pipe_index				),
+		.I_Op(				PipeReg_Index				),
 		.O_Op(				pipe_idx_rf				)
 	);
 
