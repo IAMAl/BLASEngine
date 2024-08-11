@@ -15,19 +15,121 @@ module IF_MPU
 	input							clock,
 	input							reset,
 	input							I_Req,
-	input	mpu_if_t				I_Data,
+	input	mpu_if_t				I_Data_IF,
 	output							O_Ack,
-	output	mpu_if_t				O_Data,
+	output	mpu_if_t				O_Data_IF,
 	input							I_Ack_Dispatch,
 	input							I_Ack_MapMan,
 	input							I_Ack_ThMem,
+	input							I_No_ThMem,
 	input							I_Run,
-	output	istr_t					O_Instr,
+	input							I_Commit,
+	output	instr_t					O_Instr,
+	input							I_Ld_Data,
+	input	data_t					I_Data,
+	output							O_St_Data,
 	output	data_t					O_Data,
-	output							O_State
+	output	[3:0]					O_State
 );
 
+
+	logic							is_Run;
+	logic							is_Stop;
+	logic							is_Store_Prog;
+	logic							is_Store_Data;
+	logic							is_Load_Data;
+
+	logic							is_End_Load;
+	logic							is_End_Store;
+
+	logic							Set_Ready;
+	logic							Set_Run;
+	logic							Set_NoThMem;
+
+	logic							Clr_Ready;
+	logic							Clr_Run;
+	logic							Clr_NoThMem;
+
+	logic							Ready;
+	logic							Run;
+	logic							NoThMem;
+
 	mpu_fsm_if_t					R_FSM_IF_MPU;
+
+
+	assign O_State			= { NoThMem, Stop, Run, Ready };
+
+	assign O_St_Data		=	  ( R_FSM_IF_MPU  > FSM_ST_CAPTURE_ID_IF_MPU ) & ( R_FSM_IF_MPU <= FSM_ST_DATA_IF_MPU ) &	I_Data_IF.v;
+	assign O_Data			= (   ( R_FSM_IF_MPU  > FSM_ST_CAPTURE_ID_IF_MPU ) & ( R_FSM_IF_MPU <= FSM_ST_DATA_IF_MPU ) ) ?	I_Data_IF.data : '0;
+
+	assign O_St_Instr		=	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) & I_Data_IF.v;
+	assign O_Instr			= 	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) ? I_Data_IF.data : '0;
+
+	assign O_Data_IF.v		= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Ld_Data;
+	assign O_Data_IF.data	= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Ld_Data ) ?	I_Data : '0;
+
+
+	assign is_Run			= I_Req & I_Data[0];
+	assign is_Store_Prog	= I_Req & I_Data[1];
+	assign is_Store_Data	= I_Req & I_Data[2];
+	assign is_Load_Data		= I_Req & I_Data[3];
+	assign is_Stop			= I_Req & I_Data[4];
+
+
+	assign Set_Ready		= (   ( R_FSM_IF_MPU == FSM_RUN_QUERY_THMEM_IF_MPU ) & I_Ack_ThMem &  I_No_ThMem ) |
+								( ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU )   & I_Ack_ThMem & ~I_No_ThMem );
+								( ( R_FSM_IF_MPU == FSM_LD_DATA_ID_IF_MPU )		 & is_End_Load ) |
+								( ( R_FSM_IF_MPU == FSM_ST_DATA_IF_MPU )		 & is_End_Store );
+
+	assign Clr_Ready		= (   ( R_FSM_IF_MPU == FSM_RUN_QUERY_THMEM_IF_MPU ) & I_Ack_ThMem & ~I_No_ThMem ) |
+								(   R_FSM_IF_MPU == FSM_RUN_CAPTURE_ID_IF_MPU ) |
+								( ( R_FSM_IF_MPU == FSM_LD_DATA_ID_IF_MPU ) ) |
+								( ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) );
+
+	assign Set_Run			= (   ( R_FSM_IF_MPU == FSM_RUN_DISPATCH_IF_MPU )	 & I_Ack_Dispatch );
+	assign Clr_Run			= I_Commit;
+
+	assign Set_NoThMem		= (   ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU )   & I_Ack_ThMem &  I_No_ThMem );
+	assign Clr_NoThMem		= I_Req;
+
+	assign Stop				= (	  ( R_FSM_IF_MPU == FSM_STOP_IF_MPU ) );
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Ready		<= 1'b0;
+		end
+		else if ( Clr_Ready ) begin
+			Ready		<= 1'b0;
+		end
+		else if ( Set_Ready ) begin
+			Ready		<= 1'b1;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Run		<= 1'b0;
+		end
+		else if ( Clr_Run ) begin
+			Run			<= 1'b0;
+		end
+		else if ( Set_Run ) begin
+			Run			<= 1'b1;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			NoThMem		<= 1'b0;
+		end
+		else if ( Clr_NoThMem ) begin
+			NoThMem		<= 1'b0;
+		end
+		else if ( Set_NoThMem ) begin
+			NoThMem		<= 1'b1;
+		end
+	end
 
 
 	always_ff @( posedge clock ) begin
@@ -72,7 +174,7 @@ module IF_MPU
 				end
 			end
 			FSM_STOP_IF_MPU: begin
-				if ( is_Start ) begin
+				if ( is_Run ) begin
 					R_FSM_IF_MPU	<= FSM_RUN_IF_MPU;
 				end
 				else begin
@@ -96,7 +198,7 @@ module IF_MPU
 				end
 			end
 			FSM_RUN_QUERY_THMEM_IF_MPU: begin
-				if ( I_Ack_ThMem ) begin
+				if ( I_Ack_ThMem & ~I_No_ThMem ) begin
 					R_FSM_IF_MPU	<= FSM_RUN_DISPATCH_IF_MPU;
 				end
 				else begin
@@ -112,7 +214,7 @@ module IF_MPU
 				end
 			end
 			FSM_ST_CAPTURE_ID_IF_MPU: begin
-				if ( I_Ack_ThMem ) begin
+				if ( I_Ack_ThMem & ~I_No_ThMem ) begin
 					R_FSM_IF_MPU	<= FSM_INIT_IF_MPU;
 				end
 				else begin
