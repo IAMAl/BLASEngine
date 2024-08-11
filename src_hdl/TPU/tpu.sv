@@ -18,14 +18,13 @@ module TPU
 	input						I_En_Exe,				//Enable Executing
 	input						I_Req,					//Request from MPU
 	input	instr_t				I_Instr,				//Instructions from MPU
-	output	s_address_t			O_S_Address,			//Addresses for Scalar Lane Data Memory
-	output	s_store_t			O_S_St,					//Store Request for Scalar Lane Data Memory
-	output	s_load_req_t		O_S_Ld_Req,				//Load Request to Scalar Lane Data Memory
-	input	s_load_t			I_S_Ld_Data,			//Loaded Data from Scalar Lane Data Memory
-	output	v_address_t			O_V_Address,			//Addresses for Vector Lane Data Memories
-	output	v_store_t			O_V_St,					//Store Requests for Vector Lane Data Memories
-	output	v_load_req_t		O_V_Ld,					//Load Requests to Vector Lane Data Memories
-	input	v_load_t			I_V_Ld,					//Loaded Data from Vector Lane Data Memories
+	output	s_ldst_t			O_S_LdSt,
+	input	s_ld_data			I_S_Ld_Data,
+	output	s_ld_data			O_S_St_Data,
+	input	v_ldst_t			O_V_LdSt,
+	output	v_ldst_t			O_V_LdSt,
+	input	v_ld_data			I_V_Ld_Data,
+	output	v_ld_data			O_V_St_Data,
 	output						O_Term,					//Flag: Termination
 	output						O_Nack					//Flag: Not-Acknowledge
 );
@@ -125,16 +124,9 @@ module TPU
 		.I_Commmit_Req_V(		Commmit_Req_V			),
 		.I_Scalar_Data(			In_Scalar_Data			),
 		.O_Scalar_Data(			Out_Scalar_Data			),
-		.O_Address1(			O_S_Address[0]			),
-		.O_Address2(			O_S_Address[1]			),
-		.O_Ld_Req1(				O_S_Ld_Req[0]			),
-		.O_Ld_Req2(				O_S_Ld_Req[1]			),
-		.I_Ld_Data1(			I_S_Ld_Data[0]			),
-		.I_Ld_Data2(			I_S_Ld_Data[1]			),
-		.O_St_Req1(				O_S_St[0].Req			),
-		.O_St_Req2(				O_S_St[1].Req			),
-		.O_St_Data1(			O_S_St[0].Data			),
-		.O_St_Data2(			O_S_St[1].Data			),
+		.O_LdSt(				O_S_LdSt				),
+		.I_Ld_Data(				I_S_Ld_Data				),
+		.O_St_Data(				O_S_St_Data				),
 		.O_Re_Buff(				Re_Buff					),
 		.O_V_Command(			V_Command				),
 		.I_V_State(				V_Status				),
@@ -151,11 +143,9 @@ module TPU
 		.I_Command(				V_Command				),
 		.I_Scalar_Data(			Out_Scalar_Data			),
 		.O_Scalar_Data(			In_Scalar_Data			),
-		.I_Ack_Ld(				),//ToDo
-		.O_Address(				O_V_Address				),
-		.O_St(					O_V_St					),
-		.O_Ld(					O_V_Ld					),
-		.I_Ld(					I_V_Ld					),
+		.O_LdSt(				O_V_LdSt				),
+		.I_Ld_Data(				I_V_Ld_Data				),
+		.O_St_Data(				O_V_St_Data				),
 		.O_Commmit_Req(			Commmit_Req_V			),
 		.O_Status(				V_Status				)
 	);

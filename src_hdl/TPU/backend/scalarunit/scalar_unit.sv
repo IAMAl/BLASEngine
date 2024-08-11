@@ -25,12 +25,9 @@ module Scalar_Unit
 	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
-	output	ldst_t				O_LdSt1,
-	output	ldst_t				O_LdSt2,
-	input	ld_data_t			I_LdData1,
-	input	ld_data_t			I_LdData2,
-	output	st_data_t			O_StData1,
-	output	st_data_t			O_StData2,
+	output	s_ldst_t			O_LdSt,					//Load Request
+	input	s_data				I_LdData,
+	output	s_data				O_StData,
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	command_t			O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,
@@ -616,13 +613,13 @@ module Scalar_Unit
 		.I_Src_Src_Data1(	PipeReg_Exe.data1		),
 		.I_Src_Src_Data2(	PipeReg_Exe.data2		),
 		.I_Src_Src_Data3(	PipeReg_Exe.data3		),
-		.O_LdSt1(			O_LdSt1					),
-		.O_LdSt2(			O_LdSt2					),
-		.I_LdData1(			I_LdData1				),
-		.I_LdData2(			I_LdData2				),
-		.O_StData1(			O_StData1				),
-		.O_StData2(			O_StData2				),
-		.O_WB_Index1(		WB_Index1				),
+		.O_LdSt1(			O_LdSt[0]				),
+		.O_LdSt2(			O_LdSt[1]				),
+		.I_LdData1(			I_LdData[0]				),
+		.I_LdData2(			I_LdData[1]				),
+		.O_St_Data1(		O_StData[0]				),
+		.O_St_Data2(		O_StData[1]				),
+		.O_WB_Index1(		WB_Index				),
 		.O_WB_Index2(		WB_Index2				),
 		.O_WB_Data1(		WB_Data1				),
 		.O_WB_Data2(		WB_Data2				),

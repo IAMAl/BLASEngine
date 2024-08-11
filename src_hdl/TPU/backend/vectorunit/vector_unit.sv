@@ -19,11 +19,9 @@ module Vector_Unit
 	input	v_commant_t			I_Command,				//Comamnd to Execute
 	input	data_t				I_Scalar_Data,			//Scalar Data
 	output	data_t				O_Scalar_Data,			//Scalar Data
-	input	ack_ld_t			I_Ack_Ld,				//Acknowledge fro Loading
-	output	v_address_t			O_Address,				//Data Memory Address
-	output	v_store_t			O_St,					//Store Request
-	output	v_load_req_t		O_Ld,					//Load Request
-	input	v_load_t			I_Ld,					//Loaded Data
+	output	v_ldst_t			O_LdSt,					//Load Request
+	input	v_data				I_LdData,
+	output	v_data				O_StData,
 	output	logic				O_Commmit_Req,			//Commit Request
 	output	lane_t				O_Status				//Status on Lane
 );
@@ -54,18 +52,12 @@ module Vector_Unit
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),
 			.O_Scalar_Data(		Scalr_Data[ i ]			),
-			.O_Address1(		O_Address[0][ i ]		),
-			.O_Address2(		O_Address[1][ i ]		),
-			.O_Ld_Req1(			O_Ld[0].Req[ i ]		),
-			.O_Ld_Req2(			O_Ld[1].Req[ i ]		),
-			.I_Ack_Ld1(			I_Ack_Ld[0][ i ]		),
-			.I_Ack_Ld1(			I_Ack_Ld[1][ i ]		),
-			.I_Ld_Data1(		I_Ld[0].Data[ i ]		),
-			.I_Ld_Data2(		I_Ld[1].Data[ i ]		),
-			.O_St_Req1(			O_St[0].Req[ i ]		),
-			.O_St_Req2(			O_St[1].Req[ i ]		),
-			.O_St_Data1(		O_St[0].Data[ i ]		),
-			.O_St_Data2(		O_St[1].Data[ i ]		),
+			.O_LdSt1(			O_LdSt[0][ i ]			),
+			.O_LdSt2(			O_LdSt[1][ i ]			),
+			.I_LdData1(			I_LdData[0][ i ]		),
+			.I_LdData2(			I_LdData[1][ i ]		),
+			.O_St_Data1(		O_StData[0][ i ]		),
+			.O_St_Data2(		O_StData[1][ i ]		),
 			.O_Commit(			Commit[ i ]				),
 			.I_Lane_Data_Src1(	Lane_Data_Src1			),
 			.I_Lane_Data_Src2(	Lane_Data_Src2			),

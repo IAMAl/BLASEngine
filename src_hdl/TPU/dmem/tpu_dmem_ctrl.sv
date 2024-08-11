@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	DMem
+//	Module Name:	DMem_CTRL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module DMem_TPU
+module DMem_CTRL
 	import pkg_tpu::*;
 (
 	input						clock,

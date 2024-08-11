@@ -15,9 +15,14 @@ module MPU
 (
 	input							clock,
 	input							reset,
-	input							I_Req_St,			//Request to Store Thread Program
-	input	instr_t					I_Instr,			//Thread Program Port
-	output	instr_t					O_Instr,			//Send Thread Program to TPUs
+	input							I_Req_IF,
+	input	mpu_if_t				I_Data_IF,
+	output	mpu_if_t				O_Data_IF,
+	output	instr_t					O_Instr,
+	input							I_Ld_Data,
+	input	data_t					I_Data,
+	output							O_St_Data,
+	output	data_t					O_Data,
 	input							I_Req_Commit,		//Request of Commit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
 	output							O_Wait,				//Wait Signal to Host trying the store
@@ -29,6 +34,9 @@ module MPU
 	id_t						ThreadID_S_St;
 	instr_t						Length_St;
 	logic						Ack_St;
+	logic						No_ThMem;
+	logic						End_Send_Thread;
+	logic						IF_State;
 
 	t_address_t					Used_Size;
 	logic						Req_Ld;
@@ -52,16 +60,40 @@ module MPU
 	logic						Ack_Lookup;
 	lookup_t					ThreadInfo;
 
+	assign No_ThMem			= Used_Size >= SIZE_THREAD_MEM;
+	assign O_Status.io		= IF_State;
+
+
+	IF_MPU IF_MPU (
+		.clock(					clock					),
+		.reset(					reset					),
+		.I_Req_IF(				I_Req_IF				),
+		.I_Data_IF(				I_Data_IF				),
+		.O_Data_IF(				O_Data_IF				),
+		.I_Ack_Dispatch(		End_Send_Thread			),
+		.I_Ack_MapMan(			Ack_St					),
+		.I_Ack_ThMem(			Ack_St					),
+		.I_No_ThMem(			No_ThMem				),
+		.I_Commit(				Req_Commit				),
+		.O_St_Instr(			IF_Req_St				),
+		.O_Instr(				IF_Instr				),
+		.I_Ld_Data(				I_Ld_Data				),
+		.I_Data(				I_Data					),
+		.O_St_Data(				O_St_Data				),
+		.O_Data(				O_Data					),
+		.O_State(				IF_State				)
+	);
+
 
 	ThrreadMem_MPU ThrreadMem_MPU (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_Req_St(				I_Req_St				),
+		.I_Req_St(				IF_Req_St				),
 		.O_Req_St(				Req_St					),
 		.O_ThreadID_St(			ThreadID_S_St			),
 		.O_Length_St(			Length_St				),
 		.I_Ack_St(				Ack_St					),
-		.I_Instr_St(			I_Instr					),
+		.I_Instr_St(			IF_Instr				),
 		.I_Used_Size(			Used_Size				),
 		.I_Req_Ld(				Req_Ld					),
 		.I_Adddress_Ld(			Address_Ld				),
@@ -99,7 +131,8 @@ module MPU
 		.I_Instr(				Instr_Ld				),
 		.O_Instr(				O_Instr					),
 		.I_IssueNo(				IssueNo					),
-		.O_Send_Thread(			O_Status.send_thread	)
+		.O_Send_Thread(			O_Status.send_thread	),
+		.O_End_Send(			End_Send_Thread			)
 	);
 
 

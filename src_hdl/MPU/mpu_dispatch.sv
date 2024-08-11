@@ -25,7 +25,8 @@ module Dispatch_MPU
 	input	instr_t				I_Instr,						//Loaded Instruction
 	output	instr_t				O_Instr,						//Send Loaded Instructions to TPUs
 	input	id_t				I_IssueNo,						//Issue No
-	output						O_Send_Thread					//Status
+	output						O_Send_Thread,					//Status
+	output						O_End_Send
 );
 
 
@@ -85,7 +86,8 @@ module Dispatch_MPU
 	// Send Thread (Instructions) to TPU
 	assign O_Instr.valid	= R_LdD1;
 	assign O_Instr.instr	= R_Instr;
-	assign O_Send_Thread	= FSM_Dispatch	== FSM_DPC_SEND_INSTRS;
+	assign O_Send_Thread	= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
+	assign O_End_Send		= ( FSM_Dispatch == FSM_DPC_SEND_INSTRS ) & End_Load;
 
 
 	always_ff @( posedge clock ) begin

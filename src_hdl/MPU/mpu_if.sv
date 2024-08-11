@@ -14,15 +14,13 @@ module IF_MPU
 (
 	input							clock,
 	input							reset,
-	input							I_Req,
+	input							I_Req_IF,
 	input	mpu_if_t				I_Data_IF,
-	output							O_Ack,
 	output	mpu_if_t				O_Data_IF,
 	input							I_Ack_Dispatch,
 	input							I_Ack_MapMan,
 	input							I_Ack_ThMem,
 	input							I_No_ThMem,
-	input							I_Run,
 	input							I_Commit,
 	output	instr_t					O_Instr,
 	input							I_Ld_Data,
@@ -69,11 +67,11 @@ module IF_MPU
 	assign O_Data_IF.data	= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Ld_Data ) ?	I_Data : '0;
 
 
-	assign is_Run			= I_Req & I_Data[0];
-	assign is_Store_Prog	= I_Req & I_Data[1];
-	assign is_Store_Data	= I_Req & I_Data[2];
-	assign is_Load_Data		= I_Req & I_Data[3];
-	assign is_Stop			= I_Req & I_Data[4];
+	assign is_Run			= I_Req_IF & I_Data[0];
+	assign is_Store_Prog	= I_Req_IF & I_Data[1];
+	assign is_Store_Data	= I_Req_IF & I_Data[2];
+	assign is_Load_Data		= I_Req_IF & I_Data[3];
+	assign is_Stop			= I_Req_IF & I_Data[4];
 
 
 	assign Set_Ready		= (   ( R_FSM_IF_MPU == FSM_RUN_QUERY_THMEM_IF_MPU ) & I_Ack_ThMem &  I_No_ThMem ) |
@@ -90,7 +88,7 @@ module IF_MPU
 	assign Clr_Run			= I_Commit;
 
 	assign Set_NoThMem		= (   ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU )   & I_Ack_ThMem &  I_No_ThMem );
-	assign Clr_NoThMem		= I_Req;
+	assign Clr_NoThMem		= I_Req_IF;
 
 	assign Stop				= (	  ( R_FSM_IF_MPU == FSM_STOP_IF_MPU ) );
 
@@ -138,7 +136,7 @@ module IF_MPU
 		end
 		else case ( R_FSM_IF_MPU )
 			FSM_INIT_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_COMMAND_IF_MPU;
 				end
 				else begin
@@ -146,7 +144,7 @@ module IF_MPU
 				end
 			end
 			FSM_COMMAND_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_CHK_CMD_IF_MPU;
 				end
 				else begin
@@ -182,7 +180,7 @@ module IF_MPU
 				end
 			end
 			FSM_RUN_CAPTURE_ID_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_RUN_QUERY_MAPMAN_IF_MPU;
 				end
 				else begin
@@ -222,7 +220,7 @@ module IF_MPU
 				end
 			end
 			FSM_ST_DATA_ID_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_ST_DATA_STRIDE_IF_MPU;
 				end
 				else begin
@@ -230,7 +228,7 @@ module IF_MPU
 				end
 			end
 			FSM_ST_DATA_STRIDE_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_ST_DATA_BASE_IF_MPU;
 				end
 				else begin
@@ -238,7 +236,7 @@ module IF_MPU
 				end
 			end
 			FSM_ST_DATA_BASE_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_ST_DATA_IF_MPU;
 				end
 				else begin
@@ -254,7 +252,7 @@ module IF_MPU
 				end
 			end
 			FSM_LD_DATA_ID_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_LD_DATA_STRIDE_IF_MPU;
 				end
 				else begin
@@ -262,7 +260,7 @@ module IF_MPU
 				end
 			end
 			FSM_LD_DATA_STRIDE_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_LD_DATA_BASE_IF_MPU;
 				end
 				else begin
@@ -270,7 +268,7 @@ module IF_MPU
 				end
 			end
 			FSM_LD_DATA_BASE_IF_MPU: begin
-				if ( I_Req ) begin
+				if ( I_Req_IF ) begin
 					R_FSM_IF_MPU	<= FSM_LD_DATA_STRIDE_IF_MPU;
 				end
 				else begin
