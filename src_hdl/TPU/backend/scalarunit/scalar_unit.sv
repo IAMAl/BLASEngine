@@ -277,6 +277,12 @@ module Scalar_Unit
 
 
 	//// Write-Back
+	assign Dst_Slice		=;//ToDo
+	assign Dst_Sel			=;//ToDo
+	assign Dst_Index		=;//ToDo
+	assign Dst_Index_Window	=;//ToDo
+	assign Dst_Index_Length	=;//ToDo
+
 	assign WB_Req_Odd		=;//ToDo
 	assign WB_Req_Even		=;//ToDo
 	assign WB_We_Odd		=;//ToDo
@@ -484,6 +490,7 @@ module Scalar_Unit
 		.O_Index(			PipeReg_Index.src4.idx	)
 	);
 
+	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			PipeReg_Idx_RR	<= '0;
@@ -498,11 +505,11 @@ module Scalar_Unit
 	RegFile RegFile_Odd (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				Req_RegFile_Odd			),
-		.I_We(				We_RegFile_Odd			),
+		.I_Req(				WB_Req_Odd				),
+		.I_We(				WB_We_Odd				),
 		.I_Re1(				PipeReg_Idx_RR.src1.v	),
 		.I_Re2(				PipeReg_Idx_RR.src2.v	),
-		.I_Index_Dst(		Index_Dst_Odd			),
+		.I_Index_Dst(		WB_Index_Odd			),
 		.I_Data(			WB_Data_Odd				),
 		.I_Index_Src1(		PipeReg_Idx_RR.src1.idx	),
 		.I_Index_Src2(		PipeReg_Idx_RR.src2.idx	),
@@ -514,11 +521,11 @@ module Scalar_Unit
 	RegFile RegFile_Even (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				Req_RegFile_Even		),
-		.I_We(				We_RegFile_Even			),
+		.I_Req(				WB_Req_Even				),
+		.I_We(				WB_We_Even				),
 		.I_Re1(				PipeReg_Idx_RR.src3.v	),
 		.I_Re2(				PipeReg_Idx_RR.src4.v	),
-		.I_Index_Dst(		Index_Dst_Even			),
+		.I_Index_Dst(		WB_Index_Even			),
 		.I_Data(			WB_Data_Even			),
 		.I_Index_Src1(		PipeReg_Idx_RR.src3.idx	),
 		.I_Index_Src2(		PipeReg_Idx_RR.src4.idx	),
@@ -527,6 +534,7 @@ module Scalar_Unit
 		.O_Req(				)//ToDo
 	);
 
+	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			PipeReg_RR_Net	<= '0;

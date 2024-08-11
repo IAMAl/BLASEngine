@@ -194,6 +194,12 @@ module Lane_Unit
 
 
 	//// Write-Back
+	assign Dst_Slice		=;//ToDo
+	assign Dst_Sel			=;//ToDo
+	assign Dst_Index		=;//ToDo
+	assign Dst_Index_Window	=;//ToDo
+	assign Dst_Index_Length	=;//ToDo
+
 	assign WB_Req_Odd		=;//ToDo
 	assign WB_Req_Even		=;//ToDo
 	assign WB_We_Odd		=;//ToDo
@@ -317,6 +323,7 @@ module Lane_Unit
 		.O_Index(			PipeReg_Index.src4.idx	)
 		);
 
+	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			PipeReg_Idx_RR	<= '0;
@@ -360,6 +367,7 @@ module Lane_Unit
 		.O_Req(				)//ToDo
 	);
 
+	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			PipeReg_RR_Net	<= '0;
@@ -427,6 +435,7 @@ module Lane_Unit
 		.O_Length(			Length					)
 	);
 
+	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			PipeReg_Exe		<= '0;
