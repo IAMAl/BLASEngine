@@ -113,13 +113,7 @@ package pkg_tpu;
 	////Execution Steering
 	//	Hazard Table used in Scalar unit
 	typedef struct packed {
-		logic							v;
-		idx_t							dst;
-		idx_t							src1;
-		idx_t							src2;
-		idx_t							src3;
-		index_t							slice_len;
-		issue_no_t						issue_no;
+		instr_t							instr;
 		logic							commit;
 	} iw_t;
 
@@ -185,8 +179,22 @@ package pkg_tpu;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
+		index_t							idx1;
+		index_t							idx2;
+		index_t							idx3;
 		issue_no_t						issue_no;
 	} pipe_net_t;
+
+	//	Execuution Stage (First)
+	typedef struct packed {
+		logic							v;
+		op_t							op;
+		idx_t							dst:
+		data_t							data1;
+		data_t							data2;
+		data_t							data3;
+		issue_no_t						issue_no;
+	} pipe_exe_t;
 
 	//	Execution Stage (Intermediate)
 	typedef struct packed {
