@@ -45,7 +45,8 @@ package pkg_tpu;
 
 	//	General Index Type
 	//		MSb differenciates Two Register Files
-	typedef logic	[WIDTH_INDEX:0]			index_s_t;
+	//		Mid-field used for no_t in hazard unit
+	typedef logic	[WIDTH_INDEX+2:0]		index_s_t;
 
 	//	Index Type for Single Register File
 	typedef logic	[WIDTH_INDEX-1:0]		index_t;
@@ -66,6 +67,10 @@ package pkg_tpu;
 	//		One-bit flag selected from stat_v_t
 	typedef logic	[NUM_ENTRY_REGFILE-1:0]	mask_t;
 
+	//
+	typedef	logic							unit_no_t;
+	typedef logic	[1:0]					no_t;
+
 
 
 	////Instruction-Set
@@ -78,10 +83,26 @@ package pkg_tpu;
 	} op_t;
 
 	typedef struct packed {
+		unit_no_t						unit_no;
+		no_t							no;
+	} sel_t;
+
+	typedef struct packed {
 		logic							v;
 		logic							slice;
-		index_s_t						idx;
+		index_t							idx;
 		logic		[6:0]				sel;
+		sel_t							dst_sel;
+		index_t							window;
+	} dst_t;
+
+	typedef struct packed {
+		logic							v;
+		logic							slice;
+		index_t							idx;
+		logic		[6:0]				sel;
+		sel_t							src_sel;
+		index_t							window;
 	} idx_t;
 
 	typedef struct packed {
@@ -95,12 +116,14 @@ package pkg_tpu;
 	//	Instruction Bit Field
 	typedef struct packed {
 		op_t							op;
-		idx_t							dst;
+		dst_t							dst;
 		idx_t							src1;
 		idx_t							src2;
 		idx_t							src3;
+		idx_t							src4;
 		index_t							slice_len;
 		imm_t							imm;
+		logic	[12:0]					path;
 	} instruction_t;
 
 	//	Instruction + Valid
@@ -150,13 +173,14 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		op_t							op;
-		idx_t							dst:
+		dst_t							dst;
 		idx_t							src1;
 		idx_t							src2;
 		idx_t							src3;
 		idx_t							src4;
 		index_t							slice_len;
 		issue_no_t						issue_no;
+		logic	[12:0]					path;
 	} pipe_index_t;
 
 
@@ -164,24 +188,27 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		op_t							op;
-		idx_t							dst:
+		dst_t							dst;
 		reg_idx_t						src1;
 		reg_idx_t						src2;
 		reg_idx_t						src3;
+		index_t							slice_len;
 		issue_no_t						issue_no;
+		logic	[12:0]					path;
 	} pipe_rr_t;
 
 	//	Register-Read and Network Stages
 	typedef struct packed {
 		logic							v;
 		op_t							op;
-		idx_t							dst:
+		dst_t							dst;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
 		index_t							idx1;
 		index_t							idx2;
 		index_t							idx3;
+		index_t							slice_len;
 		issue_no_t						issue_no;
 	} pipe_net_t;
 
@@ -189,25 +216,28 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		op_t							op;
-		idx_t							dst:
+		dst_t							dst;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
+		index_t							slice_len;
 		issue_no_t						issue_no;
 	} pipe_exe_t;
 
 	//	Execution Stage (Intermediate)
 	typedef struct packed {
 		logic							v;
-		idx_t							dst:
+		dst_t							dst;
+		index_t							slice_len;
 		issue_no_t						issue_no;
 	} pipe_exe_tmp_t;
 
 	//	Execuution Stage (Last)
 	typedef struct packed {
 		logic							v;
-		idx_t							dst:
+		dst_t							dst;
 		data_t							data;
+		index_t							slice_len;
 		issue_no_t						issue_no;
 	} pipe_exe_end_t;
 

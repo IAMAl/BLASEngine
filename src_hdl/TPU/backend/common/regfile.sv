@@ -16,15 +16,12 @@ module RegFile
 	input						reset,
 	input						I_Req,							//Request from Index Stage
 	input						I_We,							//Flag: Write=Enable
-	input						I_Re1,							//Flag: Read-Enable for Source-1
-	input						I_Re2,							//Flag: Read-Enable for Source-2
-	input	index_t				I_Index_Dst,					//Write Index for Destination
+	input	dst_t				I_Index_Dst,					//Write Index for Destination
 	input	data_t				I_Data,							//Write-Back Data
-	input	index_t				I_Index_Src1,					//Read Index for Source-1
-	input	index_t				I_Index_Src2,					//Read Index for Source-2
+	input	idx_t				I_Index_Src1,					//Read Index for Source-1
+	input	idx_t				I_Index_Src2,					//Read Index for Source-2
 	output	data_t				O_Data_Src1,					//Data of Source-1
-	output	data_t				O_Data_Src2,					//Data of Source-2
-	output						O_Req							//Request to Network Stage
+	output	data_t				O_Data_Src2						//Data of Source-2
 );
 
 
@@ -33,29 +30,18 @@ module RegFile
 	data_t						Data_Src1;
 	data_t						Data_Src2;
 
-	logic						R_Req;
 	data_t						R_Data_Src1;
 	data_t						R_Data_Src2;
 
 
-	assign Re1					= I_Req & I_Re1;
-	assign Re2					= I_Req & I_Re2;
+	assign Re1					= I_Req & I_Index_Src1.v & ( I_Index_Src1.no == 2'1 );
+	assign Re2					= I_Req & I_Index_Src2.v & ( I_Index_Src2.no == 2'1 );
 
 	assign O_Req				= R_Req;
 
 	assign O_Data_Src1			= Data_Src1;
 
 	assign O_Data_Src2			= Data_Src2;
-
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Req				<= 1'b0;
-		end
-		else begin
-			R_Req				<= Re1 | Re2;
-		end
-	end
 
 
 	BareRegFile RegFile (

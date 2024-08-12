@@ -156,21 +156,14 @@ module Lane_Unit
 	assign PipeReg_RR_Net.dst	= PipeReg_RR.dst;
 
 	//	Read Data
-	assign PipeReg_RR_Net.src1.v	= PipeReg_RR.src1.v;
-	assign PipeReg_RR_Net.src1.idx	= PipeReg_RR.src1.idx;
+	assign PipeReg_RR_Net.src1	= PipeReg_RR.src1;
 
-	assign PipeReg_RR_Net.src2.v	= PipeReg_RR.src2.v | PipeReg_RR.src3.v;
 
-	assign PipeReg_RR_Net.src2.idx	= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.idx :
-										( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.idx :
+	assign PipeReg_RR_Net.src2	= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2 :
+									( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3 :
 																'0;
 
-	assign PipeReg_RR_Net.src2.data	= ( PipeReg_RR.src2.v ) ?	Pre_Src_Data2 :
-										( PipeReg_RR.src3.v ) ?	Pre_Src_Data3 :
-																'0;
-
-	assign PipeReg_RR_Net.src3.v	= PipeReg_RR.src4.v;
-	assign PipeReg_RR_Net.src3.idx	= PipeReg_RR.src4.idx;
+	assign PipeReg_RR_Net.src3		= PipeReg_RR.src4;
 
 	//	Issue-No
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
@@ -179,7 +172,7 @@ module Lane_Unit
 	assign PipeReg_RR_Net.path		= PipeReg_RR.path;
 
 
-	//// Nwtwork
+	//// Network
 	assign Config_Path		= PipeReg_RR_Net.path;
 
 	//	Capture Data
@@ -205,15 +198,14 @@ module Lane_Unit
 	assign is_WB_BR			= WB_Index.dst_sel == 2'h2;
 	assign is_WB_VU			= WB_Index.dst_sel == 2'h3;
 
-
 	assign WB_Req_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
 	assign WB_Req_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
 	assign WB_We_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
 	assign WB_We_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
 	assign WB_Index_Even	= ( ~Dst_Sel ) ? WB_Index.idx : '0;
 	assign WB_Index_Odd		= (  Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Data_Even		= ( ~Dst_Sel ) ? WB_Data : '0;
-	assign WB_Data_Odd		= (  Dst_Sel ) ? WB_Data : '0;
+	assign WB_Data_Even		= ( ~Dst_Sel ) ? WB_Data : 		'0;
+	assign WB_Data_Odd		= (  Dst_Sel ) ? WB_Data : 		'0;
 
 	//	Write-Back to Mask Register
 	assign MaskReg_We		= WB_Index.v & is_WB_BR;
@@ -350,15 +342,12 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Req(				WB_Req_Odd				),
 		.I_We(				WB_We_Odd				),
-		.I_Re1(				PipeReg_Idx_RR.src1.v	),
-		.I_Re2(				PipeReg_Idx_RR.src2.v	),
 		.I_Index_Dst(		WB_Index_Odd			),
 		.I_Data(			WB_Data_Odd				),
-		.I_Index_Src1(		PipeReg_Idx_RR.src1.idx	),
-		.I_Index_Src2(		PipeReg_Idx_RR.src2.idx	),
+		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
+		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
 		.O_Data_Src1(		PipeReg_RR.data1		),
-		.O_Data_Src2(		Pre_Src_Data2			),
-		.O_Req(										)
+		.O_Data_Src2(		Pre_Src_Data21			)
 	);
 
 	RegFile RegFile_Even (
@@ -366,15 +355,12 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Req(				WB_Req_Even				),
 		.I_We(				WB_We_Even				),
-		.I_Re1(				PipeReg_Idx_RR.src3.v	),
-		.I_Re2(				PipeReg_Idx_RR.src4.v	),
 		.I_Index_Dst(		WB_Index_Even			),
 		.I_Data(			WB_Data_Even			),
-		.I_Index_Src1(		PipeReg_Idx_RR.src3.idx	),
-		.I_Index_Src2(		PipeReg_Idx_RR.src4.idx	),
-		.O_Data_Src1(		Pre_Src_Data3			),
-		.O_Data_Src2(		PipeReg_RR.data3		),
-		.O_Req(										)
+		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
+		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
+		.O_Data_Src1(		Pre_Src_Data22			),
+		.O_Data_Src2(		PipeReg_RR.data3		)
 	);
 
 	//	Pipeline Register
@@ -405,7 +391,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_We(				MaskReg_We				),
 		.I_Index(			Dst_Index				),
-		.I_Cond(			).//ToDo
+		.I_Cond(			),//ToDo
 		.I_Status(			Status					),
 		.I_Re(				MaskReg_Re				),
 		.O_Mask_Data(		Mask_Data				)
