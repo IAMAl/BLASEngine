@@ -20,8 +20,12 @@ module Vector_Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data
 	output	data_t				O_Scalar_Data,			//Scalar Data
 	output	v_ldst_t			O_LdSt,					//Load Request
-	input	v_data				I_LdData,
-	output	v_data				O_StData,
+	input	v_data				I_LdData,				//Loaded Data
+	output	v_data				O_StData,				//Storing Data
+	input	v_ready_t			I_Ld_Ready,				//Flag: Ready
+	input	v_grant_t			I_Ld_Grant,				//Flag: Grant
+	input	v_ready_t			I_St_Ready,				//Flag: Ready
+	input	v_grant_t			I_St_Grant,				//Flag: Grant
 	output	logic				O_Commmit_Req,			//Commit Request
 	output	lane_t				O_Status				//Status on Lane
 );
@@ -52,12 +56,13 @@ module Vector_Unit
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),
 			.O_Scalar_Data(		Scalr_Data[ i ]			),
-			.O_LdSt1(			O_LdSt[0][ i ]			),
-			.O_LdSt2(			O_LdSt[1][ i ]			),
-			.I_LdData1(			I_LdData[0][ i ]		),
-			.I_LdData2(			I_LdData[1][ i ]		),
-			.O_St_Data1(		O_StData[0][ i ]		),
-			.O_St_Data2(		O_StData[1][ i ]		),
+			.O_LdSt1(			O_LdSt[ i ]				),
+			.I_LdData1(			I_LdData[ i ]			),
+			.O_St_Data1(		O_StData[ i ]			),
+			.I_Ld_Ready(		I_Ld_Ready[ i ]			),
+			.I_Ld_Grant(		I_Ld_Grant[ i ]			),
+			.I_St_Ready(		I_St_Ready[ i ]			),
+			.I_St_Grant(		I_St_Grant[ i ]			),
 			.O_Commit(			Commit[ i ]				),
 			.I_Lane_Data_Src1(	Lane_Data_Src1			),
 			.I_Lane_Data_Src2(	Lane_Data_Src2			),

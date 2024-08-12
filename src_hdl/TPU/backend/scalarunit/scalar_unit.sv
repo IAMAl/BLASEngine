@@ -26,12 +26,16 @@ module Scalar_Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
 	output	s_ldst_t			O_LdSt,					//Load Request
-	input	s_data				I_LdData,
-	output	s_data				O_StData,
+	input	s_data				I_LdData,				//Loaded Data
+	output	s_data				O_StData,				//Storing Data
+	input	[1:0]				I_Ld_Ready,				//Flag: Ready
+	input	[1:0]				I_Ld_Grant,				//Flag: Grant
+	input	[1:0]				I_St_Ready,				//Flag: Ready
+	input	[1:0]				I_St_Grant,				//Flag: Grant
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	command_t			O_V_Command,			//Command to Vector Unit
-	input	lane_t				I_V_State,
-	output	lane_t				O_Lane_En,
+	input	lane_t				I_V_State,				//Status from Vector Unit
+	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
 	output	s_stat_t			O_Status				//Scalar Unit Status
 );
 
@@ -585,12 +589,13 @@ module Scalar_Unit
 		.I_Src_Src_Data1(	PipeReg_Exe.data1		),
 		.I_Src_Src_Data2(	PipeReg_Exe.data2		),
 		.I_Src_Src_Data3(	PipeReg_Exe.data3		),
-		.O_LdSt1(			O_LdSt[0]				),
-		.O_LdSt2(			O_LdSt[1]				),
-		.I_LdData1(			I_LdData[0]				),
-		.I_LdData2(			I_LdData[1]				),
-		.O_St_Data1(		O_StData[0]				),
-		.O_St_Data2(		O_StData[1]				),
+		.O_LdSt(			O_LdSt					),
+		.I_LdData(			I_LdData				),
+		.O_St_Data(			O_StData				),
+		.I_Ld_Ready(		I_Ld_Ready				),
+		.I_Ld_Grant(		I_Ld_Grant				),
+		.I_St_Ready(		I_St_Ready				),
+		.I_St_Grant(		I_St_Grant				),
 		.O_WB_Index1(		WB_Index				),
 		.O_WB_Index2(		WB_Index2				),
 		.O_WB_Data1(		WB_Data1				),

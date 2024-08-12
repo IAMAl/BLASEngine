@@ -24,12 +24,13 @@ module Lane_Unit
 	input	command_t			I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
-	output	ldst_t				O_LdSt1,
-	output	ldst_t				O_LdSt2,
-	input	ld_data_t			I_LdData1,
-	input	ld_data_t			I_LdData2,
-	output	st_data_t			O_StData1,
-	output	st_data_t			O_StData2,
+	output	ldst_t				O_LdSt,					//Load/Store Command
+	input	ld_data_t			I_LdData,				//Loaded Data
+	output	st_data_t			O_StData,				//Storing Data
+	input	[1:0]				I_Ld_Ready,				//Flag: Ready
+	input	[1:0]				I_Ld_Grant,				//Flag: Grant
+	input	[1:0]				I_St_Ready,				//Flag: Ready
+	input	[1:0]				I_St_Grat,				//Flag: Grant
 	output	logic				O_Commit,				//Commit Request
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src2,		//Inter-Lane Connect
@@ -466,6 +467,10 @@ module Lane_Unit
 		.I_LdData2(			I_LdData2				),
 		.O_StData1(			O_StData1				),
 		.O_StData2(			O_StData2				),
+		.I_Ld_Ready(		I_Ld_Ready				),
+		.I_Ld_Grant(		I_Ld_Grant				),
+		.I_St_Ready(		I_St_Ready				),
+		.I_St_Grant(		I_St_Grant				),
 		.O_WB_Index1(		WB_Index1				),
 		.O_WB_Index2(		WB_Index2				),
 		.O_WB_Data1(		WB_Data1				),
