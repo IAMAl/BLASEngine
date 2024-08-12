@@ -30,7 +30,6 @@ module FrontEnd
 );
 
 
-
 	logic						is_FSM_TPU_SCALAR;
 	logic						is_FSM_TPU_SIMT;
 	logic						is_FSM_TPU_INSTR;

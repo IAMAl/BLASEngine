@@ -24,8 +24,8 @@ module BLASEngine (
 	s_ldst_t					TPU_S_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 	v_ldst_t					TPU_V_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 
-	s_ldst_t					RAM_S_Ld_LdSt	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	v_ldst_t					RAM_V_Ld_LdSt	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
+	s_ldst_t					RAM_S_Ld_LdSt	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	v_ldst_t					RAM_V_Ld_LdSt	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
 
 
 	data_t						TPU_S_Ld_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
@@ -34,11 +34,11 @@ module BLASEngine (
 	v_data_t					TPU_V_Ld_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 	v_data_t					TPU_V_St_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 
-	data_t						RAM_S_Ld_Data	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	data_t						RAM_S_St_Data	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
+	data_t						RAM_S_Ld_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	data_t						RAM_S_St_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
 
-	v_data_t					RAM_V_Ld_Data	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	v_data_t					RAM_V_St_Data	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
+	v_data_t					RAM_V_Ld_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	v_data_t					RAM_V_St_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
 
 
 	logic	[1:0]				TPU_S_Ld_Ready	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
@@ -51,15 +51,15 @@ module BLASEngine (
 	v_ready_t					TPU_V_St_Ready	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 	v_grant_t					TPU_V_St_Grant	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 
-	logic	[1:0]				RAM_S_Ld_Ready	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	logic	[1:0]				RAM_S_Ld_Grant	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	logic	[1:0]				RAM_S_St_Ready	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	logic	[1:0]				RAM_S_St_Grant	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
+	logic	[1:0]				RAM_S_Ld_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	logic	[1:0]				RAM_S_Ld_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	logic	[1:0]				RAM_S_St_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	logic	[1:0]				RAM_S_St_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
 
-	v_ready_t					RAM_V_Ld_Ready	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	v_grant_t					RAM_V_Ld_Grant	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	v_ready_t					RAM_V_St_Ready	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
-	v_grant_t					RAM_V_St_Grant	[TPU_ROWS+1:0][TPU_CLMS+1:0][1:0];
+	v_ready_t					RAM_V_Ld_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	v_grant_t					RAM_V_Ld_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	v_ready_t					RAM_V_St_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	v_grant_t					RAM_V_St_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
 
 
 	MPU MPU (
@@ -69,12 +69,12 @@ module BLASEngine (
 		.I_Data_IF(				I_Data_IF				),
 		.O_Data_IF(				O_Data_IF				),
 		.O_Instr(				Instr					),
-		.I_Ld_Data(				),
-		.I_Data(				),
-		.O_St_Data(				),
-		.O_Data(				),
-		.I_Req_Commit(			),
-		.I_CommitNo(			),
+		.I_Ld_Data(				),//ToDo
+		.I_Data(				),//ToDo
+		.O_St_Data(				),//ToDo
+		.O_Data(				),//ToDo
+		.I_Req_Commit(			),//ToDo
+		.I_CommitNo(			),//ToDo
 		.O_Wait(				O_Wait					),
 		.O_Status(				O_Status				)
 	);

@@ -150,7 +150,7 @@ module TPU
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_En_Lane(				En_Lane					),
-		.I_ThreadID(			),//ToDo
+		.I_ThreadID(			ThreadID				),
 		.I_Command(				V_Command				),
 		.I_Scalar_Data(			Out_Scalar_Data			),
 		.O_Scalar_Data(			In_Scalar_Data			),
