@@ -79,8 +79,7 @@ module Lane_Unit
 	logic	[12:0]			Config_Path;
 
 
-	index_t					Dst_Index1;
-	index_t					Dst_Index2;
+	logic					Dst_Sel2;
 	index_t					WB_Index1;
 	index_t					WB_Index2;
 	data_t					WB_Data1;
@@ -89,19 +88,6 @@ module Lane_Unit
 	logic					Condition;
 
 
-	logic					Req_LdSt_Odd;
-	logic					Req_LdSt_Even;
-	logic					LdSt_Odd;
-	logic					LdSt_Even;
-	logic					Stall_LdSt_Odd;
-	logic					Stall_LdSt_Even;
-	address_t				Address;
-	address_t				Stride;
-	address_t				Length;
-	data_t					Ld_Data1;
-	data_t					Ld_Data2;
-	logic					Ld_NoReady1;
-	logic					Ld_NoReady2;
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
@@ -168,11 +154,11 @@ module Lane_Unit
 
 	assign PipeReg_RR_Net.src2.idx	= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.idx :
 										( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.idx :
-																	'0;
+																'0;
 
 	assign PipeReg_RR_Net.src2.data	= ( PipeReg_RR.src2.v ) ?	Pre_Src_Data2 :
 										( PipeReg_RR.src3.v ) ?	Pre_Src_Data3 :
-																	'0;
+																'0;
 
 	assign PipeReg_RR_Net.idx3	= PipeReg_RR.src4.idx;
 
@@ -195,20 +181,21 @@ module Lane_Unit
 
 
 	//// Write-Back
-	assign Dst_Slice		=;//ToDo
-	assign Dst_Sel			=;//ToDo
-	assign Dst_Index		=;//ToDo
-	assign Dst_Index_Window	=;//ToDo
-	assign Dst_Index_Length	=;//ToDo
+	assign Dst_Sel2			= ;//ToDo
+	assign Dst_Slice		= ( Dst_Sel2 ) ? WB_Index2.slice :		WB_Index1.slice;
+	assign Dst_Sel			= Dst_Sel2;
+	assign Dst_Index		= ( Dst_Sel2 ) ? WB_Index2.idx :		WB_Index1.idx;
+	assign Dst_Index_Window	= ( Dst_Sel2 ) ? WB_Index2.window :		WB_Index1.window;
+	assign Dst_Index_Length	= ( Dst_Sel2 ) ? WB_Index2.slice_len :	WB_Index1.slice_len;
 
-	assign WB_Req_Odd		=;//ToDo
-	assign WB_Req_Even		=;//ToDo
-	assign WB_We_Odd		=;//ToDo
-	assign WB_We_Even		=;//ToDo
-	assign WB_Index_Odd		=;//ToDo
-	assign WB_Index_Even	=;//ToDo
-	assign WB_Data_Odd		=;//ToDo
-	assign WB_Data_Even		=;//ToDo
+	assign WB_Req_Even		= WB_Index1.v;
+	assign WB_Req_Odd		= WB_Index2.v;
+	assign WB_We_Even		= WB_Index1.v;
+	assign WB_We_Odd		= WB_Index2.v;
+	assign WB_Index_Even	= WB_Index1.idx;
+	assign WB_Index_Odd		= WB_Index2.idx;
+	assign WB_Data_Even		= WB_Data1;
+	assign WB_Data_Odd		= WB_Data2;
 
 
 	//// Commit Request
@@ -349,7 +336,7 @@ module Lane_Unit
 		.I_Index_Src2(		PipeReg_Idx_RR.src2.idx	),
 		.O_Data_Src1(		PipeReg_RR.data1		),
 		.O_Data_Src2(		Pre_Src_Data2			),
-		.O_Req(				)//ToDo
+		.O_Req(										)
 	);
 
 	RegFile RegFile_Even (
@@ -365,7 +352,7 @@ module Lane_Unit
 		.I_Index_Src2(		PipeReg_Idx_RR.src4.idx	),
 		.O_Data_Src1(		Pre_Src_Data3			),
 		.O_Data_Src2(		PipeReg_RR.data3		),
-		.O_Req(				)//ToDo
+		.O_Req(										)
 	);
 
 	//	Pipeline Register

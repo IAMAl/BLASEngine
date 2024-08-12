@@ -85,6 +85,11 @@ module Scalar_Unit
 	data_t					Pre_Src_Data3;
 
 
+	logic					Lane_We;
+	logic					Lane_Re;
+	data_t					Lane_Data;
+
+
 	data_t					V_State;
 
 
@@ -93,8 +98,7 @@ module Scalar_Unit
 	logic	[12:0]			Config_Path;
 
 
-	index_t					Dst_Index1;
-	index_t					Dst_Index2;
+	logic					Dst_Sel2;
 	index_t					WB_Index1;
 	index_t					WB_Index2;
 	data_t					WB_Data1;
@@ -103,24 +107,7 @@ module Scalar_Unit
 	logic					Condition;
 
 
-	logic					Req_LdSt_Odd;
-	logic					Req_LdSt_Even;
-	logic	[1:0]			OpClass_LdSt_Odd;
-	logic	[1:0]			OpClass_LdSt_Even;
-	logic	[1:0]			OpCode_LdSt_Odd;
-	logic	[1:0]			OpCode_LdSt_Even;
-	logic					LdSt_Odd;
-	logic					LdSt_Even;
-	logic					Stall_LdSt_Odd;
-	logic					Stall_LdSt_Even;
-	address_t				Address;
-	address_t				Stride;
-	address_t				Length;
-	data_t					Ld_Data1;
-	data_t					Ld_Data2;
 	logic					Ld_NoReady;
-	logic					Ld_NoReady1;
-	logic					Ld_NoReady2;
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
@@ -235,6 +222,12 @@ module Scalar_Unit
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
 
 
+	//// Lane-Enable
+	assign Lane_We			= ;//ToDo
+	assign Lane_Re			= ;//ToDo
+	assign Lane_Data		= ( Lane_We ) ? /**/ : '0;
+
+
 	//// Nwtwork
 	assign Config_Path		= ;//ToDo
 
@@ -250,20 +243,21 @@ module Scalar_Unit
 
 
 	//// Write-Back
-	assign Dst_Slice		=;//ToDo
-	assign Dst_Sel			=;//ToDo
-	assign Dst_Index		=;//ToDo
-	assign Dst_Index_Window	=;//ToDo
-	assign Dst_Index_Length	=;//ToDo
+	assign Dst_Sel2			= ;//ToDo
+	assign Dst_Slice		= ( Dst_Sel2 ) ? WB_Index2.slice :		WB_Index1.slice;
+	assign Dst_Sel			= Dst_Sel2;
+	assign Dst_Index		= ( Dst_Sel2 ) ? WB_Index2.idx :		WB_Index1.idx;
+	assign Dst_Index_Window	= ( Dst_Sel2 ) ? WB_Index2.window :		WB_Index1.window;
+	assign Dst_Index_Length	= ( Dst_Sel2 ) ? WB_Index2.slice_len :	WB_Index1.slice_len;
 
-	assign WB_Req_Odd		=;//ToDo
-	assign WB_Req_Even		=;//ToDo
-	assign WB_We_Odd		=;//ToDo
-	assign WB_We_Even		=;//ToDo
-	assign WB_Index_Odd		=;//ToDo
-	assign WB_Index_Even	=;//ToDo
-	assign WB_Data_Odd		=;//ToDo
-	assign WB_Data_Even		=;//ToDo
+	assign WB_Req_Even		= WB_Index1.v;
+	assign WB_Req_Odd		= WB_Index2.v;
+	assign WB_We_Even		= WB_Index1.v;
+	assign WB_We_Odd		= WB_Index2.v;
+	assign WB_Index_Even	= WB_Index1.idx;
+	assign WB_Index_Odd		= WB_Index2.idx;
+	assign WB_Data_Even		= WB_Data1;
+	assign WB_Data_Odd		= WB_Data2;
 
 
 	//// Lane-Enable
@@ -532,9 +526,9 @@ module Scalar_Unit
 	Lane_En Lane_En (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_We(				),//ToDo
-		.I_Data(			),//ToDo
-		.I_Re(				),//ToDo
+		.I_We(				Lane_We					),
+		.I_Data(			Lane_Data				),
+		.I_Re(				Lane_Re					),
 		.I_We_V_State(		),//ToDo
 		.I_V_State(			I_V_State				),
 		.O_Data(			V_State					)
