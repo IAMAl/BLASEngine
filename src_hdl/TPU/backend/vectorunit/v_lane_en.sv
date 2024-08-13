@@ -24,7 +24,7 @@ module Lane_Unit (
 	assign W_En				= ~CTRL | ( CTRL & Cond );
 
 
-	always_ff ( posedge clock ) begin
+	always_ff @( posedge clock ) begin
 		if ( reet ) begin
 			Cond			<= 1'b0;
 		end

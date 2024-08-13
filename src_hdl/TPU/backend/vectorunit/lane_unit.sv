@@ -19,7 +19,6 @@ module Lane_Unit
 	input						clock,
 	input						reset,
 	input						I_En,					//Enable Execution
-	input	instr_t				I_LaneID,				//Lane-ID
 	input	instr_t				I_ThreadID,				//SIMT Thread-ID
 	input	command_t			I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
@@ -249,7 +248,10 @@ module Lane_Unit
 
 
 	//// Index Update Stage
-	IndexUnit Index_Dst (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Dst
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Dst		),
@@ -269,7 +271,10 @@ module Lane_Unit
 		.O_Index(			Dst_RegFile_Index		)
 	);
 
-	IndexUnit Index_Odd1 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Odd1
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -280,7 +285,6 @@ module Lane_Unit
 		.I_Index(			PipeReg_Idx.src1.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -290,7 +294,10 @@ module Lane_Unit
 		.O_Index(			PipeReg_Index.src1.idx	)
 	);
 
-	IndexUnit Index_Odd2 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Odd2
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -301,7 +308,6 @@ module Lane_Unit
 		.I_Index(			PipeReg_Idx.src2.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -311,7 +317,10 @@ module Lane_Unit
 		.O_Index(			PipeReg_Index.src2.idx	)
 	);
 
-	IndexUnit Index_Even1 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Even1
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -322,7 +331,6 @@ module Lane_Unit
 		.I_Index(			PipeReg_Idx.src3.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -332,7 +340,10 @@ module Lane_Unit
 		.O_Index(			PipeReg_Index.src3.idx	)
 	);
 
-	IndexUnit Index_Even2 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Even2
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -343,7 +354,6 @@ module Lane_Unit
 		.I_Index(			PipeReg_Idx.src4.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -351,7 +361,7 @@ module Lane_Unit
 		.O_Req(				PipeReg_Index.src4.v	),
 		.O_Slice(			PipeReg_Index.src4.slice),
 		.O_Index(			PipeReg_Index.src4.idx	)
-		);
+	);
 
 	//	Pipeline Register
 	always_ff @( posedge clock ) begin

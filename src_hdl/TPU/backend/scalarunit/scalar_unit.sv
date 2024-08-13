@@ -20,7 +20,6 @@ module Scalar_Unit
 	input						I_Req_St,				//Store Request for Instructions
 	output	logic				O_Ack_St,				//Acknowledge for Storing
 	input	instr_t				I_Instr,				//Instruction from Buffer
-	input	issue_no_t			I_IssueNo,				//Issued Thread-ID
 	input	id_t				I_ThreadID,				//Thread-ID
 	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
@@ -36,9 +35,11 @@ module Scalar_Unit
 	output	command_t			O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
 	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
-	output	s_stat_t			O_Status				//Scalar Unit Status
+	output	s_stat_t			O_Status,				//Scalar Unit Status
+	output						O_Term
 );
 
+	localparam int	LANE_ID = 0;
 
 	address_t				PC;
 	instr_t					Instruction;
@@ -307,6 +308,15 @@ module Scalar_Unit
 	assign Slice			= 1'b0;
 
 
+	//// End of Execution
+	assign O_Term			= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & PipeReg_Idx.src4.v & (
+									( PipeReg_Idx.src1.idx == '0 ) & 
+									( PipeReg_Idx.src2.idx == '0 ) & 
+									( PipeReg_Idx.src3.idx == '0 ) & 
+									( PipeReg_Idx.src4.idx == '0 )
+								)
+
+
 	//// Program Address Control
 	PACUnit PACUnit (
 		.clock(				clock					),
@@ -396,27 +406,34 @@ module Scalar_Unit
 
 
 	//// Index Update Stage
-	IndexUnit Index_Dst (
+	//// Index Update Stage
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Dst
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			Slice_Dst				),
-		.I_Sel(				Sel_Index_Dst			),
-		.I_Index(			Index_Dst				),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			Index_Length			),
+		.I_Slice(			Dst_Slice				),
+		.I_Sel(				Dst_Sel					),
+		.I_Index(			Dst_Index				),
+		.I_Window(			Dst_Index_Window		),
+		.I_Length(			Dst_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				Req_RegFile_Dst			),
-		.O_Slice(			Index_Slice_Dst			),
-		.O_Index(			Index_Dst				)
+		.O_Req(				Dst_RegFile_Req			),
+		.O_Slice(			Dst_RegFile_Slice		),
+		.O_Index(			Dst_RegFile_Index		)
 	);
 
-	IndexUnit Index_Odd1 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Odd1
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -427,7 +444,6 @@ module Scalar_Unit
 		.I_Index(			PipeReg_Idx.src1.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -437,7 +453,10 @@ module Scalar_Unit
 		.O_Index(			PipeReg_Index.src1.idx	)
 	);
 
-	IndexUnit Index_Odd2 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Odd2
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
@@ -448,7 +467,6 @@ module Scalar_Unit
 		.I_Index(			PipeReg_Idx.src2.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -458,7 +476,10 @@ module Scalar_Unit
 		.O_Index(			PipeReg_Index.src2.idx	)
 	);
 
-	IndexUnit Index_Even1 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Even1
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -469,7 +490,6 @@ module Scalar_Unit
 		.I_Index(			PipeReg_Idx.src3.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
@@ -479,7 +499,10 @@ module Scalar_Unit
 		.O_Index(			PipeReg_Index.src3.idx	)
 	);
 
-	IndexUnit Index_Even2 (
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Even2
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
@@ -490,7 +513,6 @@ module Scalar_Unit
 		.I_Index(			PipeReg_Idx.src4.idx	),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
-		.I_LaneID(			I_LaneID				),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),

@@ -49,7 +49,7 @@ module StatusCtrl (
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Status			<= 0;
+			Status			<= '0;
 		end
 		else if ( I_Req ) begin
 			Status			<= Set_Val;

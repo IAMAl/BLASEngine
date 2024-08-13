@@ -46,7 +46,7 @@ module SkipCTRL #(
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Mask				<= 0;
+			R_Mask				<= '0;
 		end
 		else if ( I_Req & ~I_Stall ) begin
 			R_Mask[ NLZ_Value ]	<= 1'b0;

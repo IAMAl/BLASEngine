@@ -64,6 +64,8 @@ module TPU
 
 	logic						Commmit_Req_V;
 
+	logic						Term;
+
 
 	//// Service Management UNit
 	FrontEnd FrontEnd (
@@ -72,11 +74,10 @@ module TPU
 		.I_En_Exe(				I_En_Exe				),
 		.I_Req(					I_Req					),
 		.I_Full(				Buff_Full				),
-		.I_Term(				),//ToDo
+		.I_Term(				Term					),
 		.I_Nack(				~Ack_St					),
 		.I_Instr(				I_Instr					),
 		.O_We(					We_Buff					),
-		.O_IssueNo(				IssueNo					),
 		.O_ThreadID(			Buff_ThreadID			),
 		.O_Instr(				Buff_Instr				),
 		.O_Term(				O_Term					),
@@ -121,12 +122,11 @@ module TPU
 	Scalar_Unit Scalar_Unit (
 		.clock(					clock					),
 		.reset(					reset					),
+		.I_En(					I_En_Exe				),
 		.I_Empty(				Buff_Empty				),
 		.I_Req_St(				IDBuff_Re				),
 		.O_Ack_St(				Ack_St					),
 		.I_Instr(				Instr					),
-		.I_En(					I_En_Exe				),
-		.I_IssueNo(				IssueNo					),
 		.I_ThreadID(			ThreadID				),
 		.I_Commmit_Req_V(		Commmit_Req_V			),
 		.I_Scalar_Data(			In_Scalar_Data			),
@@ -142,7 +142,8 @@ module TPU
 		.O_V_Command(			V_Command				),
 		.I_V_State(				V_Status				),
 		.O_Lane_En(				En_Lane					),
-		.O_Status(				S_Status				)
+		.O_Status(				S_Status				),
+		.O_Term(				Term					)
 	);
 
 

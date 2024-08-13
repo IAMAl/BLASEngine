@@ -11,7 +11,9 @@
 
 module IndexUnit
 	import pkg_tpu::*;
-(
+#(
+	parameter int LANE_ID		= 0
+)(
 	input						clock,
 	input						reset,
 	input						I_Stall,						//Force Stalling
@@ -22,7 +24,6 @@ module IndexUnit
 	input	index_s_t			I_Index,						//Index Value
 	input	index_t				I_Window,						//Window for Slicing
 	input	index_t				I_Length,						//Length for Slicing
-	input	id_t				I_LaneID,						//Lane-ID
 	input	id_t				I_ThreadID,						//Thread-ID
 	input	index_t				I_Constant,						//Constant
 	input						I_Sign,							//Config: Sign
@@ -97,12 +98,12 @@ module IndexUnit
 									( Sel_a == INDEX_ORIG ) ?	Index :
 																0;
 
-	assign Index_b				= ( Sel_b == INDEX_LANE ) ?		I_LaneID :
+	assign Index_b				= ( Sel_b == INDEX_LANE ) ?		LANE_ID :
 									( Sel_b == INDEX_CONST ) ? 	I_Constant :
 									( Sel_b == INDEX_ORIG ) ?	Index :
 																0;
 
-	assign Index_c				= ( Sel_c == INDEX_LANE ) ?		I_LaneID :
+	assign Index_c				= ( Sel_c == INDEX_LANE ) ?		LANE_ID :
 									( Sel_c == INDEX_CONST ) ? 	I_Constant :
 									( Sel_c == INDEX_ORIG ) ?	Index :
 																I_ThreadID;
