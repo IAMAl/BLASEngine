@@ -91,6 +91,13 @@ module Lane_Unit
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
+
+	logic					En;
+	logic					Lane_En;
+	logic					Lane_CTRL_Rst;
+	logic					Lane_CTRL_Set;
+
+
 	logic					Req_Issue;
 
 	pipe_index_t			PipeReg_Idx;
@@ -99,6 +106,20 @@ module Lane_Unit
 	pipe_net_t				PipeReg_RR_Net;
 	pipe_exe_t				PipeReg_Net;
 	pipe_exe_t				PipeReg_Exe;
+
+
+	//// Lane-Enable
+	Lane_Unit Lane_Unit (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_En(				I_En					),
+		.I_Rst(				Lane_CTRL_Rst			),
+		.I_Set(				Lane_CTRL_Set			),
+		.I_Index(			Dst_Index				),
+		.I_Status(			Status					),
+		.O_State(			O_Status				),
+		.O_En(				Lane_En					)
+	);
 
 
 	//// Capture Command coming from Scalar unit
@@ -227,10 +248,6 @@ module Lane_Unit
 	assign O_Commit			= LdSt_Done1 | LdSt_Done2 | Math_Done;
 
 
-	//// Lane Status
-	assign O_Status			= ;//ToDo
-
-
 	//// Index Update Stage
 	IndexUnit Index_Dst (
 		.clock(				clock					),
@@ -341,7 +358,7 @@ module Lane_Unit
 		if ( reset ) begin
 			PipeReg_Idx_RR	<= '0;
 		end
-		else if () begin
+		else if ( En) begin
 			PipeReg_Idx_RR	<= PipeReg_Index;
 		end
 	end
@@ -379,7 +396,7 @@ module Lane_Unit
 		if ( reset ) begin
 			PipeReg_RR_Net	<= '0;
 		end
-		else if () begin
+		else if ( En ) begin
 			PipeReg_RR_Net	<= PipeReg_RR;
 		end
 	end
@@ -444,7 +461,7 @@ module Lane_Unit
 		if ( reset ) begin
 			PipeReg_Exe		<= '0;
 		end
-		else if () begin
+		else if ( En ) begin
 			PipeReg_Exe		<= PipeReg_Net;
 		end
 	end
@@ -455,6 +472,7 @@ module Lane_Unit
 	VMathUnit VMathUnit (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Lane_En(			Lane_En					),
 		.I_Stall(			Stall					),
 		.I_CEn1(			CEn1					),
 		.I_CEn2(			CEn2					),
@@ -479,7 +497,8 @@ module Lane_Unit
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
-		.O_Cond(			Condition				)
+		.O_Cond(			Condition				),
+		.O_Lane_En(			En						)
 	);
 
 endmodule

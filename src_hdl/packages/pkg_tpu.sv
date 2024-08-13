@@ -71,6 +71,8 @@ package pkg_tpu;
 	typedef	logic							unit_no_t;
 	typedef logic	[1:0]					no_t;
 
+	//	Interconnection Network
+	typedef	data_t	[NUM_LANE-1:0]			lane_t;
 
 
 	////Instruction-Set

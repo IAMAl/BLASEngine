@@ -499,7 +499,7 @@ module Scalar_Unit
 		if ( reset ) begin
 			PipeReg_Idx_RR	<= '0;
 		end
-		else if () begin
+		else if ( I_En ) begin
 			PipeReg_Idx_RR	<= PipeReg_Index;
 		end
 	end
@@ -537,7 +537,7 @@ module Scalar_Unit
 		if ( reset ) begin
 			PipeReg_RR_Net	<= '0;
 		end
-		else if () begin
+		else if ( I_En ) begin
 			PipeReg_RR_Net	<= PipeReg_RR;
 		end
 	end
@@ -591,7 +591,7 @@ module Scalar_Unit
 		if ( reset ) begin
 			PipeReg_Exe		<= '0;
 		end
-		else if () begin
+		else if ( I_En ) begin
 			PipeReg_Exe		<= PipeReg_Net;
 		end
 	end
