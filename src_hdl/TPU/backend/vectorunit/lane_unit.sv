@@ -442,6 +442,7 @@ module Lane_Unit
 		.LANE_ID(			LANE_ID					)
 	) Network_V
 	(
+		.I_Stall(			~Lane_En				),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
@@ -463,7 +464,8 @@ module Lane_Unit
 		.O_Src_Data3(		PipeReg_Net.data3		),
 		.O_Lane_Data_Src1(	O_Lane_Data_Src1		),
 		.O_Lane_Data_Src2(	O_Lane_Data_Src2		),
-		.O_Lane_Data_Src3(	O_Lane_Data_Src3		)
+		.O_Lane_Data_Src3(	O_Lane_Data_Src3		),
+		.O_Buff_Full(		Bypass_Buff_Full		)
 	);
 
 	//	Pipeline Register

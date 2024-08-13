@@ -55,12 +55,15 @@ module Scalar_Unit
 	logic					Stall_IF;
 	logic					Stall_IW_St;
 	logic					Stall_IW_Ld;
+	logic					Stall_IW;
 
 
 	logic					Req_IFetch;
 
 
 	logic					Req_IW;
+	logic					Req_Issue;
+	logic					W_Req_Issue;
 	instr_t					Instr_IW;
 	instr_t					Instr;
 	issue_no_t				Rd_Ptr;
@@ -74,6 +77,11 @@ module Scalar_Unit
 	logic					Dst_RegFile_Req;
 	logic					Dst_RegFile_Slice;
 	index_t					Dst_RegFile_Index;
+
+
+	logic					Bypass_Buff_Full;
+	logic					Stall_Net;
+
 
 	logic					MaskedRead;
 	logic					Sign;
@@ -155,8 +163,8 @@ module Scalar_Unit
 
 
 	//// Select Scalar unit or Vector unit backend
-	assign S_Command		= ( Instr.op.Sel_Unit ) ? '0 : Instr;
-	assign O_V_Command		= ( Instr.op.Sel_Unit ) ? Instr : '0;
+	assign S_Command		= ( ~Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign O_V_Command		= (  Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 
 
 	//// Instruction Fetch Stage
@@ -164,8 +172,8 @@ module Scalar_Unit
 
 
 	//// Hazard Detect Stage
-	assign Req_IW			= ~Stall_IW_St;
-	assign Req_Issue		= ~Stall_IW_Ld;
+	assign Req_IW			= ~Stall_IW_St & W_Req_IW;
+	assign W_Req_Issue		= ~Stall_IW_Ld & ~Stall_IW;
 
 
 	//// Scalar unit's Back-end Pipeline
@@ -310,9 +318,9 @@ module Scalar_Unit
 
 	//// End of Execution
 	assign O_Term			= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & PipeReg_Idx.src4.v & (
-									( PipeReg_Idx.src1.idx == '0 ) & 
-									( PipeReg_Idx.src2.idx == '0 ) & 
-									( PipeReg_Idx.src3.idx == '0 ) & 
+									( PipeReg_Idx.src1.idx == '0 ) &
+									( PipeReg_Idx.src2.idx == '0 ) &
+									( PipeReg_Idx.src3.idx == '0 ) &
 									( PipeReg_Idx.src4.idx == '0 )
 								)
 
@@ -370,7 +378,7 @@ module Scalar_Unit
 	HazardCheck_TPU HazardCheck_TPU (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_Issue(		Req_Issue				),
+		.I_Req_Issue(		W_Req_Issue				),
 		.I_Req(				Req_IW					),
 		.I_Instr(			Instr_IW				),
 		.I_Commit_Req(		Commit_Req				),
@@ -396,12 +404,15 @@ module Scalar_Unit
 	//// Stall Control
 	Stall_Ctrl Stall_Ctrl (
 		.I_PCU_Wait(		PAC_Wait				),
-		.I_Hazard(			RAR_Hazard				)
+		.I_Hazard(			RAR_Hazard				),
 		.I_Slice(			Slice					),
+		.I_Bypass_Buff_Full(Bypass_Buff_Full		),
 		.I_Ld_NoReady(		Ld_NoReady				),
 		.O_Stall_IF(		Stall_IF				),
 		.O_Stall_IW_St(		Stall_IW_St				),
-		.O_Stall_IW_Ld(		Stall_IW_Ld				)
+		.O_Stall_IW_Ld(		Stall_IW_Ld				),
+		.O_Stall_IW(		Stall_IW				),
+		.O_Stall_Net(		Stall_Net				)
 	);
 
 
@@ -596,6 +607,7 @@ module Scalar_Unit
 
 	//// Network Stage
 	Network_S Network_S (
+		.I_Stall(			Stall_Net				),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
@@ -612,9 +624,11 @@ module Scalar_Unit
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
 		.O_Src_Data3(		PipeReg_Net.data3		),
+		.O_Buff_Full(		Bypass_Buff_Full		),
 		.O_PAC_Src_Data(	PAC_Src_Data			)
 	);
 
+	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			PipeReg_Exe		<= '0;

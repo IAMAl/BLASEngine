@@ -16,6 +16,7 @@ module Network_V
 	parameter int WIDTH_LANES	= $clog2(NUM_LANES),
 	parameter int LANE_ID		= 0
 )(
+	input						I_Stall,
 	input						I_Req,
 	input	[12:0]				I_Sel_Path,						//Path Selects
 	input	data_t				I_Scalar_Data,					//Data from Scalar Unit
@@ -40,7 +41,8 @@ module Network_V
 	output	data_t				O_Src_Data3,					//To Exec Unit
 	output	data_t				O_Lane_Data_Src1,				//Lane Data
 	output	data_t				O_Lane_Data_Src2,				//Lane Data
-	output	data_t				O_Lane_Data_Src3				//Lane Data
+	output	data_t				O_Lane_Data_Src3,				//Lane Data
+	output						O_Buff_Full
 );
 
 
@@ -56,13 +58,13 @@ module Network_V
 	logic	[1:0]				Sel_Path_Src2;
 	logic	[1:0]				Sel_Path_Src3;
 
-	data_t						Src_Data1;
-	data_t						Src_Data2;
-	data_t						Src_Data3;
-
 	index_t						Src_Index1;
 	index_t						Src_Index2;
 	index_t						Src_Index3;
+
+	data_t						Src_Data1;
+	data_t						Src_Data2;
+	data_t						Src_Data3;
 
 	logic						Sel_Src1_Data1;
 	logic						Sel_Src1_Data2;
@@ -82,10 +84,6 @@ module Network_V
 	logic						Sel_WB_Data1;
 	logic						Sel_WB_Data2;
 	logic						Sel_WB_Data3;
-
-	data_t						Path_Src_Data1;
-	data_t						Path_Src_Data2;
-	data_t						Path_Src_Data3;
 
 
 	assign Req					= I_Req;
@@ -137,11 +135,6 @@ module Network_V
 															'0;
 
 
-	assign Sel_WB_Data1			= Req & I_Sel_ALU_Src1 & ( Src_Index1 == I_WB_DstIdx );
-	assign Sel_WB_Data2			= Req & I_Sel_ALU_Src2 & ( Src_Index2 == I_WB_DstIdx );
-	assign Sel_WB_Data3			= Req & I_Sel_ALU_Src3 & ( Src_Index3 == I_WB_DstIdx );
-
-
 	assign Src_Data1			= ( Sel_Src1_Data1 ) ?		I_Src_Data1 ;
 									( Sel_Src1_Data2 ) ?	I_Src_Data2 ;
 									( Sel_Src1_Data3 ) ?	I_Src_Data3 ;
@@ -158,22 +151,6 @@ module Network_V
 									( Sel_Src3_Data2 ) ?	I_Src_Data2 ;
 									( Sel_Src3_Data3 ) ?	I_Src_Data3 ;
 									( Sel_Src3_Data4 ) ?	I_Src_Data4 ;
-															'0;
-
-
-	assign O_Src_Data1			= ( Sel_Scalar_Src1 ) ?		I_Scalar_Data :
-									( Sel_WB_Data ) ?		I_WB_Data :
-									( I_Sel_ALU_Src1 ) ?	Path_Src_Data1 :
-															'0;
-
-	assign O_Src_Data2			= ( Sel_Scalar_Src2 ) ?		I_Scalar_Data :
-									( Sel_WB_Data2 ) ?		I_WB_Data :
-									( I_Sel_ALU_Src2 ) ?	Path_Src_Data2 :
-															'0;
-
-	assign O_Src_Data3			= ( Sel_Scalar_Src3 ) ?		I_Scalar_Data :
-									( Sel_WB_Data3 ) ?		I_WB_Data :
-									( I_Sel_ALU_Src3 ) ?	Path_Src_Data3 :
 															'0;
 
 
@@ -195,6 +172,28 @@ module Network_V
 		.O_Lane_Data_Src1(	O_Lane_Data_Src1	),
 		.O_Lane_Data_Src2(	O_Lane_Data_Src2	),
 		.O_Lane_Data_Src3(	O_Lane_Data_Src3	)
+	);
+
+
+	BypassBuff #(
+		.BUFF_SIZE(			BYPASS_BUFF_SIZE	)
+	) BypassBuff
+	(
+		.clock(				clock				),
+		.reset(				reset				),
+		.I_Stall(			I_Stall				),
+		.I_WB_Index(		I_WB_Index			),
+		.I_WB_Data(			I_WB_Data			),
+		.I_Idx1(			Src_Index1			),
+		.I_Idx2(			Src_Index2			),
+		.I_Idx3(			Src_Index3			),
+		.I_Src1(			Path_Src_Data1		),
+		.I_Src2(			Path_Src_Data2		),
+		.I_Src3(			Path_Src_Data3		),
+		.O_Src1(			O_Src_Data1			),
+		.O_Src2(			O_Src_Data2			),
+		.O_Src3(			O_Src_Data3			),
+		.O_Full(			O_Buff_Full			)
 	);
 
 endmodule
