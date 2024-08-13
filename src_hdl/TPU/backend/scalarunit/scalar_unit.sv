@@ -301,6 +301,12 @@ module Scalar_Unit
 	assign O_Lane_En		= V_State[NUM_LANE*2-1:NUM_LANE];
 
 
+	//// Stall-Control
+	//	TB
+	assign Ld_NoReady		= 1'b0;
+	assign Slice			= 1'b0;
+
+
 	//// Program Address Control
 	PACUnit PACUnit (
 		.clock(				clock					),
