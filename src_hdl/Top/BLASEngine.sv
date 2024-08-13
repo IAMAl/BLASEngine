@@ -21,6 +21,10 @@ module BLASEngine (
 );
 
 
+	row_clm_t					TPU_En_Exe;
+	row_clm_t					TPU_Req;
+
+
 	s_ldst_t					TPU_S_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 	v_ldst_t					TPU_V_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
 
@@ -70,11 +74,13 @@ module BLASEngine (
 		.O_Data_IF(				O_Data_IF				),
 		.O_Instr(				Instr					),
 		.I_Ld_Data(				),//ToDo
-		.I_Data(				),//ToDo
 		.O_St_Data(				),//ToDo
+		.I_Data(				),//ToDo
 		.O_Data(				),//ToDo
 		.I_Req_Commit(			),//ToDo
 		.I_CommitNo(			),//ToDo
+		.O_TPU_Req(				TPU_Req					),
+		.O_TPU_En_Exe(			TPU_En_Exe				),
 		.O_Wait(				O_Wait					),
 		.O_Status(				O_Status				)
 	);
@@ -126,7 +132,8 @@ module BLASEngine (
 			TPU TPU (
 				.clock(			clock						),
 				.reset(			reset						),
-				.I_Req(			),//ToDo
+				.I_En_Exe(		TPU_En_Exe[row][clm]		),
+				.I_Req(			TPU_Req[row][clm]			),
 				.I_Instr(		Instr						),
 				.O_S_LdSt(		TPU_S_LdSt[row][clm]		),
 				.I_S_Ld_Data(	TPU_S_Ld_Data[row][clm]		),

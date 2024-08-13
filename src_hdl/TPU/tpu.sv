@@ -17,6 +17,7 @@ module TPU
 	input						reset,
 	input						I_En_Exe,				//Enable Executing
 	input						I_Req,					//Request from MPU
+	input	issue_no_mpu_t		I_IssueNo,				//Thread's Issue No
 	input	instr_t				I_Instr,				//Instructions from MPU
 	output	s_ldst_t			O_S_LdSt,				//Load/Store Command
 	input	s_ld_data			I_S_Ld_Data,			//Loaded Data from DMem
@@ -32,6 +33,7 @@ module TPU
 	input	v_grant_t			I_V_Ld_Grant,			//Flag: Grant
 	input	v_ready_t			I_V_St_Ready,			//Flag: Ready
 	input	v_grant_t			I_V_St_Grant,			//Flag: Grant
+	output	issue_no_mpu_t		O_IssueNo,				//Thread's Issue No
 	output						O_Term,					//Flag: Termination
 	output						O_Nack					//Flag: Not-Acknowledge
 );
@@ -72,15 +74,17 @@ module TPU
 		.clock(					clock					),
 		.reset(					reset					),
 		.I_En_Exe(				I_En_Exe				),
-		.I_Req(					I_Req					),
 		.I_Full(				Buff_Full				),
 		.I_Term(				Term					),
 		.I_Nack(				~Ack_St					),
+		.I_Req(					I_Req					),
 		.I_Instr(				I_Instr					),
+		.I_IssueNo(				I_IssueNo				),
 		.O_We(					We_Buff					),
 		.O_ThreadID(			Buff_ThreadID			),
 		.O_Instr(				Buff_Instr				),
 		.O_Term(				O_Term					),
+		.O_IssueNo(				O_IssueNo				),
 		.O_Nack(				O_Nack					)
 	);
 

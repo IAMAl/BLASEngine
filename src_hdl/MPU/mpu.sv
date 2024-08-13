@@ -15,16 +15,18 @@ module MPU
 (
 	input							clock,
 	input							reset,
-	input							I_Req_IF,
-	input	mpu_if_t				I_Data_IF,
-	output	mpu_if_t				O_Data_IF,
-	output	instr_t					O_Instr,
-	input							I_Ld_Data,
-	input	data_t					I_Data,
-	output							O_St_Data,
-	output	data_t					O_Data,
+	input							I_Req_IF,			//Request from External
+	input	mpu_if_t				I_Data_IF,			//Data from External
+	output	mpu_if_t				O_Data_IF,			//Data to External
+	output	instr_t					O_Instr,			//Instruction Stream to TPU
+	input							I_Ld_Data,			//Loaded Data Stream from External Mem
+	output							O_St_Data,			//Storing Data Stream to External Mem
+	input	data_t					I_Data,				//Loaded Data Stream from TPUs
+	output	data_t					O_Data,				//Storing Data Stream to TPUs
 	input							I_Req_Commit,		//Request of Commit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
+	output	row_clm_t				O_TPU_Req,			//Request to Execute
+	output	row_clm_t				O_TPU_En_Exe,		//Enable to TPUs
 	output							O_Wait,				//Wait Signal to Host trying the store
 	output	mpu_stat_t				O_Status			//Status Info to Host System
 );

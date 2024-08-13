@@ -358,7 +358,7 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Req(				Req_IFetch				),
 		.I_Empty(			I_Empty					),
-		.I_Term(			),//ToDo
+		.I_Term(			O_Term					),
 		.I_Instr(			Instruction				),
 		.O_Req(				Req_IW					),
 		.O_Instr(			Instr_IW				),
