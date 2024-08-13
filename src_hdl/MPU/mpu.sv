@@ -18,7 +18,9 @@ module MPU
 	input							I_Req_IF,			//Request from External
 	input	mpu_if_t				I_Data_IF,			//Data from External
 	output	mpu_if_t				O_Data_IF,			//Data to External
+	output							O_Req,				//Issue Request
 	output	instr_t					O_Instr,			//Instruction Stream to TPU
+	output	issue_no_t				O_IssueNo,			//Issue No
 	input							I_Ld_Data,			//Loaded Data Stream from External Mem
 	output							O_St_Data,			//Storing Data Stream to External Mem
 	input	data_t					I_Data,				//Loaded Data Stream from TPUs
@@ -131,7 +133,9 @@ module MPU
 		.O_Ld(					Req_Ld					),
 		.O_Address(				Address_Ld				),
 		.I_Instr(				Instr_Ld				),
+		.O_Req(					O_Req					),
 		.O_Instr(				O_Instr					),
+		.O_IssueNo(				O_IssueNo				),
 		.I_IssueNo(				IssueNo					),
 		.O_Send_Thread(			O_Status.send_thread	),
 		.O_End_Send(			End_Send_Thread			)
