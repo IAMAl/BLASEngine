@@ -143,7 +143,7 @@ module Scalar_Unit
 
 	pipe_index_t			PipeReg_Idx;
 	pipe_index_t			PipeReg_Index;
-	pipe_net_t				PipeReg_RR;
+	pipe_reg_t				PipeReg_RR;
 	pipe_net_t				PipeReg_RR_Net;
 	pipe_exe_t				PipeReg_Net;
 	pipe_exe_t				PipeReg_Exe;
@@ -206,6 +206,7 @@ module Scalar_Unit
 
 
 	//// Register Read/Write Stage
+
 	//	Capture Read Data
 	//	Command
 	assign PipeReg_RR_Net.v		= PipeReg_RR.v;
@@ -215,14 +216,21 @@ module Scalar_Unit
 	assign PipeReg_RR_Net.dst	= PipeReg_RR.dst;
 
 	//	Read Data
-	assign PipeReg_RR_Net.src1	= PipeReg_RR.src1;
+	assign V_State_Data.v			= 1'b1;
+	assign V_State_Data.idx			= '0;
+	assign V_State_Data.data		= V_State;
+	assign V_State_Data.src_sel		= '0;
 
+	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
+																				PipeReg_RR.src1;
 
-	assign PipeReg_RR_Net.src2	= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2 :
-									( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3 :
-																'0;
+	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
+										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
+										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
+																				'0;
 
-	assign PipeReg_RR_Net.src3		= PipeReg_RR.src4;
+	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src4.src_sel.no == 2'3 ) ?	V_State_Data :
+																				PipeReg_RR.src4;
 
 	//	Issue-No
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
@@ -231,10 +239,22 @@ module Scalar_Unit
 	assign PipeReg_RR_Net.path		= PipeReg_RR.path;
 
 
+	///// Write-Back to PAC
+	assign PAC_We			= WB_Index.v & is_WB_BR;
+	assign PAC_Data			= ( is_WB_BR ) ? WB_Data : '0;
+	assign PAC_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
+								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
+								( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
+								( PipeReg_RR.src4.src_sel.no == 2'h2 );
+
+
 	//// Lane-Enable
 	assign Lane_We			= is_WB_VU;
-	assign Lane_Re			= ;//ToDo
 	assign Lane_Data		= ( is_WB_VU ) ? WB_Data : '0;
+	assign Lane_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
+								( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
+								( PipeReg_RR.src3.src_se3.no == 2'h3 ) |
+								( PipeReg_RR.src4.src_se3.no == 2'h3 );
 
 
 	//// Nwtwork
@@ -273,7 +293,7 @@ module Scalar_Unit
 
 
 	//// Write Vector Unit Status Register
-	assign We_V_State		= ;//ToDo
+	assign We_V_State		= I_En;
 	assign V_State_Data		= I_V_State;
 
 
@@ -495,8 +515,8 @@ module Scalar_Unit
 		.I_Data(			WB_Data_Odd				),
 		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
 		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
-		.O_Data_Src1(		PipeReg_RR.data1		),
-		.O_Data_Src2(		Pre_Src_Data21			)
+		.O_Data_Src1(		PipeReg_RR.src1.data	),
+		.O_Data_Src2(		PipeReg_RR.src2.data	)
 	);
 
 	RegFile RegFile_Even (
@@ -508,8 +528,8 @@ module Scalar_Unit
 		.I_Data(			WB_Data_Even			),
 		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
 		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
-		.O_Data_Src1(		Pre_Src_Data22			),
-		.O_Data_Src2(		PipeReg_RR.data3		)
+		.O_Data_Src1(		PipeReg_RR.src3.data	),
+		.O_Data_Src2(		PipeReg_RR.src4.data	)
 	);
 
 	//	Pipeline Register
