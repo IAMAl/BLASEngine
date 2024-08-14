@@ -35,7 +35,7 @@ module Vector_Unit
 	lane_t						Lane_Data_Src2;
 	lane_t						Lane_Data_Src3;
 
-	lane_t						Commit;
+	commit_lane_t				Commit;
 
 
 	assign O_Commmit_Req		= &( ~( I_En_Lane ^ Commit ) );

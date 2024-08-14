@@ -71,6 +71,14 @@ package pkg_mpu;
 		logic								Commmit;
 	} mpu_tab_commit_t;
 
+	//MPU Status
+	typedef struct packed {
+		logic								imem_wait;
+		logic								send_thread;
+		logic								full_mapman;
+		logic								full_commit;
+	} mpu_stat_t;
+
 	//FSM for Distapch Control
 	typedef struct enum logic [1:0] {
 		FSM_DPC_INIT			= 2'h0,

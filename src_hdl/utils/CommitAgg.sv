@@ -42,7 +42,7 @@ module CommitAgg
 	commit_agg_t				CommitAgg		[BUFF_SIZE-1:0];
 
 
-	assign Send_Commit		= CommitAgg[ Rd_Ptr ].v & ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu );
+	assign Send_Commit		= CommitAgg[ Rd_Ptr ].v & ( &( ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu ) ) );
 
 
 	always_comb: begin

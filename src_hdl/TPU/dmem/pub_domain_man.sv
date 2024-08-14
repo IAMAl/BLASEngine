@@ -17,8 +17,8 @@ module PubDomain_Man
 )(
 	input					clock,
 	input					reset,
-	input	address_d_t		I_St_Base,
-	input	address_d_t		I_Ld_Base,
+	input	address_t		I_St_Base,
+	input	address_t		I_Ld_Base,
 	input					I_St_Grant1,
 	input					I_St_Grant2,
 	input					I_Ld_Grant1,
@@ -67,7 +67,7 @@ module PubDomain_Man
 
 	logic	[NUM_ENTRY-1:0]		R_Valid;
 	logic	[NUM_ENTRY-1:0]		R_Stored;
-	logic	address_d_t			TabBAddr	[NUM_ENTRY-1:0];
+	logic	address_t			TabBAddr	[NUM_ENTRY-1:0];
 
 
 	assign Event_St_Grant1	= ~R_St_Grant1 & I_St_Grant1;

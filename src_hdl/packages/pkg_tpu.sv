@@ -39,7 +39,7 @@ package pkg_tpu;
 	parameter int WIDTH_CONSTANT		= 64-7-7*4-6-1;
 
 
-	//Logic Types
+	////Logic Types
 	//	General Data Type
 	typedef logic	[WIDTH_DATA-1:0]		data_t;
 
@@ -73,6 +73,13 @@ package pkg_tpu;
 
 	//	Interconnection Network
 	typedef	data_t	[NUM_LANE-1:0]			lane_t;
+
+	//	Data Memory Flag
+	typedef	logic	[NUM_LANE-1:0]			v_ready_t;
+	typedef	logic	[NUM_LANE-1:0]			v_grant_t;
+
+	//	Lane Commit Flag
+	typedef	logic	[NUM_LANE-1:0]			commit_lane_t
 
 
 	////Instruction-Set
