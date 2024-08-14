@@ -27,15 +27,34 @@ package pkg_mpu;
 
 	//Number of Entries in Hazard Check Table
 	parameter int NUM_ENTRY_HAZARD  	= NUM_MPU_THREADS*2;
+	parameter int WIDTH_NUM_ISSUE		= $clog2(NUM_ENTRY_HAZARD);
 
 	//Address Type for Thread Memory
-	typedef logic [WIDTH_SIZE_TMEM-1:0]	t_address_t;
+	typedef logic [WIDTH_SIZE_TMEM-1:0]	mpu_address_t;
 
 	//Thread-ID Type
 	typedef logic [WIDTH_THREADID_SCALAR-1:0]	id_t;
 
 	//Instruction Type
 	typedef logic [WIDTH_INSTR-1:0]		instr_t;
+
+	//Thread's Issue Number
+	typedef logic [WIDTH_NUM_ISSUE-1:0]	mpu_issue_no_t;
+
+	// Single-bit Flag for All TPUs
+	typedef logic [NUM_ROWS*NUM_CLMS-1:0]	tpu_row_clm_t;
+
+	//I/F Data Port
+	typedef struct packed {
+		logic								v;
+		logic	[WIDTH_DATA-1:0]			data;
+	} mpu_if_t;
+
+	//MapMan LookUp Table
+	typedef struct packed {
+		mpu_address_t						length;
+		mpu_address_t						address;
+	} lookup_t;
 
 	//Hazard Check Table Entry
 	typedef struct packed {
@@ -48,7 +67,7 @@ package pkg_mpu;
 	//Commit Table Entry
 	typedef struct packed {
 		logic								Valid;
-		logic	[WIDTH_ENTRY_STH-1:0]		IsseNo;
+		logic	[WIDTH_NUM_ISSUE-1:0]		IsseNo;
 		logic								Commmit;
 	} mpu_tab_commit_t;
 

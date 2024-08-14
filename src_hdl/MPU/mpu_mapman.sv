@@ -16,10 +16,10 @@ module MapMan_MPU
 	input						reset,
 	input						I_Req_St,						//Request from Instruction Memory (Storing)
 	input	id_t				I_ThreadID_St,					//Thread-ID from Instruction Memory
-	input	t_address_t			I_Length_St,					//Storing Size of Program
+	input	mpu_address_t		I_Length_St,					//Storing Size of Program
 	output						O_Ack_St,						//Ack to Instruction Memory
 	input	id_t				I_ThreadID_Ld,					//Thread-ID from Dispatch Unit
-	output	t_address_t			O_Used_Size,					//Already Used Instruction Memory Size
+	output	mpu_address_t		O_Used_Size,					//Already Used Instruction Memory Size
 	input						I_Req_Lookup,					//Request from Dispatch Unit
 	output						O_Ack_Lookup,					//Ack to Dispatch Unit
 	output	lookup_t			O_ThreadInfo,					//Thread Info to Dispatch Unit
@@ -39,9 +39,9 @@ module MapMan_MPU
 	logic	[SIZE_TAB_MAPMAN-1:0]	Valid;
 	logic	[SIZE_TAB_MAPMAN-1:0]	is_Matched;
 
-	t_address_t						R_Address_Ld;
-	t_address_t						R_Length_Ld;
-	t_address_t						R_Used_Size;
+	mpu_address_t					R_Address_Ld;
+	mpu_address_t					R_Length_Ld;
+	mpu_address_t					R_Used_Size;
 
 	fsm_mapman_st					FSM_St;
 	fsm_mapman_ld					FSM_Ld;

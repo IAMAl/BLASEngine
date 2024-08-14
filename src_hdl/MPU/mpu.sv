@@ -20,15 +20,15 @@ module MPU
 	output	mpu_if_t				O_Data_IF,			//Data to External
 	output							O_Req,				//Issue Request
 	output	instr_t					O_Instr,			//Instruction Stream to TPU
-	output	issue_no_t				O_IssueNo,			//Issue No
+	output	mpu_issue_no_t			O_IssueNo,			//Issue No
 	input							I_Ld_Data,			//Loaded Data Stream from External Mem
 	output							O_St_Data,			//Storing Data Stream to External Mem
 	input	data_t					I_Data,				//Loaded Data Stream from TPUs
 	output	data_t					O_Data,				//Storing Data Stream to TPUs
 	input							I_Req_Commit,		//Request of Commit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
-	output	row_clm_t				O_TPU_Req,			//Request to Execute
-	output	row_clm_t				O_TPU_En_Exe,		//Enable to TPUs
+	output	tpu_row_clm_t			O_TPU_Req,			//Request to Execute
+	output	tpu_row_clm_t			O_TPU_En_Exe,		//Enable to TPUs
 	output							O_Wait,				//Wait Signal to Host trying the store
 	output	mpu_stat_t				O_Status			//Status Info to Host System
 );
@@ -52,17 +52,21 @@ module MPU
 
 
 	logic						Req_Commit;
-	issue_no_t					Issued_No;
+	mpu_issue_no_t				Issued_No;
 	logic						Req_HazardCheck;
 	logic						Req_Issue;
 	id_t						ThreadID_S;
-	issue_no_t					IssueNo;
+	mpu_issue_no_t				IssueNo;
 
 
 	logic						Req_Lookup;
 	id_t						ThreadID_S_Ld;
 	logic						Ack_Lookup;
 	lookup_t					ThreadInfo;
+
+
+	assign O_TPU_Req		= ;//ToDo
+	assign O_TPU_En_Exe		= ;//ToDO
 
 	assign No_ThMem			= Used_Size >= SIZE_THREAD_MEM;
 	assign O_Status.io		= IF_State;

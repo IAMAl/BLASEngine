@@ -9,20 +9,23 @@
 //	Module Name:	CommitAgg
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module CommitAgg #(
+module CommitAgg
+	import pkg_mpu::*;
+	import pkg_commit_agg::*;
+#(
 	parameter int	NUM_TPU		= 1,
 	parameter int	BUFF_SIZE	= 4
 )(
 	input						clock,
 	input						reset,
-	input						I_Req,
 	input	[NUM_TPU-1:0]		I_En_TPU,
-	input	issue_no_t			I_Issue_No,
-	input	tpu_commit_req_t	I_Commit_Req,
-	input	tpu_commit_no_t		I_Commit_No,
-	output						O_Commit_Req,
-	output	issue_no_t			O_Commit_No,
-	output						O_Full
+	input						I_Req,					//Issue Request
+	input	mpu_issue_no_t		I_Issue_No,				//Issue Number
+	input	tpu_commit_req_t	I_Commit_Req,			//Commit Request
+	input	tpu_commit_no_t		I_Commit_No,			//Commit Number
+	output						O_Commit_Req,			//Commit Request to MPU
+	output	mpu_issue_no_t		O_Commit_No,			//Commit Number to MPU
+	output						O_Full					//Flag: Buffer Full
 );
 
 	localparam int	WIDTH_SIZE	= $clog2(BUFF_SIZE);
@@ -39,7 +42,7 @@ module CommitAgg #(
 	commit_agg_t				CommitAgg		[BUFF_SIZE-1:0];
 
 
-	assign Send_Commit		= CommitAgg[ Rd_Ptr ].v & ( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu );
+	assign Send_Commit		= CommitAgg[ Rd_Ptr ].v & ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu );
 
 
 	always_comb: begin

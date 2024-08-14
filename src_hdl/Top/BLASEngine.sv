@@ -22,11 +22,11 @@ module BLASEngine (
 
 
 	logic						Issue_Req;
-	issue_no_t					Issue_No;
+	mpu_issue_no_t				Issue_No;
 	instr_t						Issue_Instr;
 
-	row_clm_t					TPU_En_Exe;
-	row_clm_t					TPU_Req;
+	tpu_row_clm_t				TPU_En_Exe;
+	tpu_row_clm_t				TPU_Req;
 
 
 	s_ldst_t					TPU_S_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];

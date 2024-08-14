@@ -17,12 +17,12 @@ module ThrreadMem_MPU
 	input						I_Req_St,						//Store Request
 	input						O_Req_St,						//Send Store Request to MapMan Unit
 	output	instr_t				O_ThreadID_St,					//Send Thread-ID to MapMan Unit
-	output	t_address_t			O_Length_St,					//Send Storing Length to MapMan Unit
+	output	mpu_address_t		O_Length_St,					//Send Storing Length to MapMan Unit
 	input						I_Ack_St,						//Ack from MapMan Unit
 	input	instr_t				I_Instr_St,						//Storing Instructions
-	input	t_address_t			I_Used_Size,					//Used Instruction Memory Size
+	input	mpu_address_t		I_Used_Size,					//Used Instruction Memory Size
 	input						I_Req_Ld,						//Load Request from Dispatch Unit
-	input	t_address_t			I_Adddress_Ld,					//Load Address from Dispatch Unit
+	input	mpu_address_t		I_Adddress_Ld,					//Load Address from Dispatch Unit
 	input	instr_t				O_Instr_Ld,						//Send Instructions to Dispatch Unit
 	output						O_Req,							//Request to Next Stage
 	output	id_t				O_ThreadID,						//Thread-ID to Next Stage
@@ -53,8 +53,8 @@ module ThrreadMem_MPU
 	id_t						ThreadIDs		[SIZE_THREAD_MEM/32-1:0];
 
 	// Storing Thread in Instruction Memory
-	t_address_t					R_Length_St;
-	t_address_t					R_Adddress_St;
+	mpu_address_t				R_Length_St;
+	mpu_address_t				R_Adddress_St;
 
 	logic	[WIDTH_THREAD_MEM-1:0]	R_Count;
 

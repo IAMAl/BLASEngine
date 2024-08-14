@@ -15,11 +15,11 @@ module Commit_MPU
 	input							clock,
 	input							reset,
 	input							I_Req_Issue,				//Request from Dispatch Unit
-	input	issue_no_t				I_Issue_No,					//Issue No. from Dispatch Unit
+	input	mpu_issue_no_t			I_Issue_No,					//Issue No. from Dispatch Unit
 	input							I_Req_Commit,				//Commit from Coomit-Agregator Unit
-	input	issue_no_t				I_CommitNo,					//Commit No from Commit-Agregator Unit
+	input	mpu_issue_no_t			I_CommitNo,					//Commit No from Commit-Agregator Unit
 	output							O_Req_Commit,				//Request to Next-Stage
-	output	issue_no_t				O_Issue_No,					//Commit No to Next-Stage
+	output	mpu_issue_no_t			O_Issue_No,					//Commit No to Next-Stage
 	output							O_Full						//Flag: State in Full of Table
 );
 
@@ -27,14 +27,14 @@ module Commit_MPU
 	// Commit Table Handling
 	logic							We;
 	logic							Re;
-	issue_no_t						WNo;
-	issue_no_t						RNo;
+	mpu_issue_no_t					WNo;
+	mpu_issue_no_t					RNo;
 	logic							Full;
 	logic							Empty;
 
 	// Commit Table Matter
-	mpu_tab_commit_t				IssueInfo	[NUM_ENTRY_STH-1:0];
-	issue_no_t						R_Issue_No;
+	mpu_tab_commit_t				IssueInfo	[NUM_ENTRY_HAZARD-1:0];
+	mpu_issue_no_t					R_Issue_No;
 	logic							R_Commit;
 
 
@@ -89,7 +89,7 @@ module Commit_MPU
 	assign We				= I_Req_Issue & ~Full;
 	assign Re				= Commit & ~Empty;
 	RingBuffCTRL #(
-		.NUM_ENTRY(		NUM_ENTRY_STH		)
+		.NUM_ENTRY(		NUM_ENTRY_HAZARD	)
 	) HazardTab_Ptr
 	(
 		.clock(			clock				),
