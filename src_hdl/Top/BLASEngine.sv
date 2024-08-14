@@ -9,7 +9,11 @@
 //	Module Name:	BLASEngine
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module BLASEngine (
+module BLASEngine
+	import	pkg_mpu::*;
+	import	pkg_tpu::*;
+	import	pkg_top::*;
+(
 	input						clock,
 	input						reset,
 	input						I_Req_IF,				//Request
@@ -92,7 +96,7 @@ module BLASEngine (
 	);
 
 	CommitAgg #(
-		.NUM_TPU(				NUM_CLMS				),
+		.NUM_TPU(				NUM_TPU					),
 		.BUFF_SIZE(				BYPASS_BUFF_SIZE		)
 	)(
 		.clock(					clock					),

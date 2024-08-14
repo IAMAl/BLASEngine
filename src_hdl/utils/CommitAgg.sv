@@ -10,8 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module CommitAgg
+	import pkg_top::*;
 	import pkg_mpu::*;
-	import pkg_commit_agg::*;
 #(
 	parameter int	NUM_TPU		= 1,
 	parameter int	BUFF_SIZE	= 4
