@@ -1,53 +1,45 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	BLASEngine
-//	Copyright (C) 2024  Shigeyuki TAKANO
-//
-//  GNU AFFERO GENERAL PUBLIC LICENSE
-//	version 3.0
-//
-//	Module Name:	Scalar_Unit
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-module Scalar_Unit
+module scalar_unit
 	import pkg_mpu::*;
 	import pkg_tpu::*;
 (
 	input						clock,
 	input						reset,
-	input						I_En,					//Enable Execution
 	input						I_Empty,				//Empty on Buffer
 	input						I_Req_St,				//Store Request for Instructions
 	output	logic				O_Ack_St,				//Acknowledge for Storing
 	input	instr_t				I_Instr,				//Instruction from Buffer
+	input						I_En,					//Enable Execution
+	input	issue_no_t			I_IssueNo,				//Issued Thread-ID
 	input	id_t				I_ThreadID,				//Thread-ID
 	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
-	output	s_ldst_t			O_LdSt,					//Load Request
-	input	s_data				I_LdData,				//Loaded Data
-	output	s_data				O_StData,				//Storing Data
-	input	[1:0]				I_Ld_Ready,				//Flag: Ready
-	input	[1:0]				I_Ld_Grant,				//Flag: Grant
-	input	[1:0]				I_St_Ready,				//Flag: Ready
-	input	[1:0]				I_St_Grant,				//Flag: Grant
+	output	address_t			O_Address1,				//Data Memory Address
+	output	address_t			O_Address2,				//Data Memory Address
+	output						O_Ld_Req1,				//Load Request
+	output						O_Ld_Req2,				//Load Request
+	input						I_Ack_Ld1,				//Acknowlefge from Loading
+	input						I_Ack_Ld2,				//Acknowlefge from Loading
+	input	data_t				I_Ld_Data1,				//Loaded Data
+	input	data_t				I_Ld_Data2,				//Loaded Data
+	output						O_St_Req1,				//Store Request
+	output						O_St_Req2,				//Store Request
+	output	data_t				O_St_Data1,				//Store Data
+	output	data_t				O_St_Data2,				//Store Data
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	command_t			O_V_Command,			//Command to Vector Unit
-	input	lane_t				I_V_State,				//Status from Vector Unit
-	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
-	output	s_stat_t			O_Status,				//Scalar Unit Status
-	output						O_Term
+	input	lane_t				I_V_State,
+	output	lane_t				O_Lane_En,
+	output	s_stat_t			O_Status				//Scalar Unit Status
 );
 
-	localparam int	LANE_ID = 0;
 
 	address_t				PC;
 	instr_t					Instruction;
-	instr_t					Instr;
 
 
-	logic					PAC_Req;
-	logic					PAC_Wait;
+	logic					Req_PCU;
+	logic					PCU_Wait;
 	data_t					PAC_Src_Data;
 
 
@@ -55,71 +47,117 @@ module Scalar_Unit
 	logic					Stall_IF;
 	logic					Stall_IW_St;
 	logic					Stall_IW_Ld;
-	logic					Stall_IW;
 
 
 	logic					Req_IFetch;
 
 
 	logic					Req_IW;
-	logic					Req_Issue;
-	logic					W_Req_Issue;
-	instr_t					Instr_IW;
-	instr_t					Instr;
+	command_t				Pre_Command;
+	command_t				HZD_Command;
+	command_t				Command;
+	iw_t					Index_Entry;
 	issue_no_t				Rd_Ptr;
 
+	logic					Valid_Dst;
+	logic					Valid_Src1;
+	logic					Valid_Src2;
+	logic					Valid_Src3;
+	logic					Valid_Src4;
+	index_s_t				Index_Dst;
+	index_s_t				Index_Src1;
+	index_s_t				Index_Src2;
+	index_s_t				Index_Src3;
+	logic	[7:0]			Index_Sel_Dst;
+	logic	[7:0]			Index_Sel_Odd1;
+	logic	[7:0]			Index_Sel_Odd2;
+	logic	[7:0]			Index_Sel_Even1;
+	logic	[7:0]			Index_Sel_Even2;
 
-	logic					Dst_Slice;
-	logic	[6:0]			Dst_Sel;
-	index_t					Dst_Index;
-	index_t					Dst_Index_Window;
-	index_t					Dst_Index_Length;
-	logic					Dst_RegFile_Req;
-	logic					Dst_RegFile_Slice;
-	index_t					Dst_RegFile_Index;
+	index_t					Index_Length;
+	index_t					Window_Length;
 
-
-	logic					Bypass_Buff_Full;
-	logic					Stall_Net;
-
-
-	logic					MaskedRead;
+	logic					Slice;
 	logic					Sign;
 	const_t					Constant;
-	logic					Slice_Dst;
 	logic					Stall_RegFile_Odd;
 	logic					Stall_RegFile_Even;
+	logic					Req_RegFile_Odd1;
+	logic					Req_RegFile_Odd2;
+	logic					Req_RegFile_Even1;
+	logic					Req_RegFile_Even2;
+	logic					Index_Slice_Odd1;
+	logic					Index_Slice_Odd2;
+	logic					Index_Slice_Even1;
+	logic					Index_Slice_Even2;
+	index_t					Index_Orig_Odd1;
+	index_t					Index_Orig_Odd2;
+	index_t					Index_Orig_Even1;
+	index_t					Index_Orig_Even2;
+	index_t					Index_Odd1;
+	index_t					Index_Odd2;
+	index_t					Index_Even1;
+	index_t					Index_Even2;
 
+
+	logic					Req_RegFile_Odd;
+	logic					Req_RegFile_Even;
+	logic					We_RegFile_Odd;
+	logic					We_RegFile_Even;
+	logic					Re_RegFile_Odd1;
+	logic					Re_RegFile_Odd2;
+	logic					Re_RegFile_Even1;
+	logic					Re_RegFile_Even2;
+	data_t					Pre_Src_Data1;
 	data_t					Pre_Src_Data2;
 	data_t					Pre_Src_Data3;
+	data_t					Pre_Src_Data4;
 
 
-	logic					Lane_We;
-	logic					Lane_Re;
-	data_t					Lane_Data;
-	logic	[NUM_LANE-1:0]	We_V_State;
-	logic	[NUM_LANE-1:0]	V_State_Data;
+	index_t					Src_Idx1;
+	index_t					Src_Idx2;
+	index_t					Src_Idx3;
+	index_t					Src_Idx4;
 
 
 	data_t					V_State;
 
 
-	mask_t					Mask_Data;
+	data_t					Bypass_Data1;
+	data_t					Bypass_Data2;
+	data_t					Src_Data1;
+	data_t					Src_Data2;
+	data_t					Src_Data3;
+	data_t					Src_Data4;
 
-	logic	[12:0]			Config_Path;
 
-
-	logic					Dst_Sel;
-	logic					is_WB_RF;
-	logic					is_WB_BR;
-	logic					is_WB_VU;
-	dst_t					WB_Index;
-	data_t					WB_Data;
-	logic					Math_Done;
+	index_s_t				Dst_Index1;
+	index_s_t				Dst_Index2;
+	index_s_t				WB_Index1;
+	index_s_t				WB_Index2;
+	data_t					WB_Data1;
+	data_t					WB_Data2;
 	logic					Condition;
 
 
+	logic					Req_LdSt_Odd;
+	logic					Req_LdSt_Even;
+	logic	[1:0]			OpClass_LdSt_Odd;
+	logic	[1:0]			OpClass_LdSt_Even;
+	logic	[1:0]			OpCode_LdSt_Odd;
+	logic	[1:0]			OpCode_LdSt_Even;
+	logic					LdSt_Odd;
+	logic					LdSt_Even;
+	logic					Stall_LdSt_Odd;
+	logic					Stall_LdSt_Even;
+	address_t				Address;
+	address_t				Stride;
+	address_t				Length;
+	data_t					Ld_Data1;
+	data_t					Ld_Data2;
 	logic					Ld_NoReady;
+	logic					Ld_NoReady1;
+	logic					Ld_NoReady2;
 	logic					LdSt_Done1;
 	logic					LdSt_Done2;
 
@@ -150,21 +188,8 @@ module Scalar_Unit
 	logic					Commit_Req;
 	issue_no_t				Commit_No;
 
-	pipe_index_t			PipeReg_Idx;
-	pipe_index_t			PipeReg_Index;
-	pipe_reg_t				PipeReg_RR;
-	pipe_net_t				PipeReg_RR_Net;
-	pipe_exe_t				PipeReg_Net;
-	pipe_exe_t				PipeReg_Exe;
 
-
-	//// Output Status
 	assign O_State			= State;
-
-
-	//// Select Scalar unit or Vector unit backend
-	assign S_Command		= ( ~Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign O_V_Command		= (  Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 
 
 	//// Instruction Fetch Stage
@@ -172,179 +197,75 @@ module Scalar_Unit
 
 
 	//// Hazard Detect Stage
-	assign Req_IW			= ~Stall_IW_St & W_Req_IW;
-	assign W_Req_Issue		= ~Stall_IW_Ld & ~Stall_IW;
+	assign Req_IW			= ~Stall_IW_St;
+	assign Req_Issue		= ~Stall_IW_Ld;
+
+	assign Valid_Dst		= Inst.Valid_Dst;
+	assign Valid_Src1		= Inst.Valid_src1;
+	assign Valid_Src2		= Inst.Valid_src2;
+	assign Valid_Src3		= Inst.Valid_src3;
+	assign Index_Dst		= Instr.IdxDst;
+	assign Index_Src1		= Instr.SrcIdx1;
+	assign Index_Src2		= Instr.SrcIdx2;
+	assign Index_Src3		= Instr.SrcIdx3;
 
 
-	//// Scalar unit's Back-end Pipeline
-	//	Command
-	PipeReg_Idx.v			= S_Command.instr.v;
-	PipeReg_Idx.op			= S_Command.instr.op;
-
-	//	Write-Back
-	PipeReg_Idx.sdt			= S_Command.dst
-
-	//	Indeces
-	PipeReg_Idx.slice_len	= S_Command.instr.slice_len;
-
-	PipeReg_Idx.src1		= S_Command.instr.src1;
-	PipeReg_Idx.src2		= S_Command.instr.src2;
-	PipeReg_Idx.src3		= S_Command.instr.src2;
-	PipeReg_Idx.src4		= S_Command.instr.src4;
-
-	//	Path
-	PipeReg_Idx.path		= S_Command.instr.path;
+	//// Stall Control
+	assign Slice			= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Even1 | Slice_Idx_Even2 | Slice_Dst;
 
 
 	//// Index Update Stage
-	//	Command
-	assign PipeReg_Index.v			= PipeReg_Idx.instr.v;
-	assign PipeReg_Index.op			= PipeReg_Idx.instr.op;
+	assign Index_Length		= S_Command.IdxLength;
+	assign Window_Length	= S_Command.IdxWindow;
 
-	//	Write-Back
-	assign PipeReg_Index.dst		= PipeReg_Idx.dst
+	assign Req_Index_Dst	= S_Command.v_dst & Req_Issue;
+	assign Slice_Dst		= S_Command.slice1 | S_Command.slice2 | S_Command.slice3;
+	assign Index_Dst		= S_Command.SrcDst;
+	assign Index_Sel_Dst	= //ToDo;
 
-	//	Indeces
-	assign PipeReg_Index.slice_len	= PipeReg_Idx.instr.slice_len;
+	assign Req_Index_Odd1	= S_Command.v_src1 & Req_Issue;
+	assign Slice_Odd1		= S_Command.slice1;
+	assign Index_Orig_Odd1	= S_Command.SrcIdx1;
+	assign Index_Sel_Odd1	= ;//ToDo;
 
-	//	Issue-No
-	assign PipeReg_Index.issue_no	= PipeReg_Idx.issue_no;
+	assign Req_Index_Odd2	= S_Command.v_src2 & Req_Issue;
+	assign Slice_Odd2		= S_Command.slice2;
+	assign Index_Odd2		= S_Command.SrcIdx2;
+	assign Index_Sel_Odd2	= ;//ToDo;
 
-	//	Path
-	assign PipeReg_Index.path		= PipeReg_Idx.path;
+	assign Req_Index_Even1	= S_Command.v_src3 & Req_Issue;
+	assign Slice_Even1		= S_Command.slice2;
+	assign Index_Even1		= S_Command.SrcIdx2;
+	assign Index_Sel_Even1	= ;//ToDo;
 
-
-	//// Register Read/Write Stage
-
-	//	Capture Read Data
-	//	Command
-	assign PipeReg_RR_Net.v		= PipeReg_RR.v;
-	assign PipeReg_RR_Net.op	= PipeReg_RR.op;
-
-	//	Write-Back
-	assign PipeReg_RR_Net.dst	= PipeReg_RR.dst;
-
-	//	Read Data
-	assign V_State_Data.v			= 1'b1;
-	assign V_State_Data.idx			= '0;
-	assign V_State_Data.data		= V_State;
-	assign V_State_Data.src_sel		= '0;
-
-	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
-																				PipeReg_RR.src1;
-
-	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
-										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
-										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
-																				'0;
-
-	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src4.src_sel.no == 2'3 ) ?	V_State_Data :
-																				PipeReg_RR.src4;
-
-	//	Issue-No
-	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
-
-	//	Path
-	assign PipeReg_RR_Net.path		= PipeReg_RR.path;
+	assign Req_Index_Even2	= S_Command.v_src4 & Req_Issue;
+	assign Slice_Even2		= S_Command.slice3;
+	assign Index_Even2		= S_Command.SrcIdx3;
+	assign Index_Sel_Even2	= ;//ToDo;
 
 
-	///// Write-Back to PAC
-	assign PAC_We			= WB_Index.v & is_WB_BR;
-	assign PAC_Data			= ( is_WB_BR ) ? WB_Data : '0;
-	assign PAC_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src4.src_sel.no == 2'h2 );
+	//// Register-Read Stage
+	assign Slice_Idx_RFFile	= Slice_Idx_Odd1 | Slice_Idx_Odd2 | Slice_Idx_Enen1 | Slice_Idx_Enen2;
 
 
 	//// Lane-Enable
-	assign Lane_We			= is_WB_VU;
-	assign Lane_Data		= ( is_WB_VU ) ? WB_Data : '0;
-	assign Lane_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
-								( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
-								( PipeReg_RR.src3.src_se3.no == 2'h3 ) |
-								( PipeReg_RR.src4.src_se3.no == 2'h3 );
+	assign O_Lane_En		= V_State[WIDTH_DATA-1:NUM_LANE];
 
 
-	//// Nwtwork
-	assign Config_Path		= PipeReg_RR_Net.path;
-
-	//	Capture Data
-	assign PipeReg_Net.v	= PipeReg_RR_Net.v;
-	assign PipeReg_Net.op	= PipeReg_RR_Net.op;
-
-	//	Write-Back
-	assign PipeReg_Net.dst	= PipeReg_RR_Net.dst;
-
-	//	Issue-No
-	assign PipeReg_Net.issue_no	= PipeReg_RR_Net.issue_no;
+	//// Network
+	assign Src_Idx1			= ;//ToDo
+	assign Src_Idx2			= ;//ToDo
+	assign Src_Idx3			= ;//ToDo
+	assign Src_Idx4			= ;//ToDo
 
 
-	//// Write-Back
-	assign Dst_Sel			= B_Index.dst_sel.unit_no;
-	assign Dst_Slice		= WB_Index.slice
-	assign Dst_Index		= WB_Index.idx
-	assign Dst_Index_Window	= WB_Index.window
-	assign Dst_Index_Length	= WB_Index.slice_len
+	//// Execution Stage
+	//	 Load/Store Unit
+	assign OpClass_LdSt_Odd	= S_Command.OpClass;
+	assign OpClass_LdSt_Even= S_Command.OpClass;
+	assign OpCode_LdSt		= S_Command.OpCode;
 
-	assign is_WB_RF			= WB_Index.dst_sel.no == 2'h1;
-	assign is_WB_BR			= WB_Index.dst_sel,no == 2'h2;
-	assign is_WB_VU			= WB_Index.dst_sel.no == 2'h3;
-
-	assign WB_Req_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Req_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Index_Even	= ( ~Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Index_Odd		= (  Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Data_Even		= ( ~Dst_Sel ) ? WB_Data : 		'0;
-	assign WB_Data_Odd		= (  Dst_Sel ) ? WB_Data : 		'0;
-
-
-	//// Write Vector Unit Status Register
-	assign We_V_State		= I_En;
-	assign V_State_Data		= I_V_State;
-
-
-	//// Lane-Enable
-	assign O_Lane_En		= V_State[NUM_LANE*2-1:NUM_LANE];
-
-
-	//// Stall-Control
-	//	TB
-	assign Ld_NoReady		= 1'b0;
-	assign Slice			= 1'b0;
-
-
-	//// End of Execution
-	assign O_Term			= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & PipeReg_Idx.src4.v & (
-									( PipeReg_Idx.src1.idx == '0 ) &
-									( PipeReg_Idx.src2.idx == '0 ) &
-									( PipeReg_Idx.src3.idx == '0 ) &
-									( PipeReg_Idx.src4.idx == '0 )
-								)
-
-
-	//// Program Address Control
-	PACUnit PACUnit (
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_Req(				PAC_Req					),
-		.I_Stall(			Stall_PCU				),
-		.I_Sel_CondValid(	WB_Sel_CondValid		);
-		.I_CondValid1(		CondValid1				),
-		.I_CondValid2(		CondValid2				),
-		.I_Jump(			Instr_Jump				),
-		.I_Branch(			Instr_Branch			),
-		.I_Timing_MY(		Bypass_IssueNo			),
-		.I_Timing_WB(		WB_IssueNo				),
-		.I_State(			State					),
-		.I_Cond(			Condition				),
-		.I_Src(				PAC_Src_Data			),
-		.O_IFetch(			IFetch					),
-		.O_Address(			PC						)
-		.O_StallReq(		PAC_Wait				)
-	);
+	assign Ld_NoReady		= Ld_NoReady1 | Ld_NoReady2;
 
 
 	//// Instruction Memory
@@ -360,16 +281,38 @@ module Scalar_Unit
 	);
 
 
+	//// Program Address Control
+	PAC PAC (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req(				Req_PCU					),
+		.I_Stall(			Stall_PCU				),
+		.I_Sel_CondValid(	WB_Sel_CondValid		);
+		.I_CondValid1(		CondValid1				),
+		.I_CondValid2(		CondValid2				),
+		.I_Jump(			Instr_Jump				),
+		.I_Branch(			Instr_Branch			),
+		.I_Timing_MY(		Bypass_IssueNo			),
+		.I_Timing_WB(		WB_IssueNo				),
+		.I_State(			State					),
+		.I_Cond(			Condition				),
+		.I_Src(				PAC_Src_Data			),
+		.O_IFetch(			IFetch					),
+		.O_Address(			PC						)
+		.O_StallReq(		PCU_Wait				)
+	);
+
+
 	//// Instruction Fetch Stage
 	IFetch IFetch (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_IFetch				),
 		.I_Empty(			I_Empty					),
-		.I_Term(			O_Term					),
+		.I_Term(			),//ToDo
 		.I_Instr(			Instruction				),
 		.O_Req(				Req_IW					),
-		.O_Instr(			Instr_IW				),
+		.O_Instr(			Instr					),
 		.O_Re_Buff(			O_Re_Buff				)
 	);
 
@@ -378,23 +321,32 @@ module Scalar_Unit
 	HazardCheck_TPU HazardCheck_TPU (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_Issue(		W_Req_Issue				),
+		.I_Req_Issue(		Req_Issue				),
 		.I_Req(				Req_IW					),
-		.I_Instr(			Instr_IW				),
-		.I_Commit_Req(		Commit_Req				),
+		.I_Command(			Pre_Command				),
+		.I_Valid_Dst(		Valid_Dst				),
+		.I_Valid_Src1(		Valid_Src1				),
+		.I_Valid_Src2(		Valid_Src2				),
+		.I_Valid_Src3(		Valid_Src3				),
+		.I_Index_Dst(		Index_Dst				),
+		.I_Index_Src1(		Index_Src1				),
+		.I_Index_Src2(		Index_Src2				),
+		.I_Index_Src3(		Index_Src3				),
+		.I_Command(			HZD_Command				),
+		.I_Index_Entry(		Index_Entry				),
+		.I_Slice(			Slice					),
+		.I_Req_Commit(		Commit_Req				),
 		.I_Commit_No(		Commit_No				),
 		.O_Req_Issue(		Req_Issue				),
-		.O_Instr(			Instr					),
+		.O_Command(			Pre_Command				),
+		.O_Issue_No(		IW_IssueNo				),
 		.O_RAR_Hzard(		RAR_Hazard				),
-		.O_RAW_Hzard(								),
-		.O_WAR_Hzard(								),
-		.O_WAW_Hzard(								),
 		.O_Rd_Ptr(			Rd_Ptr					)
 	);
 
 
 	//// Select Scalar-Unit Back-End or Vector Unit Back-End
-	Dispatch_TPU Dispatch_TPU (
+	Issue_Command Issue_Command (
 		.I_Command(			Pre_Command				),
 		.O_S_Command(		S_Command				),
 		.O_V_Command(		O_V_Command				)
@@ -403,240 +355,211 @@ module Scalar_Unit
 
 	//// Stall Control
 	Stall_Ctrl Stall_Ctrl (
-		.I_PCU_Wait(		PAC_Wait				),
-		.I_Hazard(			RAR_Hazard				),
+		.I_PCU_Wait(		PCU_Wait				),
+		.I_Hazard(			RAR_Hazard				)
 		.I_Slice(			Slice					),
-		.I_Bypass_Buff_Full(Bypass_Buff_Full		),
 		.I_Ld_NoReady(		Ld_NoReady				),
 		.O_Stall_IF(		Stall_IF				),
 		.O_Stall_IW_St(		Stall_IW_St				),
-		.O_Stall_IW_Ld(		Stall_IW_Ld				),
-		.O_Stall_IW(		Stall_IW				),
-		.O_Stall_Net(		Stall_Net				)
+		.O_Stall_IW_Ld(		Stall_IW_Ld				)
 	);
 
 
 	//// Index Update Stage
-	//// Index Update Stage
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Dst
-	(
+	Index Index_Dst (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Dst		),
+		.I_Stall(			Stall_RegFile_Odd		),
 		.I_Req(				Req_Index_Dst			),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			Dst_Slice				),
-		.I_Sel(				Dst_Sel					),
-		.I_Index(			Dst_Index				),
-		.I_Window(			Dst_Index_Window		),
-		.I_Length(			Dst_Index_Length		),
+		.I_Slice(			Slice_Dst				),
+		.I_Sel(				Index_Sel_Dst			),
+		.I_Index(			Index_Dst				),
+		.I_Window(			Window_Length			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				Dst_RegFile_Req			),
-		.O_Slice(			Dst_RegFile_Slice		),
-		.O_Index(			Dst_RegFile_Index		)
+		.O_Req(				Req_RegFile_Dst			),
+		.O_Slice(			Slice_Idx_Dst			),
+		.O_Index(			Index_Dst				)
 	);
 
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Odd1
-	(
+	Index Index_Odd1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
-		.I_Req(				PipeReg_Idx.src1.v		),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src1.slice	),
-		.I_Sel(				PipeReg_Idx.src1.sel	),
-		.I_Index(			PipeReg_Idx.src1.idx	),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Req(				Req_Index_Odd1			),
+		.I_Slice(			Slice_Odd1				),
+		.I_Sel(				Index_Sel_Odd1			),
+		.I_Index(			Index_Orig_Odd1			),
+		.I_Window(			Window_Length			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src1.v	),
-		.O_Slice(			PipeReg_Index.src1.slice),
-		.O_Index(			PipeReg_Index.src1.idx	)
+		.O_Req(				Req_RegFile_Odd1		),
+		.O_Slice(			Slice_Idx_Odd1			),
+		.O_Index(			Index_Odd1				)
 	);
 
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Odd2
-	(
+	Index Index_Odd2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
-		.I_Req(				PipeReg_Idx.src2.v		),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src2.slice	),
-		.I_Sel(				PipeReg_Idx.src2.sel	),
-		.I_Index(			PipeReg_Idx.src2.idx	),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Req(				Req_Index_Odd2			),
+		.I_Slice(			Slice_Odd2				),
+		.I_Sel(				Index_Sel_Odd2			),
+		.I_Index(			Index_Orig_Odd2			),
+		.I_Window(			Window_Length			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src2.v	),
-		.O_Slice(			PipeReg_Index.src2.slice),
-		.O_Index(			PipeReg_Index.src2.idx	)
+		.O_Req(				Req_RegFile_Odd2		),
+		.O_Slice(			Slice_Idx_Odd2			),
+		.O_Index(			Index_Odd2				)
 	);
 
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Even1
-	(
+	Index Index_Even1 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
-		.I_Req(				PipeReg_Idx.src3.v		),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src3.slice	),
-		.I_Sel(				PipeReg_Idx.src3.sel	),
-		.I_Index(			PipeReg_Idx.src3.idx	),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Req(				Req_Index_Even1			),
+		.I_Slice(			Slice_Even1				),
+		.I_Sel(				Index_Sel_Even1			),
+		.I_Index(			Index_Orig_Even1		),
+		.I_Window(			Window_Length			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src3.v	),
-		.O_Slice(			PipeReg_Index.src3.slice),
-		.O_Index(			PipeReg_Index.src3.idx	)
-	);
+		.O_Req(				Req_RegFile_Even1		),
+		.O_Slice(			Slice_Idx_Enen1			),
+		.O_Index(			Index_Even1				)
+		);
 
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Even2
-	(
+	Index Index_Even2 (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
-		.I_Req(				PipeReg_Idx.src4.v		),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src4.slice	),
-		.I_Sel(				PipeReg_Idx.src4.sel	),
-		.I_Index(			PipeReg_Idx.src4.idx	),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Req(				Req_Index_Even2			),
+		.I_Slice(			Slice_Even2				),
+		.I_Sel(				Index_Sel_Even1			),
+		.I_Index(			Index_Orig_Even2		),
+		.I_Window(			Window_Length			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src4.v	),
-		.O_Slice(			PipeReg_Index.src4.slice),
-		.O_Index(			PipeReg_Index.src4.idx	)
+		.O_Req(				Req_RegFile_Even2		),
+		.O_Slice(			Slice_Idx_Enen2			),
+		.O_Index(			Index_Even2				)
 	);
 
-	//	Pipeline Register
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			PipeReg_Idx_RR	<= '0;
-		end
-		else if ( I_En ) begin
-			PipeReg_Idx_RR	<= PipeReg_Index;
-		end
-	end
+	pipereg PReg_Index (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			Stall					),
+		.I_Op(				Pipe_OP_Index			),
+		.O_Op(				Pipe_OP_RFile			)
+	);
 
 
-	//// Register Read/Write Stage
+	//// Register Read/Write-Back Stage
 	RegFile RegFile_Odd (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_Req_Odd				),
-		.I_We(				WB_We_Odd				),
-		.I_Index_Dst(		WB_Index_Odd			),
-		.I_Data(			WB_Data_Odd				),
-		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
-		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
-		.O_Data_Src1(		PipeReg_RR.src1.data	),
-		.O_Data_Src2(		PipeReg_RR.src2.data	)
+		.I_Req(				Req_RegFile_Odd			),
+		.I_We(				WB_RF_We1				),
+		.I_Re1(				Req_RegFile_Odd1		),
+		.I_Re2(				Req_RegFile_Odd2		),
+		.I_Index_Dst(		WB_RF_Index1			),
+		.I_Data(			WB_RF_Data1				),
+		.I_Index_Src1(		Index_Odd1				),
+		.I_Index_Src2(		Index_Odd2				),
+		.O_Data_Src1(		Pre_Src_Data1			),
+		.O_Data_Src2(		Pre_Src_Data21			),
+		.O_Req(				)
 	);
 
 	RegFile RegFile_Even (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_Req_Even				),
-		.I_We(				WB_We_Even				),
-		.I_Index_Dst(		WB_Index_Even			),
-		.I_Data(			WB_Data_Even			),
-		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
-		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
-		.O_Data_Src1(		PipeReg_RR.src3.data	),
-		.O_Data_Src2(		PipeReg_RR.src4.data	)
+		.I_Req(				Req_RegFile_Even		),
+		.I_We(				WB_RF_We2				),
+		.I_Re1(				Req_RegFile_Even1		),
+		.I_Re2(				Req_RegFile_Even2		),
+		.I_Index_Dst(		WB_RF_Index2			),
+		.I_Data(			WB_RF_Data2				),
+		.I_Index_Src1(		Index_Even1				),
+		.I_Index_Src2(		Index_Even2				),
+		.O_Data_Src1(		Pre_Src_Data3			),
+		.O_Data_Src2(		Pre_Src_Data22			),
+		.O_Req(				)
 	);
 
-	//	Pipeline Register
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			PipeReg_RR_Net	<= '0;
-		end
-		else if ( I_En ) begin
-			PipeReg_RR_Net	<= PipeReg_RR;
-		end
-	end
-
-
-	//// Status Register
-	StatusCtrl StatusCtrl (
+	pipereg_be PReg_RFile (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_En					),
-		.I_Diff_Data(		Diff_Data				),
-		.O_Status(			Status					),
+		.I_Stall(			Stall					),
+		.I_Op(				Pipe_OP_RFile			),
+		.O_Op(				Pipe_OP_Net				),
+		.I_Slice_Idx(		Slice_Idx_RFile			),
+		.O_Slice_Idx(		Slice_Idx_Net			)
 	);
 
 
 	//// Lane Enable Register
-	Lane_En Lane_En (
+	lane_en Lane_En (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_We(				Lane_We					),
-		.I_Data(			Lane_Data				),
-		.I_Re(				Lane_Re					),
-		.I_We_V_State(		We_V_State				),
-		.I_V_State(			V_State_Data			),
+		.I_We(				),
+		.I_Data(			),
+		.I_Re(				),
+		.I_We_V_State(		),
+		.I_V_State(			I_V_State				),
 		.O_Data(			V_State					)
 	);
 
 
 	//// Network Stage
-	Network_S Network_S (
-		.I_Stall(			Stall_Net				),
-		.I_Req(				PipeReg_RR_Net.v		),
-		.I_Sel_Path(		Config_Path				),
-		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
-		.I_Sel_ALU_Src2(	PipeReg_RR_Net.src2.v	),
-		.I_Sel_ALU_Src3(	PipeReg_RR_Net.src3.v	),
-		.I_Src_Data1(		PipeReg_RR_Net.data1	),
-		.I_Src_Data2(		PipeReg_RR_Net.data2	),
-		.I_Src_Data3(		PipeReg_RR_Net.data3	),
-		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
-		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
-		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
-		.I_WB_DstIdx(		WB_Index				),
-		.I_WB_Data(			WB_Data					),
-		.O_Src_Data1(		PipeReg_Net.data1		),
-		.O_Src_Data2(		PipeReg_Net.data2		),
-		.O_Src_Data3(		PipeReg_Net.data3		),
-		.O_Buff_Full(		Bypass_Buff_Full		),
+	network_s network_s (
+		.I_Req(				),//ToDo
+		.I_Sel_Path(		Sel_Path				),
+		.I_Sel_ALU_Src1(	Sel_ALU_Src1			),
+		.I_Sel_ALU_Src2(	Sel_ALU_Src2			),
+		.I_Sel_ALU_Src3(	Sel_ALU_Src3			),
+		.I_Src_Data1(		Pre_Src_Data1			),
+		.I_Src_Data2(		Pre_Src_Data2			),
+		.I_Src_Data3(		Pre_Src_Data3			),
+		.I_Src_Data4(		Pre_Src_Data4			),
+		.I_Src_Idx1(		Src_Idx1				),
+		.I_Src_Idx2(		Src_Idx2				),
+		.I_Src_Idx3(		Src_Idx3				),
+		.I_Src_Idx4(		Src_Idx4				),
+		.I_WB_DstIdx1(		WB_Index1				),
+		.I_WB_DstIdx2(		WB_Index2				),
+		.I_WB_Data1(		WB_Data1				),
+		.I_WB_Data2(		WB_Data2				),
+		.O_Src_Data1(		Src_Data1				),
+		.O_Src_Data2(		Src_Data2				),
+		.O_Src_Data3(		Src_Data3				),
+		.O_Address(			Address					),
+		.O_Stride(			Stride					),
+		.O_Length(			Length					),
 		.O_PAC_Src_Data(	PAC_Src_Data			)
 	);
 
-	//	Pipeline Register
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			PipeReg_Exe		<= '0;
-		end
-		else if ( I_En ) begin
-			PipeReg_Exe		<= PipeReg_Net;
-		end
-	end
+
+	pipereg_be PReg_Net (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			Stall					),
+		.I_Op(				Pipe_OP_RFile			),
+		.O_Op(				Pipe_OP_Net				),
+		.I_Slice_Idx(		Slixe_Idx_Net			),
+		.O_Slice_Idx(		Slixe_Idx_Math			)
+	);
 
 
 	//// Execution Stage
@@ -645,33 +568,71 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall					),
-		.I_CEn1(			CEn1					),
-		.I_CEn2(			CEn2					),
-		.I_Req(				PipeReg_Exe.v			),
-		.I_Command(			PipeReg_Exe.op			),
-		.I_WB_Dst(			PipeReg_Exe.dst			),
-		.I_Src_Src_Data1(	PipeReg_Exe.data1		),
-		.I_Src_Src_Data2(	PipeReg_Exe.data2		),
-		.I_Src_Src_Data3(	PipeReg_Exe.data3		),
-		.O_LdSt(			O_LdSt					),
-		.I_LdData(			I_LdData				),
-		.O_St_Data(			O_StData				),
-		.I_Ld_Ready(		I_Ld_Ready				),
-		.I_Ld_Grant(		I_Ld_Grant				),
-		.I_St_Ready(		I_St_Ready				),
-		.I_St_Grant(		I_St_Grant				),
-		.O_WB_Index(		WB_Index				),
-		.O_WB_Data(			WB_Data					),
-		.O_Math_Done(		Math_Done				),
-		.O_LdSt_Done1(		LdSt_Done1				),
-		.O_LdSt_Done2(		LdSt_Done2				),
-		.O_Cond(			Condition				)
+		.I_CEn(				CEn						),
+		.I_Command(			Command					),
+		.I_WB_Index(		Dst_Index				),
+		.I_Src_Src_Data1(	Src_Data1				),
+		.I_Src_Src_Data2(	Src_Data2				),
+		.I_Src_Src_Data3(	Src_Data3				),
+		.O_WB_Index1(		WB_Index1				),
+		.O_WB_Index2(		WB_Index2				),
+		.O_WB_Data1(		WB_Data1				),
+		.O_WB_Data2(		WB_Data2				),
+		.O_CondValid1(		CondValid1				),
+		.O_CondValid2(		CondValid2				),
+		.O_State(			State					)
+	);
+
+
+	//	 Load/Store Unit
+	LoadStoreUnit LdSt_Odd (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req(				Req_LdSt_Odd			),
+		.I_Ack_Ld(			I_Ack_Ld1				),
+		.I_OpClass(			OpClass_LdSt_Odd		),
+		.I_OpCode(			OpCode_LdSt				),
+		.I_Stall(			Stall_LdSt_Odd			),
+		.I_Address(			Address					),
+		.I_Stride(			Stride					),
+		.I_Length(			Length					),
+		.O_St(				O_St_Req1				),
+		.O_Ld(				O_Ld_Req1				),
+		.O_Address(			O_Address1				),
+		.I_St_Data(			St_Data1				),
+		.O_St_Data(			O_St_Data1				),
+		.I_Ld_Data(			I_Ld_Data1				),
+		.O_Ld_Data(			Ld_Data1				),
+		.O_Ld_NoReady(		Ld_NoReady1				),
+		.O_Done(			LdSt_Done1				)
+	);
+
+	LoadStoreUnit LdSt_Even (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req(				Req_LdSt_Even			),
+		.I_Ack_Ld(			I_Ack_Ld2				),
+		.I_OpClass(			OpClass_LdSt_Even		),
+		.I_OpCode(			OpCode_LdSt				),
+		.I_Stall(			Stall_LdSt_Even			),
+		.I_Address(			Address					),
+		.I_Stride(			Stride					),
+		.I_Length(			Length					),
+		.O_St(				O_St_Req2				),
+		.O_Ld(				O_Ld_Req2				),
+		.O_Address(			O_Address2				),
+		.I_St_Data(			St_Data2				),
+		.O_St_Data(			O_St_Data2				),
+		.I_Ld_Data(			I_Ld_Data2				),
+		.O_Ld_Data(			Ld_Data2				),
+		.O_Ld_NoReady(		Ld_NoReady2				),
+		.O_Done(			LdSt_Done2				)
 	);
 
 
 	//// Commitment Stage
 	//	 Commit Unit for Scalar Unit
-	ReorderBuff_S #(
+	reorderbuff_s #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_S			)
 	) ReorderBuff_S
 	(
@@ -696,7 +657,7 @@ module Scalar_Unit
 	);
 
 	//	 Commit Unit for Vector Unit
-	ReorderBuff_V #(
+	reorderbuff_v #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
 	) ReorderBuff_V
 	(
@@ -713,7 +674,7 @@ module Scalar_Unit
 	);
 
 	// Commit Request Selecter
-	Commit_TPU Commit_TPU (
+	commit_select Commit_Select (
 		.I_Rd_Ptr(			Rd_Ptr					),
 		.I_RB_Empty_S(		Empty_RB_S				),
 		.I_RB_Empty_V(		Empty_RB_V				),
