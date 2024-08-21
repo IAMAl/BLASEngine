@@ -66,7 +66,7 @@ module MPU
 
 
 	assign O_TPU_Req		= ;//ToDo
-	assign O_TPU_En_Exe		= ;//ToDO
+	assign O_TPU_En_Exe		= En_TPU;
 
 	assign No_ThMem			= Used_Size >= SIZE_THREAD_MEM;
 	assign O_Status.io		= IF_State;
@@ -89,6 +89,7 @@ module MPU
 		.I_Data(				I_Data					),
 		.O_St_Data(				O_St_Data				),
 		.O_Data(				O_Data					),
+		.O_En_TPU(				O_TPU_En_Exe			),
 		.O_State(				IF_State				)
 	);
 
