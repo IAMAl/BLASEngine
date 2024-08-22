@@ -1,15 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	BLASEngine
-//	Copyright (C) 2024  Shigeyuki TAKANO
-//
-//  GNU AFFERO GENERAL PUBLIC LICENSE
-//	version 3.0
-//
-//	Module Name:	DMem_Body
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-module DMem_Body
+module DMem
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -71,8 +60,8 @@ module DMem_Body
 	logic						St_Offset;
 	logic						Ld_Offset;
 
-	address_t					St_Base;
-	address_t					Ld_Base;
+	address_d_t					St_Base;
+	address_d_t					Ld_Base;
 
 	address_t					Length_St;
 	address_t					Length_Ld;
@@ -170,12 +159,14 @@ module DMem_Body
 	end
 
 
-	ReqHandle_St ReqHandle_St
+	req_handle req_handle_st
 	(
 		.clock(				clock						),
 		.reset(				reset						),
-		.I_St_Req1(			I_St_Req1					),
-		.I_St_Req2(			I_St_Req2					),
+		.I_Req1(			I_St_Req1					),
+		.I_Req2(			I_St_Req2					),
+		.I_Term1(			End_St						),
+		.I_Term2(			End_St						),
 		.I_Length1(			I_St_Length1				),
 		.I_Stride1(			I_St_Stride1				),
 		.I_Base_Addr1(		I_St_Base_Addr1				),
@@ -192,12 +183,14 @@ module DMem_Body
 		.O_GrantNo(			St_GrantNo					)
 	);
 
-	ReqHandle_Ld ReqHandle_Ld
+	req_handle req_handle_ld
 	(
 		.clock(				clock						),
 		.reset(				reset						),
-		.I_Ld_Req1(			I_Ld_Req1					),
-		.I_Ld_Req2(			I_Ld_Req2					),
+		.I_Req1(			I_Ld_Req1					),
+		.I_Req2(			I_Ld_Req2					),
+		.I_Term1(			End_Ld						),
+		.I_Term2(			End_Ld						),
 		.I_Length1(			I_Ld_Length1				),
 		.I_Stride1(			I_Ld_Stride1				),
 		.I_Base_Addr1(		I_Ld_Base_Addr1				),
@@ -214,10 +207,9 @@ module DMem_Body
 		.O_GrantNo(			Ld_GrantNo					)
 	);
 
-	PubDomain_Man #(
+	pub_domain_man #(
 		.NUM_ENTRY(			32							)
-	) PubDomain_Man
-	(
+	)(
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_St_Base(			St_Base						),
@@ -240,7 +232,7 @@ module DMem_Body
 		.O_Set_Config_Ld(	Set_Config_Ld				)
 	);
 
-	AGU AGU_St (
+	agu agu_st (
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Req(				Set_Cfg_St					),
@@ -253,7 +245,7 @@ module DMem_Body
 		.O_End_Access(		End_St						)
 	);
 
-	AGU AGU_Ld (
+	agu agu_ld (
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Req(				Set_Cfg_Ld					),
