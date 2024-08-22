@@ -159,12 +159,12 @@ module DMem
 	end
 
 
-	req_handle_st req_handle_st
+	req_handle req_handle_st
 	(
 		.clock(				clock						),
 		.reset(				reset						),
-		.I_St_Req1(			I_St_Req1					),
-		.I_St_Req2(			I_St_Req2					),
+		.I_Req1(			I_St_Req1					),
+		.I_Req2(			I_St_Req2					),
 		.I_Length1(			I_St_Length1				),
 		.I_Stride1(			I_St_Stride1				),
 		.I_Base_Addr1(		I_St_Base_Addr1				),
@@ -181,12 +181,12 @@ module DMem
 		.O_GrantNo(			St_GrantNo					)
 	);
 
-	req_handle_ld req_handle_ld
+	req_handle req_handle_ld
 	(
 		.clock(				clock						),
 		.reset(				reset						),
-		.I_Ld_Req1(			I_Ld_Req1					),
-		.I_Ld_Req2(			I_Ld_Req2					),
+		.I_Req1(			I_Ld_Req1					),
+		.I_Req2(			I_Ld_Req2					),
 		.I_Length1(			I_Ld_Length1				),
 		.I_Stride1(			I_Ld_Stride1				),
 		.I_Base_Addr1(		I_Ld_Base_Addr1				),
