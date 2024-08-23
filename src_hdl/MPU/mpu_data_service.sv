@@ -26,6 +26,7 @@ import pkg_tpu::*;
 	output	data_t				O_St_Data		//Storing Data to Data Memory
 );
 
+
 	//
 	assign is_FSM_Extern_Not_Init	= FSM_Extern_Serv != FSM_EXTERN_INIT;
 	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_RUN;
