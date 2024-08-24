@@ -14,18 +14,26 @@ import pkg_tpu::*;
 (
 	input						clock,
 	input						reset,
-	input	s_ldst_t			I_LdSt,			//Load/Store Command
-	output	s_ld_data			O_Ld_Data,		//Loaded Data, to TPU Core
-	input	s_st_data			I_St_Data,		//Storing Data, from TPU Core
-	output	[1:0]				O_Ld_Ready,		//Flag: Ready to Service
-	output	[1:0]				O_Ld_Grant		//Flag: Grant for Request
-	output	[1:0]				O_St_Ready,		//Flag: Ready to Service
-	output	[1:0]				O_St_Grant		//Flag: Grant for Request
+	input						I_Rt_Req,				//Request from Router
+	input	data_t				I_Rt_Data,				//Data from Router
+	input						O_Rt_Req,				//Request to Router
+	input	data_t				O_Rt_Data,				//Data to Router
+	input	s_ldst_t			I_LdSt,					//Load/Store Command
+	output	s_ld_data			O_Ld_Data,				//Loaded Data, to TPU Core
+	input	s_st_data			I_St_Data,				//Storing Data, from TPU Core
+	output	[1:0]				O_Ld_Ready,				//Flag: Ready to Service
+	output	[1:0]				O_Ld_Grant,				//Flag: Grant for Request
+	output	[1:0]				O_St_Ready,				//Flag: Ready to Service
+	output	[1:0]				O_St_Grant				//Flag: Grant for Request
 	);
 
 	DMem_Body DMem_Body (
-		.clock(				),
-		.reset(				),
+		.clock(				clock						),
+		.reset(				reset						),
+		.I_Rt_Req(			I_Rt_Req					),
+		.I_Rt_Data(			I_Rt_Data					),
+		.O_Rt_Req(			O_Rt_Req					),
+		.O_Rt_Data(			O_Rt_Data					),
 		.I_St_Req1(			I_LdSt[0].st.req			),
 		.I_St_Req2(			I_LdSt[1].st.req			),
 		.I_Ld_Req1(			I_LdSt[0].ld.req			),

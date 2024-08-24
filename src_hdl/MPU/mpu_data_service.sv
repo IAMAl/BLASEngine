@@ -20,9 +20,9 @@ import pkg_tpu::*;
 	input	data_t				I_Data,			//Data from Extern
 	output						O_Req,			//Request to Extern
 	output	data_t				O_Data,			//Data to Extern
-	output						I_Ld_Req		//Request from Data Memory
+	output						I_Ld_Req,		//Request from Data Memory
 	input	data_t				I_Ld_Data,		//Data from Data Memory
-	output						O_St_Req		//Request Storing to Data Memory
+	output						O_St_Req,		//Request Storing to Data Memory
 	output	data_t				O_St_Data		//Storing Data to Data Memory
 );
 

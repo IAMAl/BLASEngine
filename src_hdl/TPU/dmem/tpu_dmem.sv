@@ -3,6 +3,10 @@ module DMem
 (
 	input						clock,
 	input						reset,
+	input						I_Rt_Req,						//Request from Router
+	input	data_t				I_Rt_Data,						//Data from Router
+	input						O_Rt_Req,						//Request to Router
+	input	data_t				O_Rt_Data,						//Data to Router
 	input						I_St_Req1,						//Flag Store Request
 	input						I_St_Req2,						//Flag Store Request
 	input						I_Ld_Req1,						//Flag Load Request
@@ -48,8 +52,10 @@ module DMem
 
 	logic						St_Grant1;
 	logic						St_Grant2;
+	logic						St_Grant3;
 	logic						Ld_Grant1;
 	logic						Ld_Grant2;
+	logic						Ld_Grant3;
 
 	logic						St_Public;
 	logic						Ld_Public;
@@ -75,6 +81,22 @@ module DMem
 	logic						Set_Config_St;
 	logic						Set_Config_Ld;
 
+
+	logic						Extern_Ld_Req;
+	address_t					Extern_Ld_Length;
+	address_t					Extern_Ld_Stride;
+	address_t					Extern_Ld_Base;
+	logic						Extern_Ld_Grant;
+	logic						Extern_Ld_Term;
+
+	logic						Extern_St_Req;
+	address_t					Extern_St_Length;
+	address_t					Extern_St_Stride;
+	address_t					Extern_St_Base;
+	logic						Extern_St_Grant;
+	logic						Extern_St_Term;
+
+
 	data_t						DataMem	[SIZE_DATA_MEM-1:0];
 
 
@@ -84,10 +106,13 @@ module DMem
 	assign St_Private		= ~Base_Addr_St[POS__MSB_DMEM_ADDR+1] & St_GrantVld;
 	assign Ld_Private		= ~Base_Addr_Ld[POS__MSB_DMEM_ADDR+1] & Ld_GrantVld;
 
-	assign St_Grant1		= St_GrantVld & ~St_GrantNo;
-	assign St_Grant2		= St_GrantVld &  St_GrantNo;
-	assign Ld_Grant1		= Ld_GrantVld & ~Ld_GrantNo;
-	assign Ld_Grant2		= Ld_GrantVld &  Ld_GrantNo;
+	assign St_Grant1		= St_GrantVld & ( St_GrantNo == 2'h0 );
+	assign St_Grant2		= St_GrantVld & ( St_GrantNo == 2'h1 );
+	assign St_Grant3		= St_GrantVld & ( St_GrantNo == 2'h2 );
+
+	assign Ld_Grant1		= Ld_GrantVld & ( Ld_GrantNo == 2'h0 );
+	assign Ld_Grant2		= Ld_GrantVld & ( Ld_GrantNo == 2'h1 );
+	assign Ld_Grant3		= Ld_GrantVld & ( Ld_GrantNo == 2'h2 );
 
 
 	assign St_Offset		= ~St_Public & St_GrantVld & St_GrantNo;
@@ -104,11 +129,19 @@ module DMem
 
 	assign St_Data			= (   St_Grant1 ) ?	I_St_Data1 :
 								( St_Grant2 ) ?	I_St_Data2 :
+								( St_Grant3 ) ?	Extern_St_Data :
 												0;
+
+
+	assign Extern_St_Term	= End_St;
+	assign Extern_Ld_Term	= End_Ld;
+	assign Extern_St_Grant	= St_Grant3;
+	assign Extern_Ld_Grant	= Ld_Grant3;
+
 
 	assign O_Ld_Data1		= (  Ld_Grant1 ) ?	Ld_Data : 0;
 	assign O_Ld_Data2		= (  Ld_Grant2 ) ?	Ld_Data : 0;
-
+	assign Extern_Ld_Data	= (  Ld_Grant3 ) ?	Ld_Data : 0;
 
 	assign O_St_Grant1		= St_Grant1;
 	assign O_St_Grant2		= St_Grant2;
@@ -159,49 +192,84 @@ module DMem
 	end
 
 
-	req_handle req_handle_st
-	(
+	extern_handle extern_handle (
+		.clock(				clock						),
+		.reset(				reset						),
+		.I_Req(				I_Rt_Req					),
+		.I_Data(			I_Rt_Data					),
+		.O_Req(				O_Rt_Req					),
+		.O_Data(			O_Rt_Data					),
+		.O_Ld_Req(			Extern_Ld_Req				),
+		.O_Ld_Length(		Extern_Ld_Length			),
+		.O_Ld_Stride(		Extern_Ld_Stride			),
+		.O_Ld_Base(			Extern_Ld_Base				),
+		.I_Ld_Grant(		Extern_Ld_Grant				),
+		.I_Ld_Data(			Extern_Ld_Data				),
+		.I_Ld_Term(			Extern_Ld_Term				),
+		.O_St_Req(			Extern_St_Req				),
+		.O_St_Length(		Extern_St_Length			),
+		.O_St_Stride(		Extern_St_Stride			),
+		.O_St_Base(			Extern_St_Base				),
+		.I_St_Grant(		Extern_St_Grant				),
+		.O_St_Data(			Extern_St_Data				),
+		.I_St_Term(			Extern_St_Term				)
+	);
+
+
+
+	req_handle req_handle_st (
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Req1(			I_St_Req1					),
 		.I_Req2(			I_St_Req2					),
+		.I_Req3(			Extern_St_Req				),
 		.I_Term1(			End_St						),
 		.I_Term2(			End_St						),
+		.I_Term3(			End_St						),
 		.I_Length1(			I_St_Length1				),
 		.I_Stride1(			I_St_Stride1				),
 		.I_Base_Addr1(		I_St_Base_Addr1				),
 		.I_Length2(			I_St_Length2				),
 		.I_Stride2(			I_St_Stride2				),
 		.I_Base_Addr2(		I_St_Base_Addr2				),
+		.I_Length3(			Extern_St_Length			),
+		.I_Stride3(			Extern_St_Stride			),
+		.I_Base_Addr3(		Extern_St_Base				),
 		.O_Length(			Length_St					),
 		.O_Stride(			Stride_St					),
 		.O_Base_Addr(		Base_Addr_St				),
 		.O_Grant1(			O_St_Grant1					),
 		.O_Grant2(			O_St_Grant2					),
+		.O_Grant3(										),
 		.O_St_Req(			St_Req						),
 		.O_GranndVld(		St_GrantVld					),
 		.O_GrantNo(			St_GrantNo					)
 	);
 
-	req_handle req_handle_ld
-	(
+	req_handle req_handle_ld (
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Req1(			I_Ld_Req1					),
 		.I_Req2(			I_Ld_Req2					),
+		.I_Req2(			Extern_Ld_Req				),
 		.I_Term1(			End_Ld						),
 		.I_Term2(			End_Ld						),
+		.I_Term3(			End_Ld						),
 		.I_Length1(			I_Ld_Length1				),
 		.I_Stride1(			I_Ld_Stride1				),
 		.I_Base_Addr1(		I_Ld_Base_Addr1				),
 		.I_Length2(			I_Ld_Length2				),
 		.I_Stride2(			I_Ld_Stride2				),
 		.I_Base_Addr2(		I_Ld_Base_Addr2				),
+		.I_Length3(			Extern_Ld_Length			),
+		.I_Stride3(			Extern_Ld_Stride			),
+		.I_Base_Addr3(		Extern_Ld_Base				),
 		.O_Length(			Length_Ld					),
 		.O_Stride(			Stride_Ld					),
 		.O_Base_Addr(		Base_Addr_Ld				),
 		.O_Grant1(			O_Ld_Grant1					),
 		.O_Grant2(			O_Ld_Grant2					),
+		.O_Grant3(										),
 		.O_Ld_Req(			Ld_Req						),
 		.O_GranndVld(		Ld_GrantVld					),
 		.O_GrantNo(			Ld_GrantNo					)
@@ -209,15 +277,18 @@ module DMem
 
 	pub_domain_man #(
 		.NUM_ENTRY(			32							)
-	)(
+	) pub_domain_man
+	(
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_St_Base(			St_Base						),
 		.I_Ld_Base(			Ld_Base						),
 		.I_St_Grant1(		St_Grant1					),
 		.I_St_Grant2(		St_Grant2					),
+		.I_St_Grant3(		Ld_Grant3					),
 		.I_Ld_Grant1(		Ld_Grant1					),
 		.I_Ld_Grant2(		Ld_Grant2					),
+		.I_Ld_Grant3(		Ld_Grant3					),
 		.I_St_End(			End_St						),
 		.I_Ld_End(			End_Ld						),
 		.I_GrantVld_St(		St_GrantVld					),

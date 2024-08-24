@@ -29,6 +29,10 @@ module MPU
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
 	output	tpu_row_clm_t			O_TPU_Req,			//Request to Execute
 	output	tpu_row_clm_t			O_TPU_En_Exe,		//Enable to TPUs
+	output							I_Ld_Req,			//Request from Data Memory
+	input	data_t					I_Ld_Data,			//Data from Data Memory
+	output							O_St_Req,			//Request Storing to Data Memory
+	output	data_t					O_St_Data,			//Storing Data to Data Memory
 	output							O_Wait,				//Wait Signal to Host trying the store
 	output	mpu_stat_t				O_Status			//Status Info to Host System
 );
@@ -91,6 +95,20 @@ module MPU
 		.O_Data(				O_Data					),
 		.O_En_TPU(				O_TPU_En_Exe			),
 		.O_State(				IF_State				)
+	);
+
+
+	DataService_MPU DataService_MPU (
+		.clock(					clock					),
+		.reset(					reset					),
+		.I_Req(					),//ToDo
+		.I_Data(				),//ToDo
+		.O_Req(					),//ToDo
+		.O_Data(				),//ToDo
+		.I_Ld_Req(				I_Ld_Req				),
+		.I_Ld_Data(				I_Ld_Data				),
+		.O_St_Req(				O_St_Req				),
+		.O_St_Data(				O_St_Data				)
 	);
 
 

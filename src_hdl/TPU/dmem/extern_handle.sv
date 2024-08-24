@@ -20,14 +20,14 @@ module extern_handle
 	input	data_t				I_Data,			//Data from Extern
 	output						O_Req,			//Request to Extern
 	output	data_t				O_Data,			//Data to Extern
-	output						O_Ld_Req		//Request Loading
+	output						O_Ld_Req,		//Request Loading
 	output	address_t			O_Ld_Length,	//Access-Length for Loading
 	output	address_t			O_Ld_Stride,	//Access-Stride for Loading
 	output	address_t			O_Ld_Base,		//Access-Base Address for Loading
 	input						I_Ld_Grant,		//Grant fro Load-Request
 	input	data_t				I_Ld_Data,		//Loaded Data
 	input						I_Ld_Term,		//End of Loading
-	output						O_St_Req		//Request Storing
+	output						O_St_Req,		//Request Storing
 	output	address_t			O_St_Length,	//Access-Length for Storing
 	output	address_t			O_St_Stride,	//Access-Stride for Storing
 	output	address_t			O_St_Base,		//Access-Base Address for Storing

@@ -10,28 +10,29 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Router
-import pkg_top::*;
-import pkg_mpu::*;
+	import pkg_top::*;
+	import pkg_mpu::*;
 (
 	input						clock,
 	input						reset,
-	input						I_Req,
-	input						I_Rls,
-	input	[WIDTH_DATA-1:0]	I_Data,
-	output						O_Req_A,
-	output						O_Req_B,
-	output	[WIDTH_DATA-1:0]	O_Data_A,
-	output	[WIDTH_DATA-1:0]	O_Data_B,
-	output						O_Req;
-	output						O_Rls;
-	output	[WIDTH_DATA-1:0]	O_Data,
-	input						I_Req_A,
-	input						I_Req_B,
-	input						I_Rls_A,
-	input						I_Rls_B,
-	input	[WIDTH_DATA-1:0]	I_Data_A,
-	input	[WIDTH_DATA-1:0]	I_Data_B
+	input						I_Req,					//Request from Forward Path
+	input						I_Rls,					//Release Token from Forward Path
+	input	[WIDTH_DATA-1:0]	I_Data,					//Data from Forward Path
+	output						O_Req_A,				//Request for Branch Path
+	output						O_Req_B,				//Request for Branch Path
+	output	[WIDTH_DATA-1:0]	O_Data_A,				//Data for Branch Path
+	output	[WIDTH_DATA-1:0]	O_Data_B,				//Data for Branch Path
+	output						O_Req;					//Request for Backward Path
+	output						O_Rls;					//Release Token for Backward Path
+	output	[WIDTH_DATA-1:0]	O_Data,					//Data for Backward Path
+	input						I_Req_A,				//Request from Branch
+	input						I_Req_B,				//Request from Branch
+	input						I_Rls_A,				//Release Token from Branch
+	input						I_Rls_B,				//Release Token from Branch
+	input	[WIDTH_DATA-1:0]	I_Data_A,				//Data from Branch
+	input	[WIDTH_DATA-1:0]	I_Data_B				//Data from Branch
 );
+
 
 	logic	[WIDTH_DATA/2:0]	MyID;
 	logic	[WIDTH_DATA/2:0]	ID;
