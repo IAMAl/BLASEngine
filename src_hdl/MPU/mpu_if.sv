@@ -16,6 +16,7 @@ module IF_MPU
 	input							reset,
 	input							I_Req_IF,
 	input	mpu_if_t				I_Data_IF,
+	output							O_Req_IF,
 	output	mpu_if_t				O_Data_IF,
 	input							I_Ack_Dispatch,
 	input							I_Ack_MapMan,
@@ -23,9 +24,9 @@ module IF_MPU
 	input							I_No_ThMem,
 	input							I_Commit,
 	output	instr_t					O_Instr,
-	input							I_Ld_Data,
+	input							I_Req,
 	input	data_t					I_Data,
-	output							O_St_Data,
+	output							O_Req,
 	output	data_t					O_Data,
 	output	[NUM_TPU-1:0]			O_En_TPU,
 	output	[3:0]					O_State
@@ -60,25 +61,25 @@ module IF_MPU
 
 	assign O_State			= { NoThMem, Stop, Run, Ready };
 
-	assign O_St_Data		=	  ( R_FSM_IF_MPU  > FSM_ST_CAPTURE_ID_IF_MPU ) & ( R_FSM_IF_MPU <= FSM_ST_DATA_IF_MPU ) &	I_Data_IF.v;
+	assign O_Req			= (   ( R_FSM_IF_MPU  > FSM_ST_CAPTURE_ID_IF_MPU ) & ( R_FSM_IF_MPU <= FSM_ST_DATA_IF_MPU ) );
 	assign O_Data			= (   ( R_FSM_IF_MPU  > FSM_ST_CAPTURE_ID_IF_MPU ) & ( R_FSM_IF_MPU <= FSM_ST_DATA_IF_MPU ) ) ?	I_Data_IF.data : '0;
 
 	assign O_St_Instr		=	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) & I_Data_IF.v;
-	assign O_Instr			= 	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) ? I_Data_IF.data : '0;
+	assign O_Instr			= 	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) ? I_Data_IF.data :	'0;
 
-	assign O_Data_IF.v		= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Ld_Data;
-	assign O_Data_IF.data	= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Ld_Data ) ?	I_Data : '0;
+	assign O_Data_IF.v		= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I__Data;
+	assign O_Data_IF.data	= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I__Data & I_Req ) ?	I_Data : '0;
 
 
 	assign O_En_TPU			= En_TPU;
 
 
-	assign is_Run			= I_Req_IF & I_Data[0];
-	assign is_Store_Prog	= I_Req_IF & I_Data[1];
-	assign is_Store_Data	= I_Req_IF & I_Data[2];
-	assign is_Load_Data		= I_Req_IF & I_Data[3];
-	assign is_Stop			= I_Req_IF & I_Data[4];
-	assign is_Set_EN_TPU	= I_Req_IF & I_Data[5];
+	assign is_Run			= I_Req & I_Data[0];
+	assign is_Store_Prog	= I_Req & I_Data[1];
+	assign is_Store_Data	= I_Req & I_Data[2];
+	assign is_Load_Data		= I_Req & I_Data[3];
+	assign is_Stop			= I_Req & I_Data[4];
+	assign is_Set_EN_TPU	= I_Req & I_Data[5];
 
 
 	assign Set_Ready		= (   ( R_FSM_IF_MPU == FSM_RUN_QUERY_THMEM_IF_MPU ) & I_Ack_ThMem &  I_No_ThMem ) |

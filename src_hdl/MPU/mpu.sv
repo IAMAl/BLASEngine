@@ -17,12 +17,11 @@ module MPU
 	input							reset,
 	input							I_Req_IF,			//Request from External
 	input	mpu_if_t				I_Data_IF,			//Data from External
+	input							O_Req_IF,			//Request to External
 	output	mpu_if_t				O_Data_IF,			//Data to External
 	output							O_Req,				//Issue Request
 	output	instr_t					O_Instr,			//Instruction Stream to TPU
 	output	mpu_issue_no_t			O_IssueNo,			//Issue No
-	input							I_Ld_Data,			//Loaded Data Stream from External Mem
-	output							O_St_Data,			//Storing Data Stream to External Mem
 	input	data_t					I_Data,				//Loaded Data Stream from TPUs
 	output	data_t					O_Data,				//Storing Data Stream to TPUs
 	input							I_Req_Commit,		//Request of Commit
@@ -69,8 +68,13 @@ module MPU
 	logic						Ack_Lookup;
 	lookup_t					ThreadInfo;
 
+	logic						Dmem_I_Req;
+	data_t						Dmem_I_Data;
+	logic						Dmem_O_Req;
+	data_t						Dmem_O_Data;
 
-	assign O_TPU_Req		= ;//ToDo
+
+	assign O_TPU_Req		= |En_TPU;
 	assign O_TPU_En_Exe		= En_TPU;
 
 	assign No_ThMem			= Used_Size >= SIZE_THREAD_MEM;
@@ -82,6 +86,7 @@ module MPU
 		.reset(					reset					),
 		.I_Req_IF(				I_Req_IF				),
 		.I_Data_IF(				I_Data_IF				),
+		.O_Req_IF(				O_Req_IF				),
 		.O_Data_IF(				O_Data_IF				),
 		.I_Ack_Dispatch(		End_Send_Thread			),
 		.I_Ack_MapMan(			Ack_St					),
@@ -90,10 +95,10 @@ module MPU
 		.I_Commit(				Req_Commit				),
 		.O_St_Instr(			IF_Req_St				),
 		.O_Instr(				IF_Instr				),
-		.I_Ld_Data(				I_Ld_Data				),
-		.I_Data(				I_Data					),
-		.O_St_Data(				O_St_Data				),
-		.O_Data(				O_Data					),
+		.I_Req(					Dmem_O_Req				),
+		.I_Data(				Dmem_O_Data				),
+		.O_Req(					Dmem_I_Req				),
+		.O_Data(				Dmem_I_Data				),
 		.O_En_TPU(				O_TPU_En_Exe			),
 		.O_State(				IF_State				)
 	);
@@ -102,10 +107,10 @@ module MPU
 	DataService_MPU DataService_MPU (
 		.clock(					clock					),
 		.reset(					reset					),
-		.I_Req(					),//ToDo
-		.I_Data(				),//ToDo
-		.O_Req(					),//ToDo
-		.O_Data(				),//ToDo
+		.I_Req(					Dmem_I_Req				),
+		.I_Data(				Dmem_I_Data				),
+		.O_Req(					Dmem_O_Req				),
+		.O_Data(				Dmem_O_Data				),
 		.I_Ld_Req(				I_Ld_Req				),
 		.I_Ld_Data(				I_Ld_Data				),
 		.O_St_Req(				O_St_Req				),

@@ -16,10 +16,10 @@ module BLASEngine
 (
 	input						clock,
 	input						reset,
-	input						I_Req_IF,				//Request
-	output						O_St_Req,				//Request for Sending Data
-	input	mpu_if_t			I_Data_IF,				//Data Input Port
-	output	mpu_if_t			O_Data_IF,				//Data Output Port
+	input						I_Req_IF,				//Request from External
+	input	mpu_if_t			I_Data_IF,				//Data from External
+	output						O_Req_IF,				//Request to External
+	output	mpu_if_t			O_Data_IF,				//Data to External
 	output	mpu_stat_t			O_Status,				//System Status
 	output						O_Wait					//Flag: Wait for Thread Program
 );
@@ -99,12 +99,11 @@ module BLASEngine
 		.reset(					reset					),
 		.I_Req_IF(				I_Req_IF				),
 		.I_Data_IF(				I_Data_IF				),
+		.O_Req_IF(				O_Req_IF				),
 		.O_Data_IF(				O_Data_IF				),
 		.O_Req(					Issue_Req				),
 		.O_Instr(				Issue_Instr				),
 		.O_IssueNo(				Issue_No				),
-		.I_Ld_Data(				),//ToDo
-		.O_St_Data(				),//ToDo
 		.I_Data(				),//ToDo
 		.O_Data(				),//ToDo
 		.I_Req_Commit(			Commit_Req				),

@@ -54,7 +54,7 @@ module extern_handle
 
 	address_t						Counter_St;
 
-	//Store Buffer
+	// Store Buffer
 	logic							We;
 	logic							Re;
 	logic	[WIDTH_BUFF-1:0]		Wr_Ptr;
@@ -182,7 +182,7 @@ module extern_handle
 	end
 
 
-	//Counter
+	// Counter
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			Counter_St		<= 0;
@@ -257,7 +257,7 @@ module extern_handle
 	end
 
 
-	//Store Control
+	// Store Control
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			FSM_Extern_St	<= FSM_ST_EXTERN_INIT;
@@ -300,7 +300,7 @@ module extern_handle
 	end
 
 
-	//Load Control
+	// Load Control
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			FSM_Extern_Ld	<= FSM_LD_EXTERN_INIT;
