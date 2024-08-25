@@ -5,8 +5,10 @@ module DMem
 	input						reset,
 	input						I_Rt_Req,						//Request from Router
 	input	data_t				I_Rt_Data,						//Data from Router
+	input	logic				I_Rt_Rls,						//Release Token from Router
 	input						O_Rt_Req,						//Request to Router
 	input	data_t				O_Rt_Data,						//Data to Router
+	input						O_Rt_Rls,						//Release Token to Router
 	input						I_St_Req1,						//Flag Store Request
 	input						I_St_Req2,						//Flag Store Request
 	input						I_Ld_Req1,						//Flag Load Request
@@ -197,8 +199,10 @@ module DMem
 		.reset(				reset						),
 		.I_Req(				I_Rt_Req					),
 		.I_Data(			I_Rt_Data					),
+		.I_Rls(				I_Rt_Rls					),
 		.O_Req(				O_Rt_Req					),
 		.O_Data(			O_Rt_Data					),
+		.O_Rls(				O_Rt_Rls					),
 		.O_Ld_Req(			Extern_Ld_Req				),
 		.O_Ld_Length(		Extern_Ld_Length			),
 		.O_Ld_Stride(		Extern_Ld_Stride			),
@@ -214,7 +218,6 @@ module DMem
 		.O_St_Data(			Extern_St_Data				),
 		.I_St_Term(			Extern_St_Term				)
 	);
-
 
 
 	req_handle req_handle_st (

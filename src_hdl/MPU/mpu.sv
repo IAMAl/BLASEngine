@@ -33,6 +33,7 @@ module MPU
 	input	data_t					I_Ld_Data,			//Data from Data Memory
 	output							O_St_Req,			//Request Storing to Data Memory
 	output	data_t					O_St_Data,			//Storing Data to Data Memory
+	output							O_St_Rls,			//Path Release
 	output							O_Wait,				//Wait Signal to Host trying the store
 	output	mpu_stat_t				O_Status			//Status Info to Host System
 );

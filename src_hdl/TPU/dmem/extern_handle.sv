@@ -18,8 +18,10 @@ module extern_handle
 	input						reset,
 	input						I_Req,			//Request from Extern
 	input	data_t				I_Data,			//Data from Extern
+	input						I_Rls,			//Release Token from Extern
 	output						O_Req,			//Request to Extern
 	output	data_t				O_Data,			//Data to Extern
+	output						O_Rls,			//Release TOken to Extern
 	output						O_Ld_Req,		//Request Loading
 	output	address_t			O_Ld_Length,	//Access-Length for Loading
 	output	address_t			O_Ld_Stride,	//Access-Stride for Loading
@@ -104,10 +106,10 @@ module extern_handle
 
 	// Store Configuration
 	assign O_St_Req		= Output_St_Config | ( Load_Buff_St & ~Empty );
-	assign O_St_Length	= ( Output_St_Config ) ?	R_Lenght :	0;
-	assign O_St_Stride	= ( Output_St_Config ) ?	R_Stride :	0;
-	assign O_St_Base	= ( Output_St_Config ) ?	R_Base : 	0;
-	assign O_St_Data	= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : 0;
+	assign O_St_Length	= ( Output_St_Config ) ?		R_Lenght :				0;
+	assign O_St_Stride	= ( Output_St_Config ) ?		R_Stride :				0;
+	assign O_St_Base	= ( Output_St_Config ) ?		R_Base : 				0;
+	assign O_St_Data	= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :	0;
 
 	// Load Configuration
 	assign O_Ld_Req		= Output_Ld_Config;
@@ -121,6 +123,8 @@ module extern_handle
 	assign O_Data		= ( Load_Buff_Ld ) ?				I_Data :
 							( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
 															0;
+	assign O_Rls		= ( Load_Buff_Ld ) ?				I_Ld_Term :
+															1'b0;
 
 
 	// data-Memory Access-Configuration
@@ -183,7 +187,7 @@ module extern_handle
 		if ( reset ) begin
 			Counter_St		<= 0;
 		end
-		else if ( I_St_Term ) begin
+		else if ( I_St_Term | I_Rls ) begin
 			Counter_St		<= 0;
 		end
 		else if ( I_Req & is_FSM_Extern_St_Run ) begin
@@ -239,7 +243,7 @@ module extern_handle
 				end
 			end
 			FSM_EXTERN_RUN: begin
-				if ( I_Ld_Term | I_St_Term ) begin
+				if ( I_Ld_Term | I_St_Term | I_Rls ) begin
 					FSM_Extern_Serv	<= FSM_EXTERN_INIT;
 				end
 				else begin
@@ -282,7 +286,7 @@ module extern_handle
 					FSM_Extern_St	<= FSM_EXTERN_ST_BUFF;
 			end
 			FSM_ST_EXTERN_RUN: begin
-				if ( I_St_Term ) begin
+				if ( I_St_Term | I_Rls ) begin
 					FSM_Extern_St	<= FSM_EXTERN_INIT;
 				end
 				else begin

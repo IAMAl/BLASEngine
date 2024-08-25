@@ -39,12 +39,18 @@ module BLASEngine
 	data_t						Route_I_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0];
 	data_t						Route_O_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0];
 
+	logic						Route_I_Rls		[TPU_ROWS+1:0][TPU_CLMS-1:0];
+	logic						Route_O_Rls		[TPU_ROWS+1:0][TPU_CLMS-1:0];
+
 
 	logic						Route_Fwd_Req	[TPU_ROWS+1:0][TPU_CLMS:0];
 	logic						Route_Bwd_Req	[TPU_ROWS+1:0][TPU_CLMS:0];
 
 	data_t						Route_Fwd_Data	[TPU_ROWS+1:0][TPU_CLMS:0];
 	data_t						Route_Bwd_Data	[TPU_ROWS+1:0][TPU_CLMS:0];
+
+	logic						Route_Fwd_Rls	[TPU_ROWS+1:0][TPU_CLMS:0];
+	logic						Route_Bwd_Rls	[TPU_ROWS+1:0][TPU_CLMS:0];
 
 
 	s_ldst_t					TPU_S_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
@@ -107,8 +113,10 @@ module BLASEngine
 		.O_TPU_En_Exe(			TPU_En_Exe				),
 		.I_Ld_Req(				Route_Bwd_Req[0][0]		),
 		.I_Ld_Data(				Route_Bwd_Data[0][0]	),
+		.I_Ld_Rls(				Route_Bwd_Rls[0][0]		),
 		.O_St_Req(				Route_Fwd_Req[0][0]		),
-		.O_St_Data(				Route_Fwd_Data[0][0]	)
+		.O_St_Data(				Route_Fwd_Data[0][0]	),
+		.O_St_Rls(				Route_Fwd_Rls[0][0]		),
 		.O_Wait(				O_Wait					),
 		.O_Status(				O_Status				)
 	);
@@ -127,7 +135,7 @@ module BLASEngine
 		.I_Commit_No(			TPU_CLM_Commit_No		),
 		.O_Commit_Req(			Commit_Req				),
 		.O_Commit_No(			Commit_No				),
-		.O_Full(				)
+		.O_Full(				)//ToDo
 	);
 
 
@@ -179,20 +187,22 @@ module BLASEngine
 					.clock(			clock						),
 					.reset(			reset						),
 					.I_Req(			Route_Fwd_Req[row][clm]		),
-					.I_Rls(			),//ToDo
+					.I_Rls(			Route_Fwd_Req[row][clm]		),
 					.I_Data(		Route_Fwd_data[row][clm]	),
 					.O_Req_A(		Route_I_Req[row][clm]		),
 					.O_Req_B(		Route_Fwd_Req[row][clm+1]	),
 					.O_Data_A(		Route_I_Data[row][clm]		),
 					.O_Data_B(		Route_Fwd_data[row+1][clm]	),
+					.O_Rls_A(		Route_I_Rls[row][clm]		),
+					.O_Rls_B(		Route_Fwd_Rls[row][clm+1]	),
 					.O_Req(			Route_Bwd_Req[row][clm]		),
-					.O_Rls(			),//ToDo
+					.O_Rls(			Route_Bwd_Rls[row][clm]		),
 					.O_Data(		Route_Bwd_data[row][clm]	),
 					.I_Req_A(		Route_O_Req[row][clm]		),
 					.I_Req_B(		Route_Bwd_Req[row][clm+1]	),
-					.I_Rls_A(		),//ToDo
-					.I_Rls_B(		),//ToDo
-					.I_Data_A(		Route_O_Daya[row][clm]	)	,
+					.I_Rls_A(		Route_O_Rls[row][clm]		),
+					.I_Rls_B(		Route_Bwd_Rls[row][clm+1]	),
+					.I_Data_A(		Route_O_Daya[row][clm]		),
 					.I_Data_B(		Route_Bwd_Data[row][clm+1]	)
 				);
 			end
@@ -201,19 +211,21 @@ module BLASEngine
 					.clock(			clock						),
 					.reset(			reset						),
 					.I_Req(			Route_Fwd_Req[row][clm]		),
-					.I_Rls(			),//ToDo
+					.I_Rls(			Route_Fwd_Rls[row][clm]		),
 					.I_Data(		Route_Fwd_data[row][clm]	),
 					.O_Req_A(		Route_Fwd_Req[row+1][clm]	),
 					.O_Req_B(		Route_Fwd_Req[row][clm+1]	),
 					.O_Data_A(		Route_Fwd_data[row+1][clm]	),
-					.O_Data_B(		Route_Fwd_data[row+1][clm]	),
+					.O_Data_B(		Route_Fwd_data[row][clm+1]	),
+					.O_Rls_A(		Route_Fwd_Rls[row+1][clm]	),
+					.O_Rls_B(		Route_Fwd_Rls[row][clm+1]	),
 					.O_Req(			Route_Bwd_Req[row][clm]		),
-					.O_Rls(			),//ToDo
+					.O_Rls(			Route_Bwd_Rls[row][clm]		),
 					.O_Data(		Route_Bwd_data[row][clm]	),
 					.I_Req_A(		Route_Bwd_Req[row+1][clm]	),
 					.I_Req_B(		Route_Bwd_Req[row][clm+1]	),
-					.I_Rls_A(		),//ToDo
-					.I_Rls_B(		),//ToDo
+					.I_Rls_A(		Route_Bwd_Req[row+1][clm]	),
+					.I_Rls_B(		Route_Bwd_Rls[row][clm+1]	),
 					.I_Data_A(		Route_Bwd_Data[row+1][clm]	),
 					.I_Data_B(		Route_Bwd_Data[row][clm+1]	)
 				);
@@ -253,8 +265,10 @@ module BLASEngine
 				.reset(			reset						),
 				.I_Rt_Req(		Route_I_Req[row][clm]		),
 				.I_Rt_Data(		Route_I_Data[row][clm]		),
+				.I_Rt_Rls(		Route_I_Rls[row][clm]		),
 				.O_Rt_Req(		Route_O_Req[row][clm]		),
 				.O_Rt_Data(		Route_O_Data[row][clm]		),
+				.O_Rt_Rls(		Route_O_Rls[row][clm]		),
 				.I_S_LdSt(		RAM_S_LdSt[row][clm]		),
 				.O_S_Ld_Data(	RAM_S_Ld_Data[row][clm]		),
 				.I_S_St_Data(	RAM_S_St_Data[row][clm]		),
@@ -280,8 +294,10 @@ module BLASEngine
 			.reset(			reset							),
 			.I_Rt_Req(		Route_I_Req[0][clm]				),
 			.I_Rt_Data(		Route_I_Data[0][clm]			),
+			.I_Rt_Els(		Route_I_Rls[0][clm]				),
 			.O_Rt_Req(		Route_O_Req[0][clm]				),
 			.O_Rt_Data(		Route_O_Data[0][clm]			),
+			.O_Rt_Rls(		Route_O_Rls[0][clm]				),
 			.I_S_LdSt(		RAM_S_LdSt[0][clm]				),
 			.O_S_Ld_Data(	RAM_S_Ld_Data[0][clm]			),
 			.I_S_St_Data(	RAM_S_St_Data[0][clm]			),
