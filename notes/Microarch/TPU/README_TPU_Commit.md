@@ -11,7 +11,7 @@
 ベクトルレーンユニットのライトバックが終了したことを指す信号（例：WB_End-1）とフラグレジスタの値とでXNOR演算を行いすべてについて論理積を行うことで使用していないレーンも踏まえてベクトルユニットとしてのコミット信号を生成します。
 
 <div align="center">
-  <img src="./TPU_Commit_Aggregation.png"
+  <img src="./TPU_Commit.png"
        alt="HTML image alt text"
        title="TPUコミットAggregation方法"
        width="￥￥200px"
