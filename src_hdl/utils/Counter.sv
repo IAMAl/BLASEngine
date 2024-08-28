@@ -14,9 +14,9 @@ module Counter #(
 )(
 	input						clock,
 	input						reset,
-	input						I_Clr,
-	input						I_En,
-	output	[WIDHT_COUNT-1:0]	O_CountVal
+	input						I_Clr,					//Clear Counter
+	input						I_En,					//Enable to Count
+	output	[WIDHT_COUNT-1:0]	O_CountVal				//Count Value
 );
 
 	logic	[WIDHT_COUNT-1:0]	R_CountVal;

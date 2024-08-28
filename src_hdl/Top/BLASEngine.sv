@@ -104,8 +104,6 @@ module BLASEngine
 		.O_Req(					Issue_Req				),
 		.O_Instr(				Issue_Instr				),
 		.O_IssueNo(				Issue_No				),
-		.I_Data(				),//ToDo
-		.O_Data(				),//ToDo
 		.I_Req_Commit(			Commit_Req				),
 		.I_CommitNo(			Commit_No				),
 		.O_TPU_Req(				TPU_Req					),

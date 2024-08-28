@@ -36,7 +36,7 @@ module Scalar_Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
 	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
 	output	s_stat_t			O_Status,				//Scalar Unit Status
-	output						O_Term
+	output						O_Term					//Flag: Termination
 );
 
 	localparam int	LANE_ID = 0;

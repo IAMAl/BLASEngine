@@ -15,8 +15,8 @@ module RingBuffCTRL_Re
 )(
 	input							clock,
 	input							reset,
-	input							I_Update,
-	input	[$clog2(NUM_ENTRY)-1:0]	I_UpdateLen,
+	input							I_Update,			//Force Updating Counter
+	input	[$clog2(NUM_ENTRY)-1:0]	I_UpdateLen,		//Updating Amount
 	input							I_We,				//Write-Enable
 	input							I_Re,				//Read-Enable
 	output	[$clog2(NUM_ENTRY)-1:0]	O_WAddr,			//Write Address

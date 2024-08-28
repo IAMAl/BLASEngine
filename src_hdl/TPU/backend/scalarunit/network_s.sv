@@ -34,8 +34,8 @@ module Network_S
 	output	data_t				O_Src_Data1,					//To Exec Unit
 	output	data_t				O_Src_Data2,					//To Exec Unit
 	output	data_t				O_Src_Data3,					//To Exec Unit
-	output						O_Buff_Full,
-	output	data_t				O_PAC_Src_Data
+	output						O_Buff_Full,					//Flag: Buffer is Full
+	output	data_t				O_PAC_Src_Data					//Data to PAC Unit
 );
 
 

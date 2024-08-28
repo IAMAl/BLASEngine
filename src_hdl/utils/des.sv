@@ -19,7 +19,7 @@ module Des
 	input							I_Req,							//Request
 	input	[WIDTH_INPUT-1:0]		I_Data,							//Serial Source
 	output							O_Valid,						//Valid Output
-	output	[WIDTH_OUTPUT-1:0]		O_Data							//De-sirialized Data
+	output	[WIDTH_OUTPUT-1:0]		O_Data							//De-serialized Data
 );
 
 	localparam int	ROUND_VAL		= (WIDTH_INPUT+1)/2;

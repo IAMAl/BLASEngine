@@ -14,22 +14,22 @@ module IF_MPU
 (
 	input							clock,
 	input							reset,
-	input							I_Req_IF,
-	input	mpu_if_t				I_Data_IF,
-	output							O_Req_IF,
-	output	mpu_if_t				O_Data_IF,
-	input							I_Ack_Dispatch,
-	input							I_Ack_MapMan,
-	input							I_Ack_ThMem,
-	input							I_No_ThMem,
-	input							I_Commit,
-	output	instr_t					O_Instr,
-	input							I_Req,
-	input	data_t					I_Data,
-	output							O_Req,
-	output	data_t					O_Data,
-	output	[NUM_TPU-1:0]			O_En_TPU,
-	output	[3:0]					O_State
+	input							I_Req_IF,			//Request from External
+	input	mpu_if_t				I_Data_IF,			//Data from External
+	output							O_Req_IF,			//Request to External
+	output	mpu_if_t				O_Data_IF,			//Data to External
+	input							I_Ack_Dispatch,		//Ack from Dispatcher
+	input							I_Ack_MapMan,		//Ack from Map Manager
+	input							I_Ack_ThMem,		//Ack from Thread Memory
+	input							I_No_ThMem,			//N/A Response from Thread Memory
+	input							I_Commit,			//Commit Notification
+	output	instr_t					O_Instr,			//Instruction
+	input							I_Req,				//Request from TPU
+	input	data_t					I_Data,				//Data from TPU
+	output							O_Req,				//Request to TPU
+	output	data_t					O_Data,				//Data to TPU
+	output	[NUM_TPU-1:0]			O_En_TPU,			//Enable TPUs
+	output	[3:0]					O_State				//MPU Status
 );
 
 

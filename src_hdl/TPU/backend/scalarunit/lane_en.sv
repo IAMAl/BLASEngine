@@ -14,12 +14,12 @@ module Lane_En
 (
 	input						clock,
 	input						reset,
-	input						I_We,
-	input	data_t				I_Data,
-	input						I_Re,
-	input						I_We_V_State,
-	input	lane_t				I_V_State,
-	output	data_t				O_Data
+	input						I_We,					//Write-Enable
+	input	data_t				I_Data,					//Writing Lane-Enable
+	input						I_Re,					//Read-Enable
+	input						I_We_V_State,			//Write-Enable Vector Unit (Lanes) State
+	input	lane_t				I_V_State,				//Writing Vector Unit (Lanes) State
+	output	data_t				O_Data					//Read-out Register
 );
 
 

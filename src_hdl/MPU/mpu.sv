@@ -22,8 +22,6 @@ module MPU
 	output							O_Req,				//Issue Request
 	output	instr_t					O_Instr,			//Instruction Stream to TPU
 	output	mpu_issue_no_t			O_IssueNo,			//Issue No
-	input	data_t					I_Data,				//Loaded Data Stream from TPUs
-	output	data_t					O_Data,				//Storing Data Stream to TPUs
 	input							I_Req_Commit,		//Request of Commit
 	input	[WIDTH_ENTRY_STH-1:0]	I_CommitNo,			//Commit No.
 	output	tpu_row_clm_t			O_TPU_Req,			//Request to Execute
