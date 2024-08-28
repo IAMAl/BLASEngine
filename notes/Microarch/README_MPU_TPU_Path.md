@@ -12,7 +12,7 @@ TPUを受け取ったプログラムを実行して終了したことをMPUへ�
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/MPU_TPU_Path.png"
+  <img src="./MPU_TPU_Path.png"
        alt="HTML image alt text"
        title="MPUとTPUの間の経路"
        width="550px"

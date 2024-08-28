@@ -13,7 +13,7 @@ MPUモジュールは外部からの実行指示やスレッドプログラム�
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/MPU/MPU_BlockDiagram.png"
+  <img src="./MPU_BlockDiagram.png"
        alt="HTML image alt text"
        title="MPU構成図"
        width="550px"

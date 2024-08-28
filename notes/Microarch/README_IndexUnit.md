@@ -6,7 +6,7 @@ TPUはインデックス計算のパイプラインステージを持ちます�
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/IndexUnit.png"
+  <img src="./IndexUnit.png"
        alt="HTML image alt text"
        title="インデックスユニットデータパス構成図"
        width="550px"
