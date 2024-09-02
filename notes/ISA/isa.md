@@ -105,7 +105,6 @@
 
 ## 4. Logic/Shift/Rotate [1:0]
 ### Scalar Unit
-	    - 11		XOR
 - 00		Shift
 	- OpCode [1:0]
 	    - 00		Logic Left-Shift
@@ -123,6 +122,7 @@
 	    - 00		NOT
 	    - 01		AND
 	    - 10		OR
+	    - 11		XOR
 - 11		Reserved
 
 ### Vector Unit
