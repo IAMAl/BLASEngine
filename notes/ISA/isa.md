@@ -2,14 +2,14 @@
 
 ## 1. Unit Selector [2:0]
 ### [2]
-- 0		Select Scalar Unit
-- 1		Select Vector Unit
+- 0		Scalar Unit
+- 1		Vector Unit
 
 ### [1:0]
 - 00		Arithmetic Unit
-- 01		Conditional (Scalar: Jump/Branch, Vector Masked Arithmetic Unit)
-- 10		Logic/Shift/Rotate
-- 11		Load/Store
+- 01		Conditional (Scalar: Jump/Branch (PAC) Unit, Vector: Mask Unit)
+- 10		Logic/Shift/Rotate Units
+- 11		Load/Store Unit
 
 
 ## 2. Arithmetic Unit [1:0]
@@ -29,8 +29,8 @@
 	- OpCode [1:0]
 		- 00		Unsigned Division
 		- 01		Signed Division
-		- 10		Float32 Division
-		- 11		Float32 Modulo
+		- 10		Unsigned Modulo
+		- 11		Float32 Division
 - 11		Convert
 	- OpCode [1:0]
 	    - 00		Int32 to Float32
@@ -42,8 +42,7 @@
 	- OpCode [1:0]
 	    - 00		Addition
 	    - 01		Subtraction
-	    - 10		Compare
-        - 11		Reserved
+        - 1x		Reserved
 - 01		Multiplier
 	- OpCode [1:0]
 	    - 00		Multiplication
@@ -89,7 +88,13 @@
 	    - 10		Lesser than or Equal
 	    - 11		Not Equal
 - 01		Reserved
-- 1x		Reserved
+- 10		Reserved
+- 11		Mask Handle
+    - Opcode [1:0]
+	    - 00 Set Mask All One
+		- 01 Enable Masked Operation
+		- 10 Disable Masked Operation
+		- 11 Set Mask by Comparing
 
 
 ## 4. Logic/Shift/Rotate [1:0]
