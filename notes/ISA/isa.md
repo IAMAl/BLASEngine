@@ -24,7 +24,8 @@
     - OpCode [1:0]
 	    - 00		Unsigned Multiplication
 	    - 01		Signed Multiplication
-	    - 1x		Reserved
+	    - 10		Add-Multiply
+	    - 11		Multiply-Add
 - 10		Divider
 	- OpCode [1:0]
 		- 00		Unsigned Division
@@ -47,11 +48,12 @@
 	- OpCode [1:0]
 	    - 00		Multiplication
 	    - 01		Reserved
-	    - 1x		Reserved
+	    - 10		Add-Multiply
+	    - 11		Multiply-Add
 - 10		Specials
 	- OpCode [1:0]
-	    - 00		Power of Any
-	    - 01		Exponential
+	    - 00		Exponential
+	    - 01		Power of Any
 	    - 10		Logarithm of Two
 	    - 11		Reserved
 - 11		Convert
@@ -70,15 +72,20 @@
 	    - 11		Not Equal
 - 01		Jump
 	- OpCode [1:0]
-	    - 00		Relative Jump width Source
-	    - 01		Relative Jump width Constant
+	    - 00		Relative Jump width Constant
+	    - 01		Relative Jump width Source
 	    - 1x		Reserved
 - 10		Branch
 	- OpCode [1:0]
-	    - 00		Relative Branch width Source
-	    - 01		Relative Branch width Constant
+	    - 00		Relative Branch width Constant
+	    - 01		Relative Branch width Source
 	    - 1x		Reserved
-- 11		Reserved
+- 11		Vector Unit Handle
+	- Opcode [1:0]
+		- 00 Enable All Lanes
+		- 01 Reserved
+		- 10 Write Lane-Enable Register
+		- 11 Read Lane Status Register
 
 ### Vector Unit
 - 00		Compare
@@ -87,14 +94,18 @@
 	    - 01		Greater than
 	    - 10		Lesser than or Equal
 	    - 11		Not Equal
-- 01		Reserved
-- 10		Reserved
+- 01		Set Mask
+	- Opcode [1:0]
+	    - 00 Set Mask All One
+		- 01 Reserved
+		- 1x Reserved
 - 11		Mask Handle
     - Opcode [1:0]
-	    - 00 Set Mask All One
-		- 01 Enable Masked Operation
-		- 10 Disable Masked Operation
-		- 11 Set Mask by Comparing
+		- 00 Enable Masked Operation
+		- 01 Disable Masked Operation
+		- 10 Reserved
+		- 11 Set Mask by True of Follower Comparing
+- 11		Reserved
 
 
 ## 4. Logic/Shift/Rotate [1:0]
@@ -171,3 +182,10 @@
 	    - 0x		Reserved
 	    - 10		Word Store
 	    - 11		Reserved
+
+## 6. Constant Operation Flag [1:0]
+
+- 00 No Constant
+- 01 Source-1 Constant (Access-Length in case of Ld/St)
+- 10 Source-2 Constant (Stride Factor in case of Ld/St)
+- 11 Source-3 Constant (Base Address in case of Ld/St)
