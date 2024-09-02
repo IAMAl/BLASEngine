@@ -3,14 +3,14 @@ module agu
 (
 	input						clock,
 	input						reset,
-	input						I_Req,							//Flag: Activate Load/Store Unit
-	input						I_Stall,						//Force Stalling by Local Memory
-	input	address_t			I_Length,						//Vector-Length for Load/Store
-	input	address_t			I_Stride,						//Stride-Factor for Load/Store
-	input	address_t			I_Base_Addr,					//Load/Store Base Address
-	output	logic				O_Req,					        //Access-Request
-	output	address_t			O_Address,						//Access-Address
-	output						O_End_Access					//Flag: End of Access
+	input						I_Req,					//Flag: Activate Load/Store Unit
+	input						I_Stall,				//Force Stalling by Local Memory
+	input	address_t			I_Length,				//Vector-Length for Load/Store
+	input	address_t			I_Stride,				//Stride-Factor for Load/Store
+	input	address_t			I_Base_Addr,			//Load/Store Base Address
+	output	logic				O_Req,					//Access-Request
+	output	address_t			O_Address,				//Access-Address
+	output						O_End_Access			//Flag: End of Access
 );
 
 

@@ -61,25 +61,25 @@ module PathSel
 	assign Sel_WB_Path			= I_Sel_Path_WB[4];
 
 	assign Lane_Data1			= I_Lane_Data[ Sel_Path_Lane ];
-	assign Src_Data1			= ( Sel_Path_Src == 2'h3 ) ?	I_Src_Data3 :
+	assign Src_Data1			= (   Sel_Path_Src == 2'h3 ) ?	I_Src_Data3 :
 									( Sel_Path_Src == 2'h2 ) ?	I_Src_Data2 :
 									( Sel_Path_Src == 2'h1 ) ?	I_Src_Data1 :
 																'0;
 
 	assign Lane_Data2			= I_Lane_Data[ Sel_Path_Lane ];
-	assign Src_Data2			= ( Sel_Path_Src == 2'h3 ) ?	I_Src_Data4 :
+	assign Src_Data2			= (   Sel_Path_Src == 2'h3 ) ?	I_Src_Data4 :
 									( Sel_Path_Src == 2'h2 ) ?	I_Src_Data3 :
 									( Sel_Path_Src == 2'h1 ) ?	I_Src_Data2 :
 																I_Src_Data1;
 
 	assign Lane_Data3			= I_Lane_Data[ Sel_Path_Lane ];
-	assign Src_Data3			= ( Sel_Path_Src == 2'h3 ) ?	I_Src_Data4 :
+	assign Src_Data3			= (   Sel_Path_Src == 2'h3 ) ?	I_Src_Data4 :
 									( Sel_Path_Src == 2'h2 ) ?	I_Src_Data3 :
 									( Sel_Path_Src == 2'h1 ) ?	I_Src_Data2 :
 																I_Src_Data1;
 
 	assign Lane_WB_Data			= I_Lane_Data[ Sel_Path_WB_Lane ];
-	assign WB_Data				= ( Sel_Path_Src == 2'h4 ) ?	I_Src_Data4 :
+	assign WB_Data				= (   Sel_Path_Src == 2'h4 ) ?	I_Src_Data4 :
 									( Sel_Path_Src == 2'h3 ) ?	I_Src_Data3 :
 									( Sel_Path_Src == 2'h2 ) ?	I_Src_Data2 :
 									( Sel_Path_Src == 2'h1 ) ?	I_Src_Data1 :

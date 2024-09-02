@@ -157,18 +157,18 @@ module ReorderBuff_S #(
 
 	//// Module: Ring-Buffer Controller
 	RingBuffCTRL #(
-		.NUM_ENTRY(			NUM_ENTRY					)
+		.NUM_ENTRY(			NUM_ENTRY				)
 	) RingBuffCTRL
 	(
-		.clock(				clock						),
-		.reset(				reset						),
-		.I_We(				We							),
-		.I_Re(				Re							),
-		.O_WAddr(			WNo							),
-		.O_RAddr(			RNo							),
-		.O_Full(			Full						),
-		.O_Empty(			Empty						),
-		.O_Num(											)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.O_WAddr(			WNo						),
+		.O_RAddr(			RNo						),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(										)
 	);
 
 endmodule

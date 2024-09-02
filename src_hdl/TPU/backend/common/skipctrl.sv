@@ -3,14 +3,14 @@ module SkipCTRL #(
 )()
 	input						clock,
 	input						reset,
-	input						I_Req,
-	input						I_Stall,
-	input	mask_t				I_Mask_Value,
-	input	index_t				I_Index_Start,
-	input	index_t				I_Index_Length,
-	output	logic;				O_Req,
-	output	index_t				O_Index_Offset,
-	output	logic				O_End
+	input						I_Req,					//Request to Skip
+	input						I_Stall,				//Stall
+	input	mask_t				I_Mask_Value,			//Mask Value
+	input	index_t				I_Index_Start,			//Start Index
+	input	index_t				I_Index_Length,			//Length of Access
+	output	logic;				O_Req,					//Request
+	output	index_t				O_Index_Offset,			//Offset Value
+	output	logic				O_End					//End of Skipping
 );
 
 	logic						Run;
@@ -47,11 +47,11 @@ module SkipCTRL #(
 
 
 	NLZ #(
-		.NUM_ENTRY(				NUM_ENTRY_NLZ_INDEX	),
+		.NUM_ENTRY(			NUM_ENTRY_NLZ_INDEX		),
 	) NLZ_Index
 	(
-		.I_Data(				R_Mask				),
-		.O_NLZ_Value(			NLZ_Value			)
+		.I_Data(			R_Mask					),
+		.O_NLZ_Value(		NLZ_Value				)
 	);
 
 endmodule

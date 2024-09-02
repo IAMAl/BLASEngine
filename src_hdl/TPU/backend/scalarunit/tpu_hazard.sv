@@ -444,18 +444,18 @@ module HazardCheck_TPU
 
 	//// Module: Ring-Buffer Controller
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_BUFF					)
+		.NUM_ENTRY(			DEPTH_BUFF				)
 	) RingBuffCTRL
 	(
-		.clock(				clock						),
-		.reset(				reset						),
-		.I_We(				We							),
-		.I_Re(				Re							),
-		.O_WAddr(			WNo							),
-		.O_RAddr(			RNo							),
-		.O_Full(			Full						),
-		.O_Empty(			Empty						),
-		.O_Num(											)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.O_WAddr(			WNo						),
+		.O_RAddr(			RNo						),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(										)
 	);
 
 endmodule

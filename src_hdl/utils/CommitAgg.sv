@@ -42,7 +42,7 @@ module CommitAgg
 	commit_agg_t				CommitAgg		[BUFF_SIZE-1:0];
 
 
-	assign Send_Commit		= CommitAgg[ Rd_Ptr ].v & ( &( ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu ) ) );
+	assign Send_Commit			= CommitAgg[ Rd_Ptr ].v & ( &( ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu ) ) );
 
 
 	always_comb: begin
@@ -91,18 +91,18 @@ module CommitAgg
 
 
 	RingBuffCTRL #(
-		.NUM_ENTRY(				BUFF_SIZE				)
+		.NUM_ENTRY(			BUFF_SIZE				)
 	) RingBuffCTRL
 	(
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_We(					I_Commit_Req			),
-		.I_Re(					Send_Commit				),
-		.O_WAddr(				Wr_Ptr					),
-		.O_RAddr(				Rd_Ptr					),
-		.O_Full(				O_Full					),
-		.O_Empty(										),
-		.O_Num(											)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				I_Commit_Req			),
+		.I_Re(				Send_Commit				),
+		.O_WAddr(			Wr_Ptr					),
+		.O_RAddr(			Rd_Ptr					),
+		.O_Full(			O_Full					),
+		.O_Empty(									),
+		.O_Num(										)
 	);
 
 endmodule

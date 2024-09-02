@@ -13,8 +13,8 @@ module Encoder
 #(
 	parameter int NUM_ENTRY			= 8
 )(
-	input	[NUM_ENTRY-1:0]			I_Data,							//Encode-Source
-	output	[$clog2(NUM_ENTRY)-1:0]	O_Enc							//Encoded Value
+	input	[NUM_ENTRY-1:0]			I_Data,				//Encode-Source
+	output	[$clog2(NUM_ENTRY)-1:0]	O_Enc				//Encoded Value
 );
 
 

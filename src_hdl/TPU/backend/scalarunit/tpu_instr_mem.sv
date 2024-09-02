@@ -15,12 +15,12 @@ module InstrMem
 (
 	input						clock,
 	input						reset,
-	input						I_Req_St,						//Request Storing
-	input						O_Ack_St,						//Ack for Storing
-	input	instr_t				I_St_Instr,						//Storing Instruction
-	input						I_Req_Ld,						//Request Loading
-	input	t_address_t			I_Ld_Address,					//Load Address
-	input	instr_t				O_Ld_Instr						//Loaded Instruction
+	input						I_Req_St,				//Request Storing
+	input						O_Ack_St,				//Ack for Storing
+	input	instr_t				I_St_Instr,				//Storing Instruction
+	input						I_Req_Ld,				//Request Loading
+	input	t_address_t			I_Ld_Address,			//Load Address
+	input	instr_t				O_Ld_Instr				//Loaded Instruction
 );
 
 

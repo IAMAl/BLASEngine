@@ -3,28 +3,28 @@ module HazardCheck_TPU
 (
 	input						clock,
 	input						reset,
-	input						I_Req_Issue,					//Request from Previous Stage
-	input						I_Req,							//Request to Work
-	input						I_is_Vec,						//Request is for Vector Unit
-	input						I_Sel_Unit,						//Select Scalr/Vector Unit
-	input						I_Valid_Dst,					//Flag: Valid for Destination
-	input						I_Valid_Src1,					//Flag: Valid for Source-1
-	input						I_Valid_Src2,					//Flag: Valid for Source-2
-	input						I_Valid_Src3,					//Flag: Valid for Source-3
-	input	index_t				I_Index_Dst,					//Index for Destination
-	input	index_t				I_Index_Src1,					//Index for Source-1
-	input	index_t				I_Index_Src2,					//Index for Source-2
-	input	index_t				I_Index_Src3,					//Index fpr Source-3
-	input						I_Slice,						//Flaag: Index-Sllicing
-	input						I_Req_Commit,					//Request to Commit
-	input	[WIDTH_BUFF-1:0]	I_Commit_No,					//Commit (Issued) No.
-	output						O_Req_Issue,					//Request to Next Stage
-	output						O_Issue_Instr,					//Issue(Dispatch) Instruction
-	output						O_RAR_Hzard,					//RAR-Hazard
-	output						O_RAW_Hzard,					//RAW-Hazard
-	output						O_WAR_Hzard,					//WAR-Hazard
-	output						O_WAW_Hzard,					//WAW-Hazard
-	output	issue_no_t			O_Rd_Ptr						//Read Pointer to Commit Unit
+	input						I_Req_Issue,			//Request from Previous Stage
+	input						I_Req,					//Request to Work
+	input						I_is_Vec,				//Request is for Vector Unit
+	input						I_Sel_Unit,				//Select Scalr/Vector Unit
+	input						I_Valid_Dst,			//Flag: Valid for Destination
+	input						I_Valid_Src1,			//Flag: Valid for Source-1
+	input						I_Valid_Src2,			//Flag: Valid for Source-2
+	input						I_Valid_Src3,			//Flag: Valid for Source-3
+	input	index_t				I_Index_Dst,			//Index for Destination
+	input	index_t				I_Index_Src1,			//Index for Source-1
+	input	index_t				I_Index_Src2,			//Index for Source-2
+	input	index_t				I_Index_Src3,			//Index fpr Source-3
+	input						I_Slice,				//Flaag: Index-Sllicing
+	input						I_Req_Commit,			//Request to Commit
+	input	[WIDTH_BUFF-1:0]	I_Commit_No,			//Commit (Issued) No.
+	output						O_Req_Issue,			//Request to Next Stage
+	output						O_Issue_Instr,			//Issue(Dispatch) Instruction
+	output						O_RAR_Hzard,			//RAR-Hazard
+	output						O_RAW_Hzard,			//RAW-Hazard
+	output						O_WAR_Hzard,			//WAR-Hazard
+	output						O_WAW_Hzard,			//WAW-Hazard
+	output	issue_no_t			O_Rd_Ptr				//Read Pointer to Commit Unit
 );
 
 
@@ -455,18 +455,18 @@ module HazardCheck_TPU
 
 	//// Module: Ring-Buffer Controller
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_BUFF					)
+		.NUM_ENTRY(			DEPTH_BUFF				)
 	) RingBuffCTRL
 	(
-		.clock(				clock						),
-		.reset(				reset						),
-		.I_We(				We							),
-		.I_Re(				Re							),
-		.O_WAddr(			WNo							),
-		.O_RAddr(			RNo							),
-		.O_Full(			Full						),
-		.O_Empty(			Empty						),
-		.O_Num(											)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.O_WAddr(			WNo						),
+		.O_RAddr(			RNo						),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(										)
 	);
 
 endmodule

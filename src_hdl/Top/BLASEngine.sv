@@ -95,44 +95,44 @@ module BLASEngine
 
 
 	MPU MPU (
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_Req_IF(				I_Req_IF				),
-		.I_Data_IF(				I_Data_IF				),
-		.O_Req_IF(				O_Req_IF				),
-		.O_Data_IF(				O_Data_IF				),
-		.O_Req(					Issue_Req				),
-		.O_Instr(				Issue_Instr				),
-		.O_IssueNo(				Issue_No				),
-		.I_Req_Commit(			Commit_Req				),
-		.I_CommitNo(			Commit_No				),
-		.O_TPU_Req(				TPU_Req					),
-		.O_TPU_En_Exe(			TPU_En_Exe				),
-		.I_Ld_Req(				Route_Bwd_Req[0][0]		),
-		.I_Ld_Data(				Route_Bwd_Data[0][0]	),
-		.I_Ld_Rls(				Route_Bwd_Rls[0][0]		),
-		.O_St_Req(				Route_Fwd_Req[0][0]		),
-		.O_St_Data(				Route_Fwd_Data[0][0]	),
-		.O_St_Rls(				Route_Fwd_Rls[0][0]		),
-		.O_Wait(				O_Wait					),
-		.O_Status(				O_Status				)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req_IF(			I_Req_IF				),
+		.I_Data_IF(			I_Data_IF				),
+		.O_Req_IF(			O_Req_IF				),
+		.O_Data_IF(			O_Data_IF				),
+		.O_Req(				Issue_Req				),
+		.O_Instr(			Issue_Instr				),
+		.O_IssueNo(			Issue_No				),
+		.I_Req_Commit(		Commit_Req				),
+		.I_CommitNo(		Commit_No				),
+		.O_TPU_Req(			TPU_Req					),
+		.O_TPU_En_Exe(		TPU_En_Exe				),
+		.I_Ld_Req(			Route_Bwd_Req[0][0]		),
+		.I_Ld_Data(			Route_Bwd_Data[0][0]	),
+		.I_Ld_Rls(			Route_Bwd_Rls[0][0]		),
+		.O_St_Req(			Route_Fwd_Req[0][0]		),
+		.O_St_Data(			Route_Fwd_Data[0][0]	),
+		.O_St_Rls(			Route_Fwd_Rls[0][0]		),
+		.O_Wait(			O_Wait					),
+		.O_Status(			O_Status				)
 	);
 
 
 	CommitAgg #(
-		.NUM_TPU(				NUM_TPU					),
-		.BUFF_SIZE(				BYPASS_BUFF_SIZE		)
+		.NUM_TPU(			NUM_TPU					),
+		.BUFF_SIZE(			BYPASS_BUFF_SIZE		)
 	)(
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_En_TPU(				TPU_En_Exe				),
-		.I_Req(					Issue_Req				),
-		.I_Issue_No(			Issue_No				),
-		.I_Commit_Req(			TPU_CLM_Commit_Req		),
-		.I_Commit_No(			TPU_CLM_Commit_No		),
-		.O_Commit_Req(			Commit_Req				),
-		.O_Commit_No(			Commit_No				),
-		.O_Full(				)//ToDo
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_En_TPU(			TPU_En_Exe				),
+		.I_Req(				Issue_Req				),
+		.I_Issue_No(		Issue_No				),
+		.I_Commit_Req(		TPU_CLM_Commit_Req		),
+		.I_Commit_No(		TPU_CLM_Commit_No		),
+		.O_Commit_Req(		Commit_Req				),
+		.O_Commit_No(		Commit_No				),
+		.O_Full(			)//ToDo
 	);
 
 

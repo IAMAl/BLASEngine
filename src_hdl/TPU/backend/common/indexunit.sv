@@ -16,21 +16,21 @@ module IndexUnit
 )(
 	input						clock,
 	input						reset,
-	input						I_Stall,						//Force Stalling
-	input						I_Req,							//Request from Hazard-Check Stage
-	input						I_MaskedRead,					//Flag: Masked Access to Register File
-	input						I_Slice,						//Flag: Index-Slicing
-	input	[6:0]				I_Sel,							//Select Sources
-	input	index_s_t			I_Index,						//Index Value
-	input	index_t				I_Window,						//Window for Slicing
-	input	index_t				I_Length,						//Length for Slicing
-	input	id_t				I_ThreadID,						//Thread-ID
-	input	index_t				I_Constant,						//Constant
-	input						I_Sign,							//Config: Sign
-	input	mask_t				I_Mask_Data,					//Mask
-	output						O_Req,							//Request to Register-Read Stage
-	output						O_Slice,						//Flag: Index-Slicing
-	output	index_t				O_Index							//Index Value
+	input						I_Stall,				//Force Stalling
+	input						I_Req,					//Request from Hazard-Check Stage
+	input						I_MaskedRead,			//Flag: Masked Access to Register File
+	input						I_Slice,				//Flag: Index-Slicing
+	input	[6:0]				I_Sel,					//Select Sources
+	input	index_s_t			I_Index,				//Index Value
+	input	index_t				I_Window,				//Window for Slicing
+	input	index_t				I_Length,				//Length for Slicing
+	input	id_t				I_ThreadID,				//Thread-ID
+	input	index_t				I_Constant,				//Constant
+	input						I_Sign,					//Config: Sign
+	input	mask_t				I_Mask_Data,			//Mask
+	output						O_Req,					//Request to Register-Read Stage
+	output						O_Slice,				//Flag: Index-Slicing
+	output	index_t				O_Index					//Index Value
 );
 
 

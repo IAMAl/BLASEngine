@@ -12,48 +12,48 @@
 module HazardCheck_MPU
 	import pkg_mpu::*;
 (
-	input							clock,
-	input							reset,
-	input							I_Req_Commit,				//Commit Signal from Commit Unit
-	input	tpu_row_clm_t			I_Issued_No,				//Commit No. from Commit Unit
-	input							I_Req,						//Request from Previous Stage
-	input	id_t					I_ThreadID_S,				//Scalar Thread-ID
-	output							O_Req_Issue,				//Request to Next Stage
-	output	id_t					O_ThreadID_S,				//Scalar Thread-ID to Commit Unit
-	output	tpu_row_clm_t			O_IssueNo,					//Issue No to Commit Unit
+	input						clock,
+	input						reset,
+	input						I_Req_Commit,			//Commit Signal from Commit Unit
+	input	tpu_row_clm_t		I_Issued_No,			//Commit No. from Commit Unit
+	input						I_Req,					//Request from Previous Stage
+	input	id_t				I_ThreadID_S,			//Scalar Thread-ID
+	output						O_Req_Issue,			//Request to Next Stage
+	output	id_t				O_ThreadID_S,			//Scalar Thread-ID to Commit Unit
+	output	tpu_row_clm_t		O_IssueNo,				//Issue No to Commit Unit
 );
 
 
-	localparam WIDTH_ENTRY			= $clog2(NUM_ENTRY_HAZARD);
+	localparam WIDTH_ENTRY		= $clog2(NUM_ENTRY_HAZARD);
 
 	logic	[NUM_ENTRY_HAZARD-1:0]	Mask;
 	logic	[NUM_ENTRY_HAZARD-1:0]	Retire;
 
-	tpu_row_clm_t					Issue_No;
+	tpu_row_clm_t				Issue_No;
 
 	// Table Handling
-	logic							We;
-	logic							Re;
-	logic							Full;
-	logic							Empty;
+	logic						We;
+	logic						Re;
+	logic						Full;
+	logic						Empty;
 
 	logic	[NUM_ENTRY_HAZARD-1:0]	Valid;
 	logic	[NUM_ENTRY_HAZARD-1:0]	Commit;
-	logic	[WIDTH_ENTRY-1:0]		Offset;
+	logic	[WIDTH_ENTRY-1:0]	Offset;
 
-	logic							R_Req;
-	logic							R_Req_Issue;
-	tpu_row_clm_t					R_Issue_No;
-	mpu_tab_hazard_t				ThreadID		[NUM_ENTRY_HAZARD-1:0];
+	logic						R_Req;
+	logic						R_Req_Issue;
+	tpu_row_clm_t				R_Issue_No;
+	mpu_tab_hazard_t			ThreadID		[NUM_ENTRY_HAZARD-1:0];
 
 
 	//// Issue Sequence
-	assign O_Req_Issue				= R_Req_Issue;
-	assign O_ThreadID_S				= ThreadID[ Issue_No ].ID;
-	assign O_IssueNo				= R_Issue_No;
+	assign O_Req_Issue			= R_Req_Issue;
+	assign O_ThreadID_S			= ThreadID[ Issue_No ].ID;
+	assign O_IssueNo			= R_Issue_No;
 
 	// Check Issuable or Not
-	assign Issueable				= &is_Matched;
+	assign Issueable			= &is_Matched;
 
 	// Generate Mask Flags
 	always_comb begin
@@ -152,19 +152,19 @@ module HazardCheck_MPU
 	assign We				= I_Req & ~Full;
 	assign Re				= Issueable & ~Empty;
 	RingBuffCTRL #(
-		.NUM_ENTRY(		NUM_ENTRY_HAZARD	)
+		.NUM_ENTRY(			NUM_ENTRY_HAZARD		)
 	) HazardTab_Ptr
 	(
-		.clock(			clock				),
-		.reset(			reset				),
-		.I_We(			We					),
-		.I_Re(			Re					),
-		.I_Offset(		Offset				),
-		.O_WAddr(		WNo					),
-		.O_RAddr(		Issue_No			),
-		.O_Full(		Full				),
-		.O_Empty(		Empty				),
-		.O_Num(								)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.I_Offset(			Offset					),
+		.O_WAddr(			WNo						),
+		.O_RAddr(			Issue_No				),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(										)
 	);
 
 endmodule

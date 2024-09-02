@@ -14,21 +14,21 @@ module PACUnit
 (
 	input						clock,
 	input						reset,
-	input						I_Req,							//Request from Network Stage
-	input						I_Stall,						//Force Stalling
-	input						I_Sel_CondValid,				//Selector for CondValid-1/2
-	input						I_CondValid1,					//Condition Valid
-	input						I_CondValid2,					//Condition Valid
-	input						I_Jump,							//Jump Instruction
-	input						I_Branch,						//Branch Instruction
-	input	count_t				I_Timing_MY,					//Count Value for This Instruction
-	input	count_t				I_Timing_WB,					//Count Value for Write-Back Instr
-	input	state_t				I_State,						//Status Register
-	input	cond_t				I_Cond,							//Flag: Condition
-	output	address_t			I_Src,							//Source Value
-	output						O_IFetch,						//Instruction Fetch
-	output	address_t			O_Address,						//Address (Program COunter)
-	output						O_StallReq						//Stall Request
+	input						I_Req,					//Request from Network Stage
+	input						I_Stall,				//Force Stalling
+	input						I_Sel_CondValid,		//Selector for CondValid-1/2
+	input						I_CondValid1,			//Condition Valid
+	input						I_CondValid2,			//Condition Valid
+	input						I_Jump,					//Jump Instruction
+	input						I_Branch,				//Branch Instruction
+	input	count_t				I_Timing_MY,			//Count Value for This Instruction
+	input	count_t				I_Timing_WB,			//Count Value for Write-Back Instr
+	input	state_t				I_State,				//Status Register
+	input	cond_t				I_Cond,					//Flag: Condition
+	output	address_t			I_Src,					//Source Value
+	output						O_IFetch,				//Instruction Fetch
+	output	address_t			O_Address,				//Address (Program COunter)
+	output						O_StallReq				//Stall Request
 );
 
 

@@ -218,11 +218,11 @@ module Scalar_Unit
 
 	//	Capture Read Data
 	//	Command
-	assign PipeReg_RR_Net.v		= PipeReg_RR.v;
-	assign PipeReg_RR_Net.op	= PipeReg_RR.op;
+	assign PipeReg_RR_Net.v			= PipeReg_RR.v;
+	assign PipeReg_RR_Net.op		= PipeReg_RR.op;
 
 	//	Write-Back
-	assign PipeReg_RR_Net.dst	= PipeReg_RR.dst;
+	assign PipeReg_RR_Net.dst		= PipeReg_RR.dst;
 
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
@@ -267,14 +267,14 @@ module Scalar_Unit
 
 
 	//// Nwtwork
-	assign Config_Path		= PipeReg_RR_Net.path;
+	assign Config_Path			= PipeReg_RR_Net.path;
 
 	//	Capture Data
-	assign PipeReg_Net.v	= PipeReg_RR_Net.v;
-	assign PipeReg_Net.op	= PipeReg_RR_Net.op;
+	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
+	assign PipeReg_Net.op		= PipeReg_RR_Net.op;
 
 	//	Write-Back
-	assign PipeReg_Net.dst	= PipeReg_RR_Net.dst;
+	assign PipeReg_Net.dst		= PipeReg_RR_Net.dst;
 
 	//	Issue-No
 	assign PipeReg_Net.issue_no	= PipeReg_RR_Net.issue_no;

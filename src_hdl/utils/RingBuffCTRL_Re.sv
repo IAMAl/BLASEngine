@@ -45,23 +45,23 @@ module RingBuffCTRL_Re
     logic 	[WIDTH_BUFF:0]		R_RCNT;
 
 
-    assign W_WPtr			= R_WCNT;
-    assign W_RPtr			= R_RCNT;
-    assign W_CNT			= R_WCNT - R_RCNT;
+    assign W_WPtr				= R_WCNT;
+    assign W_RPtr				= R_RCNT;
+    assign W_CNT				= R_WCNT - R_RCNT;
 
 
 	//// Output 													////
-    assign O_WAddr			= W_WPtr[$clog2(NUM_ENTRY)-1:0];
-	assign O_RAddr			= W_RPtr[$clog2(NUM_ENTRY)-1:0];
-    assign O_Num            = ( W_CNT[WIDTH_BUFF+1] ) ?	R_WCNT - R_RCNT + NUM_ENTRY :
+    assign O_WAddr				= W_WPtr[$clog2(NUM_ENTRY)-1:0];
+	assign O_RAddr				= W_RPtr[$clog2(NUM_ENTRY)-1:0];
+    assign O_Num        	    = ( W_CNT[WIDTH_BUFF+1] ) ?	R_WCNT - R_RCNT + NUM_ENTRY :
 														W_CNT[WIDTH_BUFF:0] ;
 
 
 	//// Buffer Status												////
-	assign Full				= ( O_Num  == (NUM_ENTRY-2));
-	assign Empty			= W_CNT[WIDTH_BUFF:0] == '0;
-	assign O_Full			= Full;
-	assign O_Empty			= Empty;
+	assign Full					= ( O_Num  == (NUM_ENTRY-2));
+	assign Empty				= W_CNT[WIDTH_BUFF:0] == '0;
+	assign O_Full				= Full;
+	assign O_Empty				= Empty;
 
 
 	//// Pointers													////

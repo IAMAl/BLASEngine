@@ -17,25 +17,25 @@ module Network_S
 )(
 	input						I_Stall,
 	input						I_Req,
-	input	[5:0]				I_Sel_Path,						//Path Selects
-	input						I_Sel_ALU_Src1,					//Source Select
-	input						I_Sel_ALU_Src2,					//Source Select
-	input						I_Sel_ALU_Src3,					//Source Select
-	input	data_t				I_Src_Data1,					//Data from RegFile
-	input	data_t				I_Src_Data2,					//Data From RegFile
-	input	data_t				I_Src_Data3,					//Data From RegFile
-	input	data_t				I_Src_Data4,					//Data From RegFile
-	input	index_t				I_Src_Idx1,						//Index from RegFile
-	input	index_t				I_Src_Idx2,						//Index from RegFile
-	input	index_t				I_Src_Idx3,						//Index from RegFile
-	input	index_t				I_Src_Idx4,						//Index from RegFile
-	input	index_t				I_WB_DstIdx,					//Index from ALU
-	input	data_t				I_WB_Data,						//Data from ALU
-	output	data_t				O_Src_Data1,					//To Exec Unit
-	output	data_t				O_Src_Data2,					//To Exec Unit
-	output	data_t				O_Src_Data3,					//To Exec Unit
-	output						O_Buff_Full,					//Flag: Buffer is Full
-	output	data_t				O_PAC_Src_Data					//Data to PAC Unit
+	input	[5:0]				I_Sel_Path,				//Path Selects
+	input						I_Sel_ALU_Src1,			//Source Select
+	input						I_Sel_ALU_Src2,			//Source Select
+	input						I_Sel_ALU_Src3,			//Source Select
+	input	data_t				I_Src_Data1,			//Data from RegFile
+	input	data_t				I_Src_Data2,			//Data From RegFile
+	input	data_t				I_Src_Data3,			//Data From RegFile
+	input	data_t				I_Src_Data4,			//Data From RegFile
+	input	index_t				I_Src_Idx1,				//Index from RegFile
+	input	index_t				I_Src_Idx2,				//Index from RegFile
+	input	index_t				I_Src_Idx3,				//Index from RegFile
+	input	index_t				I_Src_Idx4,				//Index from RegFile
+	input	index_t				I_WB_DstIdx,			//Index from ALU
+	input	data_t				I_WB_Data,				//Data from ALU
+	output	data_t				O_Src_Data1,			//To Exec Unit
+	output	data_t				O_Src_Data2,			//To Exec Unit
+	output	data_t				O_Src_Data3,			//To Exec Unit
+	output						O_Buff_Full,			//Flag: Buffer is Full
+	output	data_t				O_PAC_Src_Data			//Data to PAC Unit
 );
 
 
@@ -93,37 +93,37 @@ module Network_S
 	assign Sel_Src3_Data4		= Req & I_Sel_ALU_Src3 & ( Sel_Path_Src3 == 2'h3 );
 
 
-	assign Src_Index1			= ( Sel_Src1_Data1 ) ?		I_Src_Idx1 ;
+	assign Src_Index1			= (   Sel_Src1_Data1 ) ?	I_Src_Idx1 ;
 									( Sel_Src1_Data2 ) ?	I_Src_Idx2 ;
 									( Sel_Src1_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src1_Data4 ) ?	I_Src_Idx4 ;
 															'0;
 
-	assign Src_Index2			= ( Sel_Src2_Data1 ) ?		I_Src_Idx1 ;
+	assign Src_Index2			= (   Sel_Src2_Data1 ) ?	I_Src_Idx1 ;
 									( Sel_Src2_Data2 ) ?	I_Src_Idx2 ;
 									( Sel_Src2_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src2_Data4 ) ?	I_Src_Idx4 ;
 															'0;
 
-	assign Src_Index3			= ( Sel_Src3_Data1 ) ?		I_Src_Idx1 ;
+	assign Src_Index3			= (   Sel_Src3_Data1 ) ?	I_Src_Idx1 ;
 									( Sel_Src3_Data2 ) ?	I_Src_Idx2 ;
 									( Sel_Src3_Data3 ) ?	I_Src_Idx3 ;
 									( Sel_Src3_Data4 ) ?	I_Src_Idx4 ;
 															'0;
 
 
-	assign Src_Data1			= ( Sel_Src1_Data1 ) ?		I_Src_Data1 :
+	assign Src_Data1			= (   Sel_Src1_Data1 ) ?	I_Src_Data1 :
 									( Sel_Src1_Data2 ) ?	I_Src_Data2 :
 									( Sel_Src1_Data3 ) ?	I_Src_Data3 :
 									( Sel_Src1_Data4 ) ?	I_Src_Data4 :
 															'0;
 
-	assign Src_Data2			= ( Sel_Src2_Data1 ) ?		I_Src_Data1 :
+	assign Src_Data2			= (   Sel_Src2_Data1 ) ?	I_Src_Data1 :
 									( Sel_Src2_Data2 ) ?	I_Src_Data2 :
 									( Sel_Src2_Data3 ) ?	I_Src_Data3 :
 									( Sel_Src2_Data4 ) ?	I_Src_Data4 :
 															'0;
-	assign Src_Data3			= ( Sel_Src3_Data1 ) ?		I_Src_Data1 :
+	assign Src_Data3			= (   Sel_Src3_Data1 ) ?	I_Src_Data1 :
 									( Sel_Src3_Data2 ) ?	I_Src_Data2 :
 									( Sel_Src3_Data3 ) ?	I_Src_Data3 :
 									( Sel_Src3_Data4 ) ?	I_Src_Data4 :
@@ -138,24 +138,24 @@ module Network_S
 
 
 	BypassBuff #(
-		.BUFF_SIZE(			BYPASS_BUFF_SIZE	)
+		.BUFF_SIZE(			BYPASS_BUFF_SIZE		)
 	) BypassBuff
 	(
-		.clock(				clock				),
-		.reset(				reset				),
-		.I_Stall(			I_Stall				),
-		.I_WB_Index(		I_WB_Index			),
-		.I_WB_Data(			I_WB_Data			),
-		.I_Idx1(			Src_Index1			),
-		.I_Idx2(			Src_Index2			),
-		.I_Idx3(			Src_Index3			),
-		.I_Src1(			Src_Data1			),
-		.I_Src2(			Src_Data2			),
-		.I_Src3(			Src_Data3			),
-		.O_Src1(			O_Src_Data1			),
-		.O_Src2(			O_Src_Data2			),
-		.O_Src3(			O_Src_Data3			),
-		.O_Full(			O_Buff_Full			)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			I_Stall					),
+		.I_WB_Index(		I_WB_Index				),
+		.I_WB_Data(			I_WB_Data				),
+		.I_Idx1(			Src_Index1				),
+		.I_Idx2(			Src_Index2				),
+		.I_Idx3(			Src_Index3				),
+		.I_Src1(			Src_Data1				),
+		.I_Src2(			Src_Data2				),
+		.I_Src3(			Src_Data3				),
+		.O_Src1(			O_Src_Data1				),
+		.O_Src2(			O_Src_Data2				),
+		.O_Src3(			O_Src_Data3				),
+		.O_Full(			O_Buff_Full				)
 	);
 
 endmodule

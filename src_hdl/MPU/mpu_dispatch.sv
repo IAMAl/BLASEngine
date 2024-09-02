@@ -14,83 +14,83 @@ module Dispatch_MPU
 (
 	input						clock,
 	input						reset,
-	input						I_Req_Issue,					//Request from Previous Stage
-	input	id_t				I_ThreadID,						//Scalar Thread-ID from Hazard Check Unit
-	output						O_Req_Lookup,					//Request to MapMan Unit
-	output	id_t				O_ThreadID,						//Scalar Thread-ID to Commit Unit
-	input						I_Ack,							//Ack from MapMan Unit
-	input	lookup_t			I_ThreadInfo,					//Instr Memory Info from MapMan Unit
-	output						O_Ld,							//Load Instruction
-	output	mpu_address_t		O_Address,						//Loading Address
-	input	instr_t				I_Instr,						//Loaded Instruction
-	output	instr_t				O_Instr,						//Send Loaded Instructions to TPUs
-	output	mpu_issue_no_t		O_IssueNo,						//Issue No
-	input	mpu_issue_no_t		I_IssueNo,						//Issue No
-	output						O_Send_Thread,					//Status
+	input						I_Req_Issue,			//Request from Previous Stage
+	input	id_t				I_ThreadID,				//Scalar Thread-ID from Hazard Check Unit
+	output						O_Req_Lookup,			//Request to MapMan Unit
+	output	id_t				O_ThreadID,				//Scalar Thread-ID to Commit Unit
+	input						I_Ack,					//Ack from MapMan Unit
+	input	lookup_t			I_ThreadInfo,			//Instr Memory Info from MapMan Unit
+	output						O_Ld,					//Load Instruction
+	output	mpu_address_t		O_Address,				//Loading Address
+	input	instr_t				I_Instr,				//Loaded Instruction
+	output	instr_t				O_Instr,				//Send Loaded Instructions to TPUs
+	output	mpu_issue_no_t		O_IssueNo,				//Issue No
+	input	mpu_issue_no_t		I_IssueNo,				//Issue No
+	output						O_Send_Thread,			//Status
 	output						O_End_Send
 );
 
 
 	// Status
-	logic							Loading;
-	logic							End_Load;
+	logic						Loading;
+	logic						End_Load;
 
 	// Loading Information
-	mpu_address_t					Length;
-	logic							Set_Address;
-	mpu_address_t					Base_Addr;
+	mpu_address_t				Length;
+	logic						Set_Address;
+	mpu_address_t				Base_Addr;
 
 	// FSM for Dispatch Control
-	fsm_dispatch_t					FSM_Dispatch;
+	fsm_dispatch_t				FSM_Dispatch;
 
 	// Thread-ID
-	id_t							R_ThreadID;
+	id_t						R_ThreadID;
 
 	// Issue-No
-	mpu_issue_no_t					R_IssueNo;
+	mpu_issue_no_t				R_IssueNo;
 
 	// Store Information
-	mpu_address_t					R_Length;
-	mpu_address_t					R_Address;
+	mpu_address_t				R_Length;
+	mpu_address_t				R_Address;
 
 	// Thread Program Length
 	//	In terms of Number of Instructions
 	logic	[WIDTH_THREAD_LEN-1:0]	R_TLength;
 
 	// Load Ack
-	logic							R_Ld;
-	logic							R_LdD1;
+	logic						R_Ld;
+	logic						R_LdD1;
 
 
 	// Set when Ack has come
 	//	Ack comes from MapMan having Base Address and Length used for loading
-	assign Set_Address		= I_Ack;
-	assign Loading			= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
+	assign Set_Address			= I_Ack;
+	assign Loading				= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
 
 	// Check Loading is ended
-	assign End_Load			= R_Length == 0;
+	assign End_Load				= R_Length == 0;
 
 	// Requset to MapMan with Thread-ID
-	assign O_Req_Lookup		= FSM_Dispatch == FSM_DPC_GETINFO;
-	assign O_ThreadID		= R_ThreadID;
+	assign O_Req_Lookup			= FSM_Dispatch == FSM_DPC_GETINFO;
+	assign O_ThreadID			= R_ThreadID;
 
 	// Information from MapMan
-	assign Length			= I_ThreadInfo.length;
-	assign Base_Addr		= I_ThreadInfo.address;
+	assign Length				= I_ThreadInfo.length;
+	assign Base_Addr			= I_ThreadInfo.address;
 
 	// Load Request
-	assign O_Ld				= Loading;
+	assign O_Ld					= Loading;
 
 	// Load Address
-	assign O_Address		= R_Address;
+	assign O_Address			= R_Address;
 
 	// Send Thread (Instructions) to TPU
-	assign O_Instr.valid	= R_LdD1;
-	assign O_Instr.instr	= R_Instr;
-	assign O_Send_Thread	=   FSM_Dispatch == FSM_DPC_SEND_INSTRS;
-	assign O_End_Send		= ( FSM_Dispatch == FSM_DPC_SEND_INSTRS ) & End_Load;
+	assign O_Instr.valid		= R_LdD1;
+	assign O_Instr.instr		= R_Instr;
+	assign O_Send_Thread		=   FSM_Dispatch == FSM_DPC_SEND_INSTRS;
+	assign O_End_Send			= ( FSM_Dispatch == FSM_DPC_SEND_INSTRS ) & End_Load;
 
-	assign O_IssueNo		= R_IssueNo;
+	assign O_IssueNo			= R_IssueNo;
 
 
 	always_ff @( posedge clock ) begin

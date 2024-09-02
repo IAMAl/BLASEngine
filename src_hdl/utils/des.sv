@@ -11,30 +11,30 @@
 
 module Des
 #(
-	parameter int WIDTH_INPUT		= 8,
-	parameter int WIDTH_OUTPUT		= 32,
+	parameter int WIDTH_INPUT	= 8,
+	parameter int WIDTH_OUTPUT	= 32,
 )(
-	input							clock,
-	input							reset
-	input							I_Req,							//Request
-	input	[WIDTH_INPUT-1:0]		I_Data,							//Serial Source
-	output							O_Valid,						//Valid Output
-	output	[WIDTH_OUTPUT-1:0]		O_Data							//De-serialized Data
+	input						clock,
+	input						reset
+	input						I_Req,					//Request
+	input	[WIDTH_INPUT-1:0]	I_Data,					//Serial Source
+	output						O_Valid,				//Valid Output
+	output	[WIDTH_OUTPUT-1:0]	O_Data					//De-serialized Data
 );
 
-	localparam int	ROUND_VAL		= (WIDTH_INPUT+1)/2;
-	localparam int	COUNT_VAL		= (WIDTH_OUTPUT+ROUND_VAL)/WIDTH_INPUT;
-	localparam int	WIDTH_COUNT		= $clog2(COUNT_VAL);
+	localparam int	ROUND_VAL	= (WIDTH_INPUT+1)/2;
+	localparam int	COUNT_VAL	= (WIDTH_OUTPUT+ROUND_VAL)/WIDTH_INPUT;
+	localparam int	WIDTH_COUNT	= $clog2(COUNT_VAL);
 
 
 
-	logic	[WIDTH_OUTPUT-1:0]		Shift_Data;
+	logic	[WIDTH_OUTPUT-1:0]	Shift_Data;
 
-	logic							Valid;
+	logic						Valid;
 
-	logic	[WIDTH_COUNT-1:0]		Count;
+	logic	[WIDTH_COUNT-1:0]	Count;
 
-	logic	[WIDTH_OUTPUT-1:0]		Data;
+	logic	[WIDTH_OUTPUT-1:0]	Data;
 
 
 	assign Valid				= Count == COUNT_VAL;

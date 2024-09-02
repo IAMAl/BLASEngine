@@ -14,13 +14,13 @@ module IFetch
 (
 	input						clock,
 	input						reset,
-	input						I_Req,							//Enable to Work
-	input						I_Empty,						//Flag: State in Empty for Buffer
-	input						I_Term,							//Flag: Termination
-	input	instr_t				I_Instr,						//Instruction
-	output						O_Req,							//Request to Next Stage
-	output	instr_t				O_Instr,						//Instruction
-	output						O_Re_Buff						//Read-Enabloe for Buffer
+	input						I_Req,					//Enable to Work
+	input						I_Empty,				//Flag: State in Empty for Buffer
+	input						I_Term,					//Flag: Termination
+	input	instr_t				I_Instr,				//Instruction
+	output						O_Req,					//Request to Next Stage
+	output	instr_t				O_Instr,				//Instruction
+	output						O_Re_Buff				//Read-Enabloe for Buffer
 );
 
 

@@ -44,72 +44,72 @@ module Lane_Unit
 );
 
 
-	logic					Dst_Slice;
-	logic	[6:0]			Dst_Sel;
-	index_t					Dst_Index;
-	index_t					Dst_Index_Window;
-	index_t					Dst_Index_Length;
-	logic					Dst_RegFile_Req;
-	logic					Dst_RegFile_Slice;
-	index_t					Dst_RegFile_Index;
+	logic						Dst_Slice;
+	logic	[6:0]				Dst_Sel;
+	index_t						Dst_Index;
+	index_t						Dst_Index_Window;
+	index_t						Dst_Index_Length;
+	logic						Dst_RegFile_Req;
+	logic						Dst_RegFile_Slice;
+	index_t						Dst_RegFile_Index;
 
-	logic					MaskedRead;
-	logic					Sign;
-	const_t					Constant;
-	logic					Slice_Dst;
-	logic					Stall_RegFile_Odd;
-	logic					Stall_RegFile_Even;
+	logic						MaskedRead;
+	logic						Sign;
+	const_t						Constant;
+	logic						Slice_Dst;
+	logic						Stall_RegFile_Odd;
+	logic						Stall_RegFile_Even;
 
-	data_t					Pre_Src_Data2;
-	data_t					Pre_Src_Data3;
-
-
-	stat_v_t				Status;
+	data_t						Pre_Src_Data2;
+	data_t						Pre_Src_Data3;
 
 
-	index_t					Src_Idx1;
-	index_t					Src_Idx2;
-	index_t					Src_Idx3;
+	stat_v_t					Status;
 
 
-	mask_t					Mask_Data;
-
-	logic	[12:0]			Config_Path;
-	logic	[4:0]			Config_Path_WB;
-
-
-	logic					Dst_Sel;
-	logic					is_WB_RF;
-	logic					is_WB_BR;
-	logic					is_WB_VU;
-	index_t					WB_Index;
-	data_t					WB_Data;
-	data_t					W_WB_Data;
-	logic					Math_Done;
-	logic					Condition;
-
-	logic					MaskReg_We;
-	logic					MaskReg_Re;
+	index_t						Src_Idx1;
+	index_t						Src_Idx2;
+	index_t						Src_Idx3;
 
 
-	logic					LdSt_Done1;
-	logic					LdSt_Done2;
+	mask_t						Mask_Data;
+
+	logic	[12:0]				Config_Path;
+	logic	[4:0]				Config_Path_WB;
 
 
-	logic					En;
-	logic					Lane_En;
-	logic					Lane_CTRL_Rst;
-	logic					Lane_CTRL_Set;
+	logic						Dst_Sel;
+	logic						is_WB_RF;
+	logic						is_WB_BR;
+	logic						is_WB_VU;
+	index_t						WB_Index;
+	data_t						WB_Data;
+	data_t						W_WB_Data;
+	logic						Math_Done;
+	logic						Condition;
+
+	logic						MaskReg_We;
+	logic						MaskReg_Re;
 
 
-	logic					Req_Issue;
+	logic						LdSt_Done1;
+	logic						LdSt_Done2;
 
-	pipe_index_t			PipeReg_Idx;
-	pipe_index_t			PipeReg_Index;
-	pipe_reg_t				PipeReg_RR;
-	pipe_net_t				PipeReg_RR_Net;
-	pipe_exe_t				PipeReg_Net;
-	pipe_exe_t				PipeReg_Exe;
+
+	logic						En;
+	logic						Lane_En;
+	logic						Lane_CTRL_Rst;
+	logic						Lane_CTRL_Set;
+
+
+	logic						Req_Issue;
+
+	pipe_index_t				PipeReg_Idx;
+	pipe_index_t				PipeReg_Index;
+	pipe_reg_t					PipeReg_RR;
+	pipe_net_t					PipeReg_RR_Net;
+	pipe_exe_t					PipeReg_Net;
+	pipe_exe_t					PipeReg_Exe;
 
 
 	//// Lane-Enable
@@ -174,11 +174,11 @@ module Lane_Unit
 	//// Register Read/Write Stage
 	//	Capture Read Data
 	//	Command
-	assign PipeReg_RR_Net.v		= PipeReg_RR.v;
-	assign PipeReg_RR_Net.op	= PipeReg_RR.op;
+	assign PipeReg_RR_Net.v			= PipeReg_RR.v;
+	assign PipeReg_RR_Net.op		= PipeReg_RR.op;
 
 	//	Write-Back
-	assign PipeReg_RR_Net.dst	= PipeReg_RR.dst;
+	assign PipeReg_RR_Net.dst		= PipeReg_RR.dst;
 
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
@@ -205,14 +205,14 @@ module Lane_Unit
 
 
 	//// Network
-	assign Config_Path		= PipeReg_RR_Net.path[12:0];
+	assign Config_Path			= PipeReg_RR_Net.path[12:0];
 
 	//	Capture Data
-	assign PipeReg_Net.v	= PipeReg_RR_Net.v;
-	assign PipeReg_Net.op	= PipeReg_RR_Net.op;
+	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
+	assign PipeReg_Net.op		= PipeReg_RR_Net.op;
 
 	//	Write-Back
-	assign PipeReg_Net.dst	= PipeReg_RR_Net.dst;
+	assign PipeReg_Net.dst		= PipeReg_RR_Net.dst;
 
 	//	Issue-No
 	assign PipeReg_Net.issue_no	= PipeReg_RR_Net.issue_no;
@@ -223,39 +223,39 @@ module Lane_Unit
 
 
 	//// Write-Back
-	assign Dst_Sel			= B_Index.dst_sel.unit_no;
-	assign Dst_Slice		= WB_Index.slice
-	assign Dst_Index		= WB_Index.idx
-	assign Dst_Index_Window	= WB_Index.window
-	assign Dst_Index_Length	= WB_Index.slice_len
+	assign Dst_Sel				= B_Index.dst_sel.unit_no;
+	assign Dst_Slice			= WB_Index.slice
+	assign Dst_Index			= WB_Index.idx
+	assign Dst_Index_Window		= WB_Index.window
+	assign Dst_Index_Length		= WB_Index.slice_len
 
 	//	Write-Back Target Decision
-	assign is_WB_RF			= WB_Index.dst_sel == 2'h1;
-	assign is_WB_BR			= WB_Index.dst_sel == 2'h2;
-	assign is_WB_VU			= WB_Index.dst_sel == 2'h3;
+	assign is_WB_RF				= WB_Index.dst_sel == 2'h1;
+	assign is_WB_BR				= WB_Index.dst_sel == 2'h2;
+	assign is_WB_VU				= WB_Index.dst_sel == 2'h3;
 
-	assign WB_Req_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Req_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Index_Even	= ( ~Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Index_Odd		= (  Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Data_Even		= ( ~Dst_Sel ) ? W_WB_Data :	'0;
-	assign WB_Data_Odd		= (  Dst_Sel ) ? W_WB_Data :	'0;
+	assign WB_Req_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_Req_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_We_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_We_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :	'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? W_WB_Data :	'0;
 
-	assign Config_Path_W	= WB_Index.path;
+	assign Config_Path_W		= WB_Index.path;
 
 	//	Write-Back to Mask Register
-	assign MaskReg_We		= WB_Index.v & is_WB_BR;
-	assign Cond_Data		= ( is_WB_BR ) ? W_WB_Data : '0;
-	assign MaskReg_Re		= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src4.src_sel.no == 2'h2 );
+	assign MaskReg_We			= WB_Index.v & is_WB_BR;
+	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
+	assign MaskReg_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src4.src_sel.no == 2'h2 );
 
 
 	//// Commit Request
-	assign O_Commit			= LdSt_Done1 | LdSt_Done2 | Math_Done;
+	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
 
 
 	//// Index Update Stage

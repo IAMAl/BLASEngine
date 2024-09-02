@@ -14,19 +14,19 @@ module FrontEnd
 (
 	input						clock,
 	input						reset,
-	input						I_En_Exe,						//Enable Execution
-	input						I_Full,							//Flag: State in Full in Buffer
-	input						I_Term,							//Flag: Termination from Scalar Unit
-	input						I_Nack,							//Nack from Back-End
-	input						I_Req,							//Request to Work
-	input	mpu_issue_no_t		I_IssueNo						//Issue No at MPU, used for Exec
-	input	instr_t				I_Instr,						//Instruction
-	output						O_We,							//Write-Enable for Buffer
-	output	id_t				O_ThreadID,						//ThreadID to Buffer
-	output	instr_t				O_Instr,						//Instruction to Buffer
-	output						O_Term,							//Flag: Termination
-	output	mpu_issue_no_t		O_IssueNo,						//Issue No at MPU, used for Commit
-	output						O_Nack							//Nack to Allocator
+	input						I_En_Exe,				//Enable Execution
+	input						I_Full,					//Flag: State in Full in Buffer
+	input						I_Term,					//Flag: Termination from Scalar Unit
+	input						I_Nack,					//Nack from Back-End
+	input						I_Req,					//Request to Work
+	input	mpu_issue_no_t		I_IssueNo				//Issue No at MPU, used for Exec
+	input	instr_t				I_Instr,				//Instruction
+	output						O_We,					//Write-Enable for Buffer
+	output	id_t				O_ThreadID,				//ThreadID to Buffer
+	output	instr_t				O_Instr,				//Instruction to Buffer
+	output						O_Term,					//Flag: Termination
+	output	mpu_issue_no_t		O_IssueNo,				//Issue No at MPU, used for Commit
+	output						O_Nack					//Nack to Allocator
 );
 
 

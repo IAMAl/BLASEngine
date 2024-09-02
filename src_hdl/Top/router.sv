@@ -55,18 +55,18 @@ module Router
 	logic						R_is_Matched;
 
 
-	assign O_Req_A			= Req_A;
-	assign O_Rls_A			= Rls_A;
-	assign O_Data_A			= DataA;
+	assign O_Req_A				= Req_A;
+	assign O_Rls_A				= Rls_A;
+	assign O_Data_A				= DataA;
 
-	assign O_Req_B			= Req_B;
-	assign O_Rls_B			= Rls_B;
-	assign O_Data_B			= DataB;
+	assign O_Req_B				= Req_B;
+	assign O_Rls_B				= Rls_B;
+	assign O_Data_B				= DataB;
 
 
-	assign O_Req			= Req
-	assign O_Rls			= Rls;
-	assign O_Data			= Data;
+	assign O_Req				= Req
+	assign O_Rls				= Rls;
+	assign O_Data				= Data;
 
 
 	always_ff @( posedge clock ) begin

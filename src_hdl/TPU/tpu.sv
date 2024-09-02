@@ -71,103 +71,103 @@ module TPU
 
 	//// Service Management UNit
 	FrontEnd FrontEnd (
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_En_Exe(				I_En_Exe				),
-		.I_Full(				Buff_Full				),
-		.I_Term(				Term					),
-		.I_Nack(				~Ack_St					),
-		.I_Req(					I_Req					),
-		.I_Instr(				I_Instr					),
-		.I_IssueNo(				I_IssueNo				),
-		.O_We(					We_Buff					),
-		.O_ThreadID(			Buff_ThreadID			),
-		.O_Instr(				Buff_Instr				),
-		.O_Term(				O_Term					),
-		.O_IssueNo(				O_IssueNo				),
-		.O_Nack(				O_Nack					)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_En_Exe(			I_En_Exe				),
+		.I_Full(			Buff_Full				),
+		.I_Term(			Term					),
+		.I_Nack(			~Ack_St					),
+		.I_Req(				I_Req					),
+		.I_Instr(			I_Instr					),
+		.I_IssueNo(			I_IssueNo				),
+		.O_We(				We_Buff					),
+		.O_ThreadID(		Buff_ThreadID			),
+		.O_Instr(			Buff_Instr				),
+		.O_Term(			O_Term					),
+		.O_IssueNo(			O_IssueNo				),
+		.O_Nack(			O_Nack					)
 	);
 
 
 	//// Buffers between FrontENd and Scalar Unit
 	//	 Buffer for Instructions
 	buff #(
-		.NUM_ENTRY(				SIZE_THREAD_MEM			),
-		.TYPE_DEF(				instr_t					)
+		.NUM_ENTRY(			SIZE_THREAD_MEM			),
+		.TYPE_DEF(			instr_t					)
 	) Instr_Buff
 	(
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_We(					We_Buff					),
-		.I_Re(					Re_Buff					),
-		.I_Data(				Buff_Instr				),
-		.O_Data(				Instr					),
-		.O_Full(				Buff_Full				),
-		.O_Empty(				Buff_Empty				)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We_Buff					),
+		.I_Re(				Re_Buff					),
+		.I_Data(			Buff_Instr				),
+		.O_Data(			Instr					),
+		.O_Full(			Buff_Full				),
+		.O_Empty(			Buff_Empty				)
 	);
 
 	//	 Buffer for SIMT Thread-ID
 	buff #(
-		.NUM_ENTRY(				SIZE_THREAD_MEM			),
-		.TYPE_DEF(				id_t					)
+		.NUM_ENTRY(			SIZE_THREAD_MEM			),
+		.TYPE_DEF(			id_t					)
 	) ID_Buff
 	(
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_We(					IDBuff_We				),
-		.I_Re(					IDBuff_Re				),
-		.I_Data(				Buff_ThreadID			),
-		.O_Data(				ThreadID				),
-		.O_Full(				IDBuff_Full				),
-		.O_Empty(				IDBuff_Empty			)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				IDBuff_We				),
+		.I_Re(				IDBuff_Re				),
+		.I_Data(			Buff_ThreadID			),
+		.O_Data(			ThreadID				),
+		.O_Full(			IDBuff_Full				),
+		.O_Empty(			IDBuff_Empty			)
 	);
 
 
 	Scalar_Unit Scalar_Unit (
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_En(					I_En_Exe				),
-		.I_Empty(				Buff_Empty				),
-		.I_Req_St(				IDBuff_Re				),
-		.O_Ack_St(				Ack_St					),
-		.I_Instr(				Instr					),
-		.I_ThreadID(			ThreadID				),
-		.I_Commmit_Req_V(		Commmit_Req_V			),
-		.I_Scalar_Data(			In_Scalar_Data			),
-		.O_Scalar_Data(			Out_Scalar_Data			),
-		.O_LdSt(				O_S_LdSt				),
-		.I_Ld_Data(				I_S_Ld_Data				),
-		.O_St_Data(				O_S_St_Data				),
-		.I_Ld_Ready(			I_S_Ld_Ready			),
-		.I_Ld_Grant(			I_S_Ld_Grant			),
-		.I_St_Ready(			I_S_St_Ready			),
-		.I_St_Grant(			I_S_St_Grant			),
-		.O_Re_Buff(				Re_Buff					),
-		.O_V_Command(			V_Command				),
-		.I_V_State(				V_Status				),
-		.O_Lane_En(				En_Lane					),
-		.O_Status(				S_Status				),
-		.O_Term(				Term					)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_En(				I_En_Exe				),
+		.I_Empty(			Buff_Empty				),
+		.I_Req_St(			IDBuff_Re				),
+		.O_Ack_St(			Ack_St					),
+		.I_Instr(			Instr					),
+		.I_ThreadID(		ThreadID				),
+		.I_Commmit_Req_V(	Commmit_Req_V			),
+		.I_Scalar_Data(		In_Scalar_Data			),
+		.O_Scalar_Data(		Out_Scalar_Data			),
+		.O_LdSt(			O_S_LdSt				),
+		.I_Ld_Data(			I_S_Ld_Data				),
+		.O_St_Data(			O_S_St_Data				),
+		.I_Ld_Ready(		I_S_Ld_Ready			),
+		.I_Ld_Grant(		I_S_Ld_Grant			),
+		.I_St_Ready(		I_S_St_Ready			),
+		.I_St_Grant(		I_S_St_Grant			),
+		.O_Re_Buff(			Re_Buff					),
+		.O_V_Command(		V_Command				),
+		.I_V_State(			V_Status				),
+		.O_Lane_En(			En_Lane					),
+		.O_Status(			S_Status				),
+		.O_Term(			Term					)
 	);
 
 
 	Vector_Unit Vector_Unit (
-		.clock(					clock					),
-		.reset(					reset					),
-		.I_En_Lane(				En_Lane					),
-		.I_ThreadID(			ThreadID				),
-		.I_Command(				V_Command				),
-		.I_Scalar_Data(			Out_Scalar_Data			),
-		.O_Scalar_Data(			In_Scalar_Data			),
-		.O_LdSt(				O_V_LdSt				),
-		.I_Ld_Data(				I_V_Ld_Data				),
-		.O_St_Data(				O_V_St_Data				),
-		.I_Ld_Ready(			I_V_Ld_Ready			),
-		.I_Ld_Grant(			I_V_Ld_Grant			),
-		.I_St_Ready(			I_V_St_Ready			),
-		.I_St_Grant(			I_V_St_Grant			),
-		.O_Commmit_Req(			Commmit_Req_V			),
-		.O_Status(				V_Status				)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_En_Lane(			En_Lane					),
+		.I_ThreadID(		ThreadID				),
+		.I_Command(			V_Command				),
+		.I_Scalar_Data(		Out_Scalar_Data			),
+		.O_Scalar_Data(		In_Scalar_Data			),
+		.O_LdSt(			O_V_LdSt				),
+		.I_Ld_Data(			I_V_Ld_Data				),
+		.O_St_Data(			O_V_St_Data				),
+		.I_Ld_Ready(		I_V_Ld_Ready			),
+		.I_Ld_Grant(		I_V_Ld_Grant			),
+		.I_St_Ready(		I_V_St_Ready			),
+		.I_St_Grant(		I_V_St_Grant			),
+		.O_Commmit_Req(		Commmit_Req_V			),
+		.O_Status(			V_Status				)
 	);
 
 endmodule

@@ -18,10 +18,10 @@ module Lane_Unit (
 	logic						CTRL;
 
 
-	assign O_En				= En;
-	assign O_State			= Cond;
+	assign O_En					= En;
+	assign O_State				= Cond;
 
-	assign W_En				= ~CTRL | ( CTRL & Cond );
+	assign W_En					= ~CTRL | ( CTRL & Cond );
 
 
 	always_ff @( posedge clock ) begin

@@ -58,11 +58,11 @@ module SkipCTRL #(
 
 
 	NLZ #(
-		.NUM_ENTRY(				NUM_ENTRY_NLZ_INDEX	),
+		.NUM_ENTRY(			NUM_ENTRY_NLZ_INDEX		),
 	) NLZ_Index
 	(
-		.I_Data(				R_Mask				),
-		.O_NLZ_Value(			NLZ_Value			)
+		.I_Data(			R_Mask					),
+		.O_NLZ_Value(		NLZ_Value				)
 	);
 
 endmodule

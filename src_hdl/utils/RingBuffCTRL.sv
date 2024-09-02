@@ -11,17 +11,18 @@
 
 module RingBuffCTRL
 #(
-	parameter int NUM_ENTRY			= 16
+	parameter int NUM_ENTRY		= 16,
+	parameter int WIDTH_ENTRY	= $clog2(NUM_ENTRY)
 )(
-	input							clock,
-	input							reset,
-	input							I_We,				//Write-Enable
-	input							I_Re,				//Read-Enable
-	output	[$clog2(NUM_ENTRY)-1:0]	O_WAddr,			//Write Address
-	output	[$clog2(NUM_ENTRY)-1:0]	O_RAddr,			//Read Address
-	output	logic					O_Full,				//Flag: Full
-	output	logic					O_Empty,			//Flag: Empty
-    output  [$clog2(NUM_ENTRY):0]	O_Num				//Remained Number of Entries
+	input						clock,
+	input						reset,
+	input						I_We,				//Write-Enable
+	input						I_Re,				//Read-Enable
+	output	[WIDTH_ENTRY-1:0]	O_WAddr,			//Write Address
+	output	[WIDTH_ENTRY-1:0]	O_RAddr,			//Read Address
+	output	logic				O_Full,				//Flag: Full
+	output	logic				O_Empty,			//Flag: Empty
+    output  [WIDTH_ENTRY:0]		O_Num				//Remained Number of Entries
 );
 
 	localparam int WIDTH_BUFF	= $clog2(NUM_ENTRY);
@@ -43,23 +44,23 @@ module RingBuffCTRL
     logic 	[WIDTH_BUFF:0]		R_RCNT;
 
 
-    assign W_WPtr			= R_WCNT;
-    assign W_RPtr			= R_RCNT;
-    assign W_CNT			= R_WCNT - R_RCNT;
+    assign W_WPtr				= R_WCNT;
+    assign W_RPtr				= R_RCNT;
+    assign W_CNT				= R_WCNT - R_RCNT;
 
 
 	//// Output 													////
-    assign O_WAddr			= W_WPtr[$clog2(NUM_ENTRY)-1:0];
-	assign O_RAddr			= W_RPtr[$clog2(NUM_ENTRY)-1:0];
-    assign O_Num            = ( W_CNT[WIDTH_BUFF+1] ) ?	R_WCNT - R_RCNT + NUM_ENTRY :
+    assign O_WAddr				= W_WPtr[$clog2(NUM_ENTRY)-1:0];
+	assign O_RAddr				= W_RPtr[$clog2(NUM_ENTRY)-1:0];
+    assign O_Num        	    = ( W_CNT[WIDTH_BUFF+1] ) ?	R_WCNT - R_RCNT + NUM_ENTRY :
 														W_CNT[WIDTH_BUFF:0] ;
 
 
 	//// Buffer Status												////
-	assign Full				= ( O_Num  == (NUM_ENTRY-2));
-	assign Empty			= W_CNT[WIDTH_BUFF:0] == '0;
-	assign O_Full			= Full;
-	assign O_Empty			= Empty;
+	assign Full					= ( O_Num  == (NUM_ENTRY-2));
+	assign Empty				= W_CNT[WIDTH_BUFF:0] == '0;
+	assign O_Full				= Full;
+	assign O_Empty				= Empty;
 
 
 	//// Pointers													////

@@ -16,98 +16,98 @@ module BypassBuff
 )(
 	input						clock,
 	input						reset,
-	input						I_Stall,						//Force Stalling
-	input	dst_t				I_WB_Index,						//Write-back Index
-	input	data_t				I_WB_Data						//Write-back Data
-	input	reg_t				I_Src1,							//Source Data
-	input	reg_t				I_Src2,							//Source Data
-	input	reg_t				I_Src3,							//Source Data
-	input	reg_t				O_Src1,							//Source Data
-	input	reg_t				O_Src2,							//Source Data
-	input	reg_t				O_Src3,							//Source Data
-	output						O_Full							//Full in Buffer
+	input						I_Stall,				//Force Stalling
+	input	dst_t				I_WB_Index,				//Write-back Index
+	input	data_t				I_WB_Data				//Write-back Data
+	input	reg_t				I_Src1,					//Source Data
+	input	reg_t				I_Src2,					//Source Data
+	input	reg_t				I_Src3,					//Source Data
+	input	reg_t				O_Src1,					//Source Data
+	input	reg_t				O_Src2,					//Source Data
+	input	reg_t				O_Src3,					//Source Data
+	output						O_Full					//Full in Buffer
 );
 
 	localparam int	WIDTH_NUM	= $clog2(BUFF_SIZE);
 
-	logic					En;
+	logic						En;
 
-	logic					is_Matched_Src1	[BUFF_SIZE-1:0];
-	logic					is_Matched_Src2 [BUFF_SIZE-1:0];
-	logic					is_Matched_Src3 [BUFF_SIZE-1:0];
+	logic						is_Matched_Src1	[BUFF_SIZE-1:0];
+	logic						is_Matched_Src2 [BUFF_SIZE-1:0];
+	logic						is_Matched_Src3 [BUFF_SIZE-1:0];
 
-	logic	[WIDTH_NUM-1:0]	NoSrc1;
-	logic	[WIDTH_NUM-1:0]	NoSrc2;
-	logic	[WIDTH_NUM-1:0]	NoSrc3;
-	logic	[WIDTH_NUM-1:0]	Sel_NoSrc;
+	logic	[WIDTH_NUM-1:0]		NoSrc1;
+	logic	[WIDTH_NUM-1:0]		NoSrc2;
+	logic	[WIDTH_NUM-1:0]		NoSrc3;
+	logic	[WIDTH_NUM-1:0]		Sel_NoSrc;
 
-	logic	[WIDTH_NUM-1:0]	Len;
+	logic	[WIDTH_NUM-1:0]		Len;
 
-	logic					Hit;
-	logic					Hit_Src1;
-	logic					Hit_Src2;
-	logic					Hit_Src3;
+	logic						Hit;
+	logic						Hit_Src1;
+	logic						Hit_Src2;
+	logic						Hit_Src3;
 
-	logic					Update;
-	logic					Update_Src1;
-	logic					Update_Src2;
-	logic					Update_Src3;
+	logic						Update;
+	logic						Update_Src1;
+	logic						Update_Src2;
+	logic						Update_Src3;
 
-	logic					Store;
+	logic						Store;
 
-	logic					Clr;
+	logic						Clr;
 
-	logic					Last_Src1;
-	logic					Last_Src2;
-	logic					Last_Src3;
+	logic						Last_Src1;
+	logic						Last_Src2;
+	logic						Last_Src3;
 
-	logic	[WIDTH_NUM-1:0]	Wr_Ptr;
-	logic	[WIDTH_NUM-1:0]	Rd_Ptr;
-
-
-	logic					Run_Slice_Src1;
-	logic					Run_Slice_Src2;
-	logic					Run_Slice_Src3;
+	logic	[WIDTH_NUM-1:0]		Wr_Ptr;
+	logic	[WIDTH_NUM-1:0]		Rd_Ptr;
 
 
-	logic					valid			[BUFF_SIZE-1:0];
-	reg_t					Buff_Index		[BUFF_SIZE-1:0];
-	data_t					Buff_Data		[BUFF_SIZE-1:0];
+	logic						Run_Slice_Src1;
+	logic						Run_Slice_Src2;
+	logic						Run_Slice_Src3;
 
 
-	assign En				= ~I_Stall;
-
-	assign Store			= I_WB_Index.v;
-
-	assign Hit_Src1			= is_Matched_Src1[ Rd_Ptr ] & En;
-	assign Hit_Src2			= is_Matched_Src2[ Rd_Ptr ] & En;
-	assign Hit_Src3			= is_Matched_Src3[ Rd_Ptr ] & En;
-	assign Hit				= Hit_Src1 | Hit_Src2 | Hit_Src3;
-
-	assign Update_Src1		= ( |is_Matched_Src1 ) & En;
-	assign Update_Src2		= ( |is_Matched_Src2 ) & En;
-	assign Update_Src3		= ( |is_Matched_Src3 ) & En;
-	assign Update			= Upda_Src1 | Update_Src2 | Update_Src3;
+	logic						valid			[BUFF_SIZE-1:0];
+	reg_t						Buff_Index		[BUFF_SIZE-1:0];
+	data_t						Buff_Data		[BUFF_SIZE-1:0];
 
 
-	assign O_Src1			= ( Update_Src1 ) ?	Buff_Data[ NoSrc1 ] :
-								( Hit_Src1 ) ?	Buff_Data[ Rd_Ptr ] :
-								I_Src1;
+	assign En					= ~I_Stall;
 
-	assign O_Src2			= ( Update_Src2 ) ?	Buff_Data[ NoSrc2 ] :
-								( Hit_Src2 ) ?	Buff_Data[ Rd_Ptr ] :
-												I_Src2;
+	assign Store				= I_WB_Index.v;
 
-	assign O_Src3			= ( Update_Src3 ) ?	Buff_Data[ NoSrc3 ] :
-								( Hit_Src3 ) ?	Buff_Data[ Rd_Ptr ] :
-												I_Src3;
+	assign Hit_Src1				= is_Matched_Src1[ Rd_Ptr ] & En;
+	assign Hit_Src2				= is_Matched_Src2[ Rd_Ptr ] & En;
+	assign Hit_Src3				= is_Matched_Src3[ Rd_Ptr ] & En;
+	assign Hit					= Hit_Src1 | Hit_Src2 | Hit_Src3;
+
+	assign Update_Src1			= ( |is_Matched_Src1 ) & En;
+	assign Update_Src2			= ( |is_Matched_Src2 ) & En;
+	assign Update_Src3			= ( |is_Matched_Src3 ) & En;
+	assign Update				= Upda_Src1 | Update_Src2 | Update_Src3;
 
 
-	assign Last_Src1		= Run_Slice_Src1 ^ ( I_Src1.idx == Len_Src1 );
-	assign Last_Src2		= Run_Slice_Src2 ^ ( I_Src2.idx == Len_Src2 );
-	assign Last_Src3		= Run_Slice_Src3 ^ ( I_Src3.idx == Len_Src3 );
+	assign O_Src1				= ( Update_Src1 ) ?	Buff_Data[ NoSrc1 ] :
+									( Hit_Src1 ) ?	Buff_Data[ Rd_Ptr ] :
+									I_Src1;
 
-	assign Clr				= Last_Src1 & Last_Src2 & Last_Src3;
+	assign O_Src2				= ( Update_Src2 ) ?	Buff_Data[ NoSrc2 ] :
+									( Hit_Src2 ) ?	Buff_Data[ Rd_Ptr ] :
+													I_Src2;
+
+	assign O_Src3				= ( Update_Src3 ) ?	Buff_Data[ NoSrc3 ] :
+									( Hit_Src3 ) ?	Buff_Data[ Rd_Ptr ] :
+													I_Src3;
+
+
+	assign Last_Src1			= Run_Slice_Src1 ^ ( I_Src1.idx == Len_Src1 );
+	assign Last_Src2			= Run_Slice_Src2 ^ ( I_Src2.idx == Len_Src2 );
+	assign Last_Src3			= Run_Slice_Src3 ^ ( I_Src3.idx == Len_Src3 );
+
+	assign Clr					= Last_Src1 & Last_Src2 & Last_Src3;
 
 
 	always_comb: begin
@@ -237,45 +237,45 @@ module BypassBuff
 
 
 	Encoder #(
-		.NUM_ENTRY(			BUFF_SIZE					)
+		.NUM_ENTRY(			BUFF_SIZE				)
 	) EncSrc1
 	(
-		I_Data(				is_Matched_Src1				),
-		O_Enc(				NoSrc1						)
+		.I_Data(			is_Matched_Src1			),
+		.O_Enc(				NoSrc1					)
 	);
 
 	Encoder #(
-		.NUM_ENTRY(			BUFF_SIZE					)
-	) EncSrc1
+		.NUM_ENTRY(			BUFF_SIZE				)
+	) EncSrc2
 	(
-		I_Data(				is_Matched_Src2				),
-		O_Enc(				NoSrc2						)
+		.I_Data(			is_Matched_Src2			),
+		.O_Enc(				NoSrc2					)
 	);
 
 	Encoder #(
-		.NUM_ENTRY(			BUFF_SIZE					)
-	) EncSrc1
+		.NUM_ENTRY(			BUFF_SIZE				)
+	) EncSrc3
 	(
-		I_Data(				is_Matched_Src3				),
-		O_Enc(				NoSrc3						)
+		.I_Data(			is_Matched_Src3			),
+		.O_Enc(				NoSrc3					)
 	);
 
 
 	RingBuffCTRL_Re #(
-		.NUM_ENTRY(			BUFF_SIZE					)
+		.NUM_ENTRY(			BUFF_SIZE				)
 	) RingBuffCTRL
 	(
-		.clock(				clock						),
-		.reset(				reset						),
-		.I_Update(			Update						),
-		.I_UpdateLen(		Sel_NoSrc					),
-		.I_We(				Store						),
-		.I_Re(				Hit							),
-		.O_WAddr(			Wr_Ptr						),
-		.O_RAddr(			Rd_Ptr						),
-		.O_Full(			O_Full						),
-		.O_Empty(										),
-		.O_Num(											)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Update(			Update					),
+		.I_UpdateLen(		Sel_NoSrc				),
+		.I_We(				Store					),
+		.I_Re(				Hit						),
+		.O_WAddr(			Wr_Ptr					),
+		.O_RAddr(			Rd_Ptr					),
+		.O_Full(			O_Full					),
+		.O_Empty(									),
+		.O_Num(										)
 	);
 
 endmodule

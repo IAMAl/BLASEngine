@@ -18,33 +18,33 @@ module Network_V
 )(
 	input						I_Stall,
 	input						I_Req,
-	input	[12:0]				I_Sel_Path,						//Path Selects
-	input	data_t				I_Scalar_Data,					//Data from Scalar Unit
-	input						I_Sel_ALU_Src1,					//Source Select
-	input						I_Sel_ALU_Src2,					//Source Select
-	input						I_Sel_ALU_Src3,					//Source Select
-	input	lane_t				I_Lane_Data_Src1,				//Lane Data
-	input	lane_t				I_Lane_Data_Src2,				//Lane Data
-	input	lane_t				I_Lane_Data_Src3,				//Lane Data
-	input	lane_t				I_Lane_Data_WB,					//Lane Data
-	input	data_t				I_Src_Data1,					//From RegFile after Rotation Path
-	input	data_t				I_Src_Data2,					//From RegFile after Rotation Path
-	input	data_t				I_Src_Data3,					//From RegFile after Rotation Path
-	input	data_t				I_Src_Data4,					//From RegFile after Rotation Path
-	input	inex_t				I_Src_Idx1,						//Index from RegFile
-	input	inex_t				I_Src_Idx2,						//Index from RegFile
-	input	inex_t				I_Src_Idx3,						//Index from RegFile
-	input	inex_t				I_Src_Idx4,						//Index from RegFile
-	input	index_t				I_WB_DstIdx,					//Index from ALU
-	input	data_t				I_WB_Data,						//Data from ALU
-	output	data_t				O_Src_Data1,					//To Exec Unit
-	output	data_t				O_Src_Data2,					//To Exec Unit
-	output	data_t				O_Src_Data3,					//To Exec Unit
-	output	data_t				O_WB_Data,						//To RF Unit
-	output	data_t				O_Lane_Data_Src1,				//Lane Data
-	output	data_t				O_Lane_Data_Src2,				//Lane Data
-	output	data_t				O_Lane_Data_Src3,				//Lane Data
-	output	data_t				O_Lane_Data_WB,					//Lane Data
+	input	[12:0]				I_Sel_Path,				//Path Selects
+	input	data_t				I_Scalar_Data,			//Data from Scalar Unit
+	input						I_Sel_ALU_Src1,			//Source Select
+	input						I_Sel_ALU_Src2,			//Source Select
+	input						I_Sel_ALU_Src3,			//Source Select
+	input	lane_t				I_Lane_Data_Src1,		//Lane Data
+	input	lane_t				I_Lane_Data_Src2,		//Lane Data
+	input	lane_t				I_Lane_Data_Src3,		//Lane Data
+	input	lane_t				I_Lane_Data_WB,			//Lane Data
+	input	data_t				I_Src_Data1,			//From RegFile after Rotation Path
+	input	data_t				I_Src_Data2,			//From RegFile after Rotation Path
+	input	data_t				I_Src_Data3,			//From RegFile after Rotation Path
+	input	data_t				I_Src_Data4,			//From RegFile after Rotation Path
+	input	inex_t				I_Src_Idx1,				//Index from RegFile
+	input	inex_t				I_Src_Idx2,				//Index from RegFile
+	input	inex_t				I_Src_Idx3,				//Index from RegFile
+	input	inex_t				I_Src_Idx4,				//Index from RegFile
+	input	index_t				I_WB_DstIdx,			//Index from ALU
+	input	data_t				I_WB_Data,				//Data from ALU
+	output	data_t				O_Src_Data1,			//To Exec Unit
+	output	data_t				O_Src_Data2,			//To Exec Unit
+	output	data_t				O_Src_Data3,			//To Exec Unit
+	output	data_t				O_WB_Data,				//To RF Unit
+	output	data_t				O_Lane_Data_Src1,		//Lane Data
+	output	data_t				O_Lane_Data_Src2,		//Lane Data
+	output	data_t				O_Lane_Data_Src3,		//Lane Data
+	output	data_t				O_Lane_Data_WB,			//Lane Data
 	output						O_Buff_Full
 );
 
@@ -158,49 +158,49 @@ module Network_V
 
 
 	PathSel #(
-		.LANE_ID(			LANE_ID				)
+		.LANE_ID(			LANE_ID					)
 	) PathSel
 	(
-		.I_Req(				Req					),
-		.I_Sel_Path(		Sel_Path			),
-		.I_Lane_Data_Src1(	I_Lane_Data_Src1	),
-		.I_Lane_Data_Src2(	I_Lane_Data_Src2	),
-		.I_Lane_Data_Src3(	I_Lane_Data_Src3	),
-		.I_Lane_Data_WB(	I_Lane_WB_Data		),
-		.I_Src_Data1(		Src_Data1			),
-		.I_Src_Data2(		Src_Data2			),
-		.I_Src_Data3(		Src_Data3			),
-		.I_WB_Data(			I_WB_Data			),
-		.O_Src_Data1(		Path_Src_Data1		),
-		.O_Src_Data2(		Path_Src_Data2		),
-		.O_Src_Data3(		Path_Src_Data3		),
-		.O_WB_Data(			Path_WB_Data		)
-		.O_Lane_Data_Src1(	O_Lane_Data_Src1	),
-		.O_Lane_Data_Src2(	O_Lane_Data_Src2	),
-		.O_Lane_Data_Src3(	O_Lane_Data_Src3	),
-		.O_Lane_Data_WB(	O_Lane_Data_WB		)
+		.I_Req(				Req						),
+		.I_Sel_Path(		Sel_Path				),
+		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),
+		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
+		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),
+		.I_Lane_Data_WB(	I_Lane_WB_Data			),
+		.I_Src_Data1(		Src_Data1				),
+		.I_Src_Data2(		Src_Data2				),
+		.I_Src_Data3(		Src_Data3				),
+		.I_WB_Data(			I_WB_Data				),
+		.O_Src_Data1(		Path_Src_Data1			),
+		.O_Src_Data2(		Path_Src_Data2			),
+		.O_Src_Data3(		Path_Src_Data3			),
+		.O_WB_Data(			Path_WB_Data			)
+		.O_Lane_Data_Src1(	O_Lane_Data_Src1		),
+		.O_Lane_Data_Src2(	O_Lane_Data_Src2		),
+		.O_Lane_Data_Src3(	O_Lane_Data_Src3		),
+		.O_Lane_Data_WB(	O_Lane_Data_WB			)
 	);
 
 
 	BypassBuff #(
-		.BUFF_SIZE(			BYPASS_BUFF_SIZE	)
+		.BUFF_SIZE(			BYPASS_BUFF_SIZE		)
 	) BypassBuff
 	(
-		.clock(				clock				),
-		.reset(				reset				),
-		.I_Stall(			I_Stall				),
-		.I_WB_Index(		I_WB_Index			),
-		.I_WB_Data(			I_WB_Data			),
-		.I_Idx1(			Src_Index1			),
-		.I_Idx2(			Src_Index2			),
-		.I_Idx3(			Src_Index3			),
-		.I_Src1(			Path_Src_Data1		),
-		.I_Src2(			Path_Src_Data2		),
-		.I_Src3(			Path_Src_Data3		),
-		.O_Src1(			O_Src_Data1			),
-		.O_Src2(			O_Src_Data2			),
-		.O_Src3(			O_Src_Data3			),
-		.O_Full(			O_Buff_Full			)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			I_Stall					),
+		.I_WB_Index(		I_WB_Index				),
+		.I_WB_Data(			I_WB_Data				),
+		.I_Idx1(			Src_Index1				),
+		.I_Idx2(			Src_Index2				),
+		.I_Idx3(			Src_Index3				),
+		.I_Src1(			Path_Src_Data1			),
+		.I_Src2(			Path_Src_Data2			),
+		.I_Src3(			Path_Src_Data3			),
+		.O_Src1(			O_Src_Data1				),
+		.O_Src2(			O_Src_Data2				),
+		.O_Src3(			O_Src_Data3				),
+		.O_Full(			O_Buff_Full				)
 	);
 
 endmodule

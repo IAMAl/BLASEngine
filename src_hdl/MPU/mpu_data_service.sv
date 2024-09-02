@@ -16,14 +16,14 @@ module DataService_MPU
 )(
 	input						clock,
 	input						reset,
-	input						I_Req,			//Request from Extern
-	input	data_t				I_Data,			//Data from Extern
-	output						O_Req,			//Request to Extern
-	output	data_t				O_Data,			//Data to Extern
-	output						I_Ld_Req,		//Request from Data Memory
-	input	data_t				I_Ld_Data,		//Data from Data Memory
-	output						O_St_Req,		//Request Storing to Data Memory
-	output	data_t				O_St_Data		//Storing Data to Data Memory
+	input						I_Req,					//Request from Extern
+	input	data_t				I_Data,					//Data from Extern
+	output						O_Req,					//Request to Extern
+	output	data_t				O_Data,					//Data to Extern
+	output						I_Ld_Req,				//Request from Data Memory
+	input	data_t				I_Ld_Data,				//Data from Data Memory
+	output						O_St_Req,				//Request Storing to Data Memory
+	output	data_t				O_St_Data				//Storing Data to Data Memory
 );
 
 
@@ -40,33 +40,33 @@ module DataService_MPU
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
 
-	assign Ld_Req		= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_Data-1:0];
-	assign St_Req		= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_Data-1:0];
+	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_Data-1:0];
+	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_Data-1:0];
 
 	// Storing to Buffer
-	assign Store_Buff_St= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
-	assign Store_Buff_Ld= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
+	assign Store_Buff_St		= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
+	assign Store_Buff_Ld=		 is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
 
 	// Loading from Buffer
-	assign Load_Buff_St	= is_FSM_Extern_Run & is_FSM_Extern_St_Run;
-	assign Load_Buff_Ld	= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
+	assign Load_Buff_St			= is_FSM_Extern_Run & is_FSM_Extern_St_Run;
+	assign Load_Buff_Ld			= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
 
-	assign We			= Store_Buff_St | Store_Buff_Ld;
-	assign Re			= Load_Buff_St | Load_Buff_Ld;
+	assign We					= Store_Buff_St | Store_Buff_Ld;
+	assign Re					= Load_Buff_St | Load_Buff_Ld;
 
-	assign Buff_In_Data	= ( Store_Buff_St ) ?	I_Data :
-							( Store_Buff_Ld ) ?	I_Ld_Data :
-												0;
+	assign Buff_In_Data			= ( Store_Buff_St ) ?	I_Data :
+									( Store_Buff_Ld ) ?	I_Ld_Data :
+														0;
 
 	// IF
-	assign O_Req		= Load_Buff_St & ~Empty;
-	assign O_Data		= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : 0;
+	assign O_Req				= Load_Buff_St & ~Empty;
+	assign O_Data				= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : 0;
 
 	// TPU (Router)
-	assign O_St_Req		= Load_Buff_Ld | is_FSM_Extern_St_Notify;
-	assign O_St_Data	= ( Load_Buff_Ld ) ?				I_Data :
-							( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
-															0;
+	assign O_St_Req				= Load_Buff_Ld | is_FSM_Extern_St_Notify;
+	assign O_St_Data			= ( Load_Buff_Ld ) ?				I_Data :
+									( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
+																	0;
 
 
 	// Capture Access-Length
@@ -273,18 +273,18 @@ module DataService_MPU
 
 	//Store Buffer
 	RingBuffCTRL_Re #(
-		.NUM_ENTRY(			BUFF_SIZE					)
+		.NUM_ENTRY(			BUFF_SIZE				)
 	) RingBuffCTRL
 	(
-		.clock(				clock						),
-		.reset(				reset						),
-		.I_We(				We							),
-		.I_Re(				Re							),
-		.O_WAddr(			Wr_Ptr						),
-		.O_RAddr(			Rd_Ptr						),
-		.O_Full(			Full						),
-		.O_Empty(			Empty						),
-		.O_Num(				Num_Stored					)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.O_WAddr(			Wr_Ptr					),
+		.O_RAddr(			Rd_Ptr					),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(				Num_Stored				)
 	);
 
 endmodule

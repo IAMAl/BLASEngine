@@ -16,26 +16,26 @@ module extern_handle
 )(
 	input						clock,
 	input						reset,
-	input						I_Req,			//Request from Extern
-	input	data_t				I_Data,			//Data from Extern
-	input						I_Rls,			//Release Token from Extern
-	output						O_Req,			//Request to Extern
-	output	data_t				O_Data,			//Data to Extern
-	output						O_Rls,			//Release TOken to Extern
-	output						O_Ld_Req,		//Request Loading
-	output	address_t			O_Ld_Length,	//Access-Length for Loading
-	output	address_t			O_Ld_Stride,	//Access-Stride for Loading
-	output	address_t			O_Ld_Base,		//Access-Base Address for Loading
-	input						I_Ld_Grant,		//Grant fro Load-Request
-	input	data_t				I_Ld_Data,		//Loaded Data
-	input						I_Ld_Term,		//End of Loading
-	output						O_St_Req,		//Request Storing
-	output	address_t			O_St_Length,	//Access-Length for Storing
-	output	address_t			O_St_Stride,	//Access-Stride for Storing
-	output	address_t			O_St_Base,		//Access-Base Address for Storing
-	input						I_St_Grant,		//Grant fro Store-Request
-	output	data_t				O_St_Data,		//Storing Data
-	input						I_St_Term		//End of Storing
+	input						I_Req,					//Request from Extern
+	input	data_t				I_Data,					//Data from Extern
+	input						I_Rls,					//Release Token from Extern
+	output						O_Req,					//Request to Extern
+	output	data_t				O_Data,					//Data to Extern
+	output						O_Rls,					//Release TOken to Extern
+	output						O_Ld_Req,				//Request Loading
+	output	address_t			O_Ld_Length,			//Access-Length for Loading
+	output	address_t			O_Ld_Stride,			//Access-Stride for Loading
+	output	address_t			O_Ld_Base,				//Access-Base Address for Loading
+	input						I_Ld_Grant,				//Grant fro Load-Request
+	input	data_t				I_Ld_Data,				//Loaded Data
+	input						I_Ld_Term,				//End of Loading
+	output						O_St_Req,				//Request Storing
+	output	address_t			O_St_Length,			//Access-Length for Storing
+	output	address_t			O_St_Stride,			//Access-Stride for Storing
+	output	address_t			O_St_Base,				//Access-Base Address for Storing
+	input						I_St_Grant,				//Grant fro Store-Request
+	output	data_t				O_St_Data,				//Storing Data
+	input						I_St_Term				//End of Storing
 );
 
 
@@ -45,23 +45,23 @@ module extern_handle
 	localparam int	WIDTH_HALF_BUFF	= $clog2(HALF_BUFF_SIZE);
 
 
-	logic							R_St_Req;
-	logic							R_Ld_Req;
+	logic						R_St_Req;
+	logic						R_Ld_Req;
 
-	address_t						R_Length;
-	address_t						R_Stride;
-	address_t						R_Base;
+	address_t					R_Length;
+	address_t					R_Stride;
+	address_t					R_Base;
 
-	address_t						Counter_St;
+	address_t					Counter_St;
 
 	// Store Buffer
-	logic							We;
-	logic							Re;
-	logic	[WIDTH_BUFF-1:0]		Wr_Ptr;
-	logic	[WIDTH_BUFF-1:0]		Rd_Ptr;
-	logic							Full;
-	logic							Empty;
-	logic	[WIDTH_BUFF:0]			Num_Stored;
+	logic						We;
+	logic						Re;
+	logic	[WIDTH_BUFF-1:0]	Wr_Ptr;
+	logic	[WIDTH_BUFF-1:0]	Rd_Ptr;
+	logic						Full;
+	logic						Empty;
+	logic	[WIDTH_BUFF:0]		Num_Stored;
 
 
 	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_RUN;
@@ -78,53 +78,53 @@ module extern_handle
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
 
-	assign Ld_Req		= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_Data-1:0];
-	assign St_Req		= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_Data-1:0];
+	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_Data-1:0];
+	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_Data-1:0];
 
 
 	// Set Access-Config
-	assign Store_Stride	= is_FSM_Extern_Recv_Stride;
-	assign Store_Length	= is_FSM_Extern_Recv_Length;
-	assign Store_Base	= is_FSM_Extern_Recv_Base;
+	assign Store_Stride			= is_FSM_Extern_Recv_Stride;
+	assign Store_Length			= is_FSM_Extern_Recv_Length;
+	assign Store_Base			= is_FSM_Extern_Recv_Base;
 
 
 	// Storing to Buffer
-	assign Store_Buff_St= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
-	assign Store_Buff_Ld= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
+	assign Store_Buff_St		= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
+	assign Store_Buff_Ld		= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
 
 	// Loading from Buffer
-	assign Load_Buff_St	= is_FSM_Extern_Run & is_FSM_Extern_St_Run;
-	assign Load_Buff_Ld	= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
+	assign Load_Buff_St			= is_FSM_Extern_Run & is_FSM_Extern_St_Run;
+	assign Load_Buff_Ld			= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
 
-	assign We			= Store_Buff_St | Store_Buff_Ld;
-	assign Re			= Load_Buff_St | Load_Buff_Ld;
+	assign We					= Store_Buff_St | Store_Buff_Ld;
+	assign Re					= Load_Buff_St | Load_Buff_Ld;
 
-	assign Buff_In_Data	= ( Store_Buff_St ) ?	I_Data :
-							( Store_Buff_Ld ) ?	I_Ld_Data :
-												0;
+	assign Buff_In_Data			= ( Store_Buff_St ) ?	I_Data :
+									( Store_Buff_Ld ) ?	I_Ld_Data :
+														0;
 
 
 	// Store Configuration
-	assign O_St_Req		= Output_St_Config | ( Load_Buff_St & ~Empty );
-	assign O_St_Length	= ( Output_St_Config ) ?		R_Lenght :				0;
-	assign O_St_Stride	= ( Output_St_Config ) ?		R_Stride :				0;
-	assign O_St_Base	= ( Output_St_Config ) ?		R_Base : 				0;
-	assign O_St_Data	= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :	0;
+	assign O_St_Req				= Output_St_Config | ( Load_Buff_St & ~Empty );
+	assign O_St_Length			= ( Output_St_Config ) ?		R_Lenght :				0;
+	assign O_St_Stride			= ( Output_St_Config ) ?		R_Stride :				0;
+	assign O_St_Base			= ( Output_St_Config ) ?		R_Base : 				0;
+	assign O_St_Data			= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :	0;
 
 	// Load Configuration
-	assign O_Ld_Req		= Output_Ld_Config;
-	assign O_Ld_Length	= ( Output_Ld_Config ) ?	R_Lenght :	0;
-	assign O_Ld_Stride	= ( Output_Ld_Config ) ?	R_Stride :	0;
-	assign O_Ld_Base	= ( Output_Ld_Config ) ?	R_Base : 	0;
+	assign O_Ld_Req				= Output_Ld_Config;
+	assign O_Ld_Length			= ( Output_Ld_Config ) ?	R_Lenght :	0;
+	assign O_Ld_Stride			= ( Output_Ld_Config ) ?	R_Stride :	0;
+	assign O_Ld_Base			= ( Output_Ld_Config ) ?	R_Base : 	0;
 
 
 	// MPU (Router)
-	assign O_Req		= Load_Buff_Ld | is_FSM_Extern_St_Notify;
-	assign O_Data		= ( Load_Buff_Ld ) ?				I_Data :
-							( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
-															0;
-	assign O_Rls		= ( Load_Buff_Ld ) ?				I_Ld_Term :
-															1'b0;
+	assign O_Req				= Load_Buff_Ld | is_FSM_Extern_St_Notify;
+	assign O_Data				= ( Load_Buff_Ld ) ?				I_Data :
+									( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
+																	0;
+	assign O_Rls				= ( Load_Buff_Ld ) ?				I_Ld_Term :
+																	1'b0;
 
 
 	// data-Memory Access-Configuration
@@ -349,18 +349,18 @@ module extern_handle
 
 	//Store Buffer
 	RingBuffCTRL_Re #(
-		.NUM_ENTRY(			BUFF_SIZE					)
+		.NUM_ENTRY(			BUFF_SIZE				)
 	) RingBuffCTRL
 	(
-		.clock(				clock						),
-		.reset(				reset						),
-		.I_We(				We							),
-		.I_Re(				Re							),
-		.O_WAddr(			Wr_Ptr						),
-		.O_RAddr(			Rd_Ptr						),
-		.O_Full(			Full						),
-		.O_Empty(			Empty						),
-		.O_Num(				Num_Stored					)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.O_WAddr(			Wr_Ptr					),
+		.O_RAddr(			Rd_Ptr					),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(				Num_Stored				)
 	);
 
 endmodule

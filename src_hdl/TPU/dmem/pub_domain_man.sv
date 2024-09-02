@@ -15,30 +15,30 @@ module PubDomain_Man
 	parameter int NUM_ENTRY		= 32
 	parameter int WIDTH_ENTRY	= $(clog2(NUM_ENTRY))
 )(
-	input					clock,
-	input					reset,
-	input	address_t		I_St_Base,
-	input	address_t		I_Ld_Base,
-	input					I_St_Grant1,
-	input					I_St_Grant2,
-	input					I_St_Grant3,
-	input					I_Ld_Grant1,
-	input					I_Ld_Grant2,
-	input					I_Ld_Grant3,
-	input					I_St_End,
-	input					I_Ld_End,
-	input					I_GrantVld_St,
-	input					I_GrantVld_Ld,
-	input	[1:0]			I_GrantNo_St,
-	input	[1:0]			I_GrantNo_Ld,
-	output	logic			O_St_Ready1,
-	output	logic			O_St_Ready2,
-	output	logic			O_St_Ready3,
-	output	logic			O_Ld_Ready1,
-	output	logic			O_Ld_Ready2,
-	output	logic			O_Ld_Ready3,
-	output					O_Set_Config_St,
-	output					O_Set_Config_Ld
+	input						clock,
+	input						reset,
+	input	address_t			I_St_Base,
+	input	address_t			I_Ld_Base,
+	input						I_St_Grant1,
+	input						I_St_Grant2,
+	input						I_St_Grant3,
+	input						I_Ld_Grant1,
+	input						I_Ld_Grant2,
+	input						I_Ld_Grant3,
+	input						I_St_End,
+	input						I_Ld_End,
+	input						I_GrantVld_St,
+	input						I_GrantVld_Ld,
+	input	[1:0]				I_GrantNo_St,
+	input	[1:0]				I_GrantNo_Ld,
+	output	logic				O_St_Ready1,
+	output	logic				O_St_Ready2,
+	output	logic				O_St_Ready3,
+	output	logic				O_Ld_Ready1,
+	output	logic				O_Ld_Ready2,
+	output	logic				O_Ld_Ready3,
+	output						O_Set_Config_St,
+	output						O_Set_Config_Ld
 );
 
 
@@ -76,30 +76,30 @@ module PubDomain_Man
 	logic	address_t			TabBAddr	[NUM_ENTRY-1:0];
 
 
-	assign Event_St_Grant1	= ~R_St_Grant1 & I_St_Grant1;
-	assign Event_St_Grant2	= ~R_St_Grant2 & I_St_Grant2;
-	assign Event_St_Grant3	= ~R_St_Grant3 & I_St_Grant3;
+	assign Event_St_Grant1		= ~R_St_Grant1 & I_St_Grant1;
+	assign Event_St_Grant2		= ~R_St_Grant2 & I_St_Grant2;
+	assign Event_St_Grant3		= ~R_St_Grant3 & I_St_Grant3;
 
-	assign Event_Ld_Grant1	= ~R_Ld_Grant1 & I_Ld_Grant1;
-	assign Event_Ld_Grant2	= ~R_Ld_Grant2 & I_Ld_Grant2;
-	assign Event_Ld_Grant3	= ~R_Ld_Grant3 & I_Ld_Grant3;
+	assign Event_Ld_Grant1		= ~R_Ld_Grant1 & I_Ld_Grant1;
+	assign Event_Ld_Grant2		= ~R_Ld_Grant2 & I_Ld_Grant2;
+	assign Event_Ld_Grant3		= ~R_Ld_Grant3 & I_Ld_Grant3;
 
-	assign Hit_St			= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St );
-	assign Hit_Ld			= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant2 ) & ( |is_Hit_Ld );
+	assign Hit_St				= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St );
+	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant2 ) & ( |is_Hit_Ld );
 
-	assign Set_St			= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant2 ) & ~( |is_Hit_St );
-	assign Clr_Ld			= I_Ld_End & Hit_Ld;
+	assign Set_St				= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant2 ) & ~( |is_Hit_St );
+	assign Clr_Ld				= I_Ld_End & Hit_Ld;
 
-	assign Ready_St			= ~R_Stored[ SetNo ];
-	assign Ready_Ld			=  R_Stored[ ClrNo ];
+	assign Ready_St				= ~R_Stored[ SetNo ];
+	assign Ready_Ld				=  R_Stored[ ClrNo ];
 
-	assign O_St_Ready1		= ( I_GrantNo_St == 2'h0 ) & I_GrandVld_St & Ready_St;
-	assign O_St_Ready2		= ( I_GrantNo_St == 2'h1 ) & I_GrandVld_St & Ready_St;
-	assign O_St_Ready3		= ( I_GrantNo_St == 2'h2 ) & I_GrandVld_St & Ready_St;
+	assign O_St_Ready1			= ( I_GrantNo_St == 2'h0 ) & I_GrandVld_St & Ready_St;
+	assign O_St_Ready2			= ( I_GrantNo_St == 2'h1 ) & I_GrandVld_St & Ready_St;
+	assign O_St_Ready3			= ( I_GrantNo_St == 2'h2 ) & I_GrandVld_St & Ready_St;
 
-	assign O_Ld_Ready1		= ( I_GrantNo_Ld == 2'h0 ) & I_GrandVld_Ld & Ready_Ld;
-	assign O_Ld_Ready2		= ( I_GrantNo_Ld == 2'h1 ) & I_GrandVld_Ld & Ready_Ld;
-	assign O_Ld_Ready3		= ( I_GrantNo_Ld == 2'h2 ) & I_GrandVld_Ld & Ready_Ld;
+	assign O_Ld_Ready1			= ( I_GrantNo_Ld == 2'h0 ) & I_GrandVld_Ld & Ready_Ld;
+	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrandVld_Ld & Ready_Ld;
+	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrandVld_Ld & Ready_Ld;
 
 	always_comb: begin
 		for ( int=0; i<NUM_ENTRY; ++i ) begin

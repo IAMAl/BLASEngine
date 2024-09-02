@@ -3,32 +3,32 @@ module LoadStoreUnit
 (
 	input						clock,
 	input						reset,
-	input						I_St_Req,						//Flag: Activate Store Unit
-	input						I_Ld_Req,						//Flag: Activate Load Unit
-	input						I_Store,						//Flag: Request is Store
-	input						I_Stall,						//Force Stalling by Local Memory
-	input	address_t			I_Length,						//Vector-Length for Load/Store
-	input	address_t			I_Stride,						//Stride-Factor for Load/Store
-	input	address_t			I_Base_Addr,					//Load/Store Base Address
-	input						I_St_Ready,						//Flag: Ready to Store (from dmem)
-	input						I_Ld_Ready,						//Flag: Ready to Load (from dmem)
-	input						I_St_End_Access,				//Flag: End of Store Access (from dmem)
-	input						I_Ld_End_Access,				//Flag: End of Load Access (from dmem)
-	output	logic				O_St_Req,						//Store Request (to dmem)
-	output	logic				O_Ld_Req,						//Load Request (to dmem)
-	output	address_t			O_Length,						//Vector-Length for Load/Store
-	output	address_t			O_Stride,						//Stride-Factor for Load/Store
-	output	address_t			O_Base_Addr						//Load/Store Base Address
-	output	logic				O_St_Rd_RF						//Read-Enable to RF units, update index
-	output	logic				O_Ld_Wr_RF						//Write-Enable to RF units, update index
-	output	logic				O_St_Valid,						//Flag: Valid Data to Store (to dmem)
-	input	data_t				I_St_Data,						//Storing Data from Register File
-	output	data_t				O_St_Data,						//Store Data to Local Memory (to dmem)
-	output	logic				O_Ld_Valid,						//Flag: Request Loadinng (to dmem)
-	input	data_t				I_Ld_Data,						//Loaded Data (from dmem)
-	output	data_t				O_Ld_Data,						//Loading Data from Local Memory (to RF)
-	output	logic				O_St_End,						//Flag: Service is Done
-	output	logic				O_Ld_End						//Flag: Service is Done
+	input						I_St_Req,				//Flag: Activate Store Unit
+	input						I_Ld_Req,				//Flag: Activate Load Unit
+	input						I_Store,				//Flag: Request is Store
+	input						I_Stall,				//Force Stalling by Local Memory
+	input	address_t			I_Length,				//Vector-Length for Load/Store
+	input	address_t			I_Stride,				//Stride-Factor for Load/Store
+	input	address_t			I_Base_Addr,			//Load/Store Base Address
+	input						I_St_Ready,				//Flag: Ready to Store (from dmem)
+	input						I_Ld_Ready,				//Flag: Ready to Load (from dmem)
+	input						I_St_End_Access,		//Flag: End of Store Access (from dmem)
+	input						I_Ld_End_Access,		//Flag: End of Load Access (from dmem)
+	output	logic				O_St_Req,				//Store Request (to dmem)
+	output	logic				O_Ld_Req,				//Load Request (to dmem)
+	output	address_t			O_Length,				//Vector-Length for Load/Store
+	output	address_t			O_Stride,				//Stride-Factor for Load/Store
+	output	address_t			O_Base_Addr				//Load/Store Base Address
+	output	logic				O_St_Rd_RF				//Read-Enable to RF units, update index
+	output	logic				O_Ld_Wr_RF				//Write-Enable to RF units, update index
+	output	logic				O_St_Valid,				//Flag: Valid Data to Store (to dmem)
+	input	data_t				I_St_Data,				//Storing Data from Register File
+	output	data_t				O_St_Data,				//Store Data to Local Memory (to dmem)
+	output	logic				O_Ld_Valid,				//Flag: Request Loadinng (to dmem)
+	input	data_t				I_Ld_Data,				//Loaded Data (from dmem)
+	output	data_t				O_Ld_Data,				//Loading Data from Local Memory (to RF)
+	output	logic				O_St_End,				//Flag: Service is Done
+	output	logic				O_Ld_End				//Flag: Service is Done
 );
 
 

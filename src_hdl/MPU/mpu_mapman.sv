@@ -14,46 +14,46 @@ module MapMan_MPU
 (
 	input						clock,
 	input						reset,
-	input						I_Req_St,						//Request from Instruction Memory (Storing)
-	input	id_t				I_ThreadID_St,					//Thread-ID from Instruction Memory
-	input	mpu_address_t		I_Length_St,					//Storing Size of Program
-	output						O_Ack_St,						//Ack to Instruction Memory
-	input	id_t				I_ThreadID_Ld,					//Thread-ID from Dispatch Unit
-	output	mpu_address_t		O_Used_Size,					//Already Used Instruction Memory Size
-	input						I_Req_Lookup,					//Request from Dispatch Unit
-	output						O_Ack_Lookup,					//Ack to Dispatch Unit
-	output	lookup_t			O_ThreadInfo,					//Thread Info to Dispatch Unit
-	output						O_Full							//Flag: Map-Table is Fully Used
+	input						I_Req_St,				//Request from Instruction Memory (Storing)
+	input	id_t				I_ThreadID_St,			//Thread-ID from Instruction Memory
+	input	mpu_address_t		I_Length_St,			//Storing Size of Program
+	output						O_Ack_St,				//Ack to Instruction Memory
+	input	id_t				I_ThreadID_Ld,			//Thread-ID from Dispatch Unit
+	output	mpu_address_t		O_Used_Size,			//Already Used Instruction Memory Size
+	input						I_Req_Lookup,			//Request from Dispatch Unit
+	output						O_Ack_Lookup,			//Ack to Dispatch Unit
+	output	lookup_t			O_ThreadInfo,			//Thread Info to Dispatch Unit
+	output						O_Full					//Flag: Map-Table is Fully Used
 );
 
 
-	logic							Found;
+	logic						Found;
 
-	logic							We;
-	logic							Re;
+	logic						We;
+	logic						Re;
 	logic	[WIDTH_TAB_MAPMAN-1:0]	WNo;
 	logic	[WIDTH_TAB_MAPMAN-1:0]	RNo;
-	logic							Full;
-	logic							Empty;
+	logic						Full;
+	logic						Empty;
 
 	logic	[SIZE_TAB_MAPMAN-1:0]	Valid;
 	logic	[SIZE_TAB_MAPMAN-1:0]	is_Matched;
 
-	mpu_address_t					R_Address_Ld;
-	mpu_address_t					R_Length_Ld;
-	mpu_address_t					R_Used_Size;
+	mpu_address_t				R_Address_Ld;
+	mpu_address_t				R_Length_Ld;
+	mpu_address_t				R_Used_Size;
 
-	fsm_mapman_st					FSM_St;
-	fsm_mapman_ld					FSM_Ld;
+	fsm_mapman_st				FSM_St;
+	fsm_mapman_ld				FSM_Ld;
 
 
-	assign O_Full           = R_Used_Size >= (SIZE_THREAD_MEM-1);
+	assign O_Full    	       = R_Used_Size >= (SIZE_THREAD_MEM-1);
 
-	assign Found			= |(~Valid)
+	assign Found				= |(~Valid)
 
 	// Send Ack and Used-size to InstrMem Unit
-	assign O_Ack_St			= ~FSM_St & Found;
-	assign O_Used_Size		= R_Used_Size;
+	assign O_Ack_St				= ~FSM_St & Found;
+	assign O_Used_Size			= R_Used_Size;
 
 	// Send Back Information to Dispatch UNit
 	assign O_Ack_Lookup			= FSM_Ld;
@@ -61,16 +61,16 @@ module MapMan_MPU
 	assign O_ThreadInfo.address	= R_Address_ld;
 
 	// Update Used Size
-	assign Update           = O_Ack_St | FSM_Ld;
-	assign UpdateAmount     = (    O_Ack_St &  O_Ack_Lookup ) ?	I_Length_St - O_Length_Ld :
-								(  O_Ack_St & ~O_Ack_Lookup ) ?	I_Length_St :
-								( ~O_Ack_St &  O_Ack_Lookup ) ?	-O_Length_Ld :
-																0;
+	assign Update				= O_Ack_St | FSM_Ld;
+	assign UpdateAmount 		= (    O_Ack_St &  O_Ack_Lookup ) ?	I_Length_St - O_Length_Ld :
+									(  O_Ack_St & ~O_Ack_Lookup ) ?	I_Length_St :
+									( ~O_Ack_St &  O_Ack_Lookup ) ?	-O_Length_Ld :
+																	0;
 
 	// Table Handling
-	assign WError			= I_Req_St & ~Full &  TabInstr[ WNo ].Valid;
-	assign We				= I_Req_St & ~Full & ~TabInstr[ WNo ].Valid;
-	assign Re				= I_Req_Lookup & ~Empty;
+	assign WError				= I_Req_St & ~Full &  TabInstr[ WNo ].Valid;
+	assign We					= I_Req_St & ~Full & ~TabInstr[ WNo ].Valid;
+	assign Re					= I_Req_Lookup & ~Empty;
 
 
 	always_comb begin

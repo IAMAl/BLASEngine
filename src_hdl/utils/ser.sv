@@ -11,25 +11,25 @@
 
 module Ser
 #(
-	parameter int WIDTH_INPUT		= 32,
-	parameter int WIDTH_OUTPUT		= 8,
+	parameter int WIDTH_INPUT	= 32,
+	parameter int WIDTH_OUTPUT	= 8,
 )(
-	input							clock,
-	input							reset
-	input							I_Req,							//Request
-	input	[WIDTH_INPUT-1:0]		I_Data,							//Serial Source
-	output							O_Valid,						//Valid Output
-	output	[WIDTH_OUTPUT-1:0]		O_Data							//De-sirialized Data
+	input						clock,
+	input						reset
+	input						I_Req,				//Request
+	input	[WIDTH_INPUT-1:0]	I_Data,				//Serial Source
+	output						O_Valid,			//Valid Output
+	output	[WIDTH_OUTPUT-1:0]	O_Data				//De-sirialized Data
 );
 
-	localparam int	ROUND_VAL		= (WIDTH_OUTPUT+1)/2;
-	localparam int	COUNT_VAL		= (WIDTH_INPUT+ROUND_VAL)/WIDTH_OUTPUT;
-	localparam int	WIDTH_COUNT		= $clog2(COUNT_VAL);
+	localparam int	ROUND_VAL	= (WIDTH_OUTPUT+1)/2;
+	localparam int	COUNT_VAL	= (WIDTH_INPUT+ROUND_VAL)/WIDTH_OUTPUT;
+	localparam int	WIDTH_COUNT	= $clog2(COUNT_VAL);
 
 
-	logic	[WIDTH_COUNT-1:0]		Count;
+	logic	[WIDTH_COUNT-1:0]	Count;
 
-	logic	[WIDTH_OUTPUT-1:0]		Data;
+	logic	[WIDTH_OUTPUT-1:0]	Data;
 
 
 	assign Valid				= Count == COUNT_VAL;
