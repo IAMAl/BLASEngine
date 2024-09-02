@@ -137,65 +137,65 @@ module BypassBuff
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run_Slice_Src1		<= 1'0;
+			Run_Slice_Src1	<= 1'0;
 		end
 		else if ( Last_Src1 ) begin
-			Run_Slice_Src1		<= 1'b0;
+			Run_Slice_Src1	<= 1'b0;
 		end
 		else if ( I_Src1.v & ( I_Src1.slice_len != 0 ) ) begin
-			Run_Slice_Src1		<= 1'b1;
+			Run_Slice_Src1	<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run_Slice_Src2		<= 1'0;
+			Run_Slice_Src2	<= 1'0;
 		end
 		else if ( Last_Src2 ) begin
-			Run_Slice_Src2		<= 1'b0;
+			Run_Slice_Src2	<= 1'b0;
 		end
 		else if ( I_Src2.v & ( I_Src2.slice_len != 0 ) ) begin
-			Run_Slice_Src2		<= 1'b1;
+			Run_Slice_Src2	<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run_Slice_Src3		<= 1'0;
+			Run_Slice_Src3	<= 1'0;
 		end
 		else if ( Last_Src3 ) begin
-			Run_Slice_Src3		<= 1'b0;
+			Run_Slice_Src3	<= 1'b0;
 		end
 		else if (  I_Src3.v & ( I_Src3.slice_len != 0 ) ) begin
-			Run_Slice_Src3		<= 1'b1;
+			Run_Slice_Src3	<= 1'b1;
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Len_Src1				<= 0;
+			Len_Src1		<= 0;
 		end
 		else if ( I_Src1.v & ( I_Src1.slice_len != 0 ) ) begin
-			Len_Src1				<= I_Src1.slice_len + I_Src1.idx :
+			Len_Src1		<= I_Src1.slice_len + I_Src1.idx :
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Len_Src2				<= 0;
+			Len_Src2		<= 0;
 		end
 		else if ( I_Src2.v & ( I_Src2.slice_len != 0 ) ) begin
-			Len_Src2				<= I_Src2.slice_len + I_Src2.idx :
+			Len_Src2		<= I_Src2.slice_len + I_Src2.idx :
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Len_Src3				<= 0;
+			Len_Src3		<= 0;
 		end
 		else if ( I_Src3.v & ( I_Src3.slice_len != 0 ) ) begin
-			Len_Src3				<= I_Src3.slice_len + I_Src3.idx :
+			Len_Src3		<= I_Src3.slice_len + I_Src3.idx :
 		end
 	end
 

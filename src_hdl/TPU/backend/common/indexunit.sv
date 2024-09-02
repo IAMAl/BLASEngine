@@ -123,76 +123,76 @@ module IndexUnit
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Req				<= 1'b0;
+			R_Req			<= 1'b0;
 		end
 		else if ( SkipEnd ) begin
-			R_Req				<= 1'b0;
+			R_Req			<= 1'b0;
 		end
 		else begin
-			R_Req				<= I_Req;
+			R_Req			<= I_Req;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_MaskedRead		<= 1'b0;
+			R_MaskedRead	<= 1'b0;
 		end
 		else if ( SkipEnd ) begin
-			R_MaskedRead		<= 1'b0;
+			R_MaskedRead	<= 1'b0;
 		end
 		else if ( I_Req & ~I_Stall & I_Slice ) begin
-			R_MaskedRead		<= I_MaskedRead;
+			R_MaskedRead	<= I_MaskedRead;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Sel				<= 1'b0;
+			R_Sel			<= 1'b0;
 		end
 		else if ( End_Count ) begin
-			R_Sel				<= 1'b0;
+			R_Sel			<= 1'b0;
 		end
 		else if ( I_Req & ~I_Stall & I_Slice ) begin
-			R_Sel				<= 1'b1;
+			R_Sel			<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Index				<= 0;
+			R_Index			<= 0;
 		end
 		else if ( R_Sel & ~I_Stall ) begin
-			R_Index			 	<= index_val;
+			R_Index			<= index_val;
 		end
 		else if ( I_Req & ~I_Stall ) begin
-			R_Index				<= I_Index;
+			R_Index			<= I_Index;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Base_Index		<= 0;
+			R_Base_Index	<= 0;
 		end
 		else if ( I_Req & ~I_Stall & I_Slice ) begin
-			R_Base_Index		<= I_Index;
+			R_Base_Index	<= I_Index;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length			<= 0;
+			R_Length		<= 0;
 		end
 		else if ( I_Req & ~I_Stall & I_Slice ) begin
-			R_Length			<= I_Length;
+			R_Length		<= I_Length;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Window			<= 0;
+			R_Window		<= 0;
 		end
 		else if ( I_Req & ~I_Stall & I_Slice ) begin
-			R_Window			<= I_Window;
+			R_Window		<= I_Window;
 		end
 	end
 

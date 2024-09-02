@@ -92,40 +92,40 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Count				<= 0;
+			R_Count			<= 0;
 		end
 		else if ( ( R_Count > 0 ) & I_Req_Ld & ~R_Req_Ld ) begin
-			R_Count				<= R_Count - 1'b1;
+			R_Count			<= R_Count - 1'b1;
 		end
 		else if ( ( R_Count != (SIZE_THREAD_MEM-1) ) & End_Store ) begin
-			R_Count				<= R_Count + 1'b1;
+			R_Count			<= R_Count + 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Req				<= 1'b0;
+			R_Req			<= 1'b0;
 		end
 		else begin
-			R_Req				<= ( ( R_Count == 0 ) & End_Store ) | ( ( R_Count != 0 ) & I_Req_Ld & ~R_Req_Ld );
+			R_Req			<= ( ( R_Count == 0 ) & End_Store ) | ( ( R_Count != 0 ) & I_Req_Ld & ~R_Req_Ld );
 		end
 	end
 
 	always_ff @( posedfe clock ) begin
 		if ( reset ) begin
-			R_Req_Ld			<= 1'b0
+			R_Req_Ld		<= 1'b0
 		end
 		else begin
-			R_Req_Ld			<= I_Req_Ld;
+			R_Req_Ld		<= I_Req_Ld;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Instr_Ld			<= 0;
+			R_Instr_Ld		<= 0;
 		end
 		else if ( I_Req_Ld ) begin
-			R_Instr_Ld			<= InstrMeme[ I_Adddress_Ld ];
+			R_Instr_Ld		<= InstrMeme[ I_Adddress_Ld ];
 		end
 	end
 
@@ -137,40 +137,40 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Adddress_St		<= 0;
+			R_Adddress_St	<= 0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_STORE ) begin
-			R_Adddress_St		<= R_Adddress_St + 1'b1;
+			R_Adddress_St	<= R_Adddress_St + 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_ThreadID_St		<= 0;
+			R_ThreadID_St	<= 0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_RCVID ) begin
-			R_ThreadID_St		<= I_Instr_St;
+			R_ThreadID_St	<= I_Instr_St;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length_St			<= 0;
+			R_Length_St		<= 0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_CHECK ) begin
-			R_Length_St			<= I_Instr_St;
+			R_Length_St		<= I_Instr_St;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_STORE ) begin
-			R_Length_St			<= R_Length_St - 1'b1;
+			R_Length_St		<= R_Length_St - 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Error_Size		<= 1'b0;
+			R_Error_Size	<= 1'b0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_CHECK ) begin
-			R_Error_Size		<= ( I_Used_Size + I_Instr_St ) > SIZE_THREAD_MEM;
+			R_Error_Size	<= ( I_Used_Size + I_Instr_St ) > SIZE_THREAD_MEM;
 		end
 	end
 

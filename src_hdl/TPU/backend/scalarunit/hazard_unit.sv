@@ -202,8 +202,8 @@ module HazardCheck_TPU
 
 
 	//// Buffer Control
-	assign We				= I_Req_Issue & ~Full;
-	assign Re				= Valud_Issue & ~Empty;
+	assign We					= I_Req_Issue & ~Full;
+	assign Re					= Valud_Issue & ~Empty;
 
 
 	//// Storing to Table

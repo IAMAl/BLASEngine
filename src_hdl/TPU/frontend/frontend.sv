@@ -73,91 +73,91 @@ module FrontEnd
 
 	always_ff @ ( posedge clock ) begin
 		if ( reset ) begin
-			R_Instr				<= '0;
+			R_Instr			<= '0;
 		end
 		else if ( R_Req ) begin
-			R_Instr				<= I_Instr;
+			R_Instr			<= I_Instr;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_ThreadID			<= '0;
+			R_ThreadID		<= '0;
 		end
 		else if ( R_Term ) begin
-			R_ThreadID			<= '0;
+			R_ThreadID		<= '0;
 		end
 		else if ( R_Instr.v & is_FSM_TPU_SIMT ) begin
-			R_ThreadID			<= R_Instr;
+			R_ThreadID		<= R_Instr;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_IssueNo			<= '0;
+			R_IssueNo		<= '0;
 		end
 		else if ( R_Term ) begin
-			R_IssueNo			<= '0;
+			R_IssueNo		<= '0;
 		end
 		else if ( R_Instr.v & is_FSM_TPU_SCALAR ) begin
-			R_IssueNo			<= R_Instr;
+			R_IssueNo		<= R_Instr;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_We				<= 1'b0;
+			R_We			<= 1'b0;
 		end
 		else if ( ~R_Req ) begin
-			R_We				<= 1'b0;
+			R_We			<= 1'b0;
 		end
 		else if ( Set_We ) begin
-			R_We				<= 1'b1;
+			R_We			<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_En_Exe			<= 1'b0;
+			R_En_Exe		<= 1'b0;
 		end
 		else begin
-			R_En_Exe			<= I_En_Exe;
+			R_En_Exe		<= I_En_Exe;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Req				<= 1'b0;
+			R_Req			<= 1'b0;
 		end
 		else begin
-			R_Req				<= I_Req;
+			R_Req			<= I_Req;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Term				<= 1'b0;
+			R_Term			<= 1'b0;
 		end
 		else begin
-			R_Term				<= I_Term;
+			R_Term			<= I_Term;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Full				<= 1'b0;
+			R_Full			<= 1'b0;
 		end
 		else begin
-			R_Full				<= I_Full;
+			R_Full			<= I_Full;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( rset ) begin
-			R_Nack				<= 1'b0;
+			R_Nack			<= 1'b0;
 		end
 		else begin
-			R_Nack				<= I_Nack;
+			R_Nack			<= I_Nack;
 		end
 	end
 

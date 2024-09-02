@@ -164,32 +164,32 @@ module DMem
 
 	always_ff @( posedge clock ) begin
 		if ( Req_Ld ) begin
-			Ld_Data		<= DataMem[ Address_Ld ];
+			Ld_Data			<= DataMem[ Address_Ld ];
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_St_Private		<= 1'b0;
+			R_St_Private	<= 1'b0;
 		end
 		else if ( End_St ) begin
-			R_St_Private		<= 1'b0;
+			R_St_Private	<= 1'b0;
 		end
 		else if ( St_Private ) begin
-			R_St_Private		<= 1'b1;
+			R_St_Private	<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Ld_Private		<= 1'b0;
+			R_Ld_Private	<= 1'b0;
 		end
 		else if ( End_Ld ) begin
-			R_Ld_Private		<= 1'b0;
+			R_Ld_Private	<= 1'b0;
 		end
 		else if ( Ld_Private ) begin
-			R_Ld_Private		<= 1'b1;
+			R_Ld_Private	<= 1'b1;
 		end
 	end
 

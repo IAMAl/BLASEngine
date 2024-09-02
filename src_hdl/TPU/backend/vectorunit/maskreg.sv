@@ -31,10 +31,10 @@ module MaskReg
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Mask				<= '0;
+			Mask			<= '0;
 		end
 		else if ( I_We ) begin
-			Mask[ I_Index ]		<= I_Status[ I_Cond ];
+			Mask[ I_Index ]	<= I_Status[ I_Cond ];
 		end
 	end
 

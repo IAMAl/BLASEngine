@@ -45,13 +45,13 @@ module AGU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Run				<= 1'b0;
+			R_Run			<= 1'b0;
 		end
         else if ( End_Access ) begin
-            R_Run				<= 1'b0;
+            R_Run			<= 1'b0;
         end
 		else if ( I_Req ) begin
-			R_Run				<= 1'b1;
+			R_Run			<= 1'b1;
 		end
 	end
 
@@ -59,34 +59,34 @@ module AGU
     //// Access Configuration
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length			<= 0;
+			R_Length		<= 0;
 		end
 		else if (  R_Run & ( R_Length > 0 ) & ~I_Stall ) begin
-			R_Length 			<= R_Length -1'b1;
+			R_Length 		<= R_Length -1'b1;
 		end
 		else if ( I_Req & ~R_Run ) begin
-			R_Length			<= I_Length;
+			R_Length		<= I_Length;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stide				<=n 0;
+			R_Stide			<=n 0;
 		end
 		else ( I_Req & ~R_Run ) begin
-			R_Stide				<= I_Stride;
+			R_Stide			<= I_Stride;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Address			<= 0;
+			R_Address		<= 0;
 		end
 		else if ( R_Run ) begin
-			R_Address			<= R_Address + R_Stride;
+			R_Address		<= R_Address + R_Stride;
 		end
 		else ( I_Req & ~R_Run ) begin
-			R_Address			<= I_Base_Addr;
+			R_Address		<= I_Base_Addr;
 		end
 	end
 

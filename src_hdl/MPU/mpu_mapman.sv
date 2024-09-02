@@ -109,7 +109,7 @@ module MapMan_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			TabInstr			<= '0;
+			TabInstr		<= '0;
 		end
 		else if ( I_Req_St | I_Req_Lookup ) begin
 			if ( I_Req_St ) begin

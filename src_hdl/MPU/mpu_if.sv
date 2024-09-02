@@ -103,46 +103,46 @@ module IF_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Ready		<= 1'b0;
+			Ready			<= 1'b0;
 		end
 		else if ( Clr_Ready ) begin
-			Ready		<= 1'b0;
+			Ready			<= 1'b0;
 		end
 		else if ( Set_Ready ) begin
-			Ready		<= 1'b1;
+			Ready			<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run		<= 1'b0;
+			Run				<= 1'b0;
 		end
 		else if ( Clr_Run ) begin
-			Run			<= 1'b0;
+			Run				<= 1'b0;
 		end
 		else if ( Set_Run ) begin
-			Run			<= 1'b1;
+			Run				<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			NoThMem		<= 1'b0;
+			NoThMem			<= 1'b0;
 		end
 		else if ( Clr_NoThMem ) begin
-			NoThMem		<= 1'b0;
+			NoThMem			<= 1'b0;
 		end
 		else if ( Set_NoThMem ) begin
-			NoThMem		<= 1'b1;
+			NoThMem			<= 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			En_TPU		<= 0;
+			En_TPU			<= 0;
 		end
 		else if ( I_Req_IF & ( R_FSM_IF_MPU	<= FSM_SET_EN_TPU_MPU ) ) begin
-			En_TPU		<= I_Data_IF;
+			En_TPU			<= I_Data_IF;
 		end
 	end
 

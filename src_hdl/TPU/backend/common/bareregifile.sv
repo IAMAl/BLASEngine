@@ -44,26 +44,26 @@ module BareRegFile
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			src_data1			<= 0;
+			src_data1		<= 0;
 		end
 		else if ( I_Re1	) begin
-			src_data1			<= RegFile[ Index_Src1 ];
+			src_data1		<= RegFile[ Index_Src1 ];
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			src_data2			<= 0;
+			src_data2		<= 0;
 		end
 		else if ( I_Re2	) begin
-			src_data2			<= RegFile[ Index_Src2 ];
+			src_data2		<= RegFile[ Index_Src2 ];
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
 			for ( int i=0; i<NUM_RF_ENTRY; ++i ) begin
-				RegFile			<= 0;
+				RegFile		<= 0;
 			end
 		end
 		else if ( I_We ) begin

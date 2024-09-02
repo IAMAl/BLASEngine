@@ -66,7 +66,7 @@ module RingBuffCTRL
 	//// Pointers													////
 	always_ff @( posedge clock ) begin: ff_wcnt
 		if ( reset ) begin
-			R_WCNT		<= '0;
+			R_WCNT			<= '0;
 		end
 		else if ( I_We ) begin
 			if ( R_WCNT == ( NUM_ENTRY-1 ) ) begin
@@ -80,7 +80,7 @@ module RingBuffCTRL
 
 	always_ff @( posedge clock ) begin: ff_rcnt
 		if ( reset ) begin
-			R_RCNT		<= '0;
+			R_RCNT			<= '0;
 		end
 		else if  (( I_Re & ~Empty ) | ( I_Re & I_We & Empty )) begin
 			if ( R_RCNT == ( NUM_ENTRY-1 ) ) begin

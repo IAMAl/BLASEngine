@@ -47,7 +47,7 @@ module CommitAgg
 
 	always_comb: begin
 		for ( int i=0; i<BUFF_SIZE; ++i ) begin
-			assign is_Commit[ i ]			= |is_Matched[ i ];
+			assign is_Commit[ i ]	= |is_Matched[ i ];
 		end
 	end
 

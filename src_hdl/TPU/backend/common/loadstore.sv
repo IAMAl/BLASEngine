@@ -71,26 +71,26 @@ module LoadStoreUnit
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_St_Active				<= 1'b0;
+			R_St_Active		<= 1'b0;
 		end
 		else if ( I_St_End_Access ) begin
-			R_St_Active				<=  1'b0;
+			R_St_Active		<=  1'b0;
 		end
 		else if ( I_St_Req ) begin
-			R_St_Active				<=  1'b1;
+			R_St_Active		<=  1'b1;
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Ld_Active				<= 1'b0;
+			R_Ld_Active		<= 1'b0;
 		end
 		else if ( ILdt_End_Access ) begin
-			R_Ld_Active				<=  1'b0;
+			R_Ld_Active		<=  1'b0;
 		end
 		else if ( I_Ld_Req ) begin
-			R_Ld_Active				<=  1'b1;
+			R_Ld_Active		<=  1'b1;
 		end
 	end
 
@@ -98,19 +98,19 @@ module LoadStoreUnit
 	//// Capture End of Service
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_St_End			<= 1'b0;
+			R_St_End		<= 1'b0;
 		end
 		elzze begin
-			R_St_End			<= I_St_End_Access;
+			R_St_End		<= I_St_End_Access;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Ld_End			<= 1'b0;
+			R_Ld_End		<= 1'b0;
 		end
 		elzze begin
-			R_Ld_End			<= I_Ld_End_Access;
+			R_Ld_End		<= I_Ld_End_Access;
 		end
 	end
 
@@ -118,20 +118,20 @@ module LoadStoreUnit
 	//// Capture Load/Store Data for Transfer
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			St_Data				<= 0;
+			St_Data			<= 0;
 		end
 		else if ( ~I_Stall ) begin
-			St_Data				<= I_St_Data;
+			St_Data			<= I_St_Data;
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Ld_Data				<= 0;
+			Ld_Data			<= 0;
 		end
 		else if ( R_We ) begin
-			Ld_Data				<= I_Ld_Data;
+			Ld_Data			<= I_Ld_Data;
 		end
 	end
 
@@ -139,28 +139,28 @@ module LoadStoreUnit
 	//// Capture Access-Configuration
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length			<= 0;
+			R_Length		<= 0;
 		end
 		else ( I_Req & ~R_Run ) begin
-			R_Length			<= I_Length;
+			R_Length		<= I_Length;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stide				<=n 0;
+			R_Stide			<=n 0;
 		end
 		else ( I_Req & ~R_Run ) begin
-			R_Stide				<= I_Stride;
+			R_Stide			<= I_Stride;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Address			<= 0;
+			R_Address		<= 0;
 		end
 		else ( I_Req & ~R_Run ) begin
-			R_Base_Addr			<= I_Base_Addr;
+			R_Base_Addr		<= I_Base_Addr;
 		end
 	end
 

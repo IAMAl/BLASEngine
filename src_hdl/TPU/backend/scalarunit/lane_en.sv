@@ -31,7 +31,7 @@ module Lane_En
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Lane_En				<= 0;
+			Lane_En			<= 0;
 		end
 		else if ( I_We | I_We_V_State ) begin
 			if ( I_We ) begin

@@ -58,7 +58,7 @@ module ReorderBuff_V #(
 
 	always_comb: begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			Set_Commit[i]		= Commit_V[i].En_Lane ^ Commit_V[i].Commit;
+			assign Set_Commit[i]	= Commit_V[i].En_Lane ^ Commit_V[i].Commit;
 		end
 	end
 

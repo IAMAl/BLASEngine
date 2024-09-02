@@ -188,7 +188,7 @@ module PubDomain_Man
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				TabBAddr[ i ]		<= 0;
+				TabBAddr[ i ]	<= 0;
 			end
 		end
 		else if ( Set_St ) begin
@@ -199,7 +199,7 @@ module PubDomain_Man
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stored			<= 0;
+			R_Stored		<= 0;
 		end
 		else if (( Hit_St & I_St_End ) | ( Hit_Ld & I_Ld_End )) begin
 			if ( Hit_St & I_St_End ) begin

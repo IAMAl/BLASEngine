@@ -86,46 +86,46 @@ module PAC
 	// Capture Request
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Req				<= 1'b0;
+			R_Req			<= 1'b0;
 		end
 		else begin
-			R_Req				<= Req;
+			R_Req			<= Req;
 		end
 	end
 
 	// Retime to Make Stall-Sinal
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Cond				<= 1'b1;
+			R_Cond			<= 1'b1;
 		end
 		else begin
-			R_Cond				<= ~R_CondValid & I_Req;
+			R_Cond			<= ~R_CondValid & I_Req;
 		end
 	end
 
 	// Validation of Branch
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_CondValid			<= 1'b0;
+			R_CondValid		<= 1'b0;
 		end
 		else if ( StallReq ) begin
-			R_CondValid			<= 1'b0;
+			R_CondValid		<= 1'b0;
 		end
 		else if ( Cond_Valid ) begin
-			R_CondValid			<= 1'b1;
+			R_CondValid		<= 1'b1;
 		end
 	end
 
 	// Program Address
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
-			R_Address			<= '0;
+			R_Address		<= '0;
 		end
 		else if ( Req & I_Jump ) begin
-			R_Address			<= I_Src;
+			R_Address		<= I_Src;
 		end
 		else if ( Update ) begin
-			R_Address			<= Address;
+			R_Address		<= Address;
 		end
 	end
 

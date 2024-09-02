@@ -69,7 +69,7 @@ module Commit_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			IssueInfo			<= '0;
+			IssueInfo		<= '0;
 		end
 		else if ( I_Req_Issue | I_Req_Commit ) begin
 			if ( I_Req_Commit ) begin
@@ -86,8 +86,8 @@ module Commit_MPU
 
 
 	//// Module: Ring-Buffer Controller
-	assign We				= I_Req_Issue & ~Full;
-	assign Re				= Commit & ~Empty;
+	assign We					= I_Req_Issue & ~Full;
+	assign Re					= Commit & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			NUM_ENTRY_HAZARD		)
 	) HazardTab_Ptr

@@ -191,8 +191,8 @@ module HazardCheck_TPU
 
 
 	//// Buffer Control
-	assign We				= I_Req_Issue & ~Full;
-	assign Re				= Valud_Issue & ~Empty;
+	assign We					= I_Req_Issue & ~Full;
+	assign Re					= Valud_Issue & ~Empty;
 
 
 	//// Storing to Table
@@ -275,16 +275,16 @@ module HazardCheck_TPU
 		end
 		else if ( Set_Index ) begin
 			if ( R_Valid_Dst ) begin
-				R_Indeces.instr.dst.v		<= 1'b1;
+				R_Indeces.instr.dst.v	<= 1'b1;
 				R_Indeces.dst.idx		<= R_Index_Dst;
 			end
 			else begin
-				R_Indeces.instr.dst.v		<= 1'b0;
+				R_Indeces.instr.dst.v	<= 1'b0;
 			end
 
 			if ( R_Valid_Src1 ) begin
 				R_Indeces.instr.src1.v	<= 1'b1;
-				R_Indeces.src1.idx	<= R_Index_Src1;
+				R_Indeces.src1.idx		<= R_Index_Src1;
 			end
 			else begin
 				R_Indeces.instr.src1.v	<= 1'b0;
@@ -292,7 +292,7 @@ module HazardCheck_TPU
 
 			if ( R_Valid_Src2 ) begin
 				R_Indeces.instr.src2.v	<= 1'b1;
-				R_Indeces.src2.idx	<= R_Index_Src2;
+				R_Indeces.src2.idx		<= R_Index_Src2;
 			end
 			else begin
 				R_Indeces.instr.src2.v	<= 1'b0;
@@ -300,7 +300,7 @@ module HazardCheck_TPU
 
 			if ( R_Valid_Src3 ) begin
 				R_Indeces.instr.src3.v	<= 1'b1;
-				R_Indeces.src3.idx	<= R_Index_Src3;
+				R_Indeces.src3.idx		<= R_Index_Src3;
 			end
 			else begin
 				R_Indeces.instr.src3.v	<= 1'b0;

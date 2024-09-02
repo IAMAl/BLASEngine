@@ -32,10 +32,10 @@ module InstrMem
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Instr					<= 0;
+			R_Instr			<= 0;
 		end
 		else if ( I_Req_Ld ) begin
-			R_Instr					<= InstrMeme[ I_Ld_Address ];
+			R_Instr			<= InstrMeme[ I_Ld_Address ];
 		end
 	end
 

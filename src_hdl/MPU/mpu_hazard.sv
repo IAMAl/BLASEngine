@@ -149,8 +149,8 @@ module HazardCheck_MPU
 
 
 	//// Module: Ring-Buffer Controller
-	assign We				= I_Req & ~Full;
-	assign Re				= Issueable & ~Empty;
+	assign We					= I_Req & ~Full;
+	assign Re					= Issueable & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			NUM_ENTRY_HAZARD		)
 	) HazardTab_Ptr

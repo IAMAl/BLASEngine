@@ -71,131 +71,131 @@ module Router
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			MyID				<= 0;
+			MyID			<= 0;
 		end
 		else if ( I_Req ~Run ) begin
-			MyID				<= I_Data[WIDTH_DATA/2-1:0];
+			MyID			<= I_Data[WIDTH_DATA/2-1:0];
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Req					<= 1'b0;
+			Req				<= 1'b0;
 		end
 		else if ( ~Run ) begin
-			Req					<= 1'b0;
+			Req				<= 1'b0;
 		end
 		else if ( Run & ( I_Req_A | I_Req_B ) ) begin
-			Req					<= ( R_is_Matched ) ? I_Req_B : I_Req_A;
+			Req				<= ( R_is_Matched ) ? I_Req_B : I_Req_A;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Rls					<= 1'b0;
+			Rls				<= 1'b0;
 		end
 		else if ( ~Run ) begin
-			Req					<= 1'b0;
+			Req				<= 1'b0;
 		end
 		else if ( Run & ( I_Rls_A | I_Rls_B ) ) begin
-			Rls					<= ( R_is_Matched ) ? I_Rls_B : I_Rls_A;
+			Rls				<= ( R_is_Matched ) ? I_Rls_B : I_Rls_A;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Data				<= 0;
+			Data			<= 0;
 		end
 		else if ( Run & ( I_Req_A | I_Req_B ) ) begin
-			Data				<= ( R_is_Matched ) ? I_Data_B : I_Data_A;
+			Data			<= ( R_is_Matched ) ? I_Data_B : I_Data_A;
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Req_A				<=1'b0;
+			Req_A			<=1'b0;
 		end
 
 		else if ( I_Req ~Run & ~is_Matched ) begin
-			Req_A				<= 1'b1;
+			Req_A			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Req_A				<=1'b0;
+			Req_A			<=1'b0;
 		end
 		else if ( Run ~R_is_Matched ) begin
-			Req_A				<= I_Req;
+			Req_A			<= I_Req;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Req_B				<= 1'b0;
+			Req_B			<= 1'b0;
 		end
 		else if ( I_Req ~Run & is_Matched ) begin
-			Req_B				<= 1'b1;
+			Req_B			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Req_B				<=1'b0;
+			Req_B			<=1'b0;
 		end
 		else if ( Run R_is_Matched ) begin
-			Req_B				<= I_Req;
+			Req_B			<= I_Req;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Rls_A				<=1'b0;
+			Rls_A			<=1'b0;
 		end
 		else if ( I_Rls & ~Run & ~is_Matched ) begin
-			Rls_A				<= 1'b1;
+			Rls_A			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Rls_A				<=1'b0;
+			Rls_A			<=1'b0;
 		end
 		else if ( Run ~R_is_Matched ) begin
-			Rls_A				<= I_Rls;
+			Rls_A			<= I_Rls;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Rls_B				<= 1'b0;
+			Rls_B			<= 1'b0;
 		end
 		else if ( I_Rls ~Run & is_Matched ) begin
-			Rls_B				<= 1'b1;
+			Rls_B			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Rls_B				<=1'b0;
+			Rls_B			<=1'b0;
 		end
 		else if ( Run R_is_Matched ) begin
-			Rls_B				<= I_Rls;
+			Rls_B			<= I_Rls;
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			DataA				<= 0;
+			DataA			<= 0;
 		end
 		else if ( I_Req ~Run ) begin
-			DataA				<= I_Data;
+			DataA			<= I_Data;
 		end
 		else if ( I_Req & Run ~R_is_Matched ) begin
-			DataA				<= I_Data;
+			DataA			<= I_Data;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			DataB				<= 0;
+			DataB			<= 0;
 		end
 		else if ( I_Req ~Run ) begin
-			DataB				<= { I_Data[WIDTH_DATA/2-1:0], I_Data[WIDTH_DATA:WIDTH_DATA/2] };
+			DataB			<= { I_Data[WIDTH_DATA/2-1:0], I_Data[WIDTH_DATA:WIDTH_DATA/2] };
 		end
 		else if ( I_Req & Run R_is_Matched ) begin
-			DataB				<= I_Data;
+			DataB			<= I_Data;
 		end
 	end
 
