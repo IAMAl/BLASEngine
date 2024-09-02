@@ -19,7 +19,7 @@
 	    - 00		Unsiged Addition
 	    - 01		Unsigned Subtruction
 	    - 10		Signed Addition
-	    - 11		Signed Addition
+	    - 11		Signed Subtruction
 - 01		Multiplier
     - OpCode [1:0]
 	    - 00		Unsigned Multiplication
@@ -50,12 +50,7 @@
 	    - 01		Reserved
 	    - 10		Add-Multiply
 	    - 11		Multiply-Add
-- 10		Specials
-	- OpCode [1:0]
-	    - 00		Exponential
-	    - 01		Power of Any
-	    - 10		Logarithm of Two
-	    - 11		Reserved
+- 10		Reserved
 - 11		Convert
 	- OpCode [1:0]
 	    - 00		Float32 to Int32
@@ -110,28 +105,35 @@
 
 ## 4. Logic/Shift/Rotate [1:0]
 ### Scalar Unit
-- 00		Logic
-	- OpCode [1:0]
-	    - 00		NOT
-	    - 01		AND
-	    - 10		OR
 	    - 11		XOR
-- 01		Shift
+- 00		Shift
 	- OpCode [1:0]
 	    - 00		Logic Left-Shift
 	    - 01		Arithmetic Left-Shift
 	    - 10		Logic Right-Shift
 	    - 11		Arithmetic Right-Shift
-- 10		Rotate
+- 01		Rotate
     - OpCode [1:0]
 	    - 00		Left-Rotate
 	    - 01		Reserved
 	    - 10		Right-Rotate
 	    - 11		Reserved
+- 10		Logic
+	- OpCode [1:0]
+	    - 00		NOT
+	    - 01		AND
+	    - 10		OR
 - 11		Reserved
 
 ### Vector Unit
-- xx		Reserved
+- 00 Power and Logarithm
+	- OpCode [1:0]
+	    - 00		Exponential
+	    - 01		Power of Any
+	    - 10		Logarithm of Two
+	    - 11		Reserved
+- 10 Reserved
+- 1x		Reserved
 
 
 ## 5. Load/Store [1:0]
