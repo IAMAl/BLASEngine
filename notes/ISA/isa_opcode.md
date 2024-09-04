@@ -1,5 +1,11 @@
 # Bit-Field in Operation Code
 
+Bit-Field is;
+
+[Unit Sel[2:0]][Func Sel[1:0]][OpCode[1:0]][ConstFlag[1:0]]
+
+Total 9-bit.
+
 ## 1. Unit Selector [2:0]
 ### [2]
 - 0		Scalar Unit
@@ -185,7 +191,7 @@
 	    - 10		Word Store
 	    - 11		Reserved
 
-## 6. Constant Operation Flag [1:0]
+## 6. Constant Operation Flag ConstSel[1:0]
 
 - 00 No Constant
 - 01 Source-1 Constant (Access-Length in case of Ld/St)
