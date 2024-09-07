@@ -44,72 +44,81 @@ module Lane_Unit
 );
 
 
-	logic						Dst_Slice;
-	logic	[6:0]				Dst_Sel;
-	index_t						Dst_Index;
-	index_t						Dst_Index_Window;
-	index_t						Dst_Index_Length;
-	logic						Dst_RegFile_Req;
-	logic						Dst_RegFile_Slice;
-	index_t						Dst_RegFile_Index;
+	index_t					Index_Src1;
+	index_t					Index_Src2;
+	index_t					Index_Src3;
 
-	logic						MaskedRead;
-	logic						Sign;
-	const_t						Constant;
-	logic						Slice_Dst;
-	logic						Stall_RegFile_Odd;
-	logic						Stall_RegFile_Even;
-
-	data_t						Pre_Src_Data2;
-	data_t						Pre_Src_Data3;
+	data_t					RF_Odd_Data1;
+	data_t					RF_Odd_Data2;
+	data_t					RF_Even_Data1;
+	data_t					RF_Even_Data3;
 
 
-	stat_v_t					Status;
+	logic					Dst_Slice;
+	logic	[6:0]			Dst_Sel;
+	index_t					Dst_Index;
+	index_t					Dst_Index_Window;
+	index_t					Dst_Index_Length;
+	logic					Dst_RegFile_Req;
+	logic					Dst_RegFile_Slice;
+	index_t					Dst_RegFile_Index;
+
+	logic					Sign;
+	const_t					Constant;
+	logic					Slice_Dst;
+	logic					Stall_RegFile_Odd;
+	logic					Stall_RegFile_Even;
+
+	data_t					Pre_Src_Data2;
+	data_t					Pre_Src_Data3;
 
 
-	index_t						Src_Idx1;
-	index_t						Src_Idx2;
-	index_t						Src_Idx3;
+	stat_v_t				Status;
 
 
-	mask_t						Mask_Data;
-
-	logic	[12:0]				Config_Path;
-	logic	[4:0]				Config_Path_WB;
-
-
-	logic						Dst_Sel;
-	logic						is_WB_RF;
-	logic						is_WB_BR;
-	logic						is_WB_VU;
-	index_t						WB_Index;
-	data_t						WB_Data;
-	data_t						W_WB_Data;
-	logic						Math_Done;
-	logic						Condition;
-
-	logic						MaskReg_We;
-	logic						MaskReg_Re;
+	index_t					Src_Idx1;
+	index_t					Src_Idx2;
+	index_t					Src_Idx3;
 
 
-	logic						LdSt_Done1;
-	logic						LdSt_Done2;
+	mask_t					Mask_Data;
+
+	logic	[12:0]			Config_Path;
+	logic	[4:0]			Config_Path_WB;
 
 
-	logic						En;
-	logic						Lane_En;
-	logic						Lane_CTRL_Rst;
-	logic						Lane_CTRL_Set;
+	logic					Dst_Sel;
+	logic					is_WB_RF;
+	logic					is_WB_BR;
+	logic					is_WB_VU;
+	index_t					WB_Index;
+	data_t					WB_Data;
+	data_t					W_WB_Data;
+	logic					Math_Done;
+	logic					Condition;
+
+	logic					MaskReg_We;
+	logic					MaskReg_Re;
 
 
-	logic						Req_Issue;
+	logic					LdSt_Done1;
+	logic					LdSt_Done2;
 
-	pipe_index_t				PipeReg_Idx;
-	pipe_index_t				PipeReg_Index;
-	pipe_reg_t					PipeReg_RR;
-	pipe_net_t					PipeReg_RR_Net;
-	pipe_exe_t					PipeReg_Net;
-	pipe_exe_t					PipeReg_Exe;
+
+	logic					En;
+	logic					Lane_En;
+	logic					Lane_CTRL_Rst;
+	logic					Lane_CTRL_Set;
+
+
+	logic					Req_Issue;
+
+	pipe_index_t			PipeReg_Idx;
+	pipe_index_t			PipeReg_Index;
+	pipe_reg_t				PipeReg_RR;
+	pipe_net_t				PipeReg_RR_Net;
+	pipe_exe_t				PipeReg_Net;
+	pipe_exe_t				PipeReg_Exe;
 
 
 	//// Lane-Enable
@@ -186,16 +195,17 @@ module Lane_Unit
 	assign V_State_Data.data		= Mask_Data;
 	assign V_State_Data.src_sel		= '0;
 
-	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
-																				PipeReg_RR.src1;
+	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'3 ) ?	V_State_Data :
+										( PipeReg_RR.src1.v ) ?					PipeReg_RR.src1 :
+																				'0;
 
 	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
 										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
-										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
 																				'0;
 
-	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src4.src_sel.no == 2'3 ) ?	V_State_Data :
-																				PipeReg_RR.src4;
+	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'3 ) ?	V_State_Data :
+										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
+																				'0;
 
 	//	Issue-No
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
@@ -206,6 +216,7 @@ module Lane_Unit
 
 	//// Network
 	assign Config_Path			= PipeReg_RR_Net.path[12:0];
+
 
 	//	Capture Data
 	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
@@ -223,39 +234,42 @@ module Lane_Unit
 
 
 	//// Write-Back
-	assign Dst_Sel				= B_Index.dst_sel.unit_no;
-	assign Dst_Slice			= WB_Index.slice
-	assign Dst_Index			= WB_Index.idx
-	assign Dst_Index_Window		= WB_Index.window
-	assign Dst_Index_Length		= WB_Index.slice_len
+	assign Dst_Sel			= B_Index.dst_sel.unit_no;
+	assign Dst_Slice		= WB_Index.slice
+	assign Dst_Index		= WB_Index.idx
+	assign Dst_Index_Window	= WB_Index.window
+	assign Dst_Index_Length	= WB_Index.slice_len
+
+	//  Network Path
+	assign Config_Path_WB	= WB_Index.path;
 
 	//	Write-Back Target Decision
-	assign is_WB_RF				= WB_Index.dst_sel == 2'h1;
-	assign is_WB_BR				= WB_Index.dst_sel == 2'h2;
-	assign is_WB_VU				= WB_Index.dst_sel == 2'h3;
+	assign is_WB_RF			= WB_Index.dst_sel == 2'h1;
+	assign is_WB_BR			= WB_Index.dst_sel == 2'h2;
+	assign is_WB_VU			= WB_Index.dst_sel == 2'h3;
 
-	assign WB_Req_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Req_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :	'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? W_WB_Data :	'0;
+	assign WB_Req_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_Req_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_We_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_We_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_Index_Even	= ( ~Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Index_Odd		= (  Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Data_Even		= ( ~Dst_Sel ) ? W_WB_Data :	'0;
+	assign WB_Data_Odd		= (  Dst_Sel ) ? W_WB_Data :	'0;
 
-	assign Config_Path_W		= WB_Index.path;
+	assign Config_Path_W	= WB_Index.path;
 
 	//	Write-Back to Mask Register
-	assign MaskReg_We			= WB_Index.v & is_WB_BR;
-	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
-	assign MaskReg_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src4.src_sel.no == 2'h2 );
+	assign MaskReg_We		= WB_Index.v & is_WB_BR;
+	assign Cond_Data		= ( is_WB_BR ) ? W_WB_Data : '0;
+	assign MaskReg_Re		= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
+								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
+								( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
+								( PipeReg_RR.src4.src_sel.no == 2'h2 );
 
 
 	//// Commit Request
-	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
+	assign O_Commit			= LdSt_Done1 | LdSt_Done2 | Math_Done;
 
 
 	//// Index Update Stage
@@ -267,7 +281,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
-		.I_MaskedRead(		MaskedRead				),
+		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Slice(			Dst_Slice				),
 		.I_Sel(				Dst_Sel					),
 		.I_Index(			Dst_Index				),
@@ -284,13 +298,13 @@ module Lane_Unit
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
-	) Index_Odd1
+	) Index1
 	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
 		.I_Req(				PipeReg_Idx.src1.v		),
-		.I_MaskedRead(		MaskedRead				),
+		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Slice(			PipeReg_Idx.src1.slice	),
 		.I_Sel(				PipeReg_Idx.src1.sel	),
 		.I_Index(			PipeReg_Idx.src1.idx	),
@@ -302,18 +316,18 @@ module Lane_Unit
 		.I_Mask_Data(		Mask_Data				),
 		.O_Req(				PipeReg_Index.src1.v	),
 		.O_Slice(			PipeReg_Index.src1.slice),
-		.O_Index(			PipeReg_Index.src1.idx	)
+		.O_Index(			Index_Src1				)
 	);
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
-	) Index_Odd2
+	) Index2
 	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Odd		),
 		.I_Req(				PipeReg_Idx.src2.v		),
-		.I_MaskedRead(		MaskedRead				),
+		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Slice(			PipeReg_Idx.src2.slice	),
 		.I_Sel(				PipeReg_Idx.src2.sel	),
 		.I_Index(			PipeReg_Idx.src2.idx	),
@@ -325,18 +339,18 @@ module Lane_Unit
 		.I_Mask_Data(		Mask_Data				),
 		.O_Req(				PipeReg_Index.src2.v	),
 		.O_Slice(			PipeReg_Index.src2.slice),
-		.O_Index(			PipeReg_Index.src2.idx	)
+		.O_Index(			Index_Src2				)
 	);
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
-	) Index_Even1
+	) Index3
 	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Even		),
 		.I_Req(				PipeReg_Idx.src3.v		),
-		.I_MaskedRead(		MaskedRead				),
+		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Slice(			PipeReg_Idx.src3.slice	),
 		.I_Sel(				PipeReg_Idx.src3.sel	),
 		.I_Index(			PipeReg_Idx.src3.idx	),
@@ -348,30 +362,20 @@ module Lane_Unit
 		.I_Mask_Data(		Mask_Data				),
 		.O_Req(				PipeReg_Index.src3.v	),
 		.O_Slice(			PipeReg_Index.src3.slice),
-		.O_Index(			PipeReg_Index.src3.idx	)
+		.O_Index(			Index_Src3				)
 	);
 
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Even2
-	(
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Even		),
-		.I_Req(				PipeReg_Idx.src4.v		),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src4.slice	),
-		.I_Sel(				PipeReg_Idx.src4.sel	),
-		.I_Index(			PipeReg_Idx.src4.idx	),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
-		.I_ThreadID(		I_ThreadID				),
-		.I_Constant(		Constant				),
-		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src4.v	),
-		.O_Slice(			PipeReg_Index.src4.slice),
-		.O_Index(			PipeReg_Index.src4.idx	)
+	RF_Index_Sel RF_Index_Sel (
+		.I_Odd1(			PipeReg_Index.src1.v	),
+		.I_Odd2(			PipeReg_Index.src2.v	),
+		.I_Odd3(			PipeReg_Index.src3.v	),
+		.I_Index_Src1(		Index_Src1				),
+		.I_Index_Src2(		Index_Src2				),
+		.I_Index_Src3(		Index_Src3				),
+		.O_Index_Src1(		PipeReg_Index.src1.idx	),
+		.O_Index_Src2(		PipeReg_Index.src2.idx	),
+		.O_Index_Src3(		PipeReg_Index.src3.idx	),
+		.O_Index_Src4(		PipeReg_Index.src4.idx	)
 	);
 
 	//	Pipeline Register
@@ -381,6 +385,16 @@ module Lane_Unit
 		end
 		else if ( En) begin
 			PipeReg_Idx_RR	<= PipeReg_Index;
+		end
+	end
+
+	logic	[2:0]			Sel;
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Sel				<= '0;
+		end
+		else begin
+			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
 		end
 	end
 
@@ -395,8 +409,8 @@ module Lane_Unit
 		.I_Data(			WB_Data_Odd				),
 		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
 		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
-		.O_Data_Src1(		PipeReg_RR.src1.data	),
-		.O_Data_Src2(		PipeReg_RR.src2.data	)
+		.O_Data_Src1(		RF_Odd_Data1			),
+		.O_Data_Src2(		RF_Odd_Data2			)
 	);
 
 	RegFile RegFile_Even (
@@ -408,8 +422,21 @@ module Lane_Unit
 		.I_Data(			WB_Data_Even			),
 		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
 		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
-		.O_Data_Src1(		PipeReg_RR.src3.data	),
-		.O_Data_Src2(		PipeReg_RR.src4.data	)
+		.O_Data_Src1(		RF_Even_Data1			),
+		.O_Data_Src2(		RF_Even_Data2			)
+	);
+
+	RF_Data_Sel RF_Data_Sel (
+		.I_Odd1				Sel[0]					),
+		.I_Odd2(			Sel[1]					),
+		.I_Odd3(			Sel[2]					),
+		.I_Data_Src1(		RF_Odd_Data1			),
+		.I_Data_Src2(		RF_Odd_Data2			),
+		.I_Data_Src3(		RF_Even_Data1			),
+		.I_Data_Src4(		RF_Even_Data2			),
+		.O_Data_Src1(		PipeReg_RR.src1.data	),
+		.O_Data_Src2(		PipeReg_RR.src2.data	),
+		.O_Data_Src3(		PipeReg_RR.src3.data	)
 	);
 
 	//	Pipeline Register
@@ -448,6 +475,29 @@ module Lane_Unit
 
 
 	//// Network Stage
+	IndexUnit #(
+		.LANE_ID(			LANE_ID					)
+	) Index_Net
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			~Lane_En				),
+		.I_Req(				PipeReg_RR_Net.net..v	),
+		.I_MaskedRead(		'0						),
+		.I_Slice(			PipeReg_RR_Net.net.slice),
+		.I_Sel(				PipeReg_RR_Net.net.sel	),
+		.I_Index(			PipeReg_RR_Net.net.idx	),
+		.I_Window(			NUM_LANES				),
+		.I_Length(			NUM_LANES				),
+		.I_ThreadID(		I_ThreadID				),
+		.I_Constant(		Constant				),
+		.I_Sign(			'0						),
+		.I_Mask_Data(		'0						),
+		.O_Req(										),
+		.O_Slice(									),
+		.O_Index(			Net_Index				)
+	);
+
 	Network_V #(
 		.NUM_LANES(			NUM_LANES				),
 		.LANE_ID(			LANE_ID					)
@@ -456,14 +506,14 @@ module Lane_Unit
 		.I_Stall(			~Lane_En				),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
-		.I_Sel_Path_W(		Config_Path_W			),
+		.I_Sel_Path_WB(		Config_Path_WB			),
 		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
 		.I_Sel_ALU_Src2(	PipeReg_RR_Net.src2.v	),
 		.I_Sel_ALU_Src3(	PipeReg_RR_Net.src3.v	),
 		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),
 		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
 		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),
-		.I_Lane_Data_WB(	I_Lane_Data_WB		),
+		.I_Lane_Data_WB(	I_Lane_Data_WB			),
 		.I_Src_Data1(		PipeReg_RR_Net.data1	),
 		.I_Src_Data2(		PipeReg_RR_Net.data2	),
 		.I_Src_Data3(		PipeReg_RR_Net.data3	),

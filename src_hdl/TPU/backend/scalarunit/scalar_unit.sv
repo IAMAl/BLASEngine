@@ -78,6 +78,15 @@ module Scalar_Unit
 	logic					Dst_RegFile_Slice;
 	index_t					Dst_RegFile_Index;
 
+	index_t					Index_Src1;
+	index_t					Index_Src2;
+	index_t					Index_Src3;
+
+	data_t					RF_Odd_Data1;
+	data_t					RF_Odd_Data2;
+	data_t					RF_Even_Data1;
+	data_t					RF_Even_Data3;
+
 
 	logic					Bypass_Buff_Full;
 	logic					Stall_Net;
@@ -230,16 +239,17 @@ module Scalar_Unit
 	assign V_State_Data.data		= V_State;
 	assign V_State_Data.src_sel		= '0;
 
-	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
-																				PipeReg_RR.src1;
+	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'3 ) ?	V_State_Data :
+										( PipeReg_RR.src1.v ) ?					PipeReg_RR.src1 :
+																				'0;
 
 	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
 										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
-										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
 																				'0;
 
-	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src4.src_sel.no == 2'3 ) ?	V_State_Data :
-																				PipeReg_RR.src4;
+	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'3 ) ?	V_State_Data :
+										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
+																				'0;
 
 	//	Issue-No
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
@@ -281,6 +291,9 @@ module Scalar_Unit
 
 
 	//// Write-Back
+	//  Network Path
+	assign Config_Path_WB	= WB_Index.path;
+
 	assign Dst_Sel			= B_Index.dst_sel.unit_no;
 	assign Dst_Slice		= WB_Index.slice
 	assign Dst_Index		= WB_Index.idx
@@ -443,7 +456,7 @@ module Scalar_Unit
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
-	) Index_Odd1
+	) Index1
 	(
 		.clock(				clock					),
 		.reset(				reset					),
@@ -461,12 +474,12 @@ module Scalar_Unit
 		.I_Mask_Data(		Mask_Data				),
 		.O_Req(				PipeReg_Index.src1.v	),
 		.O_Slice(			PipeReg_Index.src1.slice),
-		.O_Index(			PipeReg_Index.src1.idx	)
+		.O_Index(			Index_Src1				)
 	);
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
-	) Index_Odd2
+	) Index2
 	(
 		.clock(				clock					),
 		.reset(				reset					),
@@ -484,12 +497,12 @@ module Scalar_Unit
 		.I_Mask_Data(		Mask_Data				),
 		.O_Req(				PipeReg_Index.src2.v	),
 		.O_Slice(			PipeReg_Index.src2.slice),
-		.O_Index(			PipeReg_Index.src2.idx	)
+		.O_Index(			Index_Src2				)
 	);
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
-	) Index_Even1
+	) Index3
 	(
 		.clock(				clock					),
 		.reset(				reset					),
@@ -507,30 +520,20 @@ module Scalar_Unit
 		.I_Mask_Data(		Mask_Data				),
 		.O_Req(				PipeReg_Index.src3.v	),
 		.O_Slice(			PipeReg_Index.src3.slice),
-		.O_Index(			PipeReg_Index.src3.idx	)
+		.O_Index(			Index_Src3				)
 	);
 
-	IndexUnit #(
-		.LANE_ID(			LANE_ID					)
-	) Index_Even2
-	(
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Even		),
-		.I_Req(				PipeReg_Idx.src4.v		),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src4.slice	),
-		.I_Sel(				PipeReg_Idx.src4.sel	),
-		.I_Index(			PipeReg_Idx.src4.idx	),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
-		.I_ThreadID(		I_ThreadID				),
-		.I_Constant(		Constant				),
-		.I_Sign(			Sign					),
-		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src4.v	),
-		.O_Slice(			PipeReg_Index.src4.slice),
-		.O_Index(			PipeReg_Index.src4.idx	)
+	RF_Index_Sel RF_Index_Sel (
+		.I_Odd1(			PipeReg_Index.src1.v	),
+		.I_Odd2(			PipeReg_Index.src2.v	),
+		.I_Odd3(			PipeReg_Index.src3.v	),
+		.I_Index_Src1(		Index_Src1				),
+		.I_Index_Src2(		Index_Src2				),
+		.I_Index_Src3(		Index_Src3				),
+		.O_Index_Src1(		PipeReg_Index.src1.idx	),
+		.O_Index_Src2(		PipeReg_Index.src2.idx	),
+		.O_Index_Src3(		PipeReg_Index.src3.idx	),
+		.O_Index_Src4(		PipeReg_Index.src4.idx	)
 	);
 
 	//	Pipeline Register
@@ -540,6 +543,16 @@ module Scalar_Unit
 		end
 		else if ( I_En ) begin
 			PipeReg_Idx_RR	<= PipeReg_Index;
+		end
+	end
+
+	logic	[2:0]			Sel;
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Sel				<= '0;
+		end
+		else begin
+			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
 		end
 	end
 
@@ -554,8 +567,8 @@ module Scalar_Unit
 		.I_Data(			WB_Data_Odd				),
 		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
 		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
-		.O_Data_Src1(		PipeReg_RR.src1.data	),
-		.O_Data_Src2(		PipeReg_RR.src2.data	)
+		.O_Data_Src1(		RF_Odd_Data1			),
+		.O_Data_Src2(		RF_Odd_Data2			)
 	);
 
 	RegFile RegFile_Even (
@@ -567,8 +580,21 @@ module Scalar_Unit
 		.I_Data(			WB_Data_Even			),
 		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
 		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
-		.O_Data_Src1(		PipeReg_RR.src3.data	),
-		.O_Data_Src2(		PipeReg_RR.src4.data	)
+		.O_Data_Src1(		RF_Even_Data1			),
+		.O_Data_Src2(		RF_Even_Data2			)
+	);
+
+	RF_Data_Sel RF_Data_Sel (
+		.I_Odd1				Sel[0]					),
+		.I_Odd2(			Sel[1]					),
+		.I_Odd3(			Sel[2]					),
+		.I_Data_Src1(		RF_Odd_Data1			),
+		.I_Data_Src2(		RF_Odd_Data2			),
+		.I_Data_Src3(		RF_Even_Data1			),
+		.I_Data_Src4(		RF_Even_Data2			),
+		.O_Data_Src1(		PipeReg_RR.src1.data	),
+		.O_Data_Src2(		PipeReg_RR.src2.data	),
+		.O_Data_Src3(		PipeReg_RR.src3.data	)
 	);
 
 	//	Pipeline Register
@@ -619,7 +645,6 @@ module Scalar_Unit
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
-		.I_WB_DstIdx(		WB_Index				),
 		.I_WB_Data(			WB_Data					),
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
@@ -685,7 +710,7 @@ module Scalar_Unit
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
 		.I_Commit_No_LMath(	Commit_No_Math			),
-		.I_Commit_Grant(	Commit_Grant_S			)
+		.I_Commit_Grant(	Commit_Grant_S			),
 		.O_Commit_Req(		Commit_Req_S			),
 		.O_Commit_No(		Commit_No_S				),
 		.O_Commited_LdSt1(	Commited_LdSt1			),
