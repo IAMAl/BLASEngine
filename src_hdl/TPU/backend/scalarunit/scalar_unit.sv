@@ -32,7 +32,7 @@ module Scalar_Unit
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grant,				//Flag: Grant
 	output						O_Re_Buff,				//Read-Enable for Buffer
-	output	command_t			O_V_Command,			//Command to Vector Unit
+	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
 	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
 	output	s_stat_t			O_Status,				//Scalar Unit Status
@@ -67,6 +67,8 @@ module Scalar_Unit
 	instr_t					Instr_IW;
 	instr_t					Instr;
 	issue_no_t				Rd_Ptr;
+
+	instr_t					S_Command;
 
 
 	logic					Dst_Slice;
@@ -160,7 +162,7 @@ module Scalar_Unit
 	issue_no_t				Commit_No;
 
 	pipe_index_t			PipeReg_Idx;
-	pipe_index_t			PipeReg_Index;
+	pipe_index_reg_t		PipeReg_Index;
 	pipe_reg_t				PipeReg_RR;
 	pipe_net_t				PipeReg_RR_Net;
 	pipe_exe_t				PipeReg_Net;
@@ -199,7 +201,6 @@ module Scalar_Unit
 	PipeReg_Idx.src1		= S_Command.instr.src1;
 	PipeReg_Idx.src2		= S_Command.instr.src2;
 	PipeReg_Idx.src3		= S_Command.instr.src2;
-	PipeReg_Idx.src4		= S_Command.instr.src4;
 
 	//	Path
 	PipeReg_Idx.path		= S_Command.instr.path;
@@ -330,11 +331,10 @@ module Scalar_Unit
 
 
 	//// End of Execution
-	assign O_Term			= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & PipeReg_Idx.src4.v & (
+	assign O_Term			= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & (
 									( PipeReg_Idx.src1.idx == '0 ) &
 									( PipeReg_Idx.src2.idx == '0 ) &
-									( PipeReg_Idx.src3.idx == '0 ) &
-									( PipeReg_Idx.src4.idx == '0 )
+									( PipeReg_Idx.src3.idx == '0 );
 								)
 
 
@@ -524,9 +524,9 @@ module Scalar_Unit
 	);
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Index.src1.v	),
-		.I_Odd2(			PipeReg_Index.src2.v	),
-		.I_Odd3(			PipeReg_Index.src3.v	),
+		.I_Odd1(			PipeReg_Idx.src1.v		),
+		.I_Odd2(			PipeReg_Idx.src2.v		),
+		.I_Odd3(			PipeReg_Idx.src3.v		),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
@@ -552,7 +552,7 @@ module Scalar_Unit
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
+			Sel				<= { PipeReg_Idx.src3.v, PipeReg_Idx.src2.v, PipeReg_Idx.src1.v };
 		end
 	end
 
@@ -585,7 +585,7 @@ module Scalar_Unit
 	);
 
 	RF_Data_Sel RF_Data_Sel (
-		.I_Odd1				Sel[0]					),
+		.I_Odd1(			Sel[0]					),
 		.I_Odd2(			Sel[1]					),
 		.I_Odd3(			Sel[2]					),
 		.I_Data_Src1(		RF_Odd_Data1			),

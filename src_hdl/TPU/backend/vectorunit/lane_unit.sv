@@ -20,7 +20,7 @@ module Lane_Unit
 	input						reset,
 	input						I_En,					//Enable Execution
 	input	instr_t				I_ThreadID,				//SIMT Thread-ID
-	input	command_t			I_Command,				//Execution Command
+	input	instr_t				I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
 	output	ldst_t				O_LdSt,					//Load/Store Command
@@ -154,7 +154,6 @@ module Lane_Unit
 			PipeReg_Idx.src1		<= I_Command.instr.src1;
 			PipeReg_Idx.src2		<= I_Command.instr.src2;
 			PipeReg_Idx.src3		<= I_Command.instr.src2;
-			PipeReg_Idx.src4		<= I_Command.instr.src4;
 
 			//	Path
 			PipeReg_Idx.path		<= I_Command.instr.path;
@@ -366,9 +365,9 @@ module Lane_Unit
 	);
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Index.src1.v	),
-		.I_Odd2(			PipeReg_Index.src2.v	),
-		.I_Odd3(			PipeReg_Index.src3.v	),
+		.I_Odd1(			PipeReg_Idx.src1.v		),
+		.I_Odd2(			PipeReg_Idx.src2.v		),
+		.I_Odd3(			PipeReg_Idx.src3.v		),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
@@ -383,7 +382,7 @@ module Lane_Unit
 		if ( reset ) begin
 			PipeReg_Idx_RR	<= '0;
 		end
-		else if ( En) begin
+		else if ( I_En ) begin
 			PipeReg_Idx_RR	<= PipeReg_Index;
 		end
 	end
@@ -394,7 +393,7 @@ module Lane_Unit
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
+			Sel				<= { PipeReg_Idx.src3.v, PipeReg_Idx.src2.v, PipeReg_Idx.src1.v };
 		end
 	end
 
@@ -427,7 +426,7 @@ module Lane_Unit
 	);
 
 	RF_Data_Sel RF_Data_Sel (
-		.I_Odd1				Sel[0]					),
+		.I_Odd1(				Sel[0]				),
 		.I_Odd2(			Sel[1]					),
 		.I_Odd3(			Sel[2]					),
 		.I_Data_Src1(		RF_Odd_Data1			),

@@ -131,7 +131,6 @@ package pkg_tpu;
 		idx_t							src1;
 		idx_t							src2;
 		idx_t							src3;
-		idx_t							src4;
 		index_t							slice_len;
 		imm_t							imm;
 		logic	[16:0]					path;
@@ -188,11 +187,23 @@ package pkg_tpu;
 		idx_t							src1;
 		idx_t							src2;
 		idx_t							src3;
-		idx_t							src4;
 		index_t							slice_len;
 		issue_no_t						issue_no;
 		logic	[16:0]					path;
 	} pipe_index_t;
+
+	typedef struct packed {
+		logic							v;
+		op_t							op;
+		dst_t							dst;
+		idx_t							src1;
+		idx_t							src2;
+		idx_t							src3;
+		idx_t							src4;
+		index_t							slice_len;
+		issue_no_t						issue_no;
+		logic	[16:0]					path;
+	} pipe_index_reg_t;
 
 	//	Register-Read Stages
 	typedef struct packed {
@@ -202,7 +213,6 @@ package pkg_tpu;
 		reg_idx_t						src1;
 		reg_idx_t						src2;
 		reg_idx_t						src3;
-		reg_idx_t						src4;
 		index_t							slice_len;
 		issue_no_t						issue_no;
 		logic	[16:0]					path;
