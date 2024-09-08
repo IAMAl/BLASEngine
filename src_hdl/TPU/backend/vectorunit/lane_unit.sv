@@ -115,6 +115,8 @@ module Lane_Unit
 
 	pipe_index_t			PipeReg_Idx;
 	pipe_index_t			PipeReg_Index;
+	pipe_index_reg_t		PipeReg_IdxRF;
+	pipe_index_reg_t		PipeReg_IdxRR;
 	pipe_reg_t				PipeReg_RR;
 	pipe_net_t				PipeReg_RR_Net;
 	pipe_exe_t				PipeReg_Net;
@@ -263,8 +265,7 @@ module Lane_Unit
 	assign Cond_Data		= ( is_WB_BR ) ? W_WB_Data : '0;
 	assign MaskReg_Re		= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src4.src_sel.no == 2'h2 );
+								( PipeReg_RR.src3.src_sel.no == 2'h2 );
 
 
 	//// Commit Request
@@ -371,19 +372,19 @@ module Lane_Unit
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
-		.O_Index_Src1(		PipeReg_Index.src1.idx	),
-		.O_Index_Src2(		PipeReg_Index.src2.idx	),
-		.O_Index_Src3(		PipeReg_Index.src3.idx	),
-		.O_Index_Src4(		PipeReg_Index.src4.idx	)
+		.O_Index_Src1(		PipeReg_IdxRF.src1.idx	),
+		.O_Index_Src2(		PipeReg_IdxRF.src2.idx	),
+		.O_Index_Src3(		PipeReg_IdxRF.src3.idx	),
+		.O_Index_Src4(		PipeReg_IdxRF.src4.idx	)
 	);
 
 	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			PipeReg_Idx_RR	<= '0;
+			PipeReg_IdxRR	<= '0;
 		end
 		else if ( I_En ) begin
-			PipeReg_Idx_RR	<= PipeReg_Index;
+			PipeReg_IdxRR	<= PipeReg_Index;
 		end
 	end
 
@@ -406,8 +407,8 @@ module Lane_Unit
 		.I_We(				WB_We_Odd				),
 		.I_Index_Dst(		WB_Index_Odd			),
 		.I_Data(			WB_Data_Odd				),
-		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
-		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
+		.I_Index_Src1(		PipeReg_IdxRR.src1		),
+		.I_Index_Src2(		PipeReg_IdxRR.src2		),
 		.O_Data_Src1(		RF_Odd_Data1			),
 		.O_Data_Src2(		RF_Odd_Data2			)
 	);
@@ -419,14 +420,14 @@ module Lane_Unit
 		.I_We(				WB_We_Even				),
 		.I_Index_Dst(		WB_Index_Even			),
 		.I_Data(			WB_Data_Even			),
-		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
-		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
+		.I_Index_Src1(		PipeReg_IdxRR.src3		),
+		.I_Index_Src2(		PipeReg_IdxRR.src4		),
 		.O_Data_Src1(		RF_Even_Data1			),
 		.O_Data_Src2(		RF_Even_Data2			)
 	);
 
 	RF_Data_Sel RF_Data_Sel (
-		.I_Odd1(				Sel[0]				),
+		.I_Odd1(			Sel[0]					),
 		.I_Odd2(			Sel[1]					),
 		.I_Odd3(			Sel[2]					),
 		.I_Data_Src1(		RF_Odd_Data1			),

@@ -162,7 +162,9 @@ module Scalar_Unit
 	issue_no_t				Commit_No;
 
 	pipe_index_t			PipeReg_Idx;
-	pipe_index_reg_t		PipeReg_Index;
+	pipe_index_t			PipeReg_Index;
+	pipe_index_reg_t		PipeReg_IdxRF;
+	pipe_index_reg_t		PipeReg_IdxRR;
 	pipe_reg_t				PipeReg_RR;
 	pipe_net_t				PipeReg_RR_Net;
 	pipe_exe_t				PipeReg_Net;
@@ -539,10 +541,10 @@ module Scalar_Unit
 	//	Pipeline Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			PipeReg_Idx_RR	<= '0;
+			PipeReg_IdxRR	<= '0;
 		end
 		else if ( I_En ) begin
-			PipeReg_Idx_RR	<= PipeReg_Index;
+			PipeReg_IdxRR	<= PipeReg_Index;
 		end
 	end
 
@@ -565,8 +567,8 @@ module Scalar_Unit
 		.I_We(				WB_We_Odd				),
 		.I_Index_Dst(		WB_Index_Odd			),
 		.I_Data(			WB_Data_Odd				),
-		.I_Index_Src1(		PipeReg_Idx_RR.src1		),
-		.I_Index_Src2(		PipeReg_Idx_RR.src2		),
+		.I_Index_Src1(		PipeReg_IdxRR.src1		),
+		.I_Index_Src2(		PipeReg_IdxRR.src2		),
 		.O_Data_Src1(		RF_Odd_Data1			),
 		.O_Data_Src2(		RF_Odd_Data2			)
 	);
@@ -578,8 +580,8 @@ module Scalar_Unit
 		.I_We(				WB_We_Even				),
 		.I_Index_Dst(		WB_Index_Even			),
 		.I_Data(			WB_Data_Even			),
-		.I_Index_Src1(		PipeReg_Idx_RR.src3		),
-		.I_Index_Src2(		PipeReg_Idx_RR.src4		),
+		.I_Index_Src1(		PipeReg_IdxRR.src3		),
+		.I_Index_Src2(		PipeReg_IdxRR.src4		),
 		.O_Data_Src1(		RF_Even_Data1			),
 		.O_Data_Src2(		RF_Even_Data2			)
 	);
