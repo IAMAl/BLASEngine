@@ -42,8 +42,8 @@ Total 9-bit.
 	- OpCode [1:0]
 	    - 00		Int32 to Float32
 	    - 01		Move
-	    - 10		Bit-Reverse
-	    - 11		Reserved
+	    - 10		Output Scalar Data
+	    - 11		Bit-Reverse
 ### Vector Unit
 - 00		Adder
 	- OpCode [1:0]
@@ -61,7 +61,8 @@ Total 9-bit.
 	- OpCode [1:0]
 	    - 00		Float32 to Int32
 	    - 01		Move
-	    - 1x		Reserved
+		- 10		Input Scalar Data
+	    - 11		Reserved
 
 ## 3. Conditional	[1:0]
 ### Scalar Unit
