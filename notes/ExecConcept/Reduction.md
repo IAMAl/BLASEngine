@@ -7,6 +7,6 @@ Lane_Enレジスタはスカラユニットにあります。初めに初期値0
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/Reduction.png"
        alt="Reduction"
        title="1D Convolution (K=3, Delite=1)"
-       width="700px"
+       width="550px"
   />
 </div>
