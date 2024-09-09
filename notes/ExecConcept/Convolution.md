@@ -30,7 +30,7 @@ BLASEngineは畳み込み演算をサポートしています。下の図はカ�
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/ConvConfigParams2.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/ConvConfigParams.png"
        alt="HTML image alt text"
        title="1D Convolution (K=3, Delite=1)"
        width="550px"
