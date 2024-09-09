@@ -7,12 +7,12 @@ BLASEngineは行列積C=ABをサポートしています。下図は披乗算行
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/MatMatMult.png"
        alt="HTML image alt text"
        title="Matrix-Matrix Multiplication"
-       width="700px"
+       width="600px"
   />
 </div>
 
 
-この行列演算をBLAS上で実装する方法は二つあります。
+この行列演算をBLASEngine上で実装する方法は二つあります。
 
 #### 方法1：AとBを固定
 
