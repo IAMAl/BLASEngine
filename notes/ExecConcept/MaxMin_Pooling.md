@@ -1,4 +1,4 @@
-# Pooling Note
+# Max and Min Pooling Note
 
 ### Max/Min Pooling
 
