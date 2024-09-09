@@ -18,7 +18,7 @@ BLASEngineは畳み込み演算をサポートしています。下の図はカ�
 <div align="center">
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/1DConvK3D2.png"
        alt="HTML image alt text"
-       title="1D Convolution (K=3, Delite=1)"
+       title="1D Convolution (K=3, Delite=2)"
        width="700px"
   />
 </div>
@@ -32,7 +32,7 @@ BLASEngineは畳み込み演算をサポートしています。下の図はカ�
 <div align="center">
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/ConvConfigParams.png"
        alt="HTML image alt text"
-       title="1D Convolution (K=3, Delite=1)"
+       title="Parameters for Convolution"
        width="550px"
   />
 </div>

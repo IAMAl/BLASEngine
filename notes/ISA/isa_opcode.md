@@ -101,13 +101,17 @@ Total 9-bit.
 	    - 00 Set Mask All One
 		- 01 Reserved
 		- 1x Reserved
-- 11		Mask Handle
+- 10		Mask Handle
     - Opcode [1:0]
 		- 00 Enable Masked Operation
 		- 01 Disable Masked Operation
 		- 10 Reserved
 		- 11 Set Mask by True of Follower Comparing
-- 11		Reserved
+- 11		Selector
+	- Opcode [1:0]
+		- 00 max()
+		- 01 min()
+		- 1x Reserved
 
 
 ## 4. Logic/Shift/Rotate [1:0]
