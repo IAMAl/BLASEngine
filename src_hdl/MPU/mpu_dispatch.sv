@@ -27,7 +27,7 @@ module Dispatch_MPU
 	output	mpu_issue_no_t		O_IssueNo,				//Issue No
 	input	mpu_issue_no_t		I_IssueNo,				//Issue No
 	output						O_Send_Thread,			//Status
-	output						O_End_Send
+	output						O_End_Send				//Flag End of Sending
 );
 
 

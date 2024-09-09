@@ -119,7 +119,7 @@ module HazardCheck_MPU
 		else if ( I_Req_Commit | I_Req ) begin
 			if ( Issueable ) begin
 				for ( i=0: i<NUMENTRY_STH; ++i ) begin
-					valid[ i ]					<= Valid[ i ] ^ ThreadID[ i ].Commit;
+					valid[ i ]				<= Valid[ i ] ^ ThreadID[ i ].Commit;
 				end
 			end
 

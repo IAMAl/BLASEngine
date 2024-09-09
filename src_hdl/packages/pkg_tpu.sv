@@ -79,7 +79,7 @@ package pkg_tpu;
 	typedef	logic	[NUM_LANE-1:0]			v_grant_t;
 
 	//	Lane Commit Flag
-	typedef	logic	[NUM_LANE-1:0]			commit_lane_t
+	typedef	logic	[NUM_LANE-1:0]			commit_lane_t;
 
 
 	////Instruction-Set

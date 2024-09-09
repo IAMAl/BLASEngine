@@ -60,10 +60,10 @@ module Network_S
 	assign Src_Data2			= I_Src_Data2;
 	assign Src_Data3			= I_Src_Data3;
 
-	assign O_PAC_Src_Data		=( Sel_Path == 2'h1 ) ?		I_Src_Data1 :
-									( Sel_Path == 2'h2 ) ?	I_Src_Data2 :
-									( Sel_Path == 2'h3 ) ?	I_Src_Data3 :
-															'0;
+	assign O_PAC_Src_Data		=( Sel_Path == 2'h1 ) ?			I_Src_Data1 :
+									( Sel_Path == 2'h2 ) ?		I_Src_Data2 :
+									( Sel_Path == 2'h3 ) ?		I_Src_Data3 :
+																'0;
 
 	assign O_WB_Data			= (   Sel_Path_WB == 2'h3 ) ?	I_Src_Data3 :
 									( Sel_Path_WB == 2'h2 ) ?	I_Src_Data2 :

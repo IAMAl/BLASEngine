@@ -12,9 +12,9 @@
 module RF_Data_Sel
 	import pkg_tpu::*;
 (
-	input						I_Odd1,
-	input						I_Odd2,
-	input						I_Odd3,
+	input						I_Odd1,					//Flag of Odd for Srource-1
+	input						I_Odd2,					//Flag of Odd for Srource-2
+	input						I_Odd3,					//Flag of Odd for Srource-3
 	input	data_t				I_Data_Src1,			//Read Index for Source-1
 	input	data_t				I_Data_Src2,			//Read Index for Source-2
 	input	data_t				I_Data_Src3,			//Read Index for Source-3

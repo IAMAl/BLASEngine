@@ -70,17 +70,17 @@ module ReorderBuff_S #(
 
 	always_comb: begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			assign Set_Commit[i]	= Commit_S[i].Valid & (
-										( Commit_S[i].Issue_No == I_Commit_No_LdSt1 ) |
-										( Commit_S[i].Issue_No == I_Commit_No_LdSt2 ) |
-										( Commit_S[i].Issue_No == I_Commit_No_Math )
+			assign Set_Commit[ i ]	= Commit_S[ i ].Valid & (
+										( Commit_S[ i ].Issue_No == I_Commit_No_LdSt1 ) |
+										( Commit_S[ i ].Issue_No == I_Commit_No_LdSt2 ) |
+										( Commit_S[ i ].Issue_No == I_Commit_No_Math )
 									);
 		end
 	end
 
     always_comb: begin
         for ( int i=0; i<NUM_ENTRY; ++i ) begin
-            assign Clr_Valid[i]     = Commit_S[i].Valid & Commit_S[i].Commit;
+            assign Clr_Valid[ i ]     = Commit_S[ i ].Valid & Commit_S[ i ].Commit;
         end
     end
 
@@ -138,18 +138,18 @@ module ReorderBuff_S #(
 		end
 		else if ( I_Store | ( Set_Commit != 0) | ( Clr_Valid = !=0 ) ) begin
 			if ( I_Store ) begin
-				Commit_S[i].Valid	<= 1'b1;
-				Commit_S[i].Issue_No<= I_Issue_No;
-				Commit_S[i].Commit	<= 1'b0;
+				Commit_S[ WNo ].Valid	<= 1'b1;
+				Commit_S[ WNo ].Issue_No<= I_Issue_No;
+				Commit_S[ WNo ].Commit	<= 1'b0;
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit_S[i].Commit	<= Set_Commit[i];
+				Commit_S[ i ].Commit	<= Commit_V[ i ].Commi | Set_Commit[ i ];
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit_S[i].Valid	<= Commit_S[i].Valid & ~Clr_Valid[i];
-				Commit_S[i].Commit	<= Commit_S[i].Commit & ~Clr_Valid[i];
+				Commit_S[ i ].Valid		<= Commit_S[ i ].Valid &  ~Clr_Valid[ i ];
+				Commit_S[ i ].Commit	<= Commit_S[ i ].Commit & ~Clr_Valid[ i ];
 			end
 		end
 	end
