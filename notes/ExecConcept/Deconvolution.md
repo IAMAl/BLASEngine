@@ -5,7 +5,7 @@ BLASEngineはDeconvolutionをサポートしています。Deconvolutionは別�
 <div align="center">
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/DeconvConfigParams.png"
        alt="Transposition"
-       title="1D Convolution (K=3, Delite=1)"
+       title="Parameters for Deconvolution"
        width="700px"
   />
 </div>
