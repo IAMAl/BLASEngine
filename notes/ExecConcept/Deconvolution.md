@@ -1,9 +1,9 @@
-# Transposition Note
+# Deconvolution (Transposed Convolution) Note
 
 BLASEngineはDeconvolutionをサポートしています。Deconvolutionは別名Transposed Convolutionであり、ストライド量とデライト量の役割が一般的な畳み込みと比較して役割が交換された畳み込み演算と言えます。例えば、ストライド量Sは入力ベクトル要素間のにいくつ定数数を埋め込むのか（元々の畳み込みでいうディレート相当）であり、ディレートは重みベクトルの移動量（元々の畳み込みのストライド量）を定義しています。の下図はその際の各パラメータを示しています。
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/Transpose.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/DeconvConfigParams.png"
        alt="Transposition"
        title="1D Convolution (K=3, Delite=1)"
        width="700px"
