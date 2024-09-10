@@ -136,7 +136,7 @@ module ReorderBuff_S #(
 				Commit_S[i]		<= '0;
 			end
 		end
-		else if ( I_Store | ( Set_Commit != 0) | ( Clr_Valid = !=0 ) ) begin
+		else if ( I_Store | ( Set_Commit != 0) | ( Clr_Valid != 0 ) ) begin
 			if ( I_Store ) begin
 				Commit_S[ WNo ].Valid	<= 1'b1;
 				Commit_S[ WNo ].Issue_No<= I_Issue_No;

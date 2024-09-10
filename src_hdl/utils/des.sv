@@ -22,6 +22,7 @@ module Des
 	output	[WIDTH_OUTPUT-1:0]	O_Data					//De-serialized Data
 );
 
+
 	localparam int	ROUND_VAL	= (WIDTH_INPUT+1)/2;
 	localparam int	COUNT_VAL	= (WIDTH_OUTPUT+ROUND_VAL)/WIDTH_INPUT;
 	localparam int	WIDTH_COUNT	= $clog2(COUNT_VAL);

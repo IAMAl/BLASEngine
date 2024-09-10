@@ -68,8 +68,8 @@ module DMem
 	logic						St_Offset;
 	logic						Ld_Offset;
 
-	address_d_t					St_Base;
-	address_d_t					Ld_Base;
+	address_t					St_Base;
+	address_t					Ld_Base;
 
 	address_t					Length_St;
 	address_t					Length_Ld;

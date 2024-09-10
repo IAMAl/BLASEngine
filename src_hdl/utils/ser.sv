@@ -22,6 +22,7 @@ module Ser
 	output	[WIDTH_OUTPUT-1:0]	O_Data				//De-sirialized Data
 );
 
+
 	localparam int	ROUND_VAL	= (WIDTH_OUTPUT+1)/2;
 	localparam int	COUNT_VAL	= (WIDTH_INPUT+ROUND_VAL)/WIDTH_OUTPUT;
 	localparam int	WIDTH_COUNT	= $clog2(COUNT_VAL);

@@ -37,7 +37,7 @@ module RegFile
 	assign Re1					= I_Req & I_Index_Src1.v & ( I_Index_Src1.no == 2'h1 );
 	assign Re2					= I_Req & I_Index_Src2.v & ( I_Index_Src2.no == 2'h1 );
 
-	assign O_Req				= R_Req;
+	assign O_Req				= //ToDo
 
 	assign O_Data_Src1			= Data_Src1;
 

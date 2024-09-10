@@ -73,7 +73,7 @@ module PubDomain_Man
 
 	logic	[NUM_ENTRY-1:0]		R_Valid;
 	logic	[NUM_ENTRY-1:0]		R_Stored;
-	logic	address_t			TabBAddr	[NUM_ENTRY-1:0];
+	address_t					TabBAddr	[NUM_ENTRY-1:0];
 
 
 	assign Event_St_Grant1		= ~R_St_Grant1 & I_St_Grant1;

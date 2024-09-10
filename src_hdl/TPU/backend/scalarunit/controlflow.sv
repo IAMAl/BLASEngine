@@ -10,8 +10,8 @@ module PAC
 	input						I_CondValid2,			//Condition Valid
 	input						I_Jump,					//Jump Instruction
 	input						I_Branch,				//Branch Instruction
-	input	count_t				I_Timing_MY,			//Count Value for This Instruction
-	input	count_t				I_Timing_WB,			//Count Value for Write-Back Instr
+	input	issue_no_t			I_Timing_MY,			//Count Value for This Instruction
+	input	issue_no_t			I_Timing_WB,			//Count Value for Write-Back Instr
 	input	state_t				I_State,				//Status Register
 	input	cond_t				I_Cond,					//Flag: Condition
 	output	address_t			I_Src,					//Source Value

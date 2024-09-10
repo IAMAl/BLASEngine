@@ -8,7 +8,7 @@ module SkipCTRL #(
 	input	mask_t				I_Mask_Value,			//Mask Value
 	input	index_t				I_Index_Start,			//Start Index
 	input	index_t				I_Index_Length,			//Length of Access
-	output	logic;				O_Req,					//Request
+	output	logic				O_Req,					//Request
 	output	index_t				O_Index_Offset,			//Offset Value
 	output	logic				O_End					//End of Skipping
 );

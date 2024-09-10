@@ -28,6 +28,7 @@ module CommitAgg
 	output						O_Full					//Flag: Buffer Full
 );
 
+
 	localparam int	WIDTH_SIZE	= $clog2(BUFF_SIZE);
 
 

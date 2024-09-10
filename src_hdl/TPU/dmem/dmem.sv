@@ -39,7 +39,7 @@ module DMem
 		.I_Ld_Req1(			I_LdSt[0].ld.req		),
 		.I_Ld_Req2(			I_LdSt[1].ld.req		),
 		.I_St_Length1(		I_LdSt[0].st.len		),
-		.I_St_Stride1(		I_LdSt[1].st.stride		),
+		.I_St_Stride1(		I_LdSt[0].st.stride		),
 		.I_St_Base_Addr1(	I_LdSt[0].st.base		),
 		.I_St_Length2(		I_LdSt[1].st.len		),
 		.I_St_Stride2(		I_LdSt[1].st.stride		),

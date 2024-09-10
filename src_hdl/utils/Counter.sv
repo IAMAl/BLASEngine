@@ -19,6 +19,7 @@ module Counter #(
 	output	[WIDHT_COUNT-1:0]	O_CountVal				//Count Value
 );
 
+
 	logic	[WIDHT_COUNT-1:0]	R_CountVal;
 
 

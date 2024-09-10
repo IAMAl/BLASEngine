@@ -39,6 +39,7 @@ module Network_S
 
 	logic						Req;
 	logic	[1:0]				Sel_Path;
+	logic	[1:0]				Sel_Path_WB;
 
 	index_t						Src_Index1;
 	index_t						Src_Index2;
@@ -51,6 +52,7 @@ module Network_S
 
 	assign Req					= I_Req;
 	assign Sel_Path				= I_Sel_Path;
+	assign Sel_Path_WB			= I_Sel_Path_WB;
 
 	assign Src_Index1			= I_Src_Idx1;
 	assign Src_Index2			= I_Src_Idx1;
@@ -60,7 +62,7 @@ module Network_S
 	assign Src_Data2			= I_Src_Data2;
 	assign Src_Data3			= I_Src_Data3;
 
-	assign O_PAC_Src_Data		=( Sel_Path == 2'h1 ) ?			I_Src_Data1 :
+	assign O_PAC_Src_Data		=(    Sel_Path == 2'h1 ) ?		I_Src_Data1 :
 									( Sel_Path == 2'h2 ) ?		I_Src_Data2 :
 									( Sel_Path == 2'h3 ) ?		I_Src_Data3 :
 																'0;

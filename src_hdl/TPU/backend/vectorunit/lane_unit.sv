@@ -263,7 +263,7 @@ module Lane_Unit
 	//	Write-Back to Mask Register
 	assign MaskReg_We		= WB_Index.v & is_WB_BR;
 	assign Cond_Data		= ( is_WB_BR ) ? W_WB_Data : '0;
-	assign MaskReg_Re		= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
+	assign MaskReg_Re		= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
 								( PipeReg_RR.src3.src_sel.no == 2'h2 );
 

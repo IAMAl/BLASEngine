@@ -20,6 +20,7 @@ module InstrMem
 	input	instr_t				I_St_Instr,				//Storing Instruction
 	input						I_Req_Ld,				//Request Loading
 	input	t_address_t			I_Ld_Address,			//Load Address
+	input	t_address_t			I_St_Address,			//Store Address
 	input	instr_t				O_Ld_Instr				//Loaded Instruction
 );
 
@@ -41,7 +42,7 @@ module InstrMem
 
 	always_ff @( posedge clock ) begin
 		if ( I_Req_St ) begin
-			InstrMem[ St_Adddress ]	<= I_St_Instr;
+			InstrMem[ I_St_Address ]	<= I_St_Instr;
 		end
 	end
 

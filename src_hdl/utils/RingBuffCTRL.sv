@@ -25,6 +25,7 @@ module RingBuffCTRL
     output  [WIDTH_ENTRY:0]		O_Num				//Remained Number of Entries
 );
 
+
 	localparam int WIDTH_BUFF	= $clog2(NUM_ENTRY);
 
 
@@ -53,7 +54,7 @@ module RingBuffCTRL
     assign O_WAddr				= W_WPtr[$clog2(NUM_ENTRY)-1:0];
 	assign O_RAddr				= W_RPtr[$clog2(NUM_ENTRY)-1:0];
     assign O_Num        	    = ( W_CNT[WIDTH_BUFF+1] ) ?	R_WCNT - R_RCNT + NUM_ENTRY :
-														W_CNT[WIDTH_BUFF:0] ;
+															W_CNT[WIDTH_BUFF:0];
 
 
 	//// Buffer Status												////

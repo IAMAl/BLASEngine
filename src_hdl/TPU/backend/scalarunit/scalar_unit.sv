@@ -371,6 +371,7 @@ module Scalar_Unit
 		.I_St_Instr(		I_Instr					),
 		.I_Req_Ld(			IFetch					),
 		.I_Ld_Address(		PC						),
+		.I_St_Address(		).//ToDo
 		.O_Ld_Instr(		Instruction				)
 	);
 
