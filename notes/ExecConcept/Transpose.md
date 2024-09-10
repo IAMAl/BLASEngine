@@ -4,7 +4,7 @@ BLASEngineは転地をサポートしています。下図はその実行ステ�
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/Transpose.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/Transpose.png"
        alt="Transposition"
        title="1D Convolution (K=3, Delite=1)"
        width="700px"

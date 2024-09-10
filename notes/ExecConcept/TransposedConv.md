@@ -1,1 +1,0 @@
-# Transposed Convolution (Deconvolution) Note

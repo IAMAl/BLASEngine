@@ -4,7 +4,7 @@ BLASEngineは行列積C=ABをサポートしています。下図は披乗算行
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/MatMatMult.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/MatMatMult.png"
        alt="HTML image alt text"
        title="Matrix-Matrix Multiplication"
        width="600px"
