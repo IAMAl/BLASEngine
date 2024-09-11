@@ -9,7 +9,9 @@
 //	Module Name:	Commit_TPU
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module Commit_TPU (
+module Commit_TPU
+	import pkg_tpu::*;
+(
 	input	issue_no_t			I_Rd_Ptr,				//Read Pointer from Hazard Unit
 	input						I_RB_Empty_S,			//Empty in Reorder Buffer for Scalar Unit
 	input						I_RB_Empty_V,			//Empty in Reorder Buffer for Vector Unit

@@ -11,17 +11,18 @@
 
 module Vector_Unit
 	import pkg_tpu::*;
+	import pkg_mpu::*;
 (
 	input						clock,
 	input						reset,
 	input	lane_t				I_En_Lane,				//Enable to Execution on Lane
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
-	input	v_commant_t			I_Command,				//Comamnd to Execute
+	input	command_t			I_Command,				//Comamnd to Execute
 	input	data_t				I_Scalar_Data,			//Scalar Data
 	output	data_t				O_Scalar_Data,			//Scalar Data
 	output	v_ldst_t			O_LdSt,					//Load Request
-	input	v_data				I_LdData,				//Loaded Data
-	output	v_data				O_StData,				//Storing Data
+	input	v_ldst_data_t		I_LdData,				//Loaded Data
+	output	v_ldst_data_t		O_StData,				//Storing Data
 	input	v_ready_t			I_Ld_Ready,				//Flag: Ready
 	input	v_grant_t			I_Ld_Grant,				//Flag: Grant
 	input	v_ready_t			I_St_Ready,				//Flag: Ready
@@ -38,12 +39,16 @@ module Vector_Unit
 
 	commit_lane_t				Commit;
 
+	data_t	[NUM_LANES-1:0]		Scalar_Data;
+
 
 	assign O_Commmit_Req		= &( ~( I_En_Lane ^ Commit ) );
 
+	assign O_Scalar_Data		= Scalar_Data[0];//ToDo
+
 
 	//Vector-Lane Generation
-	for ( genvar i=0; i<NUM_LANE; ++i ) begin
+	for ( genvar i=0; i<NUM_LANES; ++i ) begin
 		Lane_Unit #(
 			.NUM_LANES(			NUM_LANES				),
 			.LANE_ID(			i						)
@@ -55,7 +60,7 @@ module Vector_Unit
 			.I_ThreadID(		I_ThreadID				),
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),
-			.O_Scalar_Data(		Scalr_Data[ i ]			),
+			.O_Scalar_Data(		Scalar_Data[ i ]		),
 			.O_LdSt1(			O_LdSt[ i ]				),
 			.I_LdData1(			I_LdData[ i ]			),
 			.O_St_Data1(		O_StData[ i ]			),
@@ -71,7 +76,7 @@ module Vector_Unit
 			.O_Lane_Src1(		Lane_Data_Src1[ i ]		),
 			.O_Lane_Src2(		Lane_Data_Src2[ i ]		),
 			.O_Lane_Src3(		Lane_Data_Src3[ i ]		),
-			.O_Lane_WB(			Lane_Data_WV[ i ]		),
+			.O_Lane_WB(			Lane_Data_WB[ i ]		),
 			.O_Status(			O_Status[ i ]			)
 		);
 	end

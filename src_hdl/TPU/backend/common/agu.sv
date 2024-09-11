@@ -60,7 +60,7 @@ module agu
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stide			<=n 0;
+			R_Stide			<= 0;
 		end
 		else ( I_Req & ~R_Run ) begin
 			R_Stide			<= I_Stride;

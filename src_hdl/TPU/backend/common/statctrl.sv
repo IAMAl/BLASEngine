@@ -9,22 +9,24 @@
 //	Module Name:	StatusCtrl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module StatusCtrl (
+module StatusCtrl
+	import	pkg_tpu::*;
+(
 		input					clock,
 		input					reset,
 		input					I_Req,					//Request to Update
 		input	data_t			I_Diff_Data,			//Diff Value from Adder
-		output	stat_v_t		O_Status				//Status Values
+		output	state_t			O_Status				//Status Values
 );
 
 
 	logic						Eq;
 	logic						Ne;
 	logic						Gt;
-	logic						Eq;
+	logic						Le;
 
-	stat_v_t					Set_Val;
-	stat_v_t					Status;
+	stat_t						Set_Val;
+	stat_t						Status;
 
 
 	// Float Format
@@ -44,7 +46,7 @@ module StatusCtrl (
 	assign Set_Val				= { Eq, Ne, Gt, Le };
 
 	//	Output
-	assign O_Status				= Status
+	assign O_Status				= Status;
 
 
 	always_ff @( posedge clock ) begin

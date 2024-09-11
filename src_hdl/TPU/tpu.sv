@@ -12,28 +12,29 @@
 module TPU
 	import pkg_mpu::*;
 	import pkg_tpu::*;
+	import pkg_tpu::instr_t;
 (
 	input						clock,
 	input						reset,
 	input						I_En_Exe,				//Enable Executing
 	input						I_Req,					//Request from MPU
-	input	issue_no_mpu_t		I_IssueNo,				//Thread's Issue No
+	input	mpu_issue_no_t		I_IssueNo,				//Thread's Issue No
 	input	instr_t				I_Instr,				//Instructions from MPU
 	output	s_ldst_t			O_S_LdSt,				//Load/Store Command
-	input	s_ld_data			I_S_Ld_Data,			//Loaded Data from DMem
-	output	s_ld_data			O_S_St_Data,			//Storing Data to Dmem
+	input	s_ldst_data_t		I_S_Ld_Data,			//Loaded Data from DMem
+	output	s_ldst_data_t		O_S_St_Data,			//Storing Data to Dmem
 	input	[1:0]				I_S_Ld_Ready,			//Flag: Ready
 	input	[1:0]				I_S_Ld_Grant,			//Flag: Grant for Request
 	input	[1:0]				I_S_St_Ready,			//Flag: Ready
 	input	[1:0]				I_S_St_Grant,			//Flag: Grant
 	input	v_ldst_t			O_V_LdSt,				//Load/Store Command
-	input	v_ld_data			I_V_Ld_Data,			//Loaded Data
-	output	v_ld_data			O_V_St_Data,			//Storing Data
+	input	v_ldst_data_t		I_V_Ld_Data,			//Loaded Data
+	output	v_ldst_data_t		O_V_St_Data,			//Storing Data
 	input	v_ready_t			I_V_Ld_Ready,			//Flag:	Ready
 	input	v_grant_t			I_V_Ld_Grant,			//Flag: Grant
 	input	v_ready_t			I_V_St_Ready,			//Flag: Ready
 	input	v_grant_t			I_V_St_Grant,			//Flag: Grant
-	output	issue_no_mpu_t		O_IssueNo,				//Thread's Issue No
+	output	mpu_issue_no_t		O_IssueNo,				//Thread's Issue No
 	output						O_Term,					//Flag: Termination
 	output						O_Nack					//Flag: Not-Acknowledge
 );

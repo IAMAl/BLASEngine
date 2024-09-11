@@ -16,6 +16,8 @@ module Network_V
 	parameter int WIDTH_LANES	= $clog2(NUM_LANES),
 	parameter int LANE_ID		= 0
 )(
+	input						clock,
+	input						reset,
 	input						I_Stall,
 	input						I_Req,
 	input	[6:0]				I_Sel_Path,				//Path Selects
@@ -31,9 +33,10 @@ module Network_V
 	input	data_t				I_Src_Data1,			//From RegFile after Rotation Path
 	input	data_t				I_Src_Data2,			//From RegFile after Rotation Path
 	input	data_t				I_Src_Data3,			//From RegFile after Rotation Path
-	input	inex_t				I_Src_Idx1,				//Index from RegFile
-	input	inex_t				I_Src_Idx2,				//Index from RegFile
-	input	inex_t				I_Src_Idx3,				//Index from RegFile
+	input	index_t				I_Src_Idx1,				//Index from RegFile
+	input	index_t				I_Src_Idx2,				//Index from RegFile
+	input	index_t				I_Src_Idx3,				//Index from RegFile
+	input	index_t				I_WB_Index,
 	input	data_t				I_WB_Data,				//Data from ALU
 	output	data_t				O_Src_Data1,			//To Exec Unit
 	output	data_t				O_Src_Data2,			//To Exec Unit
@@ -67,6 +70,10 @@ module Network_V
 	logic						Sel_WB_Data2;
 	logic						Sel_WB_Data3;
 
+	data_t						Path_Src_Data1;
+	data_t						Path_Src_Data2;
+	data_t						Path_Src_Data3;
+
 
 	assign Req					= I_Req;
 
@@ -99,7 +106,7 @@ module Network_V
 		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),
 		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
 		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),
-		.I_Lane_Data_WB(	I_Lane_WB_Data			),
+		.I_Lane_Data_WB(	I_Lane_Data_WB			),
 		.I_Src_Data1(		Src_Data1				),
 		.I_Src_Data2(		Src_Data2				),
 		.I_Src_Data3(		Src_Data3				),

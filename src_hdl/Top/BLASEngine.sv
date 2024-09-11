@@ -12,6 +12,8 @@
 module BLASEngine
 	import	pkg_mpu::*;
 	import	pkg_tpu::*;
+	import	pkg_tpu::instr_t;
+	import	pkg_tpu::BYPASS_BUFF_SIZE;
 	import	pkg_top::*;
 (
 	input						clock,
@@ -32,66 +34,76 @@ module BLASEngine
 	tpu_row_clm_t				TPU_En_Exe;
 	tpu_row_clm_t				TPU_Req;
 
+	logic						TPU_Term			[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	logic						TPU_Nack			[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	mpu_issue_no_t				TPU_IssueNo			[NUM_ROWS+1:0][NUM_CLMS-1:0];
 
-	logic						Route_I_Req		[TPU_ROWS+1:0][TPU_CLMS-1:0];
-	logic						Route_O_Req		[TPU_ROWS+1:0][TPU_CLMS-1:0];
+	logic						Commit_Req;
+	mpu_issue_no_t				Commit_No;
 
-	data_t						Route_I_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0];
-	data_t						Route_O_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0];
-
-	logic						Route_I_Rls		[TPU_ROWS+1:0][TPU_CLMS-1:0];
-	logic						Route_O_Rls		[TPU_ROWS+1:0][TPU_CLMS-1:0];
-
-
-	logic						Route_Fwd_Req	[TPU_ROWS+1:0][TPU_CLMS:0];
-	logic						Route_Bwd_Req	[TPU_ROWS+1:0][TPU_CLMS:0];
-
-	data_t						Route_Fwd_Data	[TPU_ROWS+1:0][TPU_CLMS:0];
-	data_t						Route_Bwd_Data	[TPU_ROWS+1:0][TPU_CLMS:0];
-
-	logic						Route_Fwd_Rls	[TPU_ROWS+1:0][TPU_CLMS:0];
-	logic						Route_Bwd_Rls	[TPU_ROWS+1:0][TPU_CLMS:0];
+	logic						TPU_CLM_Commit_Req	[NUM_CLMS-1:0];
+	mpu_issue_no_t				TPU_CLM_Commit_No	[NUM_CLMS-1:0];
 
 
-	s_ldst_t					TPU_S_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	v_ldst_t					TPU_V_Ld_LdSt	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
+	logic						Route_I_Req		[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	logic						Route_O_Req		[NUM_ROWS+1:0][NUM_CLMS-1:0];
 
-	s_ldst_t					RAM_S_Ld_LdSt	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	v_ldst_t					RAM_V_Ld_LdSt	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	data_t						Route_I_Data	[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	data_t						Route_O_Data	[NUM_ROWS+1:0][NUM_CLMS-1:0];
 
-
-	data_t						TPU_S_Ld_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	data_t						TPU_S_St_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-
-	v_data_t					TPU_V_Ld_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	v_data_t					TPU_V_St_Data	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-
-	data_t						RAM_S_Ld_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	data_t						RAM_S_St_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-
-	v_data_t					RAM_V_Ld_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	v_data_t					RAM_V_St_Data	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	logic						Route_I_Rls		[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	logic						Route_O_Rls		[NUM_ROWS+1:0][NUM_CLMS-1:0];
 
 
-	logic	[1:0]				TPU_S_Ld_Ready	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	logic	[1:0]				TPU_S_Ld_Grant	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	logic	[1:0]				TPU_S_St_Ready	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	logic	[1:0]				TPU_S_St_Grant	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
+	logic						Route_Fwd_Req	[NUM_ROWS+1:0][NUM_CLMS:0];
+	logic						Route_Bwd_Req	[NUM_ROWS+1:0][NUM_CLMS:0];
 
-	v_ready_t					TPU_V_Ld_Ready	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	v_grant_t					TPU_V_Ld_Grant	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	v_ready_t					TPU_V_St_Ready	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
-	v_grant_t					TPU_V_St_Grant	[TPU_ROWS-1:0][TPU_CLMS-1:0][1:0];
+	data_t						Route_Fwd_Data	[NUM_ROWS+1:0][NUM_CLMS:0];
+	data_t						Route_Bwd_Data	[NUM_ROWS+1:0][NUM_CLMS:0];
 
-	logic	[1:0]				RAM_S_Ld_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	logic	[1:0]				RAM_S_Ld_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	logic	[1:0]				RAM_S_St_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	logic	[1:0]				RAM_S_St_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+	logic						Route_Fwd_Rls	[NUM_ROWS+1:0][NUM_CLMS:0];
+	logic						Route_Bwd_Rls	[NUM_ROWS+1:0][NUM_CLMS:0];
 
-	v_ready_t					RAM_V_Ld_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	v_grant_t					RAM_V_Ld_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	v_ready_t					RAM_V_St_Ready	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
-	v_grant_t					RAM_V_St_Grant	[TPU_ROWS+1:0][TPU_CLMS-1:0][1:0];
+
+	s_ldst_t					TPU_S_LdSt	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	v_ldst_t					TPU_V_LdSt	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+
+	s_ldst_t					RAM_S_LdSt	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	v_ldst_t					RAM_V_LdSt	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+
+
+	data_t						TPU_S_Ld_Data	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	data_t						TPU_S_St_Data	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+
+	v_data_t					TPU_V_Ld_Data	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	v_data_t					TPU_V_St_Data	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+
+	data_t						RAM_S_Ld_Data	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	data_t						RAM_S_St_Data	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+
+	v_data_t					RAM_V_Ld_Data	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	v_data_t					RAM_V_St_Data	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+
+
+	logic	[1:0]				TPU_S_Ld_Ready	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	logic	[1:0]				TPU_S_Ld_Grant	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	logic	[1:0]				TPU_S_St_Ready	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	logic	[1:0]				TPU_S_St_Grant	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+
+	v_ready_t					TPU_V_Ld_Ready	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	v_grant_t					TPU_V_Ld_Grant	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	v_ready_t					TPU_V_St_Ready	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	v_grant_t					TPU_V_St_Grant	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+
+	logic	[1:0]				RAM_S_Ld_Ready	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	logic	[1:0]				RAM_S_Ld_Grant	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	logic	[1:0]				RAM_S_St_Ready	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	logic	[1:0]				RAM_S_St_Grant	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+
+	v_ready_t					RAM_V_Ld_Ready	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	v_grant_t					RAM_V_Ld_Grant	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	v_ready_t					RAM_V_St_Ready	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	v_grant_t					RAM_V_St_Grant	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
 
 
 	MPU MPU (
@@ -136,43 +148,49 @@ module BLASEngine
 	);
 
 
-	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
-		for ( genvar row=0; row<NUM_ROWS; ++row ) begin
-			assign RAM_S_LdSt[ row ][ clm ]			= TPU_S_Ld_LdSt[ row ][ clm ][0];
-			assign RAM_S_Ld_Data[ row ][ clm ]		= TPU_S_Ld_Data[ row ][ clm ][0];
-			assign RAM_S_ST_Data[ row ][ clm ]		= TPU_S_ST_Data[ row ][ clm ][0];
+	always_comb begin
+		for ( int clm=0; clm<NUM_CLMS; ++clm ) begin
 
-			assign RAM_V_LdSt[ row ][ clm ]			= TPU_V_Ld_LdSt[ row ][ clm ][0];
-			assign RAM_V_Ld_Data[ row ][ clm ]		= TPU_V_Ld_Data[ row ][ clm ][0];
-			assign RAM_V_ST_Data[ row ][ clm ]		= TPU_V_ST_Data[ row ][ clm ][0];
+			TPU_CLM_Commit_Req[ clm ]	= TPU_Term[0][ clm ];//ToDo
+			TPU_CLM_Commit_No[ clm ]	= TPU_IssueNo[0][ clm ];//ToDo
 
-			assign RAM_S_LdSt[ row+1 ][ clm ]		= TPU_S_Ld_LdSt[ row ][ clm ][1];
-			assign RAM_S_Ld_Data[ row+1 ][ clm ]	= TPU_S_Ld_Data[ row ][ clm ][1];
-			assign RAM_S_ST_Data[ row+1 ][ clm ]	= TPU_S_ST_Data[ row ][ clm ][1];
+			for ( int row=0; row<NUM_ROWS; ++row ) begin
+				RAM_S_LdSt[ row ][ clm ][0]		= TPU_S_LdSt[ row ][ clm ][0];
+				RAM_S_Ld_Data[ row ][ clm ][0]	= TPU_S_Ld_Data[ row ][ clm ][0];
+				RAM_S_St_Data[ row ][ clm ][0]	= TPU_S_St_Data[ row ][ clm ][0];
 
-			assign RAM_V_LdSt[ row+1 ][ clm ]		= TPU_V_Ld_LdSt[ row ][ clm ][1];
-			assign RAM_V_Ld_Data[ row+1 ][ clm ]	= TPU_V_Ld_Data[ row ][ clm ][1];
-			assign RAM_V_ST_Data[ row+1 ][ clm ]	= TPU_V_ST_Data[ row ][ clm ][1];
+				RAM_V_LdSt[ row ][ clm ][0]		= TPU_V_LdSt[ row ][ clm ][0];
+				RAM_V_Ld_Data[ row ][ clm ][0]	= TPU_V_Ld_Data[ row ][ clm ][0];
+				RAM_V_St_Data[ row ][ clm ][0]	= TPU_V_St_Data[ row ][ clm ][0];
 
-			assign TPU_S_Ld_Ready[ row ][ clm ][0]	= RAM_S_Ld_Ready[ row ][ clm ];
-			assign TPU_S_Ld_Grant[ row ][ clm ][0]	= RAM_S_Ld_Grant[ row ][ clm ];
-			assign TPU_S_St_Ready[ row ][ clm ][0]	= RAM_S_St_Ready[ row ][ clm ];
-			assign TPU_S_St_Grant[ row ][ clm ][0]	= RAM_S_St_Grant[ row ][ clm ];
+				RAM_S_LdSt[ row+1 ][ clm ][1]	= TPU_S_LdSt[ row ][ clm ][1];
+				RAM_S_Ld_Data[ row+1 ][ clm ][1]= TPU_S_Ld_Data[ row ][ clm ][1];
+				RAM_S_St_Data[ row+1 ][ clm ][1]= TPU_S_St_Data[ row ][ clm ][1];
 
-			assign TPU_S_Ld_Ready[ row ][ clm ][1]	= RAM_S_Ld_Ready[ row+1 ][ clm ];
-			assign TPU_S_Ld_Grant[ row ][ clm ][1]	= RAM_S_Ld_Grant[ row+1 ][ clm ];
-			assign TPU_S_St_Ready[ row ][ clm ][1]	= RAM_S_St_Ready[ row+1 ][ clm ];
-			assign TPU_S_St_Grant[ row ][ clm ][1]	= RAM_S_St_Grant[ row+1 ][ clm ];
+				RAM_V_LdSt[ row+1 ][ clm ][1]	= TPU_V_LdSt[ row ][ clm ][1];
+				RAM_V_Ld_Data[ row+1 ][ clm ][1]= TPU_V_Ld_Data[ row ][ clm ][1];
+				RAM_V_St_Data[ row+1 ][ clm ][1]= TPU_V_St_Data[ row ][ clm ][1];
 
-			assign TPU_V_Ld_Ready[ row ][ clm ][0]	= RAM_V_Ld_Ready[ row ][ clm ];
-			assign TPU_V_Ld_Grant[ row ][ clm ][0]	= RAM_V_Ld_Grant[ row ][ clm ];
-			assign TPU_V_St_Ready[ row ][ clm ][0]	= RAM_V_St_Ready[ row ][ clm ];
-			assign TPU_V_St_Grant[ row ][ clm ][0]	= RAM_V_St_Grant[ row ][ clm ];
+				TPU_S_Ld_Ready[ row ][ clm ][0]	= RAM_S_Ld_Ready[ row ][ clm ][0];
+				TPU_S_Ld_Grant[ row ][ clm ][0]	= RAM_S_Ld_Grant[ row ][ clm ][0];
+				TPU_S_St_Ready[ row ][ clm ][0]	= RAM_S_St_Ready[ row ][ clm ][0];
+				TPU_S_St_Grant[ row ][ clm ][0]	= RAM_S_St_Grant[ row ][ clm ][0];
 
-			assign TPU_V_Ld_Ready[ row ][ clm ][1]	= RAM_V_Ld_Ready[ row+1 ][ clm ];
-			assign TPU_V_Ld_Grant[ row ][ clm ][1]	= RAM_V_Ld_Grant[ row+1 ][ clm ];
-			assign TPU_V_St_Ready[ row ][ clm ][1]	= RAM_V_St_Ready[ row+1 ][ clm ];
-			assign TPU_V_St_Grant[ row ][ clm ][1]	= RAM_V_St_Grant[ row+1 ][ clm ];
+				TPU_S_Ld_Ready[ row ][ clm ][1]	= RAM_S_Ld_Ready[ row+1 ][ clm ][1];
+				TPU_S_Ld_Grant[ row ][ clm ][1]	= RAM_S_Ld_Grant[ row+1 ][ clm ][1];
+				TPU_S_St_Ready[ row ][ clm ][1]	= RAM_S_St_Ready[ row+1 ][ clm ][1];
+				TPU_S_St_Grant[ row ][ clm ][1]	= RAM_S_St_Grant[ row+1 ][ clm ][1];
+
+				TPU_V_Ld_Ready[ row ][ clm ][0]	= RAM_V_Ld_Ready[ row ][ clm ][0];
+				TPU_V_Ld_Grant[ row ][ clm ][0]	= RAM_V_Ld_Grant[ row ][ clm ][0];
+				TPU_V_St_Ready[ row ][ clm ][0]	= RAM_V_St_Ready[ row ][ clm ][0];
+				TPU_V_St_Grant[ row ][ clm ][0]	= RAM_V_St_Grant[ row ][ clm ][0];
+
+				TPU_V_Ld_Ready[ row ][ clm ][1]	= RAM_V_Ld_Ready[ row+1 ][ clm ][1];
+				TPU_V_Ld_Grant[ row ][ clm ][1]	= RAM_V_Ld_Grant[ row+1 ][ clm ][1];
+				TPU_V_St_Ready[ row ][ clm ][1]	= RAM_V_St_Ready[ row+1 ][ clm ][1];
+				TPU_V_St_Grant[ row ][ clm ][1]	= RAM_V_St_Grant[ row+1 ][ clm ][1];
+			end
 		end
 	end
 
@@ -184,22 +202,22 @@ module BLASEngine
 					.clock(			clock							),
 					.reset(			reset							),
 					.I_Req(			Route_Fwd_Req[ row ][ clm ]		),
-					.I_Rls(			Route_Fwd_Req[ row ][ clm ]		),
-					.I_Data(		Route_Fwd_data[ row ][ clm ]	),
+					.I_Rls(			Route_Fwd_Rls[ row ][ clm ]		),
+					.I_Data(		Route_Fwd_Data[ row ][ clm ]	),
 					.O_Req_A(		Route_I_Req[ row ][ clm ]		),
 					.O_Req_B(		Route_Fwd_Req[ row ][ clm+1 ]	),
 					.O_Data_A(		Route_I_Data[ row ][ clm ]		),
-					.O_Data_B(		Route_Fwd_data[ row+1 ][ clm ]	),
+					.O_Data_B(		Route_Fwd_Data[ row+1 ][ clm ]	),
 					.O_Rls_A(		Route_I_Rls[ row ][ clm ]		),
 					.O_Rls_B(		Route_Fwd_Rls[ row ][ clm+1 ]	),
 					.O_Req(			Route_Bwd_Req[ row ][ clm ]		),
 					.O_Rls(			Route_Bwd_Rls[ row ][ clm ]		),
-					.O_Data(		Route_Bwd_data[ row ][ clm ]	),
+					.O_Data(		Route_Bwd_Data[ row ][ clm ]	),
 					.I_Req_A(		Route_O_Req[ row ][ clm ]		),
 					.I_Req_B(		Route_Bwd_Req[ row ][ clm+1 ]	),
 					.I_Rls_A(		Route_O_Rls[ row ][ clm ]		),
 					.I_Rls_B(		Route_Bwd_Rls[ row ][ clm+1 ]	),
-					.I_Data_A(		Route_O_Daya[ row ][ clm ]		),
+					.I_Data_A(		Route_O_Data[ row ][ clm ]		),
 					.I_Data_B(		Route_Bwd_Data[ row ][ clm+1 ]	)
 				);
 			end
@@ -209,16 +227,16 @@ module BLASEngine
 					.reset(			reset							),
 					.I_Req(			Route_Fwd_Req[ row ][ clm ]		),
 					.I_Rls(			Route_Fwd_Rls[ row ][ clm ]		),
-					.I_Data(		Route_Fwd_data[ row ][ clm ]	),
+					.I_Data(		Route_Fwd_Data[ row ][ clm ]	),
 					.O_Req_A(		Route_Fwd_Req[ row+1 ][ clm ]	),
 					.O_Req_B(		Route_Fwd_Req[ row ][ clm+1 ]	),
-					.O_Data_A(		Route_Fwd_data[ row+1 ][ clm ]	),
-					.O_Data_B(		Route_Fwd_data[ row ][ clm+1 ]	),
+					.O_Data_A(		Route_Fwd_Data[ row+1 ][ clm ]	),
+					.O_Data_B(		Route_Fwd_Data[ row ][ clm+1 ]	),
 					.O_Rls_A(		Route_Fwd_Rls[ row+1 ][ clm ]	),
 					.O_Rls_B(		Route_Fwd_Rls[ row ][ clm+1 ]	),
 					.O_Req(			Route_Bwd_Req[ row ][ clm ]		),
 					.O_Rls(			Route_Bwd_Rls[ row ][ clm ]		),
-					.O_Data(		Route_Bwd_data[ row ][ clm ]	),
+					.O_Data(		Route_Bwd_Data[ row ][ clm ]	),
 					.I_Req_A(		Route_Bwd_Req[ row+1 ][ clm ]	),
 					.I_Req_B(		Route_Bwd_Req[ row ][ clm+1 ]	),
 					.I_Rls_A(		Route_Bwd_Req[ row+1 ][ clm ]	),
@@ -253,6 +271,7 @@ module BLASEngine
 				.O_V_St_Ready(	TPU_V_St_Ready[ row ][ clm ]	),
 				.O_V_Ld_Grant(	TPU_V_Ld_Grant[ row ][ clm ]	),
 				.O_V_St_Grant(	TPU_V_St_Grant[ row ][ clm ]	),
+				.O_IssueNo(		TPU_IssueNo[ row ][ clm ]		),
 				.O_Term(		TPU_Term[ row ][ clm ]			),
 				.O_Nack(		TPU_Nack[ row ][ clm ]			)
 			);

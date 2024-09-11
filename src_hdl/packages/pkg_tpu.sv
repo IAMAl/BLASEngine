@@ -47,10 +47,25 @@ package pkg_tpu;
 	//
 	localparam int NUM_ENTRY_NLZ_INDEX	= 64;
 
+	//
+	localparam int BYPASS_BUFF_SIZE		= 16;
+
+	// Reorder Buffer Size for Scalar Unit
+	localparam int NUM_ENTRY_RB_S		= 16;
+
+	// Reorder Buffer Size for Scalar Unit
+	localparam int NUM_ENTRY_RB_V		= 8;
+
+	// Instruction Memory
+	localparam int IMEM_SIZE			= 1024;
+	localparam int WIDTH_IMEM			= $clog2(IMEM_SIZE);
+
 
 	////Logic Types
 	//	General Data Type
 	typedef logic	[WIDTH_DATA-1:0]		data_t;
+
+	typedef data_t	[NUM_LANES-1:0]			v_data_t;
 
 	//	General Index Type
 	//		MSb differenciates Two Register Files
@@ -64,8 +79,10 @@ package pkg_tpu;
 	typedef logic	[WIDTH_SIZE_DMEM-1:0]	address_t;
 
 	//	Status Data (cmp instr. result) Types
-	typedef logic	[WIDTH_STATE-1:0]		stat_s_t;
-	typedef logic	[WIDTH_STATE-1:0]		stat_v_t;
+	typedef logic	[WIDTH_STATE-1:0]		state_t;
+
+	//	Instruction Memory
+	typedef logic	[WIDTH_IMEM-1:0]		t_address_t;
 
 	//	Instruction Issue No
 	//		Used for Commit as clearing address the Hazard Check Table
@@ -162,6 +179,12 @@ package pkg_tpu;
 		logic							commit;
 	} iw_t;
 
+	typedef struct packed {
+		logic							v;
+		index_t							idx;
+		data_t							data;
+	} reg_t;
+
 	//	Commit Table for Scalar Unit
 	typedef struct packed {
 		logic							v;
@@ -185,6 +208,26 @@ package pkg_tpu;
 		instr_t							instr;
 		issue_no_t						issue_no;
 	} command_t;
+
+
+	////Data Memory
+	typedef struct packed {
+		logic							req;
+		address_t						len;
+		address_t						stride;
+		address_t						base;
+	} dmem_t;
+
+	typedef struct packed {
+		dmem_t							ld;
+		dmem_t							st;
+	} ldst_t;
+
+	typedef ldst_t [1:0]				s_ldst_t;
+	typedef ldst_t [NUM_LANES-1:0]		v_ldst_t;
+
+	typedef data_t	[1:0]				s_ldst_data_t;
+	typedef s_ldst_data	[NUM_LANES-1:0]	v_ldst_data_t;
 
 
 	////Pipeline Registers

@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Counter #(
-	parameter int	WIDHT_COUNT	= 64;
+	parameter int	WIDHT_COUNT	= 64
 )(
 	input						clock,
 	input						reset,

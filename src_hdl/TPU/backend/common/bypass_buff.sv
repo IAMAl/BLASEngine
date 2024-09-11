@@ -18,13 +18,13 @@ module BypassBuff
 	input						reset,
 	input						I_Stall,				//Force Stalling
 	input	dst_t				I_WB_Index,				//Write-back Index
-	input	data_t				I_WB_Data				//Write-back Data
+	input	data_t				I_WB_Data,				//Write-back Data
 	input	reg_t				I_Src1,					//Source Data
 	input	reg_t				I_Src2,					//Source Data
 	input	reg_t				I_Src3,					//Source Data
-	input	reg_t				O_Src1,					//Source Data
-	input	reg_t				O_Src2,					//Source Data
-	input	reg_t				O_Src3,					//Source Data
+	output	reg_t				O_Src1,					//Source Data
+	output	reg_t				O_Src2,					//Source Data
+	output	reg_t				O_Src3,					//Source Data
 	output						O_Full					//Full in Buffer
 );
 
@@ -32,9 +32,11 @@ module BypassBuff
 
 	logic						En;
 
-	logic						is_Matched_Src1	[BUFF_SIZE-1:0];
-	logic						is_Matched_Src2 [BUFF_SIZE-1:0];
-	logic						is_Matched_Src3 [BUFF_SIZE-1:0];
+	logic	[BUFF_SIZE-1:0]		Valid;
+
+	logic	[BUFF_SIZE-1:0]		is_Matched_Src1;
+	logic	[BUFF_SIZE-1:0]		is_Matched_Src2;
+	logic	[BUFF_SIZE-1:0]		is_Matched_Src3;
 
 	logic	[WIDTH_NUM-1:0]		NoSrc1;
 	logic	[WIDTH_NUM-1:0]		NoSrc2;
@@ -69,6 +71,10 @@ module BypassBuff
 	logic						Run_Slice_Src2;
 	logic						Run_Slice_Src3;
 
+	index_t						Len_Src1;
+	index_t						Len_Src2;
+	index_t						Len_Src3;
+
 
 	logic						valid			[BUFF_SIZE-1:0];
 	reg_t						Buff_Index		[BUFF_SIZE-1:0];
@@ -87,7 +93,7 @@ module BypassBuff
 	assign Update_Src1			= ( |is_Matched_Src1 ) & En;
 	assign Update_Src2			= ( |is_Matched_Src2 ) & En;
 	assign Update_Src3			= ( |is_Matched_Src3 ) & En;
-	assign Update				= Upda_Src1 | Update_Src2 | Update_Src3;
+	assign Update				= Update_Src1 | Update_Src2 | Update_Src3;
 
 
 	assign O_Src1				= ( Update_Src1 ) ?	Buff_Data[ NoSrc1 ] :
@@ -110,16 +116,16 @@ module BypassBuff
 	assign Clr					= Last_Src1 & Last_Src2 & Last_Src3;
 
 
-	always_comb: begin
+	always_comb begin
 		for ( int i=0; i<BUFF_SIZE; ++i ) begin
-			assign is_Matched_Src1[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src1.v & ( Buff_Index[ i ].idx == I_Src1.idx );
-			assign is_Matched_Src2[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src2.v & ( Buff_Index[ i ].idx == I_Src2.idx );
-			assign is_Matched_Src3[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src3.v & ( Buff_Index[ i ].idx == I_Src3.idx );
+			is_Matched_Src1[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src1.v & ( Buff_Index[ i ].idx == I_Src1.idx );
+			is_Matched_Src2[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src2.v & ( Buff_Index[ i ].idx == I_Src2.idx );
+			is_Matched_Src3[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src3.v & ( Buff_Index[ i ].idx == I_Src3.idx );
 		end
 	end
 
 
-	always_comb: begin
+	always_comb begin
 		if ( ( NoSrc1 >= NoSrc2 ) & ( NoSrc1 >= NoSrc3 ) ) begin
 			assign Sel_NoSrc	= NoSrc1;
 		end
@@ -137,7 +143,7 @@ module BypassBuff
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run_Slice_Src1	<= 1'0;
+			Run_Slice_Src1	<= 1'b0;
 		end
 		else if ( Last_Src1 ) begin
 			Run_Slice_Src1	<= 1'b0;
@@ -149,7 +155,7 @@ module BypassBuff
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run_Slice_Src2	<= 1'0;
+			Run_Slice_Src2	<= 1'b0;
 		end
 		else if ( Last_Src2 ) begin
 			Run_Slice_Src2	<= 1'b0;
@@ -161,7 +167,7 @@ module BypassBuff
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Run_Slice_Src3	<= 1'0;
+			Run_Slice_Src3	<= 1'b0;
 		end
 		else if ( Last_Src3 ) begin
 			Run_Slice_Src3	<= 1'b0;
@@ -177,7 +183,7 @@ module BypassBuff
 			Len_Src1		<= 0;
 		end
 		else if ( I_Src1.v & ( I_Src1.slice_len != 0 ) ) begin
-			Len_Src1		<= I_Src1.slice_len + I_Src1.idx :
+			Len_Src1		<= I_Src1.slice_len + I_Src1.idx;
 		end
 	end
 
@@ -186,7 +192,7 @@ module BypassBuff
 			Len_Src2		<= 0;
 		end
 		else if ( I_Src2.v & ( I_Src2.slice_len != 0 ) ) begin
-			Len_Src2		<= I_Src2.slice_len + I_Src2.idx :
+			Len_Src2		<= I_Src2.slice_len + I_Src2.idx;
 		end
 	end
 
@@ -195,7 +201,7 @@ module BypassBuff
 			Len_Src3		<= 0;
 		end
 		else if ( I_Src3.v & ( I_Src3.slice_len != 0 ) ) begin
-			Len_Src3		<= I_Src3.slice_len + I_Src3.idx :
+			Len_Src3		<= I_Src3.slice_len + I_Src3.idx;
 		end
 	end
 

@@ -53,7 +53,7 @@ module PAC
 	//	The I_Timing_WB is the evaluation instruction
 	//	The I_Timing_MY is the branch (this) instruction
 	//	This module works as execution unit, entering after network stage
-	assign Valid				= ( I_Timing_MY == ( I_Timing_WB + 1'b1 ) )
+	assign Valid				= ( I_Timing_MY == ( I_Timing_WB + 1'b1 ) );
 	assign Ready				= Valid & I_Branch;
 
 

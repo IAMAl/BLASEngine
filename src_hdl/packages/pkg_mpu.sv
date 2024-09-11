@@ -97,6 +97,7 @@ package pkg_mpu;
 
 	//MPU Status
 	typedef struct packed {
+		logic							io;
 		logic							imem_wait;
 		logic							send_thread;
 		logic							full_mapman;
@@ -148,7 +149,7 @@ package pkg_mpu;
 		FSM_EXTERN_LD_RUN		= 2'h3
 	} fsm_extern_ld;
 
-	typedef enum logic [3:0] {
+	typedef enum logic [4:0] {
 		FSM_INIT_IF_MPU				= 5'h00,
 		FSM_COMMAND_IF_MPU			= 5'h01,
 		FSM_CHK_CMD_IF_MPU			= 5'h02,

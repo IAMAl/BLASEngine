@@ -1,11 +1,13 @@
-module Lane_Unit (
+module Lane_Unit
+	import pkg_tpu::*;
+(
 	input						clock,
 	input						reset,
 	input						I_En,				//Lane Enable
 	input						I_Rst,				//Reset Control
 	input						I_Set,				//Set Control
 	input	index_t				I_Index,			//Select Condition
-	input						I_Status,			//Condition
+	input	state_t				I_Status,			//Condition
 	output						O_State,			//Status
 	output						O_En				//Lane Enable
 );
@@ -25,10 +27,10 @@ module Lane_Unit (
 
 
 	always_ff @( posedge clock ) begin
-		if ( reet ) begin
+		if ( reset ) begin
 			Cond			<= 1'b0;
 		end
-		else if ( I_We ) begin
+		else if ( I_En ) begin
 			Cond			<= I_Status[ I_Index[1:0] ];
 		end
 	end

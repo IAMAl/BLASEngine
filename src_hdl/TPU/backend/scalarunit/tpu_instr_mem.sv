@@ -12,6 +12,7 @@
 module InstrMem
 	import pkg_mpu::*;
 	import pkg_tpu::*;
+	import pkg_tpu::instr_t;
 (
 	input						clock,
 	input						reset,
@@ -21,14 +22,16 @@ module InstrMem
 	input						I_Req_Ld,				//Request Loading
 	input	t_address_t			I_Ld_Address,			//Load Address
 	input	t_address_t			I_St_Address,			//Store Address
-	input	instr_t				O_Ld_Instr				//Loaded Instruction
+	output	instr_t				O_Ld_Instr				//Loaded Instruction
 );
 
 
-	instr_t						InstrMem	[SIZE_THREAD_MEM-1:0];
+	instr_t						R_Instr;
+
+	instr_t						InstrMem	[IMEM_SIZE-1:0];
 
 
-	assign O_Ld_Instr			= R_Instr;
+	assign O_Ld_Instr 			= R_Instr;
 
 
 	always_ff @( posedge clock ) begin
@@ -36,7 +39,7 @@ module InstrMem
 			R_Instr			<= 0;
 		end
 		else if ( I_Req_Ld ) begin
-			R_Instr			<= InstrMeme[ I_Ld_Address ];
+			R_Instr			<= InstrMem[ I_Ld_Address ];
 		end
 	end
 
