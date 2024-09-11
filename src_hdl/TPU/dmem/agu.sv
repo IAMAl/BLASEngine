@@ -71,10 +71,10 @@ module AGU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stide			<=n 0;
+			R_Stride		<= 0;
 		end
-		else ( I_Req & ~R_Run ) begin
-			R_Stide			<= I_Stride;
+		else if ( I_Req & ~R_Run ) begin
+			R_Stride		<= I_Stride;
 		end
 	end
 
@@ -85,7 +85,7 @@ module AGU
 		else if ( R_Run ) begin
 			R_Address		<= R_Address + R_Stride;
 		end
-		else ( I_Req & ~R_Run ) begin
+		else if ( I_Req & ~R_Run ) begin
 			R_Address		<= I_Base_Addr;
 		end
 	end

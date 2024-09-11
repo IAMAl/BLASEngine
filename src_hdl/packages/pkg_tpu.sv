@@ -32,8 +32,9 @@ package pkg_tpu;
 	localparam int WIDTH_STATE			= 4;
 
 	//Data Memory
-	localparam int SIZE_DATA_MEMORY		= 1024;
-	localparam int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEMORY);
+	localparam int SIZE_DATA_MEM		= 1024;
+	localparam int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEM);
+	localparam int POS_MSB_DMEM_ADDR	= WIDTH_SIZE_DMEM;
 
 	//Constant in Instruction
 	localparam int WIDTH_CONSTANT		= 64-7-7*4-6-1;
@@ -323,6 +324,30 @@ package pkg_tpu;
 	} pipe_exe_end_t;
 
 
+	/// FSM
+	typedef enum logic [2:0] {
+		FSM_EXTERN_INIT			= 3'h0,
+		FSM_EXTERN_RECV_STRIDE	= 3'h1,
+		FSM_EXTERN_RECV_LENGTH	= 3'h2,
+		FSM_EXTERN_RECV_BASE	= 3'h3,
+		FSM_EXTERN_RUN			= 3'h4
+	} fsm_extern_t;
+
+	typedef enum logic [1:0] {
+		FSM_EXTERN_ST_INIT		= 2'h0,
+		FSM_EXTERN_ST_BUFF		= 2'h1,
+		FSM_EXTERN_ST_NOTIFY	= 2'h2,
+		FSM_EXTERN_ST_RUN		= 2'h3
+	} fsm_extern_st_t;
+
+	typedef enum logic [1:0] {
+		FSM_EXTERN_LD_INIT		= 2'h0,
+		FSM_EXTERN_LD_WAIT		= 2'h1,
+		FSM_EXTERN_LD_NOTIFY	= 2'h2,
+		FSM_EXTERN_LD_RUN		= 2'h3
+	} fsm_extern_ld_t;
+
+
 	////ETC
 	//	Enum for Index Select
 	typedef enum [1:0] {
@@ -331,6 +356,5 @@ package pkg_tpu;
 		INDEX_LANE				= 2'h2,
 		INDEX_SIMT				= 2'h3
 	} index_sel_t;
-
 
 endpackage

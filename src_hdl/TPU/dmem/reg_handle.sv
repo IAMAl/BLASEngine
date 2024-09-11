@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	ReqHandle
+//	Module Name:	req_handle
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ReqHandle
+module req_handle
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -34,8 +34,9 @@ module ReqHandle
 	output	address_t			O_Base_Addr,			//Base Address
 	output	logic				O_Grant1,				///Grant (to Lane)
 	output	logic				O_Grant2,				//Grant (to Lane)
-	output	logic				O_St_Req,				//Store Request to Man
-	output	logic				O_GranndVld,			//Grant Validation
+	output	logic				O_Grant3,				//Grant (to Lane)
+	output	logic				O_Req,					//Access Request to Man
+	output	logic				O_GrantVld,				//Grant Validation
 	output	logic				O_GrantNo				//Grant No
 );
 
@@ -49,8 +50,9 @@ module ReqHandle
 
 	assign O_Grant1				= R_Grant1;
 	assign O_Grant2				= R_Grant2;
+	assign O_Grant3				= R_Grant3;
 
-	assign O_St_Req				= ( I_Req1 | I_Req2 | I_Req3 ) ^ ( R_Grant1 | R_Grant2 | R_Grant3 );
+	assign O_Req				= ( I_Req1 | I_Req2 | I_Req3 ) ^ ( R_Grant1 | R_Grant2 | R_Grant3 );
 
 	assign O_Length				= ( R_Grant1 ) ?	I_Length1 :
 									( R_Grant2 ) ?	I_Length2 :

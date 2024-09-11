@@ -18,9 +18,9 @@ module LoadStoreUnit
 	output	logic				O_Ld_Req,				//Load Request (to dmem)
 	output	address_t			O_Length,				//Vector-Length for Load/Store
 	output	address_t			O_Stride,				//Stride-Factor for Load/Store
-	output	address_t			O_Base_Addr				//Load/Store Base Address
-	output	logic				O_St_Rd_RF				//Read-Enable to RF units, update index
-	output	logic				O_Ld_Wr_RF				//Write-Enable to RF units, update index
+	output	address_t			O_Base_Addr,			//Load/Store Base Address
+	output	logic				O_St_Rd_RF,				//Read-Enable to RF units, update index
+	output	logic				O_Ld_Wr_RF,				//Write-Enable to RF units, update index
 	output	logic				O_St_Valid,				//Flag: Valid Data to Store (to dmem)
 	input	data_t				I_St_Data,				//Storing Data from Register File
 	output	data_t				O_St_Data,				//Store Data to Local Memory (to dmem)

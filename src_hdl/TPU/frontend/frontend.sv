@@ -19,7 +19,7 @@ module FrontEnd
 	input						I_Term,					//Flag: Termination from Scalar Unit
 	input						I_Nack,					//Nack from Back-End
 	input						I_Req,					//Request to Work
-	input	mpu_issue_no_t		I_IssueNo				//Issue No at MPU, used for Exec
+	input	mpu_issue_no_t		I_IssueNo,				//Issue No at MPU, used for Exec
 	input	instr_t				I_Instr,				//Instruction
 	output						O_We,					//Write-Enable for Buffer
 	output	id_t				O_ThreadID,				//ThreadID to Buffer

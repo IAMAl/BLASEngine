@@ -44,15 +44,61 @@ module extern_handle
 	localparam int	HALF_BUFF_SIZE	= (BUFF_SIZE+1) / 2;
 	localparam int	WIDTH_HALF_BUFF	= $clog2(HALF_BUFF_SIZE);
 
+	localparam int	NOTIFY_DATA		= -1;
 
-	logic						R_St_Req;
-	logic						R_Ld_Req;
+
+	logic						is_FSM_Extern_Run;
+	logic						is_FSM_Extern_Recv_Stride;
+	logic						is_FSM_Extern_Recv_Length;
+	logic						is_FSM_Extern_Recv_Base;
+
+	logic						is_FSM_Extern_St_Buff;
+	logic						is_FSM_Extern_St_Notify;
+	logic						is_FSM_Extern_St_Run;
+	logic						is_FSM_Extern_Ld_Run;
+
+
+	logic						Half_Data_Block_Stored;
+	logic						Half_Buffer_Stored;
+
+	logic						St_Req;
+	logic						Ld_Req;
+
+	logic						Store_Stride;
+	logic						Store_Length;
+	logic						Store_Base;
+
+	logic						Store_Buff_St;
+	logic						Store_Buff_Ld;
+
+	logic						Load_Buff_St;
+	logic						Load_Buff_Ld;
+
+	logic						Output_St_Config;
+	logic						Output_Ld_Config;
+
+
+	data_t						Buff_In_Data;
+	data_t						Buff_Data;
+
+
+	logic						Run_St_Service;
+	logic						Run_Ld_Service;
+
+
+	logic						is_Ld_Notified;
+
 
 	address_t					R_Length;
 	address_t					R_Stride;
 	address_t					R_Base;
 
 	address_t					Counter_St;
+
+
+	fsm_extern_t				FSM_Extern_Serv;
+	fsm_extern_st_t				FSM_Extern_St;
+	fsm_extern_ld_t				FSM_Extern_Ld;
 
 	// Store Buffer
 	logic						We;
@@ -71,15 +117,23 @@ module extern_handle
 
 	assign is_FSM_Extern_St_Buff	= FSM_Extern_St == FSM_EXTERN_ST_BUFF;
 	assign is_FSM_Extern_St_Notify	= FSM_Extern_St == FSM_EXTERN_ST_NOTIFY;
-	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_ST_EXTERN_RUN;
-	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_Ld_EXTERN_RUN;
+	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_ST_RUN;
+	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_LD_RUN;
+
+	assign is_Ld_Notified		= 0;//ToDo
+
+	assign Run_St_Service		= 0;//ToDo
+	assign Run_Ld_Service		= 0;//ToDo
+
+	assign Output_St_Config		= 0;//ToDo
+	assign Output_Ld_Config		= 0;//ToDo
 
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
 
-	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_Data-1:0];
-	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_Data-1:0];
+	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1:0];
+	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1:0];
 
 
 	// Set Access-Config
@@ -106,14 +160,14 @@ module extern_handle
 
 	// Store Configuration
 	assign O_St_Req				= Output_St_Config | ( Load_Buff_St & ~Empty );
-	assign O_St_Length			= ( Output_St_Config ) ?		R_Lenght :				0;
+	assign O_St_Length			= ( Output_St_Config ) ?		R_Length :				0;
 	assign O_St_Stride			= ( Output_St_Config ) ?		R_Stride :				0;
 	assign O_St_Base			= ( Output_St_Config ) ?		R_Base : 				0;
 	assign O_St_Data			= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :	0;
 
 	// Load Configuration
 	assign O_Ld_Req				= Output_Ld_Config;
-	assign O_Ld_Length			= ( Output_Ld_Config ) ?	R_Lenght :	0;
+	assign O_Ld_Length			= ( Output_Ld_Config ) ?	R_Length :	0;
 	assign O_Ld_Stride			= ( Output_Ld_Config ) ?	R_Stride :	0;
 	assign O_Ld_Base			= ( Output_Ld_Config ) ?	R_Base : 	0;
 
@@ -139,7 +193,7 @@ module extern_handle
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Lenght		<= 0;
+			R_Length		<= 0;
 		end
 		else if ( Store_Length ) begin
 			R_Length		<= I_Data;
@@ -152,32 +206,6 @@ module extern_handle
 		end
 		else if ( Store_Base ) begin
 			R_Base			<= I_Data;
-		end
-	end
-
-
-	// Service Flag
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_St_Req		<= 1'b0;
-		end
-		else if ( I_Ld_Term ) begin
-			R_St_Req		<= 1'b0;
-		end
-		else if ( St_Req ) begin
-			R_St_Req		<= 1'b1;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Ld_Req		<= 1'b0;
-		end
-		else if ( I_Ld_Term ) begin
-			R_Ld_Req		<= 1'b0;
-		end
-		else if ( Ld_Req ) begin
-			R_Ld_Req		<= 1'b1;
 		end
 	end
 
@@ -260,20 +288,20 @@ module extern_handle
 	// Store Control
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Extern_St	<= FSM_ST_EXTERN_INIT;
+			FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
 		end
-		else case ( FSM_Extern_Serv )
-			FSM_EXTERN_INIT: begin
+		else case ( FSM_Extern_St )
+			FSM_EXTERN_ST_INIT: begin
 				if ( Run_St_Service ) begin
 					FSM_Extern_St	<= FSM_EXTERN_ST_BUFF;
 				end
 				else begin
-					FSM_Extern_St	<= FSM_ST_EXTERN_INIT;
+					FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
 				end
 			end
 			FSM_EXTERN_ST_BUFF: begin
 				if ( I_St_Grant ) begin
-					FSM_Extern_St	<= FSM_ST_EXTERN_RUN;
+					FSM_Extern_St	<= FSM_EXTERN_ST_RUN;
 				end
 				else if ( Half_Buffer_Stored ) begin
 					FSM_Extern_St	<= FSM_EXTERN_ST_NOTIFY;
@@ -285,16 +313,16 @@ module extern_handle
 			FSM_EXTERN_ST_NOTIFY: begin
 					FSM_Extern_St	<= FSM_EXTERN_ST_BUFF;
 			end
-			FSM_ST_EXTERN_RUN: begin
+			FSM_EXTERN_ST_RUN: begin
 				if ( I_St_Term | I_Rls ) begin
-					FSM_Extern_St	<= FSM_EXTERN_INIT;
+					FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
 				end
 				else begin
-					FSM_Extern_St	<= FSM_ST_EXTERN_RUN;
+					FSM_Extern_St	<= FSM_EXTERN_ST_RUN;
 				end
 			end
 			default: begin
-				FSM_Extern_St	<= FSM_ST_EXTERN_INIT;
+				FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
 			end
 		endcase
 	end
@@ -303,20 +331,20 @@ module extern_handle
 	// Load Control
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Extern_Ld	<= FSM_LD_EXTERN_INIT;
+			FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
 		end
-		else case ( FSM_Extern_Serv )
-			FSM_EXTERN_INIT: begin
+		else case ( FSM_Extern_Ld )
+			FSM_EXTERN_LD_INIT: begin
 				if ( Run_Ld_Service ) begin
 					FSM_Extern_Ld	<= FSM_EXTERN_LD_WAIT;
 				end
 				else begin
-					FSM_Extern_Ld	<= FSM_LD_EXTERN_INIT;
+					FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
 				end
 			end
 			FSM_EXTERN_LD_WAIT: begin
 				if ( I_Ld_Grant ) begin
-					FSM_Extern_Ld	<= FSM_LD_EXTERN_RUN;
+					FSM_Extern_Ld	<= FSM_EXTERN_LD_RUN;
 				end
 				else begin
 					FSM_Extern_Ld	<= FSM_EXTERN_LD_WAIT;
@@ -324,25 +352,25 @@ module extern_handle
 			end
 			FSM_EXTERN_LD_NOTIFY: begin
 				if ( is_Ld_Notified ) begin
-					FSM_Extern_Ld	<= FSM_LD_EXTERN_RUN;
+					FSM_Extern_Ld	<= FSM_EXTERN_LD_RUN;
 				end
 				else begin
 					FSM_Extern_Ld	<= FSM_EXTERN_LD_NOTIFY;
 				end
 			end
-			FSM_LD_EXTERN_RUN: begin
+			FSM_EXTERN_LD_RUN: begin
 				if ( is_Ld_Notified ) begin
 					FSM_Extern_Ld	<= FSM_EXTERN_LD_NOTIFY;
 				end
 				else if ( I_Ld_Term ) begin
-					FSM_Extern_Ld	<= FSM_LD_EXTERN_INIT;
+					FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
 				end
 				else begin
-					FSM_Extern_Ld	<= FSM_LD_EXTERN_RUN;
+					FSM_Extern_Ld	<= FSM_EXTERN_LD_RUN;
 				end
 			end
 			default: begin
-				FSM_Extern_Ld	<= FSM_LD_EXTERN_INIT;
+				FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
 			end
 		endcase
 	end
@@ -356,6 +384,8 @@ module extern_handle
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
+		.I_Update(			),//ToDo
+		.I_UpdateLen(		),//ToDo
 		.O_WAddr(			Wr_Ptr					),
 		.O_RAddr(			Rd_Ptr					),
 		.O_Full(			Full					),

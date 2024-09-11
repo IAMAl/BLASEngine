@@ -6,9 +6,9 @@ module DMem
 	input						I_Rt_Req,				//Request from Router
 	input	data_t				I_Rt_Data,				//Data from Router
 	input	logic				I_Rt_Rls,				//Release Token from Router
-	input						O_Rt_Req,				//Request to Router
-	input	data_t				O_Rt_Data,				//Data to Router
-	input						O_Rt_Rls,				//Release Token to Router
+	output						O_Rt_Req,				//Request to Router
+	output	data_t				O_Rt_Data,				//Data to Router
+	output						O_Rt_Rls,				//Release Token to Router
 	input						I_St_Req1,				//Flag Store Request
 	input						I_St_Req2,				//Flag Store Request
 	input						I_Ld_Req1,				//Flag Load Request
@@ -62,6 +62,9 @@ module DMem
 	logic						St_Public;
 	logic						Ld_Public;
 
+	logic						St_Private;
+	logic						Ld_Private;
+
 	logic						St_Valid;
 	logic						Ld_Valid;
 
@@ -77,6 +80,8 @@ module DMem
 	address_t					Stride_Ld;
 	address_t					Base_Addr_St;
 	address_t					Base_Addr_Ld;
+	address_t					Address_St;
+	address_t					Address_Ld;
 
 	logic						Set_Cfg_St;
 	logic						Set_Cfg_Ld;
@@ -84,12 +89,20 @@ module DMem
 	logic						Set_Config_Ld;
 
 
-	logic						Extern_Ld_Req;
-	address_t					Extern_Ld_Length;
-	address_t					Extern_Ld_Stride;
-	address_t					Extern_Ld_Base;
-	logic						Extern_Ld_Grant;
-	logic						Extern_Ld_Term;
+	logic						Req_St;
+	logic						Req_Ld;
+
+	logic						End_St;
+	logic						End_Ld;
+
+	logic						St_Req;
+	data_t						St_Data;
+
+	data_t						Ld_Data;
+
+	data_t						Extern_St_Data;
+	data_t						Extern_Ld_Data;
+
 
 	logic						Extern_St_Req;
 	address_t					Extern_St_Length;
@@ -98,6 +111,22 @@ module DMem
 	logic						Extern_St_Grant;
 	logic						Extern_St_Term;
 
+	logic						Extern_Ld_Req;
+	address_t					Extern_Ld_Length;
+	address_t					Extern_Ld_Stride;
+	address_t					Extern_Ld_Base;
+	logic						Extern_Ld_Grant;
+	logic						Extern_Ld_Term;
+
+	logic						St_Ready1;
+	logic						St_Ready2;
+
+	logic						Ld_Ready1;
+	logic						Ld_Ready2;
+
+
+	logic						R_St_Private;
+	logic						R_Ld_Private;
 
 	data_t						DataMem	[SIZE_DATA_MEM-1:0];
 
@@ -105,8 +134,8 @@ module DMem
 	assign St_Public			= St_Ready1 | St_Ready2;
 	assign Ld_Public			= Ld_Ready1 | Ld_Ready2;
 
-	assign St_Private			= ~Base_Addr_St[POS__MSB_DMEM_ADDR+1] & St_GrantVld;
-	assign Ld_Private			= ~Base_Addr_Ld[POS__MSB_DMEM_ADDR+1] & Ld_GrantVld;
+	assign St_Private			= ~Base_Addr_St[POS_MSB_DMEM_ADDR+1] & St_GrantVld;
+	assign Ld_Private			= ~Base_Addr_Ld[POS_MSB_DMEM_ADDR+1] & Ld_GrantVld;
 
 	assign St_Grant1			= St_GrantVld & ( St_GrantNo == 2'h0 );
 	assign St_Grant2			= St_GrantVld & ( St_GrantNo == 2'h1 );
@@ -122,8 +151,8 @@ module DMem
 
 	assign St_Valid				= ( I_St_Valid1 & O_St_Grant1 ) | ( I_St_Valid2 & O_St_Grant2 );
 	assign Ld_Valid				= ( I_Ld_Valid1 & O_Ld_Grant1 ) | ( I_Ld_Valid2 & O_Ld_Grant2 );
-	assign St_Base				= { St_Public, St_Offset, Base_Addr_St[POS__MSB_DMEM_ADDR:0] };
-	assign Ld_Base				= { Ld_Public, Ld_Offset, Base_Addr_Ld[POS__MSB_DMEM_ADDR:0] };
+	assign St_Base				= { St_Public, St_Offset, Base_Addr_St[POS_MSB_DMEM_ADDR-1:0] };
+	assign Ld_Base				= { Ld_Public, Ld_Offset, Base_Addr_Ld[POS_MSB_DMEM_ADDR-1:0] };
 
 	assign Set_Cfg_St			= Set_Config_St | ( ~R_St_Private & St_Private );
 	assign Set_Cfg_Ld			= Set_Config_Ld | ( ~R_Ld_Private & Ld_Private );
@@ -243,9 +272,9 @@ module DMem
 		.O_Base_Addr(		Base_Addr_St			),
 		.O_Grant1(			O_St_Grant1				),
 		.O_Grant2(			O_St_Grant2				),
-		.O_Grant3(									),
-		.O_St_Req(			St_Req					),
-		.O_GranndVld(		St_GrantVld				),
+		.O_Grant3(			),//ToDo
+		.O_Req(				St_Req					),
+		.O_GrantVld(		St_GrantVld				),
 		.O_GrantNo(			St_GrantNo				)
 	);
 
@@ -254,7 +283,7 @@ module DMem
 		.reset(				reset					),
 		.I_Req1(			I_Ld_Req1				),
 		.I_Req2(			I_Ld_Req2				),
-		.I_Req2(			Extern_Ld_Req			),
+		.I_Req3(			Extern_Ld_Req			),
 		.I_Term1(			End_Ld					),
 		.I_Term2(			End_Ld					),
 		.I_Term3(			End_Ld					),
@@ -272,9 +301,9 @@ module DMem
 		.O_Base_Addr(		Base_Addr_Ld			),
 		.O_Grant1(			O_Ld_Grant1				),
 		.O_Grant2(			O_Ld_Grant2				),
-		.O_Grant3(									),
-		.O_Ld_Req(			Ld_Req					),
-		.O_GranndVld(		Ld_GrantVld				),
+		.O_Grant3(			),//ToDo
+		.O_Req(				Ld_Req					),
+		.O_GrantVld(		Ld_GrantVld				),
 		.O_GrantNo(			Ld_GrantNo				)
 	);
 
@@ -312,7 +341,7 @@ module DMem
 		.I_Req(				Set_Cfg_St				),
 		.I_Stall(			~St_Valid				),
 		.I_Length(			Length_St				),
-		.I_Stride(			Strude_St				),
+		.I_Stride(			Stride_St				),
 		.I_Base_Addr(		St_Base					),
 		.O_Address(			Address_St				),
 		.O_Req(				Req_St					),
@@ -325,7 +354,7 @@ module DMem
 		.I_Req(				Set_Cfg_Ld				),
 		.I_Stall(			~Ld_Valid				),
 		.I_Length(			Length_Ld				),
-		.I_Stride(			Strude_Ld				),
+		.I_Stride(			Stride_Ld				),
 		.I_Base_Addr(		Ld_Base					),
 		.O_Address(			Address_Ld				),
 		.O_Req(				Req_Ld					),

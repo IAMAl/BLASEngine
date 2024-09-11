@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module ReorderBuff_S #(
-	parameter NUM_ENTRY = 16;
+	parameter NUM_ENTRY = 16
 )(
 	input						clock,
 	input						reset,

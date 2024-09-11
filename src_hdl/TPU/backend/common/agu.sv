@@ -17,9 +17,6 @@ module agu
 	logic						End_Access;
 
 	logic						R_Run;
-
-	logic						R_We;
-	logic						R_Req;
 	address_t					R_Length;
 	address_t					R_Stride;
 	address_t					R_Address;
@@ -60,10 +57,10 @@ module agu
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stide			<= 0;
+			R_Stride		<= 0;
 		end
-		else ( I_Req & ~R_Run ) begin
-			R_Stide			<= I_Stride;
+		else if ( I_Req & ~R_Run ) begin
+			R_Stride		<= I_Stride;
 		end
 	end
 
@@ -74,7 +71,7 @@ module agu
 		else if ( R_Run ) begin
 			R_Address		<= R_Address + R_Stride;
 		end
-		else ( I_Req & ~R_Run ) begin
+		else if ( I_Req & ~R_Run ) begin
 			R_Address		<= I_Base_Addr;
 		end
 	end

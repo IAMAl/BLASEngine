@@ -27,7 +27,7 @@ module PathSel
 	output	data_t				O_Src_Data1,					//To Exec Unit
 	output	data_t				O_Src_Data2,					//To Exec Unit
 	output	data_t				O_Src_Data3,					//To Exec Unit
-	output	data_t				O_WB_Data						//To RF Unit
+	output	data_t				O_WB_Data,						//To RF Unit
 	output	lane_t				O_Lane_Data_Src1,				//Data to Lanes
 	output	lane_t				O_Lane_Data_Src2,				//Data to Lanes
 	output	lane_t				O_Lane_Data_Src3,				//Data to Lanes

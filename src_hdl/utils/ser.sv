@@ -12,10 +12,10 @@
 module Ser
 #(
 	parameter int WIDTH_INPUT	= 32,
-	parameter int WIDTH_OUTPUT	= 8,
+	parameter int WIDTH_OUTPUT	= 8
 )(
 	input						clock,
-	input						reset
+	input						reset,
 	input						I_Req,				//Request
 	input	[WIDTH_INPUT-1:0]	I_Data,				//Serial Source
 	output						O_Valid,			//Valid Output

@@ -11,7 +11,7 @@
 
 module Stall_Ctrl (
 	input						I_PAC_Wait,
-	input						I_Hazard
+	input						I_Hazard,
 	input						I_Slice,
 	input						I_Bypass_Buff_Full,
 	input						I_Ld_NoReady,

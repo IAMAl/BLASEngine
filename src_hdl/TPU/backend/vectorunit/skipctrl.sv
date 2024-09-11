@@ -11,7 +11,7 @@
 
 module SkipCTRL #(
 	parameter int	NUM_ENTRY_NLZ_INDEX = 32
-)()
+)(
 	input						clock,
 	input						reset,
 	input						I_Req,

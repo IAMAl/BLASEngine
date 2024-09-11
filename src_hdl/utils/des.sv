@@ -12,10 +12,10 @@
 module Des
 #(
 	parameter int WIDTH_INPUT	= 8,
-	parameter int WIDTH_OUTPUT	= 32,
+	parameter int WIDTH_OUTPUT	= 32
 )(
 	input						clock,
-	input						reset
+	input						reset,
 	input						I_Req,					//Request
 	input	[WIDTH_INPUT-1:0]	I_Data,					//Serial Source
 	output						O_Valid,				//Valid Output
@@ -43,7 +43,7 @@ module Des
 	assign O_Valud				= Valid;
 	assign O_Data				= ( Valid ) ? Data : '0;
 
-	assign Shift_Data			= I_Data << ( WODTH_INPUT << Count );
+	assign Shift_Data			= I_Data << ( WIDTH_INPUT << Count );
 
 
 	always_ff @( posedge clock ) begin

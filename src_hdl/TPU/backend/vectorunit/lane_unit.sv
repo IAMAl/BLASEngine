@@ -140,7 +140,7 @@ module Lane_Unit
 	//// Capture Command coming from Scalar unit
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			PipeReg_Idx		<= '0
+			PipeReg_Idx		<= '0;
 		end
 		else begin
 			//	Command
@@ -169,7 +169,7 @@ module Lane_Unit
 	assign PipeReg_Index.op			= PipeReg_Idx.instr.op;
 
 	//	Write-Back
-	assign PipeReg_Index.dst		= PipeReg_Idx.dst
+	assign PipeReg_Index.dst		= PipeReg_Idx.dst;
 
 	//	Indeces
 	assign PipeReg_Index.slice_len	= PipeReg_Idx.instr.slice_len;
@@ -196,15 +196,15 @@ module Lane_Unit
 	assign V_State_Data.data		= Mask_Data;
 	assign V_State_Data.src_sel		= '0;
 
-	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'3 ) ?	V_State_Data :
+	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) ?	V_State_Data :
 										( PipeReg_RR.src1.v ) ?					PipeReg_RR.src1 :
 																				'0;
 
-	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'3 ) ?	V_State_Data :
+	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'h3 ) ?	V_State_Data :
 										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
 																				'0;
 
-	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'3 ) ?	V_State_Data :
+	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'h3 ) ?	V_State_Data :
 										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
 																				'0;
 
@@ -236,10 +236,10 @@ module Lane_Unit
 
 	//// Write-Back
 	assign Dst_Sel			= B_Index.dst_sel.unit_no;
-	assign Dst_Slice		= WB_Index.slice
-	assign Dst_Index		= WB_Index.idx
-	assign Dst_Index_Window	= WB_Index.window
-	assign Dst_Index_Length	= WB_Index.slice_len
+	assign Dst_Slice		= WB_Index.slice;
+	assign Dst_Index		= WB_Index.idx;
+	assign Dst_Index_Window	= WB_Index.window;
+	assign Dst_Index_Length	= WB_Index.slice_len;
 
 	//  Network Path
 	assign Config_Path_WB	= WB_Index.path;
@@ -456,7 +456,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Req(				WB_En					),
 		.I_Diff_Data(		Diff_Data				),
-		.O_Status(			Status					),
+		.O_Status(			Status					)
 	);
 
 
@@ -482,7 +482,7 @@ module Lane_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			~Lane_En				),
-		.I_Req(				PipeReg_RR_Net.net..v	),
+		.I_Req(				PipeReg_RR_Net.net.v	),
 		.I_MaskedRead(		'0						),
 		.I_Slice(			PipeReg_RR_Net.net.slice),
 		.I_Sel(				PipeReg_RR_Net.net.sel	),
@@ -531,7 +531,7 @@ module Lane_Unit
 		.O_Lane_Data_Src2(	O_Lane_Data_Src2		),
 		.O_Lane_Data_Src3(	O_Lane_Data_Src3		),
 		.O_Lane_Data_WB(	O_Lane_Data_WB			),
-		.O_Buff_Full(		Bypass_Buff_Full		),
+		.O_Buff_Full(		Bypass_Buff_Full		)
 	);
 
 	//	Pipeline Register

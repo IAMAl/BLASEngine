@@ -29,7 +29,7 @@ module Counter #(
 		if ( reset ) begin
 			R_CountVal		<= 0;
 		end
-		else ( I_Clr ) begin
+		else if ( I_Clr ) begin
 			R_CountVal		<= 0;
 		end
 		else if ( I_En ) begin

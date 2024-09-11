@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	PubDomain_Man
+//	Module Name:	pub_domain_man
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module PubDomain_Man
+module pub_domain_man
 	import pkg_tpu::*;
 #(
 	parameter int NUM_ENTRY		= 32
