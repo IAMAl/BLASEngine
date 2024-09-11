@@ -276,7 +276,7 @@ module BLASEngine
 				.O_Nack(		TPU_Nack[ row ][ clm ]			)
 			);
 
-			DMem_TPU DMem_TPU (
+			DMem DMem_TPU (
 				.clock(			clock							),
 				.reset(			reset							),
 				.I_Rt_Req(		Route_I_Req[ row ][ clm ]		),
@@ -305,7 +305,7 @@ module BLASEngine
 
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
-		DMem_TPU TDMem (
+		DMem TDMem (
 			.clock(			clock							),
 			.reset(			reset							),
 			.I_Rt_Req(		Route_I_Req[0][ clm ]			),
@@ -330,7 +330,7 @@ module BLASEngine
 			.O_V_St_Grant(	RAM_V_St_Grant[0][ clm ]		)
 		);
 
-		DMem_TPU BDMem (
+		DMem BDMem (
 			.clock(			clock							),
 			.reset(			reset							),
 			.I_Rt_Req(		Route_I_Req[NUM_ROWS][ clm ]	),

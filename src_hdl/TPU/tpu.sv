@@ -59,7 +59,7 @@ module TPU
 	data_t						In_Scalar_Data;
 	data_t						Out_Scalar_Data;
 
-	s_stat_t					S_Status;
+	state_t						S_Status;
 
 	command_t					V_Command;
 	lane_t						En_Lane;

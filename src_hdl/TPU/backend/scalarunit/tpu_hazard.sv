@@ -15,6 +15,7 @@ module HazardCheck_TPU
 	input						clock,
 	input						reset,
 	input						I_Req,							//Request to Work
+	input						I_Slice,
 	input						I_Req_Issue,					//Request from Previous Stage
 	input						I_is_Vec,						//Request is for Vector Unit
 	input	instr_t				I_Instr,						//Fetched Instruction
@@ -22,15 +23,15 @@ module HazardCheck_TPU
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,					//Commit (Issued) No.
 	output						O_Req_Issue,					//Request to Next Stage
 	output						O_Instr,						//Issue Instruction
-	output						O_RAR_Hzard,					//RAR-Hazard
-	output						O_RAW_Hzard,					//RAW-Hazard
-	output						O_WAR_Hzard,					//WAR-Hazard
-	output						O_WAW_Hzard,					//WAW-Hazard
+	output						O_RAR_Hazard,					//RAR-Hazard
+	output						O_RAW_Hazard,					//RAW-Hazard
+	output						O_WAR_Hazard,					//WAR-Hazard
+	output						O_WAW_Hazard,					//WAW-Hazard
 	output	issue_no_t			O_Rd_Ptr						//Read Pointer to Commit Unit
 );
 
 
-	localparam int WIDTH_BUFF	= $clog2(DEPTH_BUFF);
+	localparam int WIDTH_BUFF	= $clog2(NUM_ENTRY_HAZARD);
 	localparam int WIDTH_ENTRY	= $clog2(NUM_ENTRY_HAZARD);
 
 
@@ -43,7 +44,7 @@ module HazardCheck_TPU
 
 	logic						We;
 	logic						Re;
-	logic						Full,
+	logic						Full;
 	logic						Empty;
 	logic	[WIDTH_BUFF-1:0]	WNo;
 	logic	[WIDTH_BUFF-1:0]	RNo;
@@ -122,10 +123,10 @@ module HazardCheck_TPU
 
 	assign O_Instr				= TabHazard[ RNo ].inst;
 
-	assign O_RAR_Hzard			= R_RAR_Hzard;
-	assign O_RAW_Hzard			= R_RAW_Hazard;
-	assign O_WAR_Hzard			= R_WAR_Hazard;
-	assign O_WAW_Hzard			= R_WAW_Hazard;
+	assign O_RAR_Hazard			= R_RAR_Hazard;
+	assign O_RAW_Hazard			= R_RAW_Hazard_Src1 | R_RAW_Hazard_Src2 | R_RAW_Hazard_Src3;
+	assign O_WAR_Hazard			= R_WAR_Hazard_Src1 | R_WAR_Hazard_Src2 | R_WAR_Hazard_Src3;
+	assign O_WAW_Hazard			= R_WAW_Hazard;
 
 
 	//// Referenced at Commit Select Unit
@@ -160,26 +161,26 @@ module HazardCheck_TPU
 	assign RAR_Hazard_Src3		= ( |is_Matched_i_src3_i_src1 ) | ( |is_Matched_i_src3_i_src2 ) | ( |is_Matched_i_src3_i_src3 );
 
 	always_comb begin
-		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			assign is_Matched_i_dst_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.dst.v  & ( TabHazard[ i ].dst.idx  == I_Instr..dst.idx );
-			assign is_Matched_i_dst_i_src1[ i ]		= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr..dst.idx );
-			assign is_Matched_i_dst_i_src2[ i ]		= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr..dst.idx );
-			assign is_Matched_i_dst_i_src3[ i ]		= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr..dst.idx );
+		for ( int i=0; i<NUM_ENTRY_HAZARD; ++i ) begin
+			is_Matched_i_dst_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.dst.v  & ( TabHazard[ i ].dst.idx  == I_Instr.dst.idx );
+			is_Matched_i_dst_i_src1[ i ]		= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr.dst.idx );
+			is_Matched_i_dst_i_src2[ i ]		= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr.dst.idx );
+			is_Matched_i_dst_i_src3[ i ]		= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr.dst.idx );
 
-			assign is_Matched_i_src1_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src1.v & ( TabHazard[ i ].dst.idx  == I_Instr..src1.idx );
-			assign is_Matched_i_src1_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr..src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
-			assign is_Matched_i_src1_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src1.v & ( TabHazard[ i ].src2.idx == I_Instr..src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
-			assign is_Matched_i_src1_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src1.v & ( TabHazard[ i ].src3.idx == I_Instr..src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src1_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src1.v & ( TabHazard[ i ].dst.idx  == I_Instr.src1.idx );
+			is_Matched_i_src1_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src1_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src1.v & ( TabHazard[ i ].src2.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src1_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src1.v & ( TabHazard[ i ].src3.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
 
-			assign is_Matched_i_src2_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src2.v & ( TabHazard[ i ].dst.idx  == I_Instr..src2.idx );
-			assign is_Matched_i_src2_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src2.v & ( TabHazard[ i ].src1.idx == I_Instr..src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
-			assign is_Matched_i_src2_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr..src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
-			assign is_Matched_i_src2_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src2.v & ( TabHazard[ i ].src3.idx == I_Instr..src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src2_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src2.v & ( TabHazard[ i ].dst.idx  == I_Instr.src2.idx );
+			is_Matched_i_src2_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src2.v & ( TabHazard[ i ].src1.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src2_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src2_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src2.v & ( TabHazard[ i ].src3.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
 
-			assign is_Matched_i_src3_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src3.v & ( TabHazard[ i ].dst.idx  == I_Instr..src3.idx );
-			assign is_Matched_i_src3_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src3.v & ( TabHazard[ i ].src1.idx == I_Instr..src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
-			assign is_Matched_i_src3_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src3.v & ( TabHazard[ i ].src2.idx == I_Instr..src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
-			assign is_Matched_i_src3_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr..src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src3_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src3.v & ( TabHazard[ i ].dst.idx  == I_Instr.src3.idx );
+			is_Matched_i_src3_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src3.v & ( TabHazard[ i ].src1.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src3_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src3.v & ( TabHazard[ i ].src2.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
+			is_Matched_i_src3_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
 		end
 	end
 
@@ -192,7 +193,7 @@ module HazardCheck_TPU
 
 	//// Buffer Control
 	assign We					= I_Req_Issue & ~Full;
-	assign Re					= Valud_Issue & ~Empty;
+	assign Re					= v_Issue & ~Empty;
 
 
 	//// Storing to Table
@@ -234,7 +235,7 @@ module HazardCheck_TPU
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( reest ) begin
+		if ( reset ) begin
 			R_Index_Dst		<= '0;
 		end
 		else begin
@@ -243,7 +244,7 @@ module HazardCheck_TPU
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( reest ) begin
+		if ( reset ) begin
 			R_Index_Src1	<= '0;
 		end
 		else begin
@@ -252,7 +253,7 @@ module HazardCheck_TPU
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( reest ) begin
+		if ( reset ) begin
 			R_Index_Src2	<= '0;
 		end
 		else begin
@@ -261,7 +262,7 @@ module HazardCheck_TPU
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( reest ) begin
+		if ( reset ) begin
 			R_Index_Src3	<= '0;
 		end
 		else begin
@@ -304,11 +305,6 @@ module HazardCheck_TPU
 			end
 			else begin
 				R_Indeces.instr.src3.v	<= 1'b0;
-			end
-
-			if ( R_Sel_Unit ) begin
-				R_Indeces.
-
 			end
 		end
 	end
@@ -425,10 +421,12 @@ module HazardCheck_TPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			TabHazard			<= '0;
+			for ( int i=0; i<NUM_ENTRY_HAZARD; ++i ) begin
+				TabHazard[ i ]			<= '0;
+			end
 		end
-		else if ( I_Req_Commit | I_Req_Issue ) begin
-			if ( I_Req_Commit ) begin
+		else if ( I_Commit_Req | I_Req_Issue ) begin
+			if ( I_Commit_Req ) begin
 				TabHazard[ I_Commit_No ].instr.dst.v	<= 1'b0;
 				TabHazard[ I_Commit_No ].instr.src1.v	<= 1'b0;
 				TabHazard[ I_Commit_No ].instr.src2.v	<= 1'b0;
@@ -444,7 +442,7 @@ module HazardCheck_TPU
 
 	//// Module: Ring-Buffer Controller
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_BUFF				)
+		.NUM_ENTRY(			NUM_ENTRY_HAZARD		)
 	) RingBuffCTRL
 	(
 		.clock(				clock					),

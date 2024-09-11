@@ -9,7 +9,9 @@
 //	Module Name:	ReorderBuff_S
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ReorderBuff_S #(
+module ReorderBuff_S
+	import pkg_tpu::*;
+#(
 	parameter NUM_ENTRY = 16
 )(
 	input						clock,
@@ -33,14 +35,14 @@ module ReorderBuff_S #(
 );
 
 
-	localparam WIDTH_ENTRY		= $clog2(NUM_ENTYRY);
+	localparam WIDTH_ENTRY		= $clog2(NUM_ENTRY);
 
 	commit_tab_s				Commit_S	[NUM_ENTRY-1:0];
 
 	logic	[NUM_ENTRY-1:0]		Clr_Valid;
 	logic	[NUM_ENTRY-1:0]		Set_Commit;
 
-	logic;						En_Commit
+	logic						En_Commit;
 
 	logic						We;
 	logic						Re;
@@ -52,6 +54,10 @@ module ReorderBuff_S #(
 	logic						R_Commit_Req_LdSt1;
 	logic						R_Commit_Req_LdSt2;
 	logic						R_Commit_Req_Math;
+
+	issue_no_t					R_Commit_No_LdSt1;
+	issue_no_t					R_Commit_No_LdSt2;
+	issue_no_t					R_Commit_No_Math;
 
 
 	// Send Commit Request
@@ -68,9 +74,9 @@ module ReorderBuff_S #(
 	assign We					= I_Store & ~Full;
 
 
-	always_comb: begin
+	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			assign Set_Commit[ i ]	= Commit_S[ i ].Valid & (
+			Set_Commit[ i ]	= Commit_S[ i ].Valid & (
 										( Commit_S[ i ].Issue_No == I_Commit_No_LdSt1 ) |
 										( Commit_S[ i ].Issue_No == I_Commit_No_LdSt2 ) |
 										( Commit_S[ i ].Issue_No == I_Commit_No_Math )
@@ -78,14 +84,14 @@ module ReorderBuff_S #(
 		end
 	end
 
-    always_comb: begin
+    always_comb begin
         for ( int i=0; i<NUM_ENTRY; ++i ) begin
-            assign Clr_Valid[ i ]     = Commit_S[ i ].Valid & Commit_S[ i ].Commit;
+            Clr_Valid[ i ]     = Commit_S[ i ].Valid & Commit_S[ i ].Commit;
         end
     end
 
 
-	always_ff @(b posedge clock ) begin
+	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Commit_Req_LdSt1	<= 1'b0;
 			R_Commit_No_LdSt1	<= 0;
@@ -100,7 +106,7 @@ module ReorderBuff_S #(
 		end
 	end
 
-	always_ff @(b posedge clock ) begin
+	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Commit_Req_LdSt2	<= 1'b0;
 			R_Commit_No_LdSt2	<= 0;
@@ -115,7 +121,7 @@ module ReorderBuff_S #(
 		end
 	end
 
-	always_ff @(b posedge clock ) begin
+	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Commit_Req_Math	<= 1'b0;
 			R_Commit_No_Math	<= 0;

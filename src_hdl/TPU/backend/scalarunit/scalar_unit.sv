@@ -446,8 +446,9 @@ module Scalar_Unit
 	HazardCheck_TPU HazardCheck_TPU (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_Issue(		W_Req_Issue				),
 		.I_Req(				Req_IW					),
+		.I_Slice(			),//ToDo
+		.I_Req_Issue(		W_Req_Issue				),
 		.I_Instr(			Instr_IW				),
 		.I_Commit_Req(		Commit_Req				),
 		.I_Commit_No(		Commit_No				),
@@ -776,6 +777,7 @@ module Scalar_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_En_Lane(			O_Lane_En				),
 		.I_Store(			Store_V					),
 		.I_Issue_No(		IW_IssueNo				),
 		.I_Commmit_Req(		I_Commmit_Req_V			),

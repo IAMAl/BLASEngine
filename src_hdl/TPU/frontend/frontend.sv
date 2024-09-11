@@ -11,6 +11,8 @@
 
 module FrontEnd
 	import pkg_tpu::*;
+	import pkg_tpu::instr_t;
+	import pkg_mpu::*;
 (
 	input						clock,
 	input						reset,
@@ -45,7 +47,7 @@ module FrontEnd
 	logic						R_We;
 	logic						R_Nack;
 
-	fsm_pe_frontend_t			R_FSM_TPU_FRONTEND;
+	fsm_frontend_t				R_FSM_TPU_FrontEnd;
 
 	mpu_issue_no_t				R_IssueNo;
 	instr_t						R_Instr;
@@ -53,15 +55,12 @@ module FrontEnd
 
 
 	// FSM State Flag
-	assign is_FSM_TPU_SCALAR	= R_FSM_TPU_FRONTEND == FSM_TPU_SCALAR;
-	assign is_FSM_TPU_SIMT		= R_FSM_TPU_FRONTEND == FSM_TPU_SIMT;
-	assign is_FSM_TPU_INSTR		= R_FSM_TPU_FRONTEND == FSM_TPU_INSTR;
-	assign is_FSM_TPU_RUN		= R_FSM_TPU_FRONTEND >  FSM_TPU_FE_INIT;
+	assign is_FSM_TPU_SCALAR	= R_FSM_TPU_FrontEnd == FSM_TPU_SCALAR;
+	assign is_FSM_TPU_SIMT		= R_FSM_TPU_FrontEnd == FSM_TPU_SIMT;
+	assign is_FSM_TPU_INSTR		= R_FSM_TPU_FrontEnd == FSM_TPU_INSTR;
+	assign is_FSM_TPU_RUN		= R_FSM_TPU_FrontEnd >  FSM_TPU_FE_INIT;
 
-	assign Set_We               = ~R_Full & (
-										( R_IssueNo.v & R_Thread_SIMT.v & R_Req ) |
-										( R_En_Exe & R_Req )
-									);
+	assign Set_We               = ~R_Full & ( R_En_Exe & R_Req );
 
 	assign O_We					= R_We;
 	assign O_Instr				= R_Instr;
@@ -153,7 +152,7 @@ module FrontEnd
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( rset ) begin
+		if ( reset ) begin
 			R_Nack			<= 1'b0;
 		end
 		else begin

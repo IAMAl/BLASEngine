@@ -228,7 +228,7 @@ package pkg_tpu;
 	typedef ldst_t [NUM_LANES-1:0]		v_ldst_t;
 
 	typedef data_t	[1:0]				s_ldst_data_t;
-	typedef s_ldst_data	[NUM_LANES-1:0]	v_ldst_data_t;
+	typedef s_ldst_data_t[NUM_LANES-1:0]v_ldst_data_t;
 
 
 	////Pipeline Registers
@@ -346,6 +346,13 @@ package pkg_tpu;
 		FSM_EXTERN_LD_NOTIFY	= 2'h2,
 		FSM_EXTERN_LD_RUN		= 2'h3
 	} fsm_extern_ld_t;
+
+	typedef enum logic [1:0] {
+		FSM_TPU_FE_INIT			= 2'h0,
+		FSM_TPU_SCALAR			= 2'h1,
+		FSM_TPU_SIMT			= 2'h2,
+		FSM_TPU_INSTR			= 2'h3
+	} fsm_frontend_t;
 
 
 	////ETC

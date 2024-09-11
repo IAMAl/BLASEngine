@@ -13,8 +13,10 @@ module Network_S
 	import pkg_tpu::*;
 #(
 	parameter int NUM_LANES		= 16,
-	parameter int WIDTH_LANES	= $clog2(NUM_LANES);
+	parameter int WIDTH_LANES	= $clog2(NUM_LANES)
 )(
+	input						clock,
+	input						reset,
 	input						I_Stall,
 	input						I_Req,
 	input	[1:0]				I_Sel_Path,				//Path Selects

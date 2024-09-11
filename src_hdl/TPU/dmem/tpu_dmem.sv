@@ -270,9 +270,9 @@ module DMem
 		.O_Length(			Length_St				),
 		.O_Stride(			Stride_St				),
 		.O_Base_Addr(		Base_Addr_St			),
-		.O_Grant1(			O_St_Grant1				),
-		.O_Grant2(			O_St_Grant2				),
-		.O_Grant3(			),//ToDo
+		.O_Grant1(			),
+		.O_Grant2(			),
+		.O_Grant3(			),
 		.O_Req(				St_Req					),
 		.O_GrantVld(		St_GrantVld				),
 		.O_GrantNo(			St_GrantNo				)
@@ -299,9 +299,9 @@ module DMem
 		.O_Length(			Length_Ld				),
 		.O_Stride(			Stride_Ld				),
 		.O_Base_Addr(		Base_Addr_Ld			),
-		.O_Grant1(			O_Ld_Grant1				),
-		.O_Grant2(			O_Ld_Grant2				),
-		.O_Grant3(			),//ToDo
+		.O_Grant1(			),
+		.O_Grant2(			),
+		.O_Grant3(			),
 		.O_Req(				Ld_Req					),
 		.O_GrantVld(		Ld_GrantVld				),
 		.O_GrantNo(			Ld_GrantNo				)

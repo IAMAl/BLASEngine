@@ -9,11 +9,14 @@
 //	Module Name:	ReorderBuff_V
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ReorderBuff_V #(
+module ReorderBuff_V
+	import pkg_tpu::*;
+#(
 	parameter NUM_ENTRY = 16
 )(
 	input						clock,
 	input						reset,
+	input	[NUM_ENTRY-1:0]		I_En_Lane,
 	input						I_Store,				//Store Issue No
 	input	issue_no_t			I_Issue_No,				//Storing Issue No
 	input						I_Commit_Grant,			//Commit Grant
@@ -25,7 +28,7 @@ module ReorderBuff_V #(
 );
 
 
-	localparam WIDTH_ENTRY		= $clog2(NUM_ENTYRY);
+	localparam WIDTH_ENTRY		= $clog2(NUM_ENTRY);
 
 	commit_tab_v				Commit_V	[NUM_ENTRY-1:0];
 
@@ -51,20 +54,20 @@ module ReorderBuff_V #(
 	assign O_Empty				= Empty;
 
 	// Buffer Handling
-	assign En_Commit			= Commit_V[ RNo ].Valid & Commit_V[ RNo ].Commit;
+	assign En_Commit			= Commit_V[ RNo ].v & Commit_V[ RNo ].commit;
 	assign Re					= En_Commit & I_Commit_Grant;
 	assign We					= I_Store & ~Full;
 
 
-	always_comb: begin
+	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			assign Set_Commit[ i ]	= Commit_V[ i ].En_Lane ^ Commit_V[ i ].Commit;
+			Set_Commit[ i ]	= Commit_V[ i ].en_lane ^ Commit_V[ i ].commit;
 		end
 	end
 
-    always_comb: begin
+    always_comb begin
         for ( int i=0; i<NUM_ENTRY; ++i ) begin
-            assign Clr_Valid[ i ]	= Commit_V[ i ].Valid & Commit_V[ i ].Commit;
+            Clr_Valid[ i ]	= Commit_V[ i ].v & Commit_V[ i ].commit;
         end
     end
 
@@ -76,23 +79,23 @@ module ReorderBuff_V #(
 		end
 		else if ( I_Store | I_Commit_Req | ( Set_Commit != 0 ) ) begin
 			if ( I_Store ) begin
-				Commit_V[ WNo ].Valid	<= 1'b1;
-				Commit_V[ WNo ].Issue_No<= I_Issue_No;
-				Commit_V[ WNo ].EN_Lane	<= I_En_Lane;
-				Commit_V[ WNo ].Commit	<= 0;
+				Commit_V[ WNo ].v		<= 1'b1;
+				Commit_V[ WNo ].issue_no<= I_Issue_No;
+				Commit_V[ WNo ].en_lane	<= 
+				Commit_V[ WNo ].commit	<= 0;
 			end
 
 			if ( I_Commit_Req ) begin
-				Commit_V[ RNo ].Valid	<= 1'b0;
+				Commit_V[ RNo ].v		<= 1'b0;
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit_V[ i ].Commit	<= Commit_V[ i ].Commi | Set_Commit[ i ];
+				Commit_V[ i ].commit	<= Commit_V[ i ].commit | Set_Commit[ i ];
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit_V[ i ].Valid		<= Commit_V[ i ].Valid &  ~Clr_Valid[ i ];
-				Commit_V[ i ].Commit	<= Commit_V[ i ].Commit & ~Clr_Valid[ i ];
+				Commit_V[ i ].v			<= Commit_V[ i ].v &  	  ~Clr_Valid[ i ];
+				Commit_V[ i ].commit	<= Commit_V[ i ].commit & ~Clr_Valid[ i ];
 			end
 		end
 	end

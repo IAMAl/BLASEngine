@@ -3,8 +3,10 @@ module LoadStoreUnit
 (
 	input						clock,
 	input						reset,
+	input						I_Req,
 	input						I_St_Req,				//Flag: Activate Store Unit
 	input						I_Ld_Req,				//Flag: Activate Load Unit
+	input						I_Ack_Ld,
 	input						I_Store,				//Flag: Request is Store
 	input						I_Stall,				//Force Stalling by Local Memory
 	input	address_t			I_Length,				//Vector-Length for Load/Store
@@ -31,6 +33,8 @@ module LoadStoreUnit
 	output	logic				O_Ld_End				//Flag: Service is Done
 );
 
+
+	logic						R_Run;
 
 	logic						R_St_Active;
 	logic						R_Ld_Active;
@@ -64,9 +68,22 @@ module LoadStoreUnit
 	assign O_Ld_Data			= Ld_Data;
 
 
-	assign O_Done				= ( R_Store | R_We ) & End_Access;
+	assign O_Done				= ( R_Store | R_Run ) & ( I_St_End_Access | I_Ld_End_Access );
 
 	assign O_Ld_NoReady			= R_Run & ~I_Ack_Ld;
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Run		<= 1'b0;
+		end
+		else if ( I_St_End_Access | I_Ld_End_Access ) begin
+			R_Run		<=  1'b0;
+		end
+		else if ( I_St_Req | I_Ld_Req ) begin
+			R_Run		<=  1'b1;
+		end
+	end
 
 
 	always_ff @( posedge clock ) begin
@@ -81,12 +98,11 @@ module LoadStoreUnit
 		end
 	end
 
-
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Ld_Active		<= 1'b0;
 		end
-		else if ( ILdt_End_Access ) begin
+		else if ( I_Ld_End_Access ) begin
 			R_Ld_Active		<=  1'b0;
 		end
 		else if ( I_Ld_Req ) begin
@@ -100,7 +116,7 @@ module LoadStoreUnit
 		if ( reset ) begin
 			R_St_End		<= 1'b0;
 		end
-		elzze begin
+		else begin
 			R_St_End		<= I_St_End_Access;
 		end
 	end
@@ -109,7 +125,7 @@ module LoadStoreUnit
 		if ( reset ) begin
 			R_Ld_End		<= 1'b0;
 		end
-		elzze begin
+		else begin
 			R_Ld_End		<= I_Ld_End_Access;
 		end
 	end
@@ -130,7 +146,7 @@ module LoadStoreUnit
 		if ( reset ) begin
 			Ld_Data			<= 0;
 		end
-		else if ( R_We ) begin
+		else if ( R_Run ) begin
 			Ld_Data			<= I_Ld_Data;
 		end
 	end
@@ -141,25 +157,25 @@ module LoadStoreUnit
 		if ( reset ) begin
 			R_Length		<= 0;
 		end
-		else ( I_Req & ~R_Run ) begin
+		else if ( I_Req & ~R_Run ) begin
 			R_Length		<= I_Length;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stide			<=n 0;
+			R_Stride		<= 0;
 		end
-		else ( I_Req & ~R_Run ) begin
-			R_Stide			<= I_Stride;
+		else if ( I_Req & ~R_Run ) begin
+			R_Stride		<= I_Stride;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Address		<= 0;
+			R_Base_Addr		<= 0;
 		end
-		else ( I_Req & ~R_Run ) begin
+		else if ( I_Req & ~R_Run ) begin
 			R_Base_Addr		<= I_Base_Addr;
 		end
 	end

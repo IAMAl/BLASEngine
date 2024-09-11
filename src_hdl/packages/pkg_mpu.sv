@@ -128,25 +128,25 @@ package pkg_mpu;
 
 	//FSM for IF Service
 	typedef enum logic [2:0] {
-		FSM_EXTERN_INIT			= 3'h0,
-		FSM_EXTERN_RECV_STRIDE	= 3'h1,
-		FSM_EXTERN_RECV_LENGTH	= 3'h2,
-		FSM_EXTERN_RECV_BASE	= 3'h3,
-		FSM_EXTERN_RUN			= 3'h4
+		FSM_EXTERN_MPU_RECV_INIT	= 3'h0,
+		FSM_EXTERN_MPU_RECV_STRIDE	= 3'h1,
+		FSM_EXTERN_MPU_RECV_LENGTH	= 3'h2,
+		FSM_EXTERN_MPU_RECV_BASE	= 3'h3,
+		FSM_EXTERN_MPU_RECV_RUN		= 3'h4
 	} fsm_extern_serv;
 
 	typedef enum logic [1:0] {
-		FSM_EXTERN_ST_INIT		= 2'h0,
-		FSM_EXTERN_ST_BUFF		= 2'h1,
-		FSM_EXTERN_ST_NOTIFY	= 2'h2,
-		FSM_EXTERN_ST_RUN		= 2'h3
+		FSM_EXTERN_MPU_ST_INIT	= 2'h0,
+		FSM_EXTERN_MPU_ST_BUFF	= 2'h1,
+		FSM_EXTERN_MPU_ST_NOTIFY= 2'h2,
+		FSM_EXTERN_MPU_ST_RUN	= 2'h3
 	} fsm_extern_st;
 
 	typedef enum logic [1:0] {
-		FSM_EXTERN_LD_INIT		= 2'h0,
-		FSM_EXTERN_LD_WAIT		= 2'h1,
-		FSM_EXTERN_LD_NOTIFY	= 2'h2,
-		FSM_EXTERN_LD_RUN		= 2'h3
+		FSM_EXTERN_MPU_LD_INIT	= 2'h0,
+		FSM_EXTERN_MPU_LD_WAIT	= 2'h1,
+		FSM_EXTERN_MPU_LD_NOTIFY= 2'h2,
+		FSM_EXTERN_MPU_LD_RUN	= 2'h3
 	} fsm_extern_ld;
 
 	typedef enum logic [4:0] {

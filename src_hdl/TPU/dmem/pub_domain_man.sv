@@ -12,8 +12,8 @@
 module pub_domain_man
 	import pkg_tpu::*;
 #(
-	parameter int NUM_ENTRY		= 32
-	parameter int WIDTH_ENTRY	= $(clog2(NUM_ENTRY))
+	parameter int NUM_ENTRY		= 32,
+	parameter int WIDTH_ENTRY	= $clog2(NUM_ENTRY)
 )(
 	input						clock,
 	input						reset,
@@ -44,11 +44,13 @@ module pub_domain_man
 
 	logic						Event_St_Grant1;
 	logic						Event_St_Grant2;
+	logic						Event_St_Grant3;
 	logic						Event_Ld_Grant1;
 	logic						Event_Ld_Grant2;
+	logic						Event_Ld_Grant3;
 
-	logic	[WIDT_ENTRY-1:0]	SetNo;
-	logic	[WIDT_ENTRY-1:0]	ClrNo;
+	logic	[WIDTH_ENTRY-1:0]	SetNo;
+	logic	[WIDTH_ENTRY-1:0]	ClrNo;
 
 	logic	[NUM_ENTRY-1:0]		is_Hit_St;
 	logic	[NUM_ENTRY-1:0]		is_Hit_Ld;
@@ -85,31 +87,31 @@ module pub_domain_man
 	assign Event_Ld_Grant3		= ~R_Ld_Grant3 & I_Ld_Grant3;
 
 	assign Hit_St				= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St );
-	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant2 ) & ( |is_Hit_Ld );
+	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant3 ) & ( |is_Hit_Ld );
 
-	assign Set_St				= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant2 ) & ~( |is_Hit_St );
+	assign Set_St				= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ~( |is_Hit_St );
 	assign Clr_Ld				= I_Ld_End & Hit_Ld;
 
 	assign Ready_St				= ~R_Stored[ SetNo ];
 	assign Ready_Ld				=  R_Stored[ ClrNo ];
 
-	assign O_St_Ready1			= ( I_GrantNo_St == 2'h0 ) & I_GrandVld_St & Ready_St;
-	assign O_St_Ready2			= ( I_GrantNo_St == 2'h1 ) & I_GrandVld_St & Ready_St;
-	assign O_St_Ready3			= ( I_GrantNo_St == 2'h2 ) & I_GrandVld_St & Ready_St;
+	assign O_St_Ready1			= ( I_GrantNo_St == 2'h0 ) & I_GrantVld_St & Ready_St;
+	assign O_St_Ready2			= ( I_GrantNo_St == 2'h1 ) & I_GrantVld_St & Ready_St;
+	assign O_St_Ready3			= ( I_GrantNo_St == 2'h2 ) & I_GrantVld_St & Ready_St;
 
-	assign O_Ld_Ready1			= ( I_GrantNo_Ld == 2'h0 ) & I_GrandVld_Ld & Ready_Ld;
-	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrandVld_Ld & Ready_Ld;
-	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrandVld_Ld & Ready_Ld;
+	assign O_Ld_Ready1			= ( I_GrantNo_Ld == 2'h0 ) & I_GrantVld_Ld & Ready_Ld;
+	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrantVld_Ld & Ready_Ld;
+	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrantVld_Ld & Ready_Ld;
 
-	always_comb: begin
-		for ( int=0; i<NUM_ENTRY; ++i ) begin
-			assign is_Hit_St[ i ]	= ( TabBAddr[ i ] & I_St_Base ) & R_Valid[ i ];
+	always_comb begin
+		for ( int i=0; i<NUM_ENTRY; ++i ) begin
+			is_Hit_St[ i ]	= ( TabBAddr[ i ] & I_St_Base ) & R_Valid[ i ];
 		end
 	end
 
-	always_comb: begin
-		for ( int=0; i<NUM_ENTRY; ++i ) begin
-			assign is_Hit_Ld[ i ]	= ( TabBAddr[ i ] & I_Ld_Base ) & R_Valid[ i ];
+	always_comb begin
+		for ( int i=0; i<NUM_ENTRY; ++i ) begin
+			is_Hit_Ld[ i ]	= ( TabBAddr[ i ] & I_Ld_Base ) & R_Valid[ i ];
 		end
 	end
 
@@ -214,7 +216,7 @@ module pub_domain_man
 
 	// Capture Valid Flag No
 	always_ff @( posedge clock ) begin
-		if ( resewt ) begin
+		if ( reset ) begin
 			R_SetNo			<= 0;
 		end
 		else if ( Hit_St ) begin
@@ -223,7 +225,7 @@ module pub_domain_man
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( resewt ) begin
+		if ( reset ) begin
 			R_ClrNo			<= 0;
 		end
 		else if ( Hit_Ld ) begin
@@ -237,7 +239,7 @@ module pub_domain_man
 		if ( reset ) begin
 			R_WPtr			<= 0;
 		end
-		else ( Set_St ) begin
+		else if ( Set_St ) begin
 			R_WPtr			<= R_WPtr + 1'b1;
 		end
 	end

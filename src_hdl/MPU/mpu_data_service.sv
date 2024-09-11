@@ -12,6 +12,8 @@
 module DataService_MPU
 import pkg_tpu::*;
 import pkg_mpu::*;
+import pkg_mpu::fsm_extern_st;
+import pkg_mpu::fsm_extern_ld;
 #(
 	parameter int	BUFF_SIZE	= 128
 )(
@@ -90,13 +92,13 @@ import pkg_mpu::*;
 
 
 	//
-	assign is_FSM_Extern_Not_Init	= FSM_Extern_Serv != FSM_EXTERN_INIT;
-	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_RUN;
+	assign is_FSM_Extern_Not_Init	= FSM_Extern_Serv != FSM_EXTERN_MPU_RECV_INIT;
+	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_RUN;
 
-	assign is_FSM_Extern_St_Buff	= FSM_Extern_St == FSM_EXTERN_ST_BUFF;
-	assign is_FSM_Extern_St_Notify	= FSM_Extern_St == FSM_EXTERN_ST_NOTIFY;
-	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_ST_RUN;
-	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_LD_RUN;
+	assign is_FSM_Extern_St_Buff	= FSM_Extern_St == FSM_EXTERN_MPU_ST_BUFF;
+	assign is_FSM_Extern_St_Notify	= FSM_Extern_St == FSM_EXTERN_MPU_ST_NOTIFY;
+	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_MPU_ST_RUN;
+	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_MPU_LD_RUN;
 
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
@@ -198,51 +200,51 @@ import pkg_mpu::*;
 	// Service Handler
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Extern_Serv	<= FSM_EXTERN_INIT;
+			FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_INIT;
 		end
 		else case ( FSM_Extern_Serv )
-			FSM_EXTERN_INIT: begin
+			FSM_EXTERN_MPU_RECV_INIT: begin
 				if ( I_Req ) begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RECV_STRIDE;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_STRIDE;
 				end
 				else begin
-					FSM_Extern_Serv	<= FSM_EXTERN_INIT;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_INIT;
 				end
 			end
-			FSM_EXTERN_RECV_STRIDE: begin
+			FSM_EXTERN_MPU_RECV_STRIDE: begin
 				if ( I_Req ) begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RECV_LENGTH;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_LENGTH;
 				end
 				else begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RECV_STRIDE;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_STRIDE;
 				end
 			end
-			FSM_EXTERN_RECV_LENGTH: begin
+			FSM_EXTERN_MPU_RECV_LENGTH: begin
 				if ( I_Req ) begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RECV_BASE;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_BASE;
 				end
 				else begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RECV_LENGTH;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_LENGTH;
 				end
 			end
-			FSM_EXTERN_RECV_BASE: begin
+			FSM_EXTERN_MPU_RECV_BASE: begin
 				if ( I_Req ) begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RUN;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_RUN;
 				end
 				else begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RECV_BASE;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_BASE;
 				end
 			end
-			FSM_EXTERN_RUN: begin
+			FSM_EXTERN_MPU_RECV_RUN: begin
 				if ( I_Ld_Term | I_St_Term ) begin
-					FSM_Extern_Serv	<= FSM_EXTERN_INIT;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_INIT;
 				end
 				else begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RUN;
+					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_RUN;
 				end
 			end
 			default: begin
-				FSM_Extern_Serv	<= FSM_EXTERN_INIT;
+				FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_INIT;
 			end
 		endcase
 	end
@@ -251,41 +253,41 @@ import pkg_mpu::*;
 	//Store Control for Loaded Data from Data Memory
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
+			FSM_Extern_St	<= FSM_EXTERN_MPU_ST_INIT;
 		end
 		else case ( FSM_Extern_St )
-			FSM_EXTERN_INIT: begin
+			FSM_EXTERN_MPU_ST_INIT: begin
 				if ( Run_St_Service ) begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_BUFF;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_BUFF;
 				end
 				else begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_INIT;
 				end
 			end
-			FSM_EXTERN_ST_BUFF: begin
+			FSM_EXTERN_MPU_ST_BUFF: begin
 				if ( I_St_Grant ) begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_RUN;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_RUN;
 				end
 				else if ( Half_Buffer_Stored ) begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_NOTIFY;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_NOTIFY;
 				end
 				else begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_BUFF;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_BUFF;
 				end
 			end
-			FSM_EXTERN_ST_NOTIFY: begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_BUFF;
+			FSM_EXTERN_MPU_ST_NOTIFY: begin
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_BUFF;
 			end
-			FSM_EXTERN_ST_RUN: begin
+			FSM_EXTERN_MPU_ST_RUN: begin
 				if ( I_St_Term ) begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_INIT;
 				end
 				else begin
-					FSM_Extern_St	<= FSM_EXTERN_ST_RUN;
+					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_RUN;
 				end
 			end
 			default: begin
-				FSM_Extern_St	<= FSM_EXTERN_ST_INIT;
+				FSM_Extern_St	<= FSM_EXTERN_MPU_ST_INIT;
 			end
 		endcase
 	end
@@ -294,46 +296,46 @@ import pkg_mpu::*;
 	//Load Control fro Storing in Data Memory
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
+			FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_INIT;
 		end
 		else case ( FSM_Extern_Ld )
-			FSM_EXTERN_LD_INIT: begin
+			FSM_EXTERN_MPU_LD_INIT: begin
 				if ( Run_Ld_Service ) begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_WAIT;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_WAIT;
 				end
 				else begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_INIT;
 				end
 			end
-			FSM_EXTERN_LD_WAIT: begin
+			FSM_EXTERN_MPU_LD_WAIT: begin
 				if ( I_Ld_Grant ) begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_RUN;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_RUN;
 				end
 				else begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_WAIT;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_WAIT;
 				end
 			end
-			FSM_EXTERN_LD_NOTIFY: begin
+			FSM_EXTERN_MPU_LD_NOTIFY: begin
 				if ( is_Ld_Notified ) begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_RUN;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_RUN;
 				end
 				else begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_NOTIFY;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_NOTIFY;
 				end
 			end
-			FSM_EXTERN_LD_RUN: begin
+			FSM_EXTERN_MPU_LD_RUN: begin
 				if ( is_Ld_Notified ) begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_NOTIFY;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_NOTIFY;
 				end
 				else if ( I_Ld_Term ) begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_INIT;
 				end
 				else begin
-					FSM_Extern_Ld	<= FSM_EXTERN_LD_RUN;
+					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_RUN;
 				end
 			end
 			default: begin
-				FSM_Extern_Ld	<= FSM_EXTERN_LD_INIT;
+				FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_INIT;
 			end
 		endcase
 	end

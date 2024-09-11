@@ -41,7 +41,7 @@ module HazardCheck_TPU
 
 	logic						We;
 	logic						Re;
-	logic						Full,
+	logic						Full;
 	logic						Empty;
 	logic	[WIDTH_BUFF-1:0]	WNo;
 	logic	[WIDTH_BUFF-1:0]	RNo;
@@ -315,11 +315,6 @@ module HazardCheck_TPU
 			end
 			else begin
 				R_Indeces.v_src3	<= 1'b0;
-			end
-
-			if ( R_Sel_Unit ) begin
-				R_Indeces.
-
 			end
 		end
 	end
