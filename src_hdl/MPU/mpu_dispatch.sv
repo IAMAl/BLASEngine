@@ -43,6 +43,9 @@ module Dispatch_MPU
 	// FSM for Dispatch Control
 	fsm_dispatch_t				FSM_Dispatch;
 
+	//Instruction
+	instr_t						R_Instr;
+
 	// Thread-ID
 	id_t						R_ThreadID;
 
@@ -117,7 +120,7 @@ module Dispatch_MPU
 			R_ThreadID		<= 0;
 			R_IssueNo		<= 0;
 		end
-		else if ( I_Req ) begin
+		else if ( I_Req_Issue ) begin
 			R_ThreadID		<= I_ThreadID;
 			R_IssueNo		<= I_IssueNo;
 		end
@@ -162,7 +165,7 @@ module Dispatch_MPU
 		end
 		else case ( FSM_Dispatch )
 			FSM_DPC_INIT: begin
-				if ( I_Req ) begin
+				if ( I_Req_Issue ) begin
 					FSM_Dispatch	<= FSM_DPC_GETINFO;
 				end
 				else begin

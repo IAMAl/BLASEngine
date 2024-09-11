@@ -63,7 +63,7 @@ module BareRegFile
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
 			for ( int i=0; i<NUM_RF_ENTRY; ++i ) begin
-				RegFile		<= 0;
+				RegFile[ i ]		<= 0;
 			end
 		end
 		else if ( I_We ) begin

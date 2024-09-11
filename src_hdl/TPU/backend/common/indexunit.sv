@@ -10,7 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IndexUnit
-	import pkg_tpu::*;
+import pkg_tpu::*;
+import pkg_mpu::*;
 #(
 	parameter int LANE_ID		= 0
 )(
@@ -34,6 +35,9 @@ module IndexUnit
 );
 
 
+	localparam int WIDTH_NLZ	= $clog2(NUM_ENTRY_NLZ_INDEX);
+
+
 	index_t						Index;
 	logic						En_Slice;
 	logic						End_Count;
@@ -41,21 +45,26 @@ module IndexUnit
 	logic						SkipReq;
 	logic						SkipEnd;
 
-	index_sel_t					Sel_a;
-	index_sel_t					Sel_b;
-	index_sel_t					Sel_c;
+	logic [1:0]					Sel_a;
+	logic [1:0]					Sel_b;
+	logic [1:0]					Sel_c;
+	logic [1:0]					Sel_s;
 	logic						Sel_Const;
 
 	logic						sign;
 	index_t						Index_a;
 	index_t						Index_b;
 	index_t						Index_c;
+	index_t						Index_m;
 	index_t						Index_s1;
 	index_t						Index_s2;
 	index_t						Index_val;
 
 	logic						Next;
 	index_t						OffsetVal;
+	index_t						CountVal;
+
+	logic	[WIDTH_NLZ-1:0]		Index_Offset;
 
 	logic						R_Req;
 	logic						R_Sel;
@@ -109,11 +118,11 @@ module IndexUnit
 																I_ThreadID;
 
 	//Index Calculation
-	assign Index_m				= index_a * index_b;
-	assign index_s1				= ( Sel_s ) ?					index_m : index_c;
-	assign index_s2				= ( Sel_s ) ?					index_c : index_m;
-	assign index_val			= ( sign ) ?					index_s1 - index_s2 :
-																index_s1 + index_s2;
+	assign Index_m				= Index_a * Index_b;
+	assign Index_s1				= ( Sel_s ) ?					Index_m : Index_c;
+	assign Index_s2				= ( Sel_s ) ?					Index_c : Index_m;
+	assign Index_val			= ( sign ) ?					Index_s1 - Index_s2 :
+																Index_s1 + Index_s2;
 
 	//Output Actual Index
 	assign O_Req				= R_Req | R_Sel | I_Req | SkipReq;
@@ -162,7 +171,7 @@ module IndexUnit
 			R_Index			<= 0;
 		end
 		else if ( R_Sel & ~I_Stall ) begin
-			R_Index			<= index_val;
+			R_Index			<= Index_val;
 		end
 		else if ( I_Req & ~I_Stall ) begin
 			R_Index			<= I_Index;
@@ -210,7 +219,7 @@ module IndexUnit
 		.reset(				reset					),
 		.I_Clr(				End_Count				),
 		.I_En(				En_Slice				),
-		.O_Val(				Countval				)
+		.O_Val(				CountVal				)
 	);
 
 

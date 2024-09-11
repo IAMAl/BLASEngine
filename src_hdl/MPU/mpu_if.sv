@@ -10,7 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IF_MPU
-	import pkg_mpu::*;
+import pkg_top::*;
+import pkg_mpu::*;
+import pkg_tpu::*;
+import pkg_tpu::instr_t;
 (
 	input						clock,
 	input						reset,
@@ -23,6 +26,7 @@ module IF_MPU
 	input						I_Ack_ThMem,			//Ack from Thread Memory
 	input						I_No_ThMem,				//N/A Response from Thread Memory
 	input						I_Commit,				//Commit Notification
+	output						O_St_Instr,
 	output	instr_t				O_Instr,				//Instruction
 	input						I_Req,					//Request from TPU
 	input	data_t				I_Data,					//Data from TPU
@@ -38,6 +42,7 @@ module IF_MPU
 	logic						is_Store_Prog;
 	logic						is_Store_Data;
 	logic						is_Load_Data;
+	logic						is_Set_EN_TPU;
 
 	logic						is_End_Load;
 	logic						is_End_Store;
@@ -53,10 +58,11 @@ module IF_MPU
 	logic						Ready;
 	logic						Run;
 	logic						NoThMem;
+	logic						Stop;
 
-	logic	[NUM_TPU-1:0]		En_TPU,
+	logic	[NUM_TPU-1:0]		En_TPU;
 
-	mpu_fsm_if_t				R_FSM_IF_MPU;
+	fsm_if_t					R_FSM_IF_MPU;
 
 
 	assign O_State				= { NoThMem, Stop, Run, Ready };
@@ -67,8 +73,8 @@ module IF_MPU
 	assign O_St_Instr			=	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) & I_Data_IF.v;
 	assign O_Instr				= 	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) ? I_Data_IF.data :	'0;
 
-	assign O_Data_IF.v			= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I__Data;
-	assign O_Data_IF.data		= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I__Data & I_Req ) ?	I_Data : '0;
+	assign O_Data_IF.v			= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Req;
+	assign O_Data_IF.data		= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Req ) ?	I_Data : '0;
 
 
 	assign O_En_TPU				= En_TPU;
@@ -83,7 +89,7 @@ module IF_MPU
 
 
 	assign Set_Ready			= (   ( R_FSM_IF_MPU == FSM_RUN_QUERY_THMEM_IF_MPU ) & I_Ack_ThMem &  I_No_ThMem ) |
-									( ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU )   & I_Ack_ThMem & ~I_No_ThMem );
+									( ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU )   & I_Ack_ThMem & ~I_No_ThMem ) |
 									( ( R_FSM_IF_MPU == FSM_LD_DATA_ID_IF_MPU )		 & is_End_Load ) |
 									( ( R_FSM_IF_MPU == FSM_ST_DATA_IF_MPU )		 & is_End_Store );
 
@@ -196,12 +202,12 @@ module IF_MPU
 					R_FSM_IF_MPU	<= FSM_INIT_IF_MPU;
 				end
 				else begin
-					R_FSM_IF_MPU	<= FSM_SET_EN_TPU_MPU
+					R_FSM_IF_MPU	<= FSM_SET_EN_TPU_MPU;
 				end
 			end
 			FSM_STOP_IF_MPU: begin
 				if ( is_Run ) begin
-					R_FSM_IF_MPU	<= FSM_RUN_IF_MPU;
+					R_FSM_IF_MPU	<= FSM_RUN_DISPATCH_IF_MPU;
 				end
 				else begin
 					R_FSM_IF_MPU	<= FSM_STOP_IF_MPU;

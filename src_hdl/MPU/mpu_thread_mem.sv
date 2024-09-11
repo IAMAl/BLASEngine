@@ -62,6 +62,13 @@ module ThrreadMem_MPU
 	logic						R_Req;
 
 
+	logic						R_Req_Ld;
+	id_t						R_ThreadID_St;
+
+
+	fsm_threadmem_t				FSM_Instr_St;
+
+
 	//// Send Wait Signal to Host in order to Stall Its Sending
 	assign O_Wait				= R_Error_Size;
 
@@ -111,9 +118,9 @@ module ThrreadMem_MPU
 		end
 	end
 
-	always_ff @( posedfe clock ) begin
+	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Req_Ld		<= 1'b0
+			R_Req_Ld		<= 1'b0;
 		end
 		else begin
 			R_Req_Ld		<= I_Req_Ld;
@@ -125,7 +132,7 @@ module ThrreadMem_MPU
 			R_Instr_Ld		<= 0;
 		end
 		else if ( I_Req_Ld ) begin
-			R_Instr_Ld		<= InstrMeme[ I_Adddress_Ld ];
+			R_Instr_Ld		<= InstrMem[ I_Adddress_Ld ];
 		end
 	end
 
@@ -176,7 +183,7 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			FSM_Instr_St	<= 0;
+			FSM_Instr_St	<= FSM_INSTR_ST_INIT;
 		end
 		else case ( FSM_Instr_St )
 			FSM_INSTR_ST_INIT: begin
@@ -231,7 +238,9 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			ThreadIDs		<= '0;
+			for ( int i=0; i<SIZE_THREAD_MEM/32; ++i ) begin
+				ThreadIDs[ i ]	<= '0;
+			end
 		end
 		else if ( We ) begin
 			ThreadIDs[ WNo ]	<= R_ThreadID_St;

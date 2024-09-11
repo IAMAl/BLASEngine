@@ -12,6 +12,7 @@
 module MPU
 	import pkg_mpu::*;
 	import pkg_tpu::*;
+	import pkg_tpu::instr_t;
 (
 	input							clock,
 	input							reset,
@@ -55,7 +56,6 @@ module MPU
 
 	logic						Req_Commit;
 	mpu_issue_no_t				Issued_No;
-	logic						Req_HazardCheck;
 	logic						Req_Issue;
 	id_t						ThreadID_S;
 	mpu_issue_no_t				IssueNo;
@@ -70,6 +70,12 @@ module MPU
 	data_t						Dmem_I_Data;
 	logic						Dmem_O_Req;
 	data_t						Dmem_O_Data;
+
+	logic						Req_St;
+	logic						IF_Req_St;
+	instr_t						IF_Instr;
+
+	tpu_row_clm_t				En_TPU;
 
 
 	assign O_TPU_Req			= |En_TPU;
@@ -144,7 +150,7 @@ module MPU
 		.I_ThreadID_S(		ID_HazardCheck			),
 		.O_Req_Issue(		Req_Issue				),
 		.O_ThreadID_S(		ThreadID_S				),
-		.O_IssueNo(			IssueNo					),
+		.O_IssueNo(			IssueNo					)
 	);
 
 	Dispatch_MPU Dispatch_MPU (

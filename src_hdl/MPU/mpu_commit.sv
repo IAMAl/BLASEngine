@@ -24,6 +24,9 @@ module Commit_MPU
 );
 
 
+	logic	[NUM_ENTRY_HAZARD-1:0]	Valid;
+	logic						Commit;
+
 	// Commit Table Handling
 	logic						We;
 	logic						Re;
@@ -43,7 +46,7 @@ module Commit_MPU
 
 	// Commit Request
 	assign O_Req_Commit			= R_Commit;
-	assign O_Issue_No			= R_Commit_No;
+	assign O_Issue_No			= R_Issue_No;
 
 	// Table Status
 	assign O_Full				= Full;
@@ -69,7 +72,9 @@ module Commit_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			IssueInfo		<= '0;
+			for ( int i=0; i<NUM_ENTRY_HAZARD; ++i  ) begin
+			IssueInfo[ i ]		<= '0;
+			end
 		end
 		else if ( I_Req_Issue | I_Req_Commit ) begin
 			if ( I_Req_Commit ) begin

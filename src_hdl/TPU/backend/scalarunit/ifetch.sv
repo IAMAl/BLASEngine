@@ -31,7 +31,7 @@ module IFetch
 	logic						R_Empty;
 	logic						R_Term;
 
-	instr_t						R_Insstr;
+	instr_t						R_Instr;
 	logic						Req;
 
 
@@ -43,7 +43,7 @@ module IFetch
 	assign O_Instr				= R_Instr;
 
 	// Reqd-Enable to Instruction Buffer
-	assign O_Re					= ~R_Empty;
+	assign O_Re_Buff			= ~R_Empty;
 
 
 	always_ff @( posedge clock ) begin
@@ -98,7 +98,7 @@ module IFetch
 		if ( reset ) begin
 			R_Instr			<= '0;
 		end
-		else if ( WE_Instr ) begin
+		else if ( We_Instr ) begin
 			R_Instr			<= I_Instr;
 		end
 	end

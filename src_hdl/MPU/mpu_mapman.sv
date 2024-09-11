@@ -29,12 +29,16 @@ module MapMan_MPU
 
 	logic						Found;
 
+	logic						Update;
+	mpu_address_t				UpdateAmount;
+
 	logic						We;
 	logic						Re;
 	logic	[WIDTH_TAB_MAPMAN-1:0]	WNo;
 	logic	[WIDTH_TAB_MAPMAN-1:0]	RNo;
 	logic						Full;
 	logic						Empty;
+	logic						WError;
 
 	logic	[SIZE_TAB_MAPMAN-1:0]	Valid;
 	logic	[SIZE_TAB_MAPMAN-1:0]	is_Matched;
@@ -46,25 +50,27 @@ module MapMan_MPU
 	fsm_mapman_st				FSM_St;
 	fsm_mapman_ld				FSM_Ld;
 
+	mpu_mapman_t				TabInstr	[SIZE_TAB_MAPMAN-1:0];
+
 
 	assign O_Full    	       = R_Used_Size >= (SIZE_THREAD_MEM-1);
 
-	assign Found				= |(~Valid)
+	assign Found				= |(~Valid);
 
 	// Send Ack and Used-size to InstrMem Unit
-	assign O_Ack_St				= ~FSM_St & Found;
+	assign O_Ack_St				= ( FSM_St == FSM_MAPMAN_ST_INIT ) & Found;
 	assign O_Used_Size			= R_Used_Size;
 
 	// Send Back Information to Dispatch UNit
 	assign O_Ack_Lookup			= FSM_Ld;
 	assign O_ThreadInfo.length	= R_Length_Ld;
-	assign O_ThreadInfo.address	= R_Address_ld;
+	assign O_ThreadInfo.address	= R_Address_Ld;
 
 	// Update Used Size
 	assign Update				= O_Ack_St | FSM_Ld;
-	assign UpdateAmount 		= (    O_Ack_St &  O_Ack_Lookup ) ?	I_Length_St - O_Length_Ld :
+	assign UpdateAmount 		= (    O_Ack_St &  O_Ack_Lookup ) ?	I_Length_St - R_Length_Ld :
 									(  O_Ack_St & ~O_Ack_Lookup ) ?	I_Length_St :
-									( ~O_Ack_St &  O_Ack_Lookup ) ?	-O_Length_Ld :
+									( ~O_Ack_St &  O_Ack_Lookup ) ?	-R_Length_Ld :
 																	0;
 
 	// Table Handling
@@ -75,8 +81,8 @@ module MapMan_MPU
 
 	always_comb begin
 		for ( int i=0; SIZE_TAB_MAPMAN; ++i ) begin
-			assign Valid[ i ]		= TabInstr[ i ].Valid;
-			assign is_Matched[ i ]	= Valid[ i ] & ( TanInstr[ WNo ].ThreadID == I_ThreadID_Ld );
+			Valid[ i ]		= TabInstr[ i ].Valid;
+			is_Matched[ i ]	= Valid[ i ] & ( TanInstr[ WNo ].ThreadID == I_ThreadID_Ld );
 		end
 	end
 
@@ -85,7 +91,7 @@ module MapMan_MPU
 			R_Length_Ld		<= 0;
 		end
 		else if ( I_Req_Lookup & ~FSM_Ld ) begin
-			R_Length_Ld		<= TabInstr[ RNo ].Length
+			R_Length_Ld		<= TabInstr[ RNo ].Length;
 		end
 	end
 
@@ -94,7 +100,7 @@ module MapMan_MPU
 			R_Length_Ld		<= 0;
 		end
 		else if ( I_Req_Lookup & ~FSM_Ld ) begin
-			R_Address_Ld	<= TabInstr[ RNo ].Address
+			R_Address_Ld	<= TabInstr[ RNo ].Address;
 		end
 	end
 
@@ -109,7 +115,9 @@ module MapMan_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			TabInstr		<= '0;
+			for ( int i=0; i<SIZE_TAB_MAPMAN; ++i ) begin
+				TabInstr[ i ]	<= '0;
+			end
 		end
 		else if ( I_Req_St | I_Req_Lookup ) begin
 			if ( I_Req_St ) begin
@@ -171,7 +179,7 @@ module MapMan_MPU
 
 	//// Module: Ring-Buffer Controller
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_BUFF				)
+		.NUM_ENTRY(			SIZE_TAB_MAPMAN			)
 	) IMemMan
 	(
 		.clock(				clock					),
@@ -190,7 +198,7 @@ module MapMan_MPU
 	//// Module: Encoder
 	//	Get Table Entry Number
 	Encoder #(
-		.NUM_ENTRY(			SIZE_TAB_MAMAN			)
+		.NUM_ENTRY(			SIZE_TAB_MAPMAN			)
 	) LoadEntry
 	(
 		.I_Data(			is_Matched				),

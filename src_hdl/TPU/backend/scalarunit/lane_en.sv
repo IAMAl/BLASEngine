@@ -35,11 +35,11 @@ module Lane_En
 		end
 		else if ( I_We | I_We_V_State ) begin
 			if ( I_We ) begin
-				Lane_En[NUM_LANE-1:0]	<= I_Data[NUM_LANE-1:0];
+				Lane_En[NUM_LANES-1:0]	<= I_Data[NUM_LANES-1:0];
 			end
 
 			if ( I_We_V_State ) begin
-				Lane_En[NUM_LANE-1:0]	<= I_V_State;
+				Lane_En[NUM_LANES-1:0]	<= I_V_State;
 			end
 		end
 	end

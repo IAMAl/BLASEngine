@@ -9,14 +9,13 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package pkg_top;
-	import pkg_mpu::*;
 
 	//Number of Rows in BLASEngine
-	parameter int NUM_ROWS				= 2;
-	parameter int NUM_CLMS				= 2;
+	localparam int NUM_ROWS				= 2;
+	localparam int NUM_CLMS				= 2;
 
 	//Total Number of TPUs
-	parameter int NUM_TPU				= NUM_ROWS*NUM_CLMS;
+	localparam int NUM_TPU				= NUM_ROWS*NUM_CLMS;
 
 	//Buffer Size in Commit Aggregater
 	localparam int	BYPASS_BUFF_SIZE	= 4;

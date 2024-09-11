@@ -21,8 +21,8 @@ module CommitAgg
 	input	[NUM_TPU-1:0]		I_En_TPU,
 	input						I_Req,					//Issue Request
 	input	mpu_issue_no_t		I_Issue_No,				//Issue Number
-	input	tpu_commit_req_t	I_Commit_Req,			//Commit Request
-	input	tpu_commit_no_t		I_Commit_No,			//Commit Number
+	input	tpu_row_clm_t		I_Commit_Req,			//Commit Request
+	input	mpu_issue_no_t		I_Commit_No,			//Commit Number
 	output						O_Commit_Req,			//Commit Request to MPU
 	output	mpu_issue_no_t		O_Commit_No,			//Commit Number to MPU
 	output						O_Full					//Flag: Buffer Full
@@ -33,8 +33,8 @@ module CommitAgg
 
 
 	logic						Send_Commit;
-	logic						is_Matched		[BUFF_SIZE-1:0][NUM_TPU-1:0];
-	logic						is_Commit		[BUFF_SIZE-1:0];
+	logic	[NUM_TPU-1:0]		is_Matched		[BUFF_SIZE-1:0];
+	logic	[BUFF_SIZE-1:0]		is_Commit;
 
 	logic	[WIDTH_SIZE-1:0]	Wr_Ptr;
 	logic	[WIDTH_SIZE-1:0]	Rd_Ptr;
@@ -46,16 +46,16 @@ module CommitAgg
 	assign Send_Commit			= CommitAgg[ Rd_Ptr ].v & ( &( ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu ) ) );
 
 
-	always_comb: begin
+	always_comb begin
 		for ( int i=0; i<BUFF_SIZE; ++i ) begin
-			assign is_Commit[ i ]	= |is_Matched[ i ];
+			is_Commit[ i ]	= |is_Matched[ i ];
 		end
 	end
 
-	always_comb: begin
+	always_comb begin
 		for ( int j=0; j<NUM_TPU; ++j ) begin
 			for ( int i=0; i<BUFF_SIZE; ++i ) begin
-				assign is_Matched[ i ][ j ]	= CommitAgg[ i ].v & CommitAgg[ i ].en_tpu[ j ] & I_Commit_Req[ j ] & ( I_Commit_No[ j ] == CommitAgg[ i ].issue_no );
+				is_Matched[ i ][ j ]	= CommitAgg[ i ].v & CommitAgg[ i ].en_tpu[ j ] & I_Commit_Req[ j ] & ( I_Commit_No[ j ] == CommitAgg[ i ].issue_no );
 			end
 		end
 	end
@@ -67,7 +67,7 @@ module CommitAgg
 				CommitAgg[ i ]	<= '0;
 			end
 		end
-		else if ( Send_Commit | I_Commit_Req | Set_Commit ) begin
+		else if ( Send_Commit | I_Commit_Req ) begin
 			if ( Send_Commit ) begin
 				CommitAgg[ Wr_Ptr ].v		<= 1'b0;
 				CommitAgg[ Wr_Ptr ].en_tpu	<= '0;

@@ -11,32 +11,41 @@
 package pkg_tpu;
 
 	//Bit-Width for Data
-	parameter int WIDTH_DATA			= 32;
+	localparam int WIDTH_DATA			= 32;
 
 	//Number of Entries in Register File
-	parameter int NUM_ENTRY_REGFILE		= 64;
-	parameter int WIDTH_ENTRY_REGFILE	= $clog2(NUM_ENTRY_REGFILE);
+	localparam int NUM_ENTRY_REGFILE	= 64;
+	localparam int WIDTH_ENTRY_REGFILE	= $clog2(NUM_ENTRY_REGFILE);
 
 	//Register File Index
-	parameter int WIDTH_INDEX 			= WIDTH_ENTRY_REGFILE;
+	localparam int WIDTH_INDEX 			= WIDTH_ENTRY_REGFILE;
 
 	//Number of Entries in Hazard Check Table
-	parameter int NUM_ENTRY_HAZARD		= 8;
-	parameter int WIDTH_ENTRY_HAZARD	= $clog2(NUM_ENTRY_HAZARD);
+	localparam int NUM_ENTRY_HAZARD		= 8;
+	localparam int WIDTH_ENTRY_HAZARD	= $clog2(NUM_ENTRY_HAZARD);
 
 	//NUmber of Active Instructions
-	parameter int NUM_ACTIVE_INSTRS		= 16;
-	parameter int WIDTH_ACTIVE_INSTRS	= $clog2(NUM_ACTIVE_INSTRS);
+	localparam int NUM_ACTIVE_INSTRS		= 16;
+	localparam int WIDTH_ACTIVE_INSTRS	= $clog2(NUM_ACTIVE_INSTRS);
 
 	//Bit-Width for Status Register
-	parameter int WIDTH_STATE			= 4;
+	localparam int WIDTH_STATE			= 4;
 
 	//Data Memory
-	parameter int SIZE_DATA_MEMORY		= 1024;
-	parameter int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEMORY);
+	localparam int SIZE_DATA_MEMORY		= 1024;
+	localparam int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEMORY);
 
 	//Constant in Instruction
-	parameter int WIDTH_CONSTANT		= 64-7-7*4-6-1;
+	localparam int WIDTH_CONSTANT		= 64-7-7*4-6-1;
+
+	// Number of Lanes in TPU
+	localparam int NUM_LANES			= 16;
+
+	//Number of Entries in Register File
+	localparam int NUM_RF_ENTRY			= 64;
+
+	//
+	localparam int NUM_ENTRY_NLZ_INDEX	= 64;
 
 
 	////Logic Types
@@ -52,7 +61,7 @@ package pkg_tpu;
 	typedef logic	[WIDTH_INDEX-1:0]		index_t;
 
 	//	Address Type for Data Memory
-	typedef logic	[WIDTH_SIZE_LMEMORY-1:0]address_t;
+	typedef logic	[WIDTH_SIZE_DMEM-1:0]	address_t;
 
 	//	Status Data (cmp instr. result) Types
 	typedef logic	[WIDTH_STATE-1:0]		stat_s_t;
@@ -72,14 +81,17 @@ package pkg_tpu;
 	typedef logic	[1:0]					no_t;
 
 	//	Interconnection Network
-	typedef	data_t	[NUM_LANE-1:0]			lane_t;
+	typedef	data_t	[NUM_LANES-1:0]			lane_t;
 
 	//	Data Memory Flag
-	typedef	logic	[NUM_LANE-1:0]			v_ready_t;
-	typedef	logic	[NUM_LANE-1:0]			v_grant_t;
+	typedef	logic	[NUM_LANES-1:0]			v_ready_t;
+	typedef	logic	[NUM_LANES-1:0]			v_grant_t;
 
 	//	Lane Commit Flag
-	typedef	logic	[NUM_LANE-1:0]			commit_lane_t;
+	typedef	logic	[NUM_LANES-1:0]			commit_lane_t;
+
+	//	Width Condition (4 types)
+	typedef logic	[1:0]					cond_t;
 
 
 	////Instruction-Set
@@ -163,8 +175,8 @@ package pkg_tpu;
 		logic							v;
 		issue_no_t						issue_no;
 		logic							commit;
-		logic	[NUM_LANE-1:0]			en_lane;
-		logic	[NUM_LANE-1:0]			en_commit;
+		logic	[NUM_LANES-1:0]			en_lane;
+		logic	[NUM_LANES-1:0]			en_commit;
 	} commit_tab_v;
 
 
@@ -270,10 +282,10 @@ package pkg_tpu;
 
 	////ETC
 	//	Enum for Index Select
-	typedef struct enum logic [1:0] {
+	typedef enum [1:0] {
 		INDEX_ORIG				= 2'h0,
 		INDEX_CONST				= 2'h1,
-		INDEX_SCALAR			= 2'h2,
+		INDEX_LANE				= 2'h2,
 		INDEX_SIMT				= 2'h3
 	} index_sel_t;
 
