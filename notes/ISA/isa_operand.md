@@ -1,6 +1,6 @@
 # Bit-Field in Operand Code
 
-Operand Bit-Field:
+Operand bit-field is;
 
 [Dst[8:0]][Src1[8:0]][Src2[8:0]][Src3[8:0]][Win0[6:0]][Win1[6:0]][Win2[6:0]][Win3[6:0]][Slice[6:0]]
 
@@ -10,9 +10,9 @@ Total 71-bit.
 
 ### Register Index
 
-Number of Register Files: 2 units
-Register File: 64 entries
-**2 Register File Spaces**
+- Number of Register Files: 2 units
+- Register File: 64 entries
+**NOTE: 2 Register File Spaces**
 
 
 Total 9-bit field for each operand.

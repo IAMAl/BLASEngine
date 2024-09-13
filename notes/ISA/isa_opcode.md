@@ -1,22 +1,26 @@
 # Bit-Field in Operation Code
 
-Bit-Field is;
+Operation COde's bit-field is;
 
 [Unit Sel[2:0]][Func Sel[1:0]][OpCode[1:0]][ConstFlag[1:0]]
 
 Total 9-bit.
 
 ## 1. Unit Selector [2:0]
-### [2]
+
+Unit Sel (Unit Selector) bit-field selects scalar unit or vector unit and its execution unit cluster.
+
+### [2] Scalar/Vector Unit Select
 - 0		Scalar Unit
 - 1		Vector Unit
 
-### [1:0]
+### [1:0] Execution Cluster Select
 - 00		Arithmetic Unit
 - 01		Conditional (Scalar: Jump/Branch (PAC) Unit, Vector: Mask Unit)
 - 10		Logic/Shift/Rotate Units
 - 11		Load/Store Unit
 
+Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique point is scalar unit and vector unit have same instruction bit-field assignment and every field has same roles.
 
 ## 2. Arithmetic Unit [1:0]
 ### Scalar Unit
