@@ -7,7 +7,7 @@
   <img src="./TPU_RegisterMap.png"
        alt="HTML image alt text"
        title="TPUレジスタマップ"
-       width="￥￥175px"
+       width="￥￥100px"
   />
 </div>
 
