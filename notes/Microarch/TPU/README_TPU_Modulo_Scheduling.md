@@ -4,7 +4,7 @@ BLASEngineはネットワークステージを通してモジュロスケジュ�
 下の図はレーン数4での簡易な例を示しています。データ依存性距離は14なのでモジュロスケジューリング時には右ローテート量2のレーンへ書き込めばよく読み書きの対応が保証されています。
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/Modulo_Scheduling.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/Microarch/TPU/TPU_Modulo_Scheduling.png"
        alt="HTML image alt text"
        title="Matrix-Matrix Multiplication"
        width="600px"
