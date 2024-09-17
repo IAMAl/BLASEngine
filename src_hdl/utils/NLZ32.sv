@@ -51,10 +51,10 @@ module NLZ32
 	);
 
 	assign O_Valid			= Valid0 | Valid1 | Valid2 | Valid3;
-	assign O_Num			= ( Valid0 ) ?		NUm0 + 5'h00 :
-								( Valid1 ) ?	NUm1 + 5'h08 :
-								( Valid2 ) ?	NUm2 + 5'h10 :
-								( Valid3 ) ?	NUm3 + 5'h18 :
+	assign O_Num			= ( Valid0 ) ?		Num0 + 5'h00 :
+								( Valid1 ) ?	Num1 + 5'h08 :
+								( Valid2 ) ?	Num2 + 5'h10 :
+								( Valid3 ) ?	Num3 + 5'h18 :
 												'0;
 
 endmodule
