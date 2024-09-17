@@ -16,7 +16,7 @@ module BLASEngine
 	import	pkg_tpu::BYPASS_BUFF_SIZE;
 	import	pkg_top::NUM_ROWS;
 	import	pkg_top::NUM_CLMS;
-	import	pkg_top::NUM_TPUS;
+	import	pkg_mpu::NUM_TPUS;
 (
 	input						clock,
 	input						reset,
