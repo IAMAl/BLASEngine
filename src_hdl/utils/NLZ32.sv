@@ -46,7 +46,7 @@ module NLZ32
 
 	NLZ8 NLZ3 (
 		.I_Data(			I_Data[31:24]				),
-		.O_Num(				Num0						),
+		.O_Num(				Num3						),
 		.O_Valid(			Valid3						)
 	);
 

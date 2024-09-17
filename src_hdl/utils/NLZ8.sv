@@ -18,14 +18,14 @@ module NLZ8
 
 	always_comb begin
 		case ( I_Data )
-		8'b???????1: assign O_NUm = 0;
-		8'b??????10: assign O_NUm = 1;
-		8'b?????100: assign O_NUm = 2;
-		8'b????1000: assign O_NUm = 3;
-		8'b???10000: assign O_NUm = 4;
-		8'b??100000: assign O_NUm = 5;
-		8'b?1000000: assign O_NUm = 6;
-		8'b10000000: assign O_NUm = 7;
+		8'b???????1: assign O_Num = 0;
+		8'b??????10: assign O_Num = 1;
+		8'b?????100: assign O_Num = 2;
+		8'b????1000: assign O_Num = 3;
+		8'b???10000: assign O_Num = 4;
+		8'b??100000: assign O_Num = 5;
+		8'b?1000000: assign O_Num = 6;
+		8'b10000000: assign O_Num = 7;
 		endcase
 	end
 
