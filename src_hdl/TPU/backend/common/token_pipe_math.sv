@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	StatusCtrl
+//	Module Name:	token_pipe_math
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module token_pipe
+module token_pipe_math
 	import	pkg_tpu::*;
 #(
 	parameter int DEPTH_MLT		= 7,
@@ -168,6 +168,5 @@ module token_pipe
 		.O_Empty(			Empty_Add					),
 		.O_Num(				Num_Add						)
 	);
-\
 
 endmodule
