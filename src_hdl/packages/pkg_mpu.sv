@@ -17,9 +17,6 @@ package pkg_mpu;
 	localparam int NUM_ROWS				= 2;
 	localparam int NUM_CLMS				= 2;
 
-	//Total Number of TPUs
-	localparam int NUM_TPU				= NUM_ROWS*NUM_CLMS;
-
 	// Number of Scalar-Thread
 	localparam int NUM_ENTRY_STH		= 64;
 
