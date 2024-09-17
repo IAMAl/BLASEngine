@@ -39,4 +39,19 @@ module RingBuff
 		end
 	end
 
+	RingBuffCTRL #(
+		.NUM_ENTRY(			NUM_ENTRY					)
+	) RingBuffCTRL
+	(
+		.clock(				clock						),
+		.reset(				reset						),
+		.I_We(				I_We						),
+		.I_Re(				I_Re						),
+		.O_WAddr(			WPtr						),
+		.O_RAddr(			RPtr						),
+		.O_Full(			O_Full						),
+		.O_Empty(			O_Empty						),
+		.O_Num(				O_Num						)
+	);
+
 endmodule
