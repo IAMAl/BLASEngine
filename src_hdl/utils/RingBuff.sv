@@ -39,6 +39,7 @@ module RingBuff
 		end
 	end
 
+
 	RingBuffCTRL #(
 		.NUM_ENTRY(			NUM_ENTRY					)
 	) RingBuffCTRL
