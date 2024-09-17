@@ -9,9 +9,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package pkg_mpu;
-	import pkg_top::NUM_ROWS;
-	import pkg_top::NUM_CLMS;
+	//import pkg_top::NUM_ROWS;
+	//import pkg_top::NUM_CLMS;
 	import pkg_tpu::WIDTH_DATA;
+
+	//Number of Rows in BLASEngine
+	localparam int NUM_ROWS				= 2;
+	localparam int NUM_CLMS				= 2;
+
+	//Total Number of TPUs
+	localparam int NUM_TPU				= NUM_ROWS*NUM_CLMS;
 
 	// Number of Scalar-Thread
 	localparam int NUM_ENTRY_STH		= 64;

@@ -9,7 +9,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package pkg_top;
-	import pkg_mpu::*;
+	import pkg_mpu::mpu_issue_no_t;
+	import pkg_mpu::tpu_row_clm_t;
 
 	//Number of Rows in BLASEngine
 	localparam int NUM_ROWS				= 2;
@@ -21,11 +22,6 @@ package pkg_top;
 	//Buffer Size in Commit Aggregater
 	localparam int	BYPASS_BUFF_SIZE	= 4;
 
-	//Thread's Issue Number
-	typedef logic [WIDTH_NUM_ISSUE-1:0]	mpu_issue_no_t;
-
-	// Single-bit Flag for All TPUs
-	typedef logic [NUM_TPUS-1:0]		tpu_row_clm_t;
 
 	//Commit Aggregater Table
 	typedef struct packed {
