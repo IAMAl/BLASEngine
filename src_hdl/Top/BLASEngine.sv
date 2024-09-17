@@ -134,7 +134,8 @@ module BLASEngine
 	CommitAgg #(
 		.NUM_TPU(			NUM_TPU					),
 		.BUFF_SIZE(			BYPASS_BUFF_SIZE		)
-	)(
+	) CommitAgg
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En_TPU(			TPU_En_Exe				),
