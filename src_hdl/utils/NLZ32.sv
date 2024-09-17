@@ -13,7 +13,7 @@ module NLZ32
 (
 	input	[32-1:0]			I_Data,				//Data
 	output	[4:0]				O_Num,				//Number
-	output	logic				O_Valid,			//Flag: Validation
+	output	logic				O_Valid				//Flag: Validation
 );
 
 	logic						Valid0;

@@ -13,7 +13,7 @@ module NLZ8
 (
 	input	[8-1:0]				I_Data,				//Data
 	output	[2:0]				O_Num,				//Number
-	output	logic				O_Valid,			//Flag: Validation
+	output	logic				O_Valid				//Flag: Validation
 );
 
 	always_comb begin
