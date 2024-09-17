@@ -45,7 +45,7 @@ module SkipCTRL
 		else begin
 			R_Req			<= I_Req;
 		end
-	end	
+	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
