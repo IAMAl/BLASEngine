@@ -29,6 +29,7 @@ module MPU
 	output	tpu_row_clm_t			O_TPU_En_Exe,		//Enable to TPUs
 	output							I_Ld_Req,			//Request from Data Memory
 	input	data_t					I_Ld_Data,			//Data from Data Memory
+	input							I_Ld_Rls,
 	output							O_St_Req,			//Request Storing to Data Memory
 	output	data_t					O_St_Data,			//Storing Data to Data Memory
 	output							O_St_Rls,			//Path Release
@@ -117,8 +118,10 @@ module MPU
 		.O_Data(			Dmem_O_Data				),
 		.I_Ld_Req(			I_Ld_Req				),
 		.I_Ld_Data(			I_Ld_Data				),
+		.I_Ld_Rls(			I_Ld_Rls				),
 		.O_St_Req(			O_St_Req				),
-		.O_St_Data(			O_St_Data				)
+		.O_St_Data(			O_St_Data				),
+		.O_St_Rls(			O_St_Rls				)
 	);
 
 

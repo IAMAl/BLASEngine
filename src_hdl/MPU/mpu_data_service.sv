@@ -26,11 +26,11 @@ import pkg_mpu::fsm_extern_ld;
 	input						I_Ld_Req,				//Request from Data Memory
 	input						I_Ld_Grant,
 	input	data_t				I_Ld_Data,				//Data from Data Memory
-	input						I_Ld_Term,				//End of Loading
+	input						I_Ld_Rls,				//End of Loading
 	output						O_St_Req,				//Request Storing to Data Memory
 	input						I_St_Grant,
 	output	data_t				O_St_Data,				//Storing Data to Data Memory
-	input						I_St_Term				//End of Storing
+	output						O_St_Rls				//End of Storing
 );
 
 
@@ -136,6 +136,7 @@ import pkg_mpu::fsm_extern_ld;
 	assign O_St_Data			= ( Load_Buff_Ld ) ?				I_Data :
 									( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
 																	0;
+	assign O_St_Rls				= Counter_St == R_Length;
 
 
 	// Capture Access-Length
@@ -154,7 +155,7 @@ import pkg_mpu::fsm_extern_ld;
 		if ( reset ) begin
 			R_St_Req		<= 1'b0;
 		end
-		else if ( I_Ld_Term ) begin
+		else if ( I_Ld_Rls ) begin
 			R_St_Req		<= 1'b0;
 		end
 		else if ( St_Req ) begin
@@ -166,7 +167,7 @@ import pkg_mpu::fsm_extern_ld;
 		if ( reset ) begin
 			R_Ld_Req		<= 1'b0;
 		end
-		else if ( I_Ld_Term ) begin
+		else if ( I_Ld_Rls ) begin
 			R_Ld_Req		<= 1'b0;
 		end
 		else if ( Ld_Req ) begin
@@ -180,7 +181,7 @@ import pkg_mpu::fsm_extern_ld;
 		if ( reset ) begin
 			Counter_St		<= 0;
 		end
-		else if ( I_St_Term ) begin
+		else if ( O_St_Rls ) begin
 			Counter_St		<= 0;
 		end
 		else if ( I_Req & is_FSM_Extern_St_Run ) begin
@@ -236,7 +237,7 @@ import pkg_mpu::fsm_extern_ld;
 				end
 			end
 			FSM_EXTERN_MPU_RECV_RUN: begin
-				if ( I_Ld_Term | I_St_Term ) begin
+				if ( I_Ld_Rls | O_St_Rls ) begin
 					FSM_Extern_Serv	<= FSM_EXTERN_MPU_RECV_INIT;
 				end
 				else begin
@@ -279,7 +280,7 @@ import pkg_mpu::fsm_extern_ld;
 					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_BUFF;
 			end
 			FSM_EXTERN_MPU_ST_RUN: begin
-				if ( I_St_Term ) begin
+				if ( O_St_Rls ) begin
 					FSM_Extern_St	<= FSM_EXTERN_MPU_ST_INIT;
 				end
 				else begin
@@ -327,7 +328,7 @@ import pkg_mpu::fsm_extern_ld;
 				if ( is_Ld_Notified ) begin
 					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_NOTIFY;
 				end
-				else if ( I_Ld_Term ) begin
+				else if ( I_Ld_Rls ) begin
 					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_INIT;
 				end
 				else begin
