@@ -16,6 +16,7 @@ module BLASEngine
 	import	pkg_tpu::BYPASS_BUFF_SIZE;
 	import	pkg_top::NUM_ROWS;
 	import	pkg_top::NUM_CLMS;
+	import	pkg_top::NUM_TPUS;
 (
 	input						clock,
 	input						reset,
@@ -133,7 +134,7 @@ module BLASEngine
 
 
 	CommitAgg #(
-		.NUM_TPU(			NUM_TPU					),
+		.NUM_TPU(			NUM_TPUS				),
 		.BUFF_SIZE(			BYPASS_BUFF_SIZE		)
 	) CommitAgg
 	(
