@@ -92,9 +92,9 @@ module TPU
 
 	//// Buffers between FrontENd and Scalar Unit
 	//	 Buffer for Instructions
-	buff #(
+	RingBuff #(
 		.NUM_ENTRY(			SIZE_THREAD_MEM			),
-		.TYPE_DEF(			instr_t					)
+		.TYPE(				instr_t					)
 	) Instr_Buff
 	(
 		.clock(				clock					),
@@ -104,13 +104,14 @@ module TPU
 		.I_Data(			Buff_Instr				),
 		.O_Data(			Instr					),
 		.O_Full(			Buff_Full				),
-		.O_Empty(			Buff_Empty				)
+		.O_Empty(			Buff_Empty				),
+		.O_Num(										)
 	);
 
 	//	 Buffer for SIMT Thread-ID
-	buff #(
+	RingBuff #(
 		.NUM_ENTRY(			SIZE_THREAD_MEM			),
-		.TYPE_DEF(			id_t					)
+		.TYPE(				id_t					)
 	) ID_Buff
 	(
 		.clock(				clock					),
@@ -120,7 +121,8 @@ module TPU
 		.I_Data(			Buff_ThreadID			),
 		.O_Data(			ThreadID				),
 		.O_Full(			IDBuff_Full				),
-		.O_Empty(			IDBuff_Empty			)
+		.O_Empty(			IDBuff_Empty			),
+		.O_Num(										)
 	);
 
 
