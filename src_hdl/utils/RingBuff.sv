@@ -13,7 +13,7 @@ module RingBuff
 #(
 	parameter int NUM_ENTRY		= 16,
 	parameter int WIDTH_ENTRY	= $clog2(NUM_ENTRY),
-	parameter int TYPE			= logic[31:0]
+	parameter typedef TYPE		= logic[31:0]
 )(
 	input						clock,
 	input						reset,
