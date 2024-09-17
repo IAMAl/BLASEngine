@@ -9,7 +9,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package pkg_top;
-	import pkg_mpu::*;
+	import pkg_mpu::mpu_issue_no_t;
+	import pkg_mpu::tpu_row_clm_t;
 
 	//Number of Rows in BLASEngine
 	localparam int NUM_ROWS				= 2;
