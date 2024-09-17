@@ -25,8 +25,8 @@ module StatusCtrl
 	logic						Gt;
 	logic						Le;
 
-	stat_t						Set_Val;
-	stat_t						Status;
+	state_t						Set_Val;
+	state_t						Status;
 
 
 	// Float Format

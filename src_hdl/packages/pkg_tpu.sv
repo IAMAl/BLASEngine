@@ -68,6 +68,10 @@ package pkg_tpu;
 
 	typedef data_t	[NUM_LANES-1:0]			v_data_t;
 
+	//	Constant
+	typedef data_t							const_t;
+
+
 	//	General Index Type
 	//		MSb differenciates Two Register Files
 	//		Mid-field used for no_t in hazard unit
