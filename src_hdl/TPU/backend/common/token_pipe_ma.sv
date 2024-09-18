@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	token_pipe_math
+//	Module Name:	token_pipe_ma
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module token_pipe_math
+module token_pipe_ma
 	import	pkg_tpu::*;
 #(
 	parameter int DEPTH_MLT		= 7,
@@ -25,6 +25,8 @@ module token_pipe_math
 	output	op_t				O_Op,					//OpCode
 	input	TYPE				I_Token,				//Input Token
 	output	TYPE				O_Token,				//Output Token
+	output						O_Chain_Mlt,
+	output						O_Chain_Add,
 	output						O_Stall					//Stall Request
 );
 
@@ -93,6 +95,9 @@ module token_pipe_math
 																			'0;
 
 	assign O_Stall				= Full_Mlt | Full_Add;
+
+	assign O_Chain_Mlt			= TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 );
+	assign O_Chain_Add			= TBuffAdd[ RPtr_Add ].v & ( OBuffAdd[ RPtr_Add ].OpCode == 2'b10 ) & ~O_Chain_Mlt;
 
 
 	assign We_Mlt				= ~Full_Mlt & ( ( Valid & ( I_Op.OpClass == 2'b01 ) ) | ( TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 ) ) );
