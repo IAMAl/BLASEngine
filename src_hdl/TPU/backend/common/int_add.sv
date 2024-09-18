@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	Add_Unit
+//	Module Name:	iAdd_Unit
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module Add_Unit
+module iAdd_Unit
 	import pkg_tpu::*;
 (
 	input						I_En,
@@ -23,6 +23,7 @@ module Add_Unit
 	output	index_t				O_Index,
 	output  issue_no_t			O_Issue_No
 );
+
 
 	logic						is_Signed;
 	logic						is_Sub;

@@ -177,7 +177,12 @@ module ALU
 														0;
 
 
-	MA_Unit MA_Unit
+	MA_Unit #(
+		.DEPTH_MLT(			3						),
+		.DEPTH_ADD(			1						),
+		.TYPE(				pipe_exe_tmp_t			),
+		.INT_UNit(			true					)
+	) MA_Unit
 	(
 		.I_En(				En_MA					),
 		.I_OP(				I_Command.instr.op		),

@@ -6,13 +6,16 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	iMA_Unit
+//	Module Name:	MA_Unit
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module iMA_Unit
+module MA_Unit
 	import pkg_tpu::*;
 #(
-	parameter type TYPE			= pipe_exe_tmp_t
+	parameter int DEPTH_MLT		= 3,
+	parameter int DEPTH_ADD		= 1,
+	parameter type TYPE			= pipe_exe_tmp_t,
+	paramter bool INT_UNit		= true
 )(
 	input						I_En,
 	input						I_Stall,
@@ -70,17 +73,11 @@ module iMA_Unit
 	issue_no_t					LifeMlt;
 
 
-	assign is_Add				= ( I_En & ( I_Op.OpClass == 2'b00 ) ) | is_Chain_to_Add;
-	assign is_Mlt				= ( I_En & ( I_Op.OpClass == 2'b01 ) );
+	assign LiFeAdd				= I_Pres_Issue_No - Add_Issue_No;
+	assign LiFeMlt				= I_Pres_Issue_No - Mlt_Issue_No;
 
-	//assign LiFeAdd				= I_Pres_Issue_No - Add_Issue_No;
-	//assign LiFeMlt				= I_Pres_Issue_No - Mlt_Issue_No;
-
-	//assign is_Chain_to_Mlt		= ( I_Op.OpCode == 2'b10 ) & is_Mlt;
-	//assign is_Chain_to_Add		= ( I_Op.OpCode == 2'b11 ) & is_Mlt;
-
-	assign En_Add				= is_Add;
-	assign En_Mlt				= is_Mlt;
+	assign En_Add				= is_Adder | is_MAC | is_MAD;
+	assign En_Mlt				= is_Mlter;
 
 
 	assign O_Valid				= ( LifeAdd > LifeMlt ) ?	Add_Valid :
@@ -95,51 +92,127 @@ module iMA_Unit
 	assign O_Issue_No			= ( LifeAdd > LifeMlt ) ?	Add_Issue_No :
 															Mlt_Issue_No;
 
+	assign is_Adder				= I_En & ( I_Op.OpClass == 2'b00 );
+	assign is_Mlter				= I_En & ( I_Op.OpClass == 2'b01 );
 
-	always_comb begin
-		case ()
-		2'h0: begin
-			assign Data1_Add	= ;//
-			assign Data2_Add	= ;//
-			assign Data1_Mlt	= ;//
-			assign Data2_Mlt	= ;//
-		end
-		endcase
-	end
+	assign is_MAC				= ( Op.OpClass == 2'b01 ) & ( Op.OpCode == 2'b10 );
+	assign is_MAD				= ( Op.OpClass == 2'b01 ) & ( Op.OpCode == 2'b11 );
 
 
-	Add_Unit Add_Unit
-	(
-		.I_En(				En_Add					),
-		.I_Op(				Op_Add					),
-		.I_Data1(			Data1_Add				),
-		.I_Data2(			Data2_Add				),
-		.I_Index(			Index_Add				),
-		.I_Issue_No(		Issue_No_Add			),
-		.O_Valid(			Add_Valid				),
-		.O_Data(			Add_Data				),
-		.O_Index(			Add_Index				),
-		.O_Issue_No(		Add_Issue_No			)
-	);
+	assign Op_Add				= ( is_Adder ) ?	I_Op :
+									( is_MAD ) ?	Op :
+									( is_MAC ) ?	Op :
+													'0;
 
-	Mlt_Unit Mlt_Unit
-	(
-		.I_En(				En_Mlt					),
-		.I_Op(				Op_Mlt					),
-		.I_Data1(			Data1_Mlt				),
-		.I_Data2(			Data2_Mlt				),
-		.I_Index(			Index_Mlt				),
-		.I_Issue_No(		Issue_No_Mlt			),
-		.O_Valid(			Mlt_Valid				),
-		.O_Data(			Mlt_Data				),
-		.O_Index(			Mlt_Index				),
-		.O_Issue_No(		Mlt_Issue_No			)
-	);
+	assign Op_Mlt				= ( is_Mlter ) ?	I_Op :
+									( is_MAD ) ?	I_Op :
+									( is_MAC ) ?	I_Op :
+													'0;
+
+	assign Index_Add			= ( is_Adder ) ?	I_Index :
+									( is_MAD ) ?	Mlt_Index :
+									( is_MAC ) ?	Mlt_Index :
+													'0;
+
+	assign Index_Mlt			= ( is_Mlter ) ?	I_Index :
+									( is_MAD ) ?	I_Index :
+									( is_MAC ) ?	I_Index :
+													'0;
+
+	assign Issue_No_Add			= ( is_Adder ) ?	I_Issue_No :
+									( is_MAD ) ?	Mlt_Issue_No :
+									( is_MAC ) ?	Mlt_Issue_No :
+													0;
+
+	assign Issue_No_Mlt			= ( is_Mlter ) ?	I_Issue_No :
+									( is_MAD ) ?	I_Issue_No :
+									( is_MAC ) ?	I_Issue_No :
+													0;
+
+	assign Data1_Add			= ( is_Adder ) ?	I_Data1 :
+									( is_MAD ) ?	Mlt_Data :
+									( is_MAC ) ?	Mlt_Data :
+													0;
+
+	assign Data2_Add			= ( is_Adder ) ?	I_Data2 :
+									( is_MAD ) ?	I_Data3 :
+									( is_MAC ) ?	C1 :
+													0;
+
+	assign Data1_Mlt			= ( is_Mlter ) ?	I_Data1 :
+									( is_MAD ) ?	I_Data1 :
+									( is_MAC ) ?	I_Data1 :
+													0;
+
+	assign Data2_Mlt			= ( is_Mlter ) ?	I_Data2 :
+									( is_MAD ) ?	I_Data2 :
+									( is_MAC ) ?	I_Data2 :
+													0;
+
+
+	`ifdef INT_UNit
+		iAdd_Unit Add_Unit
+		(
+			.I_En(				En_Add					),
+			.I_Op(				Op_Add					),
+			.I_Data1(			Data1_Add				),
+			.I_Data2(			Data2_Add				),
+			.I_Index(			Index_Add				),
+			.I_Issue_No(		Issue_No_Add			),
+			.O_Valid(			Add_Valid				),
+			.O_Data(			Add_Data				),
+			.O_Index(			Add_Index				),
+			.O_Issue_No(		Add_Issue_No			)
+		);
+
+		iMlt_Unit Mlt_Unit
+		(
+			.I_En(				En_Mlt					),
+			.I_Op(				Op_Mlt					),
+			.I_Data1(			Data1_Mlt				),
+			.I_Data2(			Data2_Mlt				),
+			.I_Index(			Index_Mlt				),
+			.I_Issue_No(		Issue_No_Mlt			),
+			.O_Valid(			Mlt_Valid				),
+			.O_Data(			Mlt_Data				),
+			.O_Index(			Mlt_Index				),
+			.O_Issue_No(		Mlt_Issue_No			)
+		);
+	`else
+		fAdd_Unit Add_Unit
+		(
+			.I_En(				En_Add					),
+			.I_Op(				Op_Add					),
+			.I_Data1(			Data1_Add				),
+			.I_Data2(			Data2_Add				),
+			.I_Index(			Index_Add				),
+			.I_Issue_No(		Issue_No_Add			),
+			.O_Valid(			Add_Valid				),
+			.O_Data(			Add_Data				),
+			.O_Index(			Add_Index				),
+			.O_Issue_No(		Add_Issue_No			)
+		);
+
+		fMlt_Unit Mlt_Unit
+		(
+			.I_En(				En_Mlt					),
+			.I_Op(				Op_Mlt					),
+			.I_Data1(			Data1_Mlt				),
+			.I_Data2(			Data2_Mlt				),
+			.I_Index(			Index_Mlt				),
+			.I_Issue_No(		Issue_No_Mlt			),
+			.O_Valid(			Mlt_Valid				),
+			.O_Data(			Mlt_Data				),
+			.O_Index(			Mlt_Index				),
+			.O_Issue_No(		Mlt_Issue_No			)
+		);
+	`endif
+
 
 	token_pipe_ma #(
-		.DEPTH_MLT(			3						),
-		.DEPTH_ADD(			1						),
-		.TYPE(				pipe_exe_tmp_t			)
+		.DEPTH_MLT(			DEPTH_MLT				),
+		.DEPTH_ADD(			DEPTH_ADD				),
+		.TYPE(				TYPE					)
 	) token_pipe_ma
 	(
 		.clock(				clock					),
