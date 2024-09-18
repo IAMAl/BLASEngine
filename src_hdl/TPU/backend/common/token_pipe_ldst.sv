@@ -51,18 +51,18 @@ module token_pipe_ldst
 	logic	[WIDTH_BUFF:0]		Num;
 
 
-	assign O_Req			= ~Empty & ~I_Stall;
-	assign O_Length			= BuffLength[ RPtr ];
-	assign O_Stride			= BuffStride[ RPtr ];
-	assign O_Base			= BuffBase[ RPtr ];
+	assign O_Req				= ~Empty & ~I_Stall;
+	assign O_Length				= BuffLength[ RPtr ];
+	assign O_Stride				= BuffStride[ RPtr ];
+	assign O_Base				= BuffBase[ RPtr ];
 
-	assign O_Token			= BuffToken[ RPtr ];
-	assign O_Stall			= Full;
-	assign O_Empty			= Empty;
+	assign O_Token				= BuffToken[ RPtr ];
+	assign O_Stall				= Full;
+	assign O_Empty				= Empty;
 
 
-	assign We				= ~Full & I_Req;
-	assign Re				= ~Empty & I_Grant;
+	assign We					= ~Full & I_Req;
+	assign Re					= ~Empty & I_Grant;
 
 
 	always_ff @( posedge clock ) begin
