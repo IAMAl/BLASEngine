@@ -736,7 +736,7 @@ module Scalar_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.O_WB_Index(		WB_Index				),
 		.O_WB_Data(			WB_Data					),
-		.WB_IssueNo(		WB_IssueNo				),
+		.O_WB_IssueNo(		WB_IssueNo				),
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
