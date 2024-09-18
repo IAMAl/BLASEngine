@@ -25,9 +25,12 @@ module Scalar_Unit
 	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
-	output	ldst_t				O_LdSt,					//Load Request
-	input	data_t				I_LdData,				//Loaded Data
-	output	data_t				O_StData,				//Storing Data
+	output	ldst_t				O_LdSt1,				//Load Request
+	output	ldst_t				O_LdSt2,				//Load Request
+	input	data_t				I_Ld_Data1,				//Loaded Data
+	input	data_t				I_Ld_Data2,				//Loaded Data
+	output	data_t				O_St_Data1,				//Storing Data
+	output	data_t				O_St_Data2,				//Storing Data
 	input	[1:0]				I_Ld_Ready,				//Flag: Ready
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
@@ -147,17 +150,13 @@ module Scalar_Unit
 	logic	[12:0]				Config_Path;;
 
 
-	logic						CEn1;
-	logic						CEn2;
-
-
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
 
 	logic						WB_En;
 
-	dst_t						WB_Index;
+	dst_t						WB_Dst;
 	data_t						WB_Data;;
 	logic						WB_Req_Even;
 	logic						WB_Req_Odd;
@@ -211,10 +210,10 @@ module Scalar_Unit
 	pipe_index_t				PipeReg_Index;
 	pipe_index_reg_t			PipeReg_IdxRF;
 	pipe_index_reg_t			PipeReg_IdxRR;
-	pipe_reg_t					PipeReg_RR;
-	pipe_net_t					PipeReg_RR_Net;
-	pipe_exe_t					PipeReg_Net;
-	pipe_exe_t					PipeReg_Exe;
+	pipe_reg_t					PipeReg_RR;//ToDo
+	pipe_net_t					PipeReg_RR_Net;//ToDo
+	pipe_exe_t					PipeReg_Net;//ToDo
+	pipe_exe_t					PipeReg_Exe;//ToDo
 
 
 	//// Output Status
@@ -308,7 +307,7 @@ module Scalar_Unit
 
 
 	///// Write-Back to PAC
-	assign PAC_We				= WB_Index.v & is_WB_BR;
+	assign PAC_We				= WB_Dst.v & is_WB_BR;
 	assign PAC_Data				= ( is_WB_BR ) ? WB_Data : '0;
 	assign PAC_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
@@ -341,24 +340,24 @@ module Scalar_Unit
 
 	//// Write-Back
 	//  Network Path
-	assign Config_Path_WB		= WB_Index.path;
+	assign Config_Path_WB		= WB_Dst.path;
 
 	assign Dst_Sel				= B_Index.dst_sel.unit_no;
-	assign Dst_Slice			= WB_Index.slice;
-	assign Dst_Index			= WB_Index.idx;
-	assign Dst_Index_Window		= WB_Index.window;
-	assign Dst_Index_Length		= WB_Index.slice_len;
+	assign Dst_Slice			= WB_Dst.slice;
+	assign Dst_Index			= WB_Dst.idx;
+	assign Dst_Index_Window		= WB_Dst.window;
+	assign Dst_Index_Length		= WB_Dst.slice_len;
 
-	assign is_WB_RF				= WB_Index.dst_sel.no == 2'h1;
-	assign is_WB_BR				= WB_Index.dst_sel.no == 2'h2;
-	assign is_WB_VU				= WB_Index.dst_sel.no == 2'h3;
+	assign is_WB_RF				= WB_Dst.dst_sel.no == 2'h1;
+	assign is_WB_BR				= WB_Dst.dst_sel.no == 2'h2;
+	assign is_WB_VU				= WB_Dst.dst_sel.no == 2'h3;
 
-	assign WB_Req_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Req_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Req_Even			= ~Dst_Sel & WB_Dst.v & is_WB_RF;
+	assign WB_Req_Odd			=  Dst_Sel & WB_Dst.v & is_WB_RF;
+	assign WB_We_Even			= ~Dst_Sel & WB_Dst.v & is_WB_RF;
+	assign WB_We_Odd			=  Dst_Sel & WB_Dst.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Dst.idx :	'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Dst.idx :	'0;
 	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 		'0;
 	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 		'0;
 
@@ -715,26 +714,27 @@ module Scalar_Unit
 
 	//// Execution Stage
 	//	 Math Unit
-	SMathUnit SMathUnit (
+	ExecUnit_S ExecUnit_S (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Math				),
-		.I_CEn1(			CEn1					),
-		.I_CEn2(			CEn2					),
 		.I_Req(				PipeReg_Exe.v			),
-		.I_Command(			PipeReg_Exe.op			),
-		.I_WB_Dst(			PipeReg_Exe.dst			),
-		.I_Src_Src_Data1(	PipeReg_Exe.data1		),
-		.I_Src_Src_Data2(	PipeReg_Exe.data2		),
-		.I_Src_Src_Data3(	PipeReg_Exe.data3		),
-		.O_LdSt(			O_LdSt					),
-		.I_LdData(			I_LdData				),
-		.O_St_Data(			O_StData				),
+		.I_Issue_No(		IW_IssueNo				),
+		.I_Command(			PipeReg_Exe.command		),
+		.I_Src_Data1(		PipeReg_Exe.data1		),
+		.I_Src_Data2(		PipeReg_Exe.data2		),
+		.I_Src_Data3(		PipeReg_Exe.data3		),
+		.O_LdSt1(			O_LdSt1					),
+		.O_LdSt1(			O_LdSt2					),
+		.I_Ld_Data1(		I_Ld_Data1				),
+		.I_Ld_Data2(		I_Ld_Data2				),
+		.O_St_Data1(		O_St_Data1				),
+		.O_St_Data2(		O_St_Data2				),
 		.I_Ld_Ready(		I_Ld_Ready				),
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),
 		.I_St_Grant(		I_St_Grant				),
-		.O_WB_Index(		WB_Index				),
+		.O_WB_Dst(			WB_Dst					),
 		.O_WB_Data(			WB_Data					),
 		.O_WB_IssueNo(		WB_IssueNo				),
 		.O_Math_Done(		Math_Done				),

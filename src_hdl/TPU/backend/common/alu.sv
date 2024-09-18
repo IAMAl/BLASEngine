@@ -11,7 +11,9 @@
 
 module ALU
 	import pkg_tpu::*;
-(
+#(
+	parameter type TYPE			= pipe_exe_tmp_t
+)(
 	input						clock,
 	input						reset,
 	input	issue_no_t			I_Issue_No,
@@ -21,7 +23,7 @@ module ALU
 	input	data_t				I_Src_Data1,
 	input	data_t				I_Src_Data2,
 	input	data_t				I_Src_Data3,
-	output	index_t				O_WB_Index,
+	output	TYPE				O_WB_Token,
 	output	data_t				O_WB_Data,
 	output	issue_no_t			O_WB_IssueNo,
 	output						O_ALU_Done
@@ -66,10 +68,10 @@ module ALU
 	data_t						SRL_Data1;
 	data_t						SRL_Data2;
 
-	index_t						MA_Index;
-	index_t						iDiv_Index;
-	index_t						Cnvt_Index;
-	index_t						SRL_Index;
+	TYPE						MA_Token;
+	TYPE						iDiv_Token;
+	TYPE						Cnvt_Token;
+	TYPE						SRL_Token;
 
 
 	logic						Valid_MA;
@@ -86,11 +88,11 @@ module ALU
 	issue_no_t					Issue_No_iDIV;
 	issue_no_t					Issue_No_Cnvt;
 	issue_no_t					Issue_No_SRL;
-	index_t						Index_MA;
+	TYPE						Token_MA;
 
-	index_t						Index_iDiv;
-	index_t						Index_Cnvt;
-	index_t						Index_SRL;
+	TYPE						Token_iDiv;
+	TYPE						Token_Cnvt;
+	TYPE						Token_SRL;
 
 
 	assign is_Arith				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
@@ -108,6 +110,10 @@ module ALU
 
 	assign En_SRL				= is_SRL;
 
+	assign MA_Token				= ( En_MA ) ?	I_Command : '0;
+	assign iDiv_Token			= ( En_iDiv ) ?	I_Command : '0;
+	assign Cnvt_Token			= ( En_Cnvt ) ?	I_Command : '0;
+	assign SRL_Token			= ( En_SRL ) ?	I_Command : '0;
 
 	assign MA_Data1				= ( En_MA ) ?	I_Src_Data1 : 0;
 	assign MA_Data2				= ( En_MA ) ?	I_Src_Data2 : 0;
@@ -158,10 +164,10 @@ module ALU
 									( ( Sel == 2'b10 ) & Valid_Cnvt ) |
 									( ( Sel == 2'b11 ) & Valid_SRL );
 
-	assign O_WB_Index			= (   Sel == 2'b00 ) ?	Index_MA :
-									( Sel == 2'b01 ) ?	Index_iDiv :
-									( Sel == 2'b10 ) ?	Index_Cnvt :
-									( Sel == 2'b11 ) ?	Index_SRL :
+	assign O_WB_Token			= (   Sel == 2'b00 ) ?	Token_MA :
+									( Sel == 2'b01 ) ?	Token_iDiv :
+									( Sel == 2'b10 ) ?	Token_Cnvt :
+									( Sel == 2'b11 ) ?	Token_SRL :
 														0;
 
 	assign O_WB_IssueNo			= (   Sel == 2'b00 ) ?	Issue_No_MA :
@@ -180,62 +186,70 @@ module ALU
 	MA_Unit #(
 		.DEPTH_MLT(			3						),
 		.DEPTH_ADD(			1						),
-		.TYPE(				pipe_exe_tmp_t			),
+		.TYPE(				TYPE					),
 		.INT_UNit(			true					)
 	) MA_Unit
 	(
+		.clock(				clock					),
+		.reset(				reset					),
 		.I_En(				En_MA					),
 		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			MA_Data1				),
 		.I_Data2(			MA_Data2				),
 		.I_Data3(			MA_Data3				),
-		.I_Index(			MA_Index				),
+		.I_Token(			MA_Token				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_MA				),
 		.O_Data1(			Data_MA					),
 		.O_Issue_No(		Issue_No_MA				),
-		.O_Index(			Index_MA				)
+		.O_Token(			Token_MA				)
 	);
 
 	iDiv_Unit iDiv_Unit
 	(
+		.clock(				clock					),
+		.reset(				reset					),
 		.I_En(				En_iDIV					),
 		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			iDIV_Data1				),
 		.I_Data2(			iDIV_Data2				),
-		.I_Index(			iDiv_Index				),
+		.I_Token(			iDiv_Token				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_iDIV				),
 		.O_Data(			Data_iDIV				),
 		.O_Issue_No(		Issue_No_iDIV			),
-		.O_Index(			Index_iDiv				)
+		.O_Token(			Token_iDiv				)
 	);
 
 	Cnvt_Unit Cnvt_Unit
 	(
+		.clock(				clock					),
+		.reset(				reset					),
 		.I_En(				En_Cnvt					),
 		.I_OP(				I_Command.instr.op		),
-		.I_Index(			Cnvt_Index				),
+		.I_Token(			Cnvt_Token				),
 		.I_Data1(			Cnvt_Data1				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_Cnvt				),
 		.O_Data(			Data_Cnvt				),
 		.O_Issue_No(		Issue_No_Cnvt			),
-		.O_Index(			Index_Cnvt				)
+		.O_Token(			Token_Cnvt				)
 	);
 
 	SRL_Unit SRL_Unit
 	(
+		.clock(				clock					),
+		.reset(				reset					),
 		.I_En(				En_SRL					),
 		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			SRL_Data1				),
 		.I_Data2(			SRL_Data2				),
-		.I_Index(			SRL_Index				),
+		.I_Token(			SRL_Token				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_SRL				),
 		.O_Data(			Data_SRL				),
 		.O_Issue_No(		Issue_No_SRL			),
-		.O_Index(			Index_SRL				)
+		.O_Token(			Token_SRL				)
 	);
 
 endmodule

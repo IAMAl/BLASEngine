@@ -11,16 +11,21 @@
 
 module SRL_Unit
 	import pkg_tpu::*;
-(
+#(
+	parameter type TYPE			= pipe_exe_tmp_t
+)(
+	input						clock,
+	input						reset,
 	input						I_En,
 	input   opt_t 				I_Op,
 	input						I_Grant,
+	input	TYPE				I_Token,
 	input   data_t				I_Data1,
 	input   data_t				I_Data2,
 	input   issue_no_t			I_Issue_No,
 	output  data_t				O_Valid,
+	output	TYPE				O_Token,
 	output  data_t				O_Data,
-	
 	output  issue_no_t			O_Issue_No
 );
 
@@ -36,9 +41,9 @@ module SRL_Unit
 	data_t						Data_Rotate;
 	data_t						Data_Logic;
 
-	index_t						Index_Shift;
-	index_t						Index_Rotate;
-	index_t						Index_Logic;
+	index_t						Token_Shift;
+	index_t						Token_Rotate;
+	index_t						Token_Logic;
 
 	issue_not					Issue_No_Shift;
 	issue_not					Issue_No_Rotate;
@@ -46,11 +51,11 @@ module SRL_Unit
 
 	data_t						ResultData;
 	issue_no_t					ResultINo;
-	index_t						ResultIndex;
+	index_t						ResultToken;
 
 	logic						Valid;
 	data_t						C2;
-	index_t						Index;
+	index_t						Token;
 	issue_no_t					Issue_No;
 
 
@@ -68,7 +73,7 @@ module SRL_Unit
 
 	assign O_Valid				= Valid;
 	assign O_Data				= C2;
-	assign O_Index				= Index; 
+	assign O_Token				= Token;
 	assign O_Issue_No			= Issue_No;
 
 
@@ -83,10 +88,10 @@ module SRL_Unit
 
 	always_comb begin
 		case ( I_Op.OpClass )
-			2'b00: assign ResultIndex	= Index_Shift;
-			2'b01: assign ResultIndex	= Index_Rotate;
-			2'b10: assign ResultIndex	= Index_Logic;
-			default: assign ResultIndex	= '0;
+			2'b00: assign ResultToken	= Token_Shift;
+			2'b01: assign ResultToken	= Token_Rotate;
+			2'b10: assign ResultToken	= Token_Logic;
+			default: assign ResultToken	= '0;
 		endcase
 	end
 
@@ -103,58 +108,70 @@ module SRL_Unit
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			Valid			<= 1'b0;
-			Index			<= 0;
+			Token			<= 0;
 			Issue_No		<= 0;
 			C2				<= 0;
 		end
 		else if ( I_En ) begin
 			Valid			<= 1'b1;
-			Index			<= ResultIndex;
+			Token			<= ResultToken;
 			Issue_No		<= ResultINo;
 			C2				<= ResultData;
 		end
 		else if ( I_Grant ) begin
 			Valid			<= 1'b0;
-			Index			<= 0;
+			Token			<= 0;
 			Issue_No		<= 0;
 			C2				<= 0;
 		end
 	end
 
 
-	Shift_Unit Shift_Unit (
+	Shift_Unit #(
+		.TYPE(				TYPE					)
+	) Shift_Unit
+	(
 		.I_En(				En_Shift				),
 		.I_OP(				I_Op					),
+		.I_Token(			I_Token					),
 		.I_Data1(			Data_Shift1				),
 		.I_Data2(			Data_Shift2				),
 		.I_Issue_No(		I_Issue_No				),
 		.O_Valid(			Valid_Shift				),
 		.O_Data(			Data_Shift				),
-		.O_Index(			Index_Shift				),
+		.O_Token(			Token_Shift				),
 		.O_Issue_No(		Issue_No_Shift			)
 	);
 
-	Rotate_Unit Rotate_Unit (
+	Rotate_Unit #(
+		.TYPE(				TYPE					)
+	) Rotate_Unit
+	(
 		.I_En(				En_Rotate				),
 		.I_OP(				I_Op					),
+		.I_Token(			I_Token					),
 		.I_Data1(			Data_Rotate				),
 		.I_Data2(			Data_Rotate				),
 		.I_Issue_No(		I_Issue_No				),
 		.O_Valid(			Valid_Rotate			),
 		.O_Data(			Data_Rotate				),
-		.O_Index(			Index_Rotate			),
+		.O_Token(			Token_Rotate			),
 		.O_Issue_No(		Issue_No_Rotate			)
 	);
 
-	Logic_Unit Logic_Unit (
+	Logic_Unit #(
+		.TYPE(				TYPE					)
+	) Logic_Unit
+	(
 		.I_En(				En_Logic				),
 		.I_OP(				I_Op					),
+		.I_Token(			I_Token					),
 		.I_Data1(			Data_Logic1				),
 		.I_Data2(			Data_Logic2				),
 		.I_Issue_No(		Issue_No_Logic			),
 		.O_Valid(			Valid_Logic				),
 		.O_Data(			Data_Logic				),
-		.O_Index(			Index_Logic				),
+		.O_Token(			Token_Logic				),
 		.O_Issue_No(		Issue_No_Logic			)
 	);
 

@@ -232,7 +232,7 @@ package pkg_tpu;
 	} ldst_t;
 
 	typedef ldst_t [1:0]				s_ldst_t;
-	typedef ldst_t [NUM_LANES-1:0]		v_ldst_t;
+	typedef s_ldst_t [NUM_LANES-1:0]	v_ldst_t;
 
 	typedef data_t	[1:0]				s_ldst_data_t;
 	typedef s_ldst_data_t[NUM_LANES-1:0]v_ldst_data_t;

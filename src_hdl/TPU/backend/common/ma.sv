@@ -17,6 +17,8 @@ module MA_Unit
 	parameter type TYPE			= pipe_exe_tmp_t,
 	paramter bool INT_UNit		= true
 )(
+	input						clock,
+	input						reset,
 	input						I_En,
 	input						I_Stall,
 	input						I_Grant,
@@ -58,8 +60,8 @@ module MA_Unit
 	data_t						Add_Data;
 	data_t						Mlt_Data;
 
-	index_t						Add_Index;
-	index_t						Mlt_Index;
+	index_t						Add_Token;
+	index_t						Mlt_Token;
 
 	issue_no_t					Add_Issue_No;
 	issue_no_t					Mlt_Issue_No;
@@ -86,8 +88,8 @@ module MA_Unit
 	assign O_Data				= ( LifeAdd > LifeMlt ) ?	Add_Data :
 															Mlt_Data;
 
-	assign O_Index				= ( LifeAdd > LifeMlt ) ?	Add_Index :
-															Mlt_Index;
+	assign O_Token				= ( LifeAdd > LifeMlt ) ?	Add_Token :
+															Mlt_Token;
 
 	assign O_Issue_No			= ( LifeAdd > LifeMlt ) ?	Add_Issue_No :
 															Mlt_Issue_No;
@@ -109,14 +111,14 @@ module MA_Unit
 									( is_MAC ) ?	I_Op :
 													'0;
 
-	assign Index_Add			= ( is_Adder ) ?	I_Index :
-									( is_MAD ) ?	Mlt_Index :
-									( is_MAC ) ?	Mlt_Index :
+	assign Index_Add			= ( is_Adder ) ?	I_Token :
+									( is_MAD ) ?	Mlt_Token :
+									( is_MAC ) ?	Mlt_Token :
 													'0;
 
-	assign Index_Mlt			= ( is_Mlter ) ?	I_Index :
-									( is_MAD ) ?	I_Index :
-									( is_MAC ) ?	I_Index :
+	assign Index_Mlt			= ( is_Mlter ) ?	I_Token :
+									( is_MAD ) ?	I_Token :
+									( is_MAC ) ?	I_Token :
 													'0;
 
 	assign Issue_No_Add			= ( is_Adder ) ?	I_Issue_No :
@@ -157,11 +159,11 @@ module MA_Unit
 			.I_Op(				Op_Add					),
 			.I_Data1(			Data1_Add				),
 			.I_Data2(			Data2_Add				),
-			.I_Index(			Index_Add				),
+			.I_Token(			Index_Add				),
 			.I_Issue_No(		Issue_No_Add			),
 			.O_Valid(			Add_Valid				),
 			.O_Data(			Add_Data				),
-			.O_Index(			Add_Index				),
+			.O_Token(			Add_Token				),
 			.O_Issue_No(		Add_Issue_No			)
 		);
 
@@ -171,11 +173,11 @@ module MA_Unit
 			.I_Op(				Op_Mlt					),
 			.I_Data1(			Data1_Mlt				),
 			.I_Data2(			Data2_Mlt				),
-			.I_Index(			Index_Mlt				),
+			.I_Token(			Index_Mlt				),
 			.I_Issue_No(		Issue_No_Mlt			),
 			.O_Valid(			Mlt_Valid				),
 			.O_Data(			Mlt_Data				),
-			.O_Index(			Mlt_Index				),
+			.O_Token(			Mlt_Token				),
 			.O_Issue_No(		Mlt_Issue_No			)
 		);
 	`else
@@ -187,11 +189,11 @@ module MA_Unit
 			.I_Op(				Op_Add					),
 			.I_Data1(			Data1_Add				),
 			.I_Data2(			Data2_Add				),
-			.I_Index(			Index_Add				),
+			.I_Token(			Index_Add				),
 			.I_Issue_No(		Issue_No_Add			),
 			.O_Valid(			Add_Valid				),
 			.O_Data(			Add_Data				),
-			.O_Index(			Add_Index				),
+			.O_Token(			Add_Token				),
 			.O_Issue_No(		Add_Issue_No			)
 		);
 
@@ -203,11 +205,11 @@ module MA_Unit
 			.I_Op(				Op_Mlt					),
 			.I_Data1(			Data1_Mlt				),
 			.I_Data2(			Data2_Mlt				),
-			.I_Index(			Index_Mlt				),
+			.I_Token(			Index_Mlt				),
 			.I_Issue_No(		Issue_No_Mlt			),
 			.O_Valid(			Mlt_Valid				),
 			.O_Data(			Mlt_Data				),
-			.O_Index(			Mlt_Index				),
+			.O_Token(			Mlt_Token				),
 			.O_Issue_No(		Mlt_Issue_No			)
 		);
 	`endif
