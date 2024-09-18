@@ -42,197 +42,197 @@ module Scalar_Unit
 
 	localparam int	LANE_ID = 0;
 
-	address_t				PC;
-	instr_t					Instruction;
-	instr_t					Instr;
+	address_t					PC;
+	instr_t						Instruction;
+	instr_t						Instr;
 
 
-	logic					PAC_Req;
-	logic					PAC_Wait;
-	data_t					PAC_Src_Data;
-	logic 					PAC_We;
-	logic 					PAC_Re;
-	data_t					PAC_Data;
+	logic						PAC_Req;
+	logic						PAC_Wait;
+	data_t						PAC_Src_Data;
+	logic 						PAC_We;
+	logic 						PAC_Re;
+	data_t						PAC_Data;
 
-	logic					CondValid1;
-	logic					CondValid2;
-
-
-	logic					Instr_Jump;
-	logic					Instr_Branch;
+	logic						CondValid1;
+	logic						CondValid2;
 
 
-	logic					Stall_PCU;
-	logic					Stall_IF;
-	logic					Stall_IW_St;
-	logic					Stall_IW_Ld;
-	logic					Stall_IW;
-	logic					Stall_RegFile_Dst;
-	logic					Stall_RegFile_Odd;
-	logic					Stall_RegFile_Even;
-	logic					Stall_Net;
-	logic					Stall_Math;
+	logic						Instr_Jump;
+	logic						Instr_Branch;
 
 
-	logic					Req_IFetch;
-
-	index_t					IDec_Index_Window;
-	index_t					IDec_Index_Length;
-
-	logic					WB_Sel_CondValid;
-
-	logic					Req_IW;
-	logic					Req_Issue;
-	logic					W_Req_Issue;
-	issue_no_t				IW_IssueNo;
-	instr_t					Instr_IW;
-	issue_no_t				Rd_Ptr;
-
-	logic					RAR_Hazard;
-
-	instr_t					S_Command;
+	logic						Stall_PCU;
+	logic						Stall_IF;
+	logic						Stall_IW_St;
+	logic						Stall_IW_Ld;
+	logic						Stall_IW;
+	logic						Stall_RegFile_Dst;
+	logic						Stall_RegFile_Odd;
+	logic						Stall_RegFile_Even;
+	logic						Stall_Net;
+	logic						Stall_Math;
 
 
-	logic					Dst_Slice;
-	logic	[6:0]			Dst_Sel;
-	index_t					Dst_Index;
-	index_t					Dst_Index_Window;
-	index_t					Dst_Index_Length;
-	logic					Dst_RegFile_Req;
-	logic					Dst_RegFile_Slice;
-	index_t					Dst_RegFile_Index;
+	logic						Req_IFetch;
 
-	index_t					Index_Src1;
-	index_t					Index_Src2;
-	index_t					Index_Src3;
+	index_t						IDec_Index_Window;
+	index_t						IDec_Index_Length;
 
-	logic					Req_Index_Dst;
+	logic						WB_Sel_CondValid;
 
-	data_t					RF_Odd_Data1;
-	data_t					RF_Odd_Data2;
-	data_t					RF_Even_Data1;
-	data_t					RF_Even_Data2;
+	logic						Req_IW;
+	logic						Req_Issue;
+	logic						W_Req_Issue;
+	issue_no_t					IW_IssueNo;
+	instr_t						Instr_IW;
+	issue_no_t					Rd_Ptr;
+
+	logic						RAR_Hazard;
+
+	instr_t						S_Command;
 
 
-	logic					Bypass_Buff_Full;
+	logic						Dst_Slice;
+	logic	[6:0]				Dst_Sel;
+	index_t						Dst_Index;
+	index_t						Dst_Index_Window;
+	index_t						Dst_Index_Length;
+	logic						Dst_RegFile_Req;
+	logic						Dst_RegFile_Slice;
+	index_t						Dst_RegFile_Index;
+
+	index_t						Index_Src1;
+	index_t						Index_Src2;
+	index_t						Index_Src3;
+
+	logic						Req_Index_Dst;
+
+	data_t						RF_Odd_Data1;
+	data_t						RF_Odd_Data2;
+	data_t						RF_Even_Data1;
+	data_t						RF_Even_Data2;
 
 
-	logic					MaskedRead;
-	logic					Sign;
-	const_t					Constant;
-	logic					Slice_Dst;
-
-	data_t					Pre_Src_Data2;
-	data_t					Pre_Src_Data3;
+	logic						Bypass_Buff_Full;
 
 
-	logic					Lane_We;
-	logic					Lane_Re;
-	data_t					Lane_Data;
-	logic	[NUM_LANES-1:0]	We_V_State;
-	logic	[NUM_LANES-1:0]	V_State_Data;
+	logic						MaskedRead;
+	logic						Sign;
+	const_t						Constant;
+	logic						Slice_Dst;
+
+	data_t						Pre_Src_Data2;
+	data_t						Pre_Src_Data3;
 
 
-	data_t					V_State;
-
-	state_t					State;
-	state_t					Status;
-
-	logic					Store_S;
-	logic					Store_V;
+	logic						Lane_We;
+	logic						Lane_Re;
+	data_t						Lane_Data;
+	logic	[NUM_LANES-1:0]		We_V_State;
+	logic	[NUM_LANES-1:0]		V_State_Data;
 
 
-	mask_t					Mask_Data;
+	data_t						V_State;
 
-	logic	[12:0]			Config_Path;;
+	state_t						State;
+	state_t						Status;
 
-
-	logic					CEn1;
-	logic					CEn2;
-
-
-	logic					is_WB_RF;
-	logic					is_WB_BR;
-	logic					is_WB_VU;
-
-	logic					WB_En;
-
-	dst_t					WB_Index;
-	data_t					WB_Data;;
-	logic					WB_Req_Even;
-	logic					WB_Req_Odd;
-	logic					WB_We_Even;
-	logic					WB_We_Odd;
-	index_t					WB_Index_Even;
-	index_t					WB_Index_Odd;
-	data_t					WB_Data_Even;
-	data_t					WB_Data_Odd;
-	issue_no_t				WB_IssueNo;
-
-	logic	[1:0]			Config_Path_WB;
-	logic					Math_Done;
-	logic					Condition;
-	issue_no_t				Bypass_IssueNo;
+	logic						Store_S;
+	logic						Store_V;
 
 
-	logic					Ld_NoReady;
-	logic					Slice;
-	logic					LdSt_Done1;
-	logic					LdSt_Done2;
+	mask_t						Mask_Data;
+
+	logic	[12:0]				Config_Path;;
 
 
-	logic					Commmit_Req_LdSt1;
-	logic					Commmit_Req_LdSt2;
-	logic					Commmit_Req_Math;
-	issue_no_t				Commit_No_LdSt1;
-	issue_no_t				Commit_No_LdSt2;
-	issue_no_t				Commit_No_Math;
-	logic					Commit_Req_S;
-	issue_no_t				Commit_No_S;
-	logic					Commited_LdSt1;
-	logic					Commited_LdSt2;
-	logic					Commited_Math;
-	logic					Commit_Grant_S;
-	logic					Full_RB_S;
-	logic					Empty_RB_S;
+	logic						CEn1;
+	logic						CEn2;
 
 
-	logic					Commit_Req_V;
-	issue_no_t				Commit_No_V;
-	logic					Commit_Grant_V;
-	logic					Full_RB_V;
-	logic					Empty_RB_V;
+	logic						is_WB_RF;
+	logic						is_WB_BR;
+	logic						is_WB_VU;
+
+	logic						WB_En;
+
+	dst_t						WB_Index;
+	data_t						WB_Data;;
+	logic						WB_Req_Even;
+	logic						WB_Req_Odd;
+	logic						WB_We_Even;
+	logic						WB_We_Odd;
+	index_t						WB_Index_Even;
+	index_t						WB_Index_Odd;
+	data_t						WB_Data_Even;
+	data_t						WB_Data_Odd;
+	issue_no_t					WB_IssueNo;
+
+	logic	[1:0]				Config_Path_WB;
+	logic						Math_Done;
+	logic						Condition;
+	issue_no_t					Bypass_IssueNo;
 
 
-	logic					Commit_Req;
-	issue_no_t				Commit_No;
+	logic						Ld_NoReady;
+	logic						Slice;
+	logic						LdSt_Done1;
+	logic						LdSt_Done2;
 
-	pipe_index_t			PipeReg_Idx;
-	pipe_index_t			PipeReg_Index;
-	pipe_index_reg_t		PipeReg_IdxRF;
-	pipe_index_reg_t		PipeReg_IdxRR;
-	pipe_reg_t				PipeReg_RR;
-	pipe_net_t				PipeReg_RR_Net;
-	pipe_exe_t				PipeReg_Net;
-	pipe_exe_t				PipeReg_Exe;
+
+	logic						Commmit_Req_LdSt1;
+	logic						Commmit_Req_LdSt2;
+	logic						Commmit_Req_Math;
+	issue_no_t					Commit_No_LdSt1;
+	issue_no_t					Commit_No_LdSt2;
+	issue_no_t					Commit_No_Math;
+	logic						Commit_Req_S;
+	issue_no_t					Commit_No_S;
+	logic						Commited_LdSt1;
+	logic						Commited_LdSt2;
+	logic						Commited_Math;
+	logic						Commit_Grant_S;
+	logic						Full_RB_S;
+	logic						Empty_RB_S;
+
+
+	logic						Commit_Req_V;
+	issue_no_t					Commit_No_V;
+	logic						Commit_Grant_V;
+	logic						Full_RB_V;
+	logic						Empty_RB_V;
+
+
+	logic						Commit_Req;
+	issue_no_t					Commit_No;
+
+	pipe_index_t				PipeReg_Idx;
+	pipe_index_t				PipeReg_Index;
+	pipe_index_reg_t			PipeReg_IdxRF;
+	pipe_index_reg_t			PipeReg_IdxRR;
+	pipe_reg_t					PipeReg_RR;
+	pipe_net_t					PipeReg_RR_Net;
+	pipe_exe_t					PipeReg_Net;
+	pipe_exe_t					PipeReg_Exe;
 
 
 	//// Output Status
-	assign O_State			= State;
+	assign O_State				= State;
 
 
 	//// Select Scalar unit or Vector unit backend
-	assign S_Command		= ( ~Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign O_V_Command		= (  Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign S_Command			= ( ~Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign O_V_Command			= (  Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 
 
 	//// Instruction Fetch Stage
-	assign Req_IFetch		= ~Stall_IF;
+	assign Req_IFetch			= ~Stall_IF;
 
 
 	//// Hazard Detect Stage
-	assign Req_IW			= ~Stall_IW_St;
-	assign W_Req_Issue		= ~Stall_IW_Ld & ~Stall_IW;
+	assign Req_IW				= ~Stall_IW_St;
+	assign W_Req_Issue			= ~Stall_IW_Ld & ~Stall_IW;
 
 
 	//// Scalar unit's Back-end Pipeline
@@ -308,21 +308,21 @@ module Scalar_Unit
 
 
 	///// Write-Back to PAC
-	assign PAC_We			= WB_Index.v & is_WB_BR;
-	assign PAC_Data			= ( is_WB_BR ) ? WB_Data : '0;
-	assign PAC_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
-								( PipeReg_RR.src4.src_sel.no == 2'h2 );
+	assign PAC_We				= WB_Index.v & is_WB_BR;
+	assign PAC_Data				= ( is_WB_BR ) ? WB_Data : '0;
+	assign PAC_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src4.src_sel.no == 2'h2 );
 
 
 	//// Lane-Enable
-	assign Lane_We			= is_WB_VU;
-	assign Lane_Data		= ( is_WB_VU ) ? WB_Data : '0;
-	assign Lane_Re			= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
-								( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
-								( PipeReg_RR.src3.src_se3.no == 2'h3 ) |
-								( PipeReg_RR.src4.src_se3.no == 2'h3 );
+	assign Lane_We				= is_WB_VU;
+	assign Lane_Data			= ( is_WB_VU ) ? WB_Data : '0;
+	assign Lane_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
+									( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
+									( PipeReg_RR.src3.src_se3.no == 2'h3 ) |
+									( PipeReg_RR.src4.src_se3.no == 2'h3 );
 
 
 	//// Nwtwork
@@ -341,51 +341,51 @@ module Scalar_Unit
 
 	//// Write-Back
 	//  Network Path
-	assign Config_Path_WB	= WB_Index.path;
+	assign Config_Path_WB		= WB_Index.path;
 
-	assign Dst_Sel			= B_Index.dst_sel.unit_no;
-	assign Dst_Slice		= WB_Index.slice;
-	assign Dst_Index		= WB_Index.idx;
-	assign Dst_Index_Window	= WB_Index.window;
-	assign Dst_Index_Length	= WB_Index.slice_len;
+	assign Dst_Sel				= B_Index.dst_sel.unit_no;
+	assign Dst_Slice			= WB_Index.slice;
+	assign Dst_Index			= WB_Index.idx;
+	assign Dst_Index_Window		= WB_Index.window;
+	assign Dst_Index_Length		= WB_Index.slice_len;
 
-	assign is_WB_RF			= WB_Index.dst_sel.no == 2'h1;
-	assign is_WB_BR			= WB_Index.dst_sel.no == 2'h2;
-	assign is_WB_VU			= WB_Index.dst_sel.no == 2'h3;
+	assign is_WB_RF				= WB_Index.dst_sel.no == 2'h1;
+	assign is_WB_BR				= WB_Index.dst_sel.no == 2'h2;
+	assign is_WB_VU				= WB_Index.dst_sel.no == 2'h3;
 
-	assign WB_Req_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Req_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Even		= ~Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_We_Odd		=  Dst_Sel & WB_Index.v & is_WB_RF;
-	assign WB_Index_Even	= ( ~Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Index_Odd		= (  Dst_Sel ) ? WB_Index.idx : '0;
-	assign WB_Data_Even		= ( ~Dst_Sel ) ? WB_Data : 		'0;
-	assign WB_Data_Odd		= (  Dst_Sel ) ? WB_Data : 		'0;
+	assign WB_Req_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_Req_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_We_Even			= ~Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_We_Odd			=  Dst_Sel & WB_Index.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Index.idx : '0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 		'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 		'0;
 
-	assign Bypass_IssueNo	= WB_IssueNo;
+	assign Bypass_IssueNo		= WB_IssueNo;
 
 
 	//// Commit
-	assign Commit_No_Math	= WB_IssueNo;
+	assign Commit_No_Math		= WB_IssueNo;
 
 
 	//// Write Vector Unit Status Register
-	assign We_V_State		= I_En;
-	assign V_State_Data		= I_V_State;
+	assign We_V_State			= I_En;
+	assign V_State_Data			= I_V_State;
 
 
 	//// Lane-Enable
-	assign O_Lane_En		= V_State[NUM_LANES*2-1:NUM_LANES];
+	assign O_Lane_En			= V_State[NUM_LANES*2-1:NUM_LANES];
 
 
 	//// Stall-Control
 	//	TB
-	assign Ld_NoReady		= 1'b0;
-	assign Slice			= 1'b0;
+	assign Ld_NoReady			= 1'b0;
+	assign Slice				= 1'b0;
 
 
 	//// End of Execution
-	assign O_Term			= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & (
+	assign O_Term				= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & (
 									( PipeReg_Idx.src1.idx == '0 ) &
 									( PipeReg_Idx.src2.idx == '0 ) &
 									( PipeReg_Idx.src3.idx == '0 )
