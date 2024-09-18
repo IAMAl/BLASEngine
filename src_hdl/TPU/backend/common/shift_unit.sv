@@ -13,7 +13,7 @@ module Shift_Unit
 	import pkg_tpu::*;
 (
 	input						I_En,
-	input   opt_t 				I_OP,
+	input   opt_t 				I_Op,
 	input   data_t				I_Data1,
 	input   data_t				I_Data2,
 	input   issue_no_t			I_Issue_No,
@@ -30,7 +30,7 @@ reg	[WIDTH_DAYA-1:0]			ResultData;
 
 assign O_Valid					= I_En;
 assign O_Data					= ( I_En ) ? ResultData : '0;
-assign O_Issue_No				= ( I_En ) ? I_Issue_NO : '0:
+assign O_Issue_No				= ( I_En ) ? I_Issue_No : '0:
 
 
 always_comn begin

@@ -13,7 +13,8 @@ module SRL_Unit
 	import pkg_tpu::*;
 (
 	input						I_En,
-	input   opt_t 				I_OP,
+	input   opt_t 				I_Op,
+	input						I_Grant,
 	input   data_t				I_Data1,
 	input   data_t				I_Data2,
 	input   issue_no_t			I_Issue_No,
@@ -46,16 +47,16 @@ module SRL_Unit
 	issue_no_t					Issue_No;
 
 
-	assign En_Shift				=  I_En & ( I_Op.OpClass == 2'b00 );
-	assign En_Rotate			=  I_En & ( I_Op.OpClass == 2'b01 );
-	assign En_Logic				=  I_En & ( I_Op.OpClass == 2'b10 );
+	assign En_Shift				= I_En & ( I_Op.OpClass == 2'b00 ) & ~( Valid & I_Grant );
+	assign En_Rotate			= I_En & ( I_Op.OpClass == 2'b01 ) & ~( Valid & I_Grant );
+	assign En_Logic				= I_En & ( I_Op.OpClass == 2'b10 ) & ~( Valid & I_Grant );
 
-	assign Data_Shift1			= ( I_En & ( I_Op.OpClass == 2'b00 ) ) ? I_Data1 : 0;
-	assign Data_Shift2			= ( I_En & ( I_Op.OpClass == 2'b00 ) ) ? I_Data2 : 0;
-	assign Data_Rotate1			= ( I_En & ( I_Op.OpClass == 2'b01 ) ) ? I_Data1 : 0;
-	assign Data_Rotate2			= ( I_En & ( I_Op.OpClass == 2'b11 ) ) ? I_Data2 : 0;
-	assign Data_Logic1			= ( I_En & ( I_Op.OpClass == 2'b10 ) ) ? I_Data1 : 0;
-	assign Data_Logic2			= ( I_En & ( I_Op.OpClass == 2'b10 ) ) ? I_Data2 : 0;
+	assign Data_Shift1			= ( En_Shift ) ?	I_Data1 : 0;
+	assign Data_Shift2			= ( En_Shift ) ?	I_Data2 : 0;
+	assign Data_Rotate1			= ( En_Rotate ) ?	I_Data1 : 0;
+	assign Data_Rotate2			= ( En_Rotate ) ?	I_Data2 : 0;
+	assign Data_Logic1			= ( En_Logic ) ?	I_Data1 : 0;
+	assign Data_Logic2			= ( En_Logic ) ?	I_Data2 : 0;
 
 
 	assign O_Valid				= Valid;
@@ -89,11 +90,11 @@ module SRL_Unit
 			C2				<= 0;
 		end
 		else if ( I_En ) begin
-			Valid			<= 1'b0
+			Valid			<= 1'b1;
 			Issue_No		<= ResultINo;
 			C2				<= ResultData;
 		end
-		else begin
+		else if ( I_Grant ) begin
 			Valid			<= 1'b0;
 			Issue_No		<= 0;
 			C2				<= 0;
@@ -112,7 +113,7 @@ module SRL_Unit
 		.O_Issue_No(		Issue_No_Shift			)
 	);
 
-	Logic_Unit Logic_Unit (
+	Rotate_Unit Rotate_Unit (
 		.I_En(				En_Rotate				),
 		.I_OP(				I_Op					),
 		.I_Data1(			Data_Rotate				),
