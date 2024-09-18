@@ -19,6 +19,7 @@ module token_pipe_math
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall
+	input						I_Grant,				//Grant to Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input	op_t				I_Op,					//OpCode
 	output	op_t				O_Op,					//OpCode
@@ -95,10 +96,10 @@ module token_pipe_math
 
 
 	assign We_Mlt				= ~Full_Mlt & ( ( Valid & ( I_Op.OpClass == 2'b01 ) ) | ( TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 ) ) );
-	assign Re_Mlt				= ~Empty & ~I_Stall & TBuffMlt[ RPtr_Mlt ].v;
+	assign Re_Mlt				= ~Empty_Mlt & ~I_Stall & TBuffMlt[ RPtr_Mlt ].v & I_Grant;
 
 	assign We_Add				= ~Full_Add & ( ( Valid & ( I_Op.OpClass == 2'b00 ) ) | ( TBuffAdd[ RPtr_Add ].v & ( OBuffAdd[ RPtr_Add ].OpCode == 2'b10 ) ) );
-	assign Re_Add				= ~Empty & ~I_Stall & TBuffAdd[ RPtr_Add ].v;
+	assign Re_Add				= ~Empty_Add & ~I_Stall & TBuffAdd[ RPtr_Add ].v & I_Grant;
 
 
 	always_ff @( posedge clock ) begin
@@ -124,6 +125,7 @@ module token_pipe_math
 		if ( reset ) begin
 			for ( int i=0; i<DEPTH_MLT; ++i ) begin
 				TBuffAdd[ i ]			<= '0;
+				OBuffAdd[ i ]			<= '0;
 			end
 			else if ( We_Add | Re_Add ) begin
 				if ( We_Add ) begin

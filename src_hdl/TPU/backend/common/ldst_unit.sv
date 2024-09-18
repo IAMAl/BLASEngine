@@ -20,7 +20,8 @@ module ldst_unit
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall
-	input						I_Grant,				//Access-Grant
+	input						I_Commit_Grant,			//Grant to Commit
+	input						I_Acceess_Grant,		//Access-Grant
 	input						I_Valid,				//Valid
 	input	data_t				I_Data,					//Data
 	output	data_t				O_Data,					//Data
@@ -34,8 +35,7 @@ module ldst_unit
 	output	address_t			O_Stride,				//Stride Factor
 	output	address_t			O_Base,					//Base Address
 	input	TYPE				I_Token,				//Input Token
-	output						O_Commit_Req,			//Commit Request
-	output	issue_no_t			O_Commit_No,			//Commit No
+	output	TYPE				O_Token,				//Commit Request
 	output						O_Stall					//Stall Request
 );
 
@@ -60,14 +60,13 @@ module ldst_unit
 
 
 	assign We					= I_Valid;
-	assign Re					= ~Empty & ~I_Stall;
+	assign Re					= ~Empty & ~I_Stall & I_Commit_Grant;
 	assign Term					= Run & I_Term;
 
 	assign O_Data				= ( Re ) ?	Data_Buff[ RPtr ] : '0;
 	assign O_Stall				= Full | Stall;
 
-	assign O_Commit_Req			= Token.v & Term;
-	assign O_Commit_No			= Token.issue_no;
+	assign O_Token				= ( Term ) Token : '0;
 
 
 	always_ff @( posedge clock ) begin
@@ -88,7 +87,7 @@ module ldst_unit
 		else if ( I_Term ) begin
 			Run				<= 1'b0;
 		end
-		else if ( ~Empty_Ldst & I_Grant ) begin
+		else if ( ~Empty_Ldst & I_Acceess_Grant ) begin
 			Run				<= 1'b1;
 		end
 	end
@@ -118,7 +117,8 @@ module ldst_unit
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Stall(			I_Stall						),
-		.I_Grant(			I_Grant						),
+		.I_Commit_Grant(	I_Commit_Grant				),
+		.I_Acceess_Grant(	I_Acceess_Grant				),
 		.I_Req(				I_Req						),
 		.I_Length(			I_Length					),
 		.I_Stride(			I_Stride					),
