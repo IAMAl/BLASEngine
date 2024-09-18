@@ -9,7 +9,7 @@
 //	Module Name:	iALU
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module iALU
+module ALU
 	import pkg_tpu::*;
 (
 	input						clock,
@@ -17,7 +17,7 @@ module iALU
 	input	issue_no_t			I_Issue_No,
 	input						I_Stall,
 	input						I_Req,
-	input	commant_t			I_Command,
+	input	command_t			I_Command,
 	input	data_t				I_Src_Data1,
 	input	data_t				I_Src_Data2,
 	input	data_t				I_Src_Data3,
@@ -33,6 +33,7 @@ module iALU
 	logic						En_Cnvt;
 	logic						En_SRL;
 
+
 	issue_no_t					Life_MA;
 	issue_no_t					Life_iDiv;
 	issue_no_t					Life_Cnvt;
@@ -46,8 +47,15 @@ module iALU
 	logic	[1:0]				Sel_Cnvt_SRL;
 	logic	[1:0]				Sel;
 
+
 	logic						is_Arith;
 	logic						is_SRL;
+
+	logic						is_Adder;
+	logic						is_Mult;
+	logic						is_Div;
+	logic						is_Cnvt;
+
 
 	data_t						MA_Data1;
 	data_t						MA_Data2;
@@ -58,10 +66,16 @@ module iALU
 	data_t						SRL_Data1;
 	data_t						SRL_Data2;
 
-	index_t						Index_MA;
-	index_t						Index_iDiv;
-	index_t						Index_Cnvt;
-	index_t						Index_SRL;
+	index_t						MA_Index;
+	index_t						iDiv_Index;
+	index_t						Cnvt_Index;
+	index_t						SRL_Index;
+
+
+	logic						Valid_MA;
+	logic						Valid_;
+	logic						Valid_Cnvt;
+	logic						Valid_SRL;
 
 	data_t						Data_MA;
 	data_t						Data_iDIV;
@@ -72,6 +86,11 @@ module iALU
 	issue_no_t					Issue_No_iDIV;
 	issue_no_t					Issue_No_Cnvt;
 	issue_no_t					Issue_No_SRL;
+	index_t						Index_MA;
+
+	index_t						Index_iDiv;
+	index_t						Index_Cnvt;
+	index_t						Index_SRL;
 
 
 	assign is_Arith				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
@@ -79,12 +98,12 @@ module iALU
 
 	assign is_Adder				= I_Command.instr.op.OpClass == 2'b00;
 	assign is_Mult				= I_Command.instr.op.OpClass == 2'b01;
-	assign is_DIv				= I_Command.instr.op.OpClass == 2'b10;
+	assign is_Div				= I_Command.instr.op.OpClass == 2'b10;
 	assign is_Cnvt				= I_Command.instr.op.OpClass == 2'b11;
 
 
 	assign En_MA				= is_Arith & ( is_Adder | is_Mult );
-	assign En_iDiv				= is_Arith & is_DIv;
+	assign En_iDiv				= is_Arith & is_Div;
 	assign En_Cnvt				= is_Arith & is_Cnvt;
 
 	assign En_SRL				= is_SRL;
@@ -139,19 +158,19 @@ module iALU
 									( ( Sel == 2'b10 ) & Valid_Cnvt ) |
 									( ( Sel == 2'b11 ) & Valid_SRL );
 
-	assign O_WB_Index			= ( Sel == 2'b00 )	?	Index_MA :
+	assign O_WB_Index			= (   Sel == 2'b00 ) ?	Index_MA :
 									( Sel == 2'b01 ) ?	Index_iDiv :
 									( Sel == 2'b10 ) ?	Index_Cnvt :
 									( Sel == 2'b11 ) ?	Index_SRL :
 														0;
 
-	assign O_WB_IssueNo			= ( Sel == 2'b00 )	?	Issue_No_MA :
+	assign O_WB_IssueNo			= (   Sel == 2'b00 ) ?	Issue_No_MA :
 									( Sel == 2'b01 ) ?	Issue_No_iDiv :
 									( Sel == 2'b10 ) ?	Issue_No_Cnvt :
 									( Sel == 2'b11 ) ?	Issue_No_SRL :
 														0;
 
-	assign O_WB_Data			= ( Sel == 2'b00 )	?	Data_MA :
+	assign O_WB_Data			= (   Sel == 2'b00 ) ?	Data_MA :
 									( Sel == 2'b01 ) ?	Data_iDiv :
 									( Sel == 2'b10 ) ?	Data_Cnvt :
 									( Sel == 2'b11 ) ?	Daat_SRL :
@@ -165,10 +184,12 @@ module iALU
 		.I_Data1(			MA_Data1				),
 		.I_Data2(			MA_Data2				),
 		.I_Data3(			MA_Data3				),
+		.I_Index(			MA_Index				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_MA				),
 		.O_Data1(			Data_MA					),
-		.O_Issue_No(		Issue_No_MA				)
+		.O_Issue_No(		Issue_No_MA				),
+		.O_Index(			Index_MA				)
 	);
 
 	iDiv_Unit iDiv_Unit
@@ -177,21 +198,25 @@ module iALU
 		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			iDIV_Data1				),
 		.I_Data2(			iDIV_Data2				),
+		.I_Index(			iDiv_Index				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_iDIV				),
 		.O_Data(			Data_iDIV				),
-		.O_Issue_No(		Issue_No_iDIV			)
+		.O_Issue_No(		Issue_No_iDIV			),
+		.O_Index(			Index_iDiv				)
 	);
 
 	Cnvt_Unit Cnvt_Unit
 	(
 		.I_En(				En_Cnvt					),
 		.I_OP(				I_Command.instr.op		),
+		.I_Index(			Cnvt_Index				),
 		.I_Data1(			Cnvt_Data1				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_Cnvt				),
 		.O_Data(			Data_Cnvt				),
-		.O_Issue_No(		Issue_No_Cnvt			)
+		.O_Issue_No(		Issue_No_Cnvt			),
+		.O_Index(			Index_Cnvt				)
 	);
 
 	SRL_Unit SRL_Unit
@@ -200,10 +225,12 @@ module iALU
 		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			SRL_Data1				),
 		.I_Data2(			SRL_Data2				),
+		.I_Index(			SRL_Index				),
 		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_SRL				),
 		.O_Data(			Data_SRL				),
-		.O_Issue_No(		Issue_No_SRL			)
+		.O_Issue_No(		Issue_No_SRL			),
+		.O_Index(			Index_SRL				)
 	);
 
 endmodule

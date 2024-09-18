@@ -20,6 +20,7 @@ module SRL_Unit
 	input   issue_no_t			I_Issue_No,
 	output  data_t				O_Valid,
 	output  data_t				O_Data,
+	
 	output  issue_no_t			O_Issue_No
 );
 
@@ -35,15 +36,21 @@ module SRL_Unit
 	data_t						Data_Rotate;
 	data_t						Data_Logic;
 
+	index_t						Index_Shift;
+	index_t						Index_Rotate;
+	index_t						Index_Logic;
+
 	issue_not					Issue_No_Shift;
 	issue_not					Issue_No_Rotate;
 	issue_not					Issue_No_Logic;
 
 	data_t						ResultData;
 	issue_no_t					ResultINo;
+	index_t						ResultIndex;
 
 	logic						Valid;
 	data_t						C2;
+	index_t						Index;
 	issue_no_t					Issue_No;
 
 
@@ -61,6 +68,7 @@ module SRL_Unit
 
 	assign O_Valid				= Valid;
 	assign O_Data				= C2;
+	assign O_Index				= Index; 
 	assign O_Issue_No			= Issue_No;
 
 
@@ -70,6 +78,15 @@ module SRL_Unit
 			2'b01: assign ResultData	= Data_Rotate;
 			2'b10: assign ResultData	= Data_Logic;
 			default: assign ResultData	= '0;
+		endcase
+	end
+
+	always_comb begin
+		case ( I_Op.OpClass )
+			2'b00: assign ResultIndex	= Index_Shift;
+			2'b01: assign ResultIndex	= Index_Rotate;
+			2'b10: assign ResultIndex	= Index_Logic;
+			default: assign ResultIndex	= '0;
 		endcase
 	end
 
@@ -86,16 +103,19 @@ module SRL_Unit
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			Valid			<= 1'b0;
+			Index			<= 0;
 			Issue_No		<= 0;
 			C2				<= 0;
 		end
 		else if ( I_En ) begin
 			Valid			<= 1'b1;
+			Index			<= ResultIndex;
 			Issue_No		<= ResultINo;
 			C2				<= ResultData;
 		end
 		else if ( I_Grant ) begin
 			Valid			<= 1'b0;
+			Index			<= 0;
 			Issue_No		<= 0;
 			C2				<= 0;
 		end
@@ -110,6 +130,7 @@ module SRL_Unit
 		.I_Issue_No(		I_Issue_No				),
 		.O_Valid(			Valid_Shift				),
 		.O_Data(			Data_Shift				),
+		.O_Index(			Index_Shift				),
 		.O_Issue_No(		Issue_No_Shift			)
 	);
 
@@ -121,6 +142,7 @@ module SRL_Unit
 		.I_Issue_No(		I_Issue_No				),
 		.O_Valid(			Valid_Rotate			),
 		.O_Data(			Data_Rotate				),
+		.O_Index(			Index_Rotate			),
 		.O_Issue_No(		Issue_No_Rotate			)
 	);
 
@@ -132,6 +154,7 @@ module SRL_Unit
 		.I_Issue_No(		Issue_No_Logic			),
 		.O_Valid(			Valid_Logic				),
 		.O_Data(			Data_Logic				),
+		.O_Index(			Index_Logic				),
 		.O_Issue_No(		Issue_No_Logic			)
 	);
 
