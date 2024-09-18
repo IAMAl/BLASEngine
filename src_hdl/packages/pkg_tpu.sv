@@ -10,6 +10,9 @@
 
 package pkg_tpu;
 
+	localparam int DEPTH_PIPE_FADD		= 5;
+	localparam int DEPTH_PIPE_FMLT		= 6;
+
 	//Bit-Width for Data
 	localparam int WIDTH_DATA			= 32;
 

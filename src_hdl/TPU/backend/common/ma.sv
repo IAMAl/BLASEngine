@@ -179,7 +179,9 @@ module MA_Unit
 			.O_Issue_No(		Mlt_Issue_No			)
 		);
 	`else
-		fAdd_Unit Add_Unit
+		fAdd_Unit #(
+			.DEPTH_PIPE(		DEPTH_ADD				)
+		) Add_Unit
 		(
 			.I_En(				En_Add					),
 			.I_Op(				Op_Add					),
@@ -193,7 +195,9 @@ module MA_Unit
 			.O_Issue_No(		Add_Issue_No			)
 		);
 
-		fMlt_Unit Mlt_Unit
+		fMlt_Unit #(
+			.DEPTH_PIPE(		DEPTH_MLT				)
+		) Mlt_Unit
 		(
 			.I_En(				En_Mlt					),
 			.I_Op(				Op_Mlt					),
