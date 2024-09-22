@@ -16,14 +16,14 @@ module SRL_Unit
 )(
 	input						clock,
 	input						reset,
-	input						I_En,
-	input						I_Grant,
-	input	TYPE				I_Token,
-	input   data_t				I_Data1,
-	input   data_t				I_Data2,
-	output  data_t				O_Valid,
-	output	TYPE				O_Token,
-	output  data_t				O_Data,
+	input						I_En,					//Enable to Execute
+	input						I_Grant,				//Grant for End of Exec
+	input	TYPE				I_Token,				//Command
+	input   data_t				I_Data1,				//Source Operand
+	input   data_t				I_Data2,				//Source Operand
+	output  data_t				O_Valid,				//Output Valid
+	output	TYPE				O_Token,				//Command
+	output  data_t				O_Data,					//Output Data
 );
 
 	logic						En_Shift;

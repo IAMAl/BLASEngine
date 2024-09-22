@@ -19,18 +19,18 @@ module MA_Unit
 )(
 	input						clock,
 	input						reset,
-	input						I_En,
-	input						I_Stall,
-	input						I_Grant,
-	input	issue_no_t			I_Pres_Issue_No,
-	input   data_t				I_Data1,
-	input   data_t				I_Data2,
-	input   data_t				I_Data3,
-	input	TYPE				I_Token,
-	output  data_t				O_Valid,
-	output  data_t				O_Data,
-	output	TYPE				O_Token,
-	output						O_Stall
+	input						I_En,					//Enable to Execute
+	input						I_Stall,				//Stall Request
+	input						I_Grant,				//Grant for End of Exec
+	input	issue_no_t			I_Pres_Issue_No,		//Current Issue No
+	input   data_t				I_Data1,				//Source Data
+	input   data_t				I_Data2,				//Source Data
+	input   data_t				I_Data3,				//Source Data
+	input	TYPE				I_Token,				//Command
+	output  data_t				O_Valid,				//Output Valid
+	output  data_t				O_Data,					//Output Data
+	output	TYPE				O_Token,				//Command
+	output						O_Stall					//Stall Request
 );
 
 

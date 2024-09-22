@@ -23,8 +23,8 @@ module token_pipe_ma
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input	TYPE				I_Token,				//Input Token
 	output	TYPE				O_Token,				//Output Token
-	output						O_Chain_Mlt,
-	output						O_Chain_Add,
+	output						O_Chain_Mlt,			//Cahin from Mult
+	output						O_Chain_Add,			//Chain from Add
 	output						O_Stall					//Stall Request
 );
 

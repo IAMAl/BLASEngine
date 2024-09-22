@@ -16,16 +16,16 @@ module ALU
 )(
 	input						clock,
 	input						reset,
-	input	issue_no_t			I_Issue_No,
-	input						I_Stall,
-	input						I_Req,
-	input	command_t			I_Command,
-	input	data_t				I_Src_Data1,
-	input	data_t				I_Src_Data2,
-	input	data_t				I_Src_Data3,
-	output	TYPE				O_WB_Token,
-	output	data_t				O_WB_Data,
-	output						O_ALU_Done
+	input	issue_no_t			I_Issue_No,				//Current Issue No
+	input						I_Stall,				//Stall Request
+	input						I_Req,					//Request from Network Stage
+	input	command_t			I_Command,				//Command
+	input	data_t				I_Src_Data1,			//Source Data
+	input	data_t				I_Src_Data2,			//Source Data
+	input	data_t				I_Src_Data3,			//Source Data
+	output	TYPE				O_WB_Token,				//Write-Back Information
+	output	data_t				O_WB_Data,				//Write-Back Data
+	output						O_ALU_Done				//Executed
 );
 
 

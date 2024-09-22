@@ -14,14 +14,13 @@ module Shift_Unit
 #(
 	parameter type TYPE			= pipe_exe_tmp_t
 )(
-	input						I_En,
-	input   data_t				I_Data1,
-	input   data_t				I_Data2,
-	input	TYPE				I_Token,
-	output  data_t				O_Valid,
-	output  data_t				O_Data,
-	output	TYPE				O_Token,
-	output  issue_no_t			O_Issue_No
+	input						I_En,					//Enable to Execute
+	input   data_t				I_Data1,				//Source Operand
+	input   data_t				I_Data2,				//Source Operand
+	input	TYPE				I_Token,				//Command
+	output  data_t				O_Valid,				//Output Valid
+	output  data_t				O_Data,					//Output Data
+	output	TYPE				O_Token					//Command
 );
 
 

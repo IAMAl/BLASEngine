@@ -16,31 +16,30 @@ module ExecUnit_V
 )(
 	input						clock,
 	input						reset,
-	input						I_Stall,
-	input						I_Req,
-	input	issue_no_t			I_Issue_No,
-	input	command_t			I_Command,
-	input						I_Src_Data1,
-	input						I_Src_Data2,
-	input						I_Src_Data3,
-	output						O_LdSt1,
-	output						O_LdSt2,
-	input	data_t				I_Ld_Data1,
-	input	data_t				I_Ld_Data2,
-	output	data_t				O_St_Data1,
-	output	data_t				O_St_Data2,
-	input						I_Ld_Ready,
-	input						I_Ld_Grant,
-	input						I_St_Ready,
-	input						I_St_Grant,
-	output	index_t				O_WB_Dst,
-	output	data_t				O_WB_Data,
-	output	issue_no_t			O_WB_IssueNo,
-	output						O_Math_Done,
-	output						O_LdSt_Done1,
-	output						O_LdSt_Done2,
-	output						O_Cond,
-	output						O_Lane_En
+	input						I_Stall,				//Stall
+	input						I_Req,					//Request from Network Stage
+	input	issue_no_t			I_Issue_No,				//Current Issue No
+	input	command_t			I_Command,				//Command
+	input						I_Src_Data1,			//Source Data
+	input						I_Src_Data2,			//Source Data
+	input						I_Src_Data3,			//Source Data
+	output						O_LdSt1,				//Load/Store Command
+	output						O_LdSt2,				//Load/Store Command
+	input	data_t				I_Ld_Data1,				//Loaded Data
+	input	data_t				I_Ld_Data2,				//Loaded Data
+	output	data_t				O_St_Data1,				//Storing Data
+	output	data_t				O_St_Data2,				//Storing Data
+	input						I_Ld_Ready,				//Ready to Load
+	input						I_Ld_Grant,				//Grant for Loading
+	input						I_St_Ready,				//Ready to Store
+	input						I_St_Grant,				//Grant for Storing
+	output	index_t				O_WB_Dst,				//Write-Back Index
+	output	data_t				O_WB_Data,				//Write-Back Data
+	output	issue_no_t			O_WB_IssueNo,			//Issue (Commit) No
+	output						O_Math_Done,			//Execution Done
+	output						O_LdSt_Done1,			//Load/Store Done
+	output						O_LdSt_Done2,			//Load/Store Done
+	output						O_Cond					//Condition
 );
 
 

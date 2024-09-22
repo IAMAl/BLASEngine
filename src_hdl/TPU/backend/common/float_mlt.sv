@@ -12,19 +12,17 @@
 module fMlt_Unit
 	import pkg_tpu::*;
 #(
-	parameter int DEPTH_PIPE	= 7
+	parameter int DEPTH_PIPE	= 7,
+	parameter type TYPE			= pipe_exe_tmp_t
 )(
-	input						I_En,
-	input						I_Stall,
-	input   opt_t 				I_Op,
-	input   float				I_Data1,
-	input   float				I_Data2,
-	input	index_t				I_Index,
-	input   issue_no_t			I_Issue_No,
-	output  data_t				O_Valid,
-	output  data_t				O_Data,
-	output	index_t				O_Index,
-	output  issue_no_t			O_Issue_No
+	input						I_En,					//Enable to Execute
+	input						I_Stall,				//Stall Request
+	input   float				I_Data1,				//Source Operand
+	input   float				I_Data2,				//Source Operand
+	input	TYPE				I_Token,				//Command
+	output  data_t				O_Valid,				//Output Valid
+	output  data_t				O_Data,					//Output Data
+	output	TYPE				O_Token					//Command
 );
 
 
@@ -32,8 +30,7 @@ module fMlt_Unit
 
 	logic						Valid;
 	data_t						Data;
-	index_t						Index;
-	issue_no_t					Issue_No;
+	TYPE						Token;
 	float						ResultData;
 
 	logic						We;
@@ -46,16 +43,14 @@ module fMlt_Unit
 	logic						Stall;
 
 	data_t						PipeData		[DEPTH_PIPE-1:0];
-	index_t						PipeIndex		[DEPTH_PIPE-1:0];
-	issue_no_t					PipeIssueNo		[DEPTH_PIPE-1:0];
+	TYPE						PipeToken		[DEPTH_PIPE-1:0];
 
 
 	assign ResultData			= I_Data1 * I_Data2;
 
 	assign Valid				= I_En;
 	assign Data					= ( I_En ) ? ResultData : 0;
-	assign Index				= ( I_En ) ? I_Index	: '0;
-	assign Issue_No				= ( I_En ) ? I_Issue_No : '0:
+	assign Token				= ( I_En ) ? I_Token	: '0;
 
 
 	assign We					= I_En & ~Full & ~Stall;
@@ -64,8 +59,7 @@ module fMlt_Unit
 
 	assign O_Valid				= Re;
 	assign O_Data				= PipeData[ RPtr ];
-	assign O_Index				= PipeIndex[ RPtr ];
-	assign O_Issue_No			= PipeIssueNo[ RPtr ];
+	assign O_Token				= PipeToken[ RPtr ];
 
 
 	always_ff @( posedge clock ) begin
@@ -79,9 +73,8 @@ module fMlt_Unit
 
 	always_ff @( posedge clock ) begin
 		if ( We ) begin
-			PipeIndex[ WPtr ]	<= Index;
+			PipeToken[ WPtr ]	<= Token;
 			PipeData[ WPtr ]	<= Data;
-			PipeIssueNo[ WPtr ]	<= Issue_No;
 		end
 	end
 

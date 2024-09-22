@@ -36,8 +36,8 @@ module Network_V
 	input	index_t				I_Src_Idx1,				//Index from RegFile
 	input	index_t				I_Src_Idx2,				//Index from RegFile
 	input	index_t				I_Src_Idx3,				//Index from RegFile
-	input	index_t				I_WB_Index,
-	input	data_t				I_WB_Data,				//Data from ALU
+	input	index_t				I_WB_Index,				//Write-Back Index
+	input	data_t				I_WB_Data,				//Write-Back Data
 	output	data_t				O_Src_Data1,			//To Exec Unit
 	output	data_t				O_Src_Data2,			//To Exec Unit
 	output	data_t				O_Src_Data3,			//To Exec Unit

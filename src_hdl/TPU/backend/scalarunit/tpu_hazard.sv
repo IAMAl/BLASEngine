@@ -15,7 +15,7 @@ module HazardCheck_TPU
 	input						clock,
 	input						reset,
 	input						I_Req,							//Request to Work
-	input						I_Slice,
+	input						I_Slice,						//Slicing is used
 	input						I_Req_Issue,					//Request from Previous Stage
 	input						I_is_Vec,						//Request is for Vector Unit
 	input	instr_t				I_Instr,						//Fetched Instruction
