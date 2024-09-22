@@ -208,6 +208,9 @@ module Lane_Unit
 										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
 																				'0;
 
+	//	Slice Length
+	assign PipeReg_RR_Net.slice_len	= PipeReg_RR.slice_len;
+
 	//	Issue-No
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
 
@@ -218,7 +221,6 @@ module Lane_Unit
 	//// Network
 	assign Config_Path			= PipeReg_RR_Net.path[12:0];
 
-
 	//	Capture Data
 	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
 	assign PipeReg_Net.op		= PipeReg_RR_Net.op;
@@ -226,12 +228,14 @@ module Lane_Unit
 	//	Write-Back
 	assign PipeReg_Net.dst		= PipeReg_RR_Net.dst;
 
+	//	Slice Length
+	assign PipeReg_Net.slice_len= PipeReg_RR_Net.slice_len;
+
 	//	Issue-No
 	assign PipeReg_Net.issue_no	= PipeReg_RR_Net.issue_no;
 
-
-	//// Math Unit
-	assign PipeReg_Net.path		=  PipeReg_RR_Net.path[16:13];
+	//	Path
+	assign PipeReg_Net.path		= PipeReg_RR_Net.path;
 
 
 	//// Write-Back

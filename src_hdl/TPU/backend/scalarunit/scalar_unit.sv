@@ -213,7 +213,7 @@ module Scalar_Unit
 	pipe_reg_t					PipeReg_RR;//ToDo
 	pipe_net_t					PipeReg_RR_Net;//ToDo
 	pipe_exe_t					PipeReg_Net;//ToDo
-	pipe_exe_t					PipeReg_Exe;//ToDo
+	pipe_exe_t					PipeReg_Exe;
 
 
 	//// Output Status
@@ -299,6 +299,9 @@ module Scalar_Unit
 										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
 																				'0;
 
+	//	Slice Length
+	assign PipeReg_RR_Net.slice_len	= PipeReg_RR.slice_len;
+
 	//	Issue-No
 	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
 
@@ -334,8 +337,14 @@ module Scalar_Unit
 	//	Write-Back
 	assign PipeReg_Net.dst		= PipeReg_RR_Net.dst;
 
+	//	Slice Length
+	assign PipeReg_Net.slice_len= PipeReg_RR_Net.slice_len;
+
 	//	Issue-No
 	assign PipeReg_Net.issue_no	= PipeReg_RR_Net.issue_no;
+
+	//	Path
+	assign PipeReg_Net.path		= PipeReg_RR_Net.path;
 
 
 	//// Write-Back
