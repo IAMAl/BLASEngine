@@ -103,6 +103,7 @@ module pub_domain_man
 	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrantVld_Ld & Ready_Ld;
 	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrantVld_Ld & Ready_Ld;
 
+
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
 			is_Hit_St[ i ]	= ( TabBAddr[ i ] & I_St_Base ) & R_Valid[ i ];

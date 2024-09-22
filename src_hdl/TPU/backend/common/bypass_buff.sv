@@ -28,6 +28,7 @@ module BypassBuff
 	output						O_Full					//Full in Buffer
 );
 
+
 	localparam int	WIDTH_NUM	= $clog2(BUFF_SIZE);
 
 	logic						En;

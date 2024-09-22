@@ -337,7 +337,8 @@ package pkg_tpu;
 		FSM_EXTERN_RECV_STRIDE	= 3'h1,
 		FSM_EXTERN_RECV_LENGTH	= 3'h2,
 		FSM_EXTERN_RECV_BASE	= 3'h3,
-		FSM_EXTERN_RUN			= 3'h4
+		FSM_EXTERN_RECV_SET		= 3'h4,
+		FSM_EXTERN_RUN			= 3'h5
 	} fsm_extern_t;
 
 	typedef enum logic [1:0] {

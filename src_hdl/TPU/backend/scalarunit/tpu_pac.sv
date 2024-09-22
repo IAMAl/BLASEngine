@@ -14,6 +14,7 @@ module PACUnit
 (
 	input						clock,
 	input						reset,
+	input						I_Req_St,				//Store Request
 	input						I_Req,					//Request from Network Stage
 	input						I_Stall,				//Force Stalling
 	input						I_Sel_CondValid,		//Selector for CondValid-1/2
@@ -45,6 +46,8 @@ module PACUnit
 	logic						R_Cond;
 	logic						R_CondValid;
 
+	logic						R_St;
+
 	address_t					R_Address;
 
 
@@ -73,9 +76,10 @@ module PACUnit
 
 
 	// Updating Address
-	assign Update				= Req & ( ~I_Branch | Ready );
-	assign Address				= ( Taken ) ?	R_Address + I_Src :
-												R_Address + 1'b1;
+	assign Update				= ( Req & ( ~I_Branch | Ready ) ) | R_St;
+	assign Address				= ( I_Req_St & ~R_St ) ?	0:
+									( Taken ) ?				R_Address + I_Src :
+															R_Address + 1'b1;
 
 
 	// Stall Request to Wait for ValidCond
@@ -101,6 +105,19 @@ module PACUnit
 		end
 		else begin
 			R_Req			<= Req;
+		end
+	end
+
+	// Capture Store Request
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_St			<= 1'b0;
+		end
+		else ( I_Req ) begin
+			R_St			<= 1'b0;
+		end
+		else ( I_Req_St ) begin
+			R_St			<= 1'b1;
 		end
 	end
 
@@ -130,6 +147,9 @@ module PACUnit
 	// Program Address
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
+			R_Address		<= '0;
+		end
+		else if ( I_Req_St & ~R_St ) begin
 			R_Address		<= '0;
 		end
 		else if ( Req & I_Jump ) begin

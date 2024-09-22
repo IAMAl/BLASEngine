@@ -30,6 +30,8 @@ module Lane_Unit
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grat,				//Flag: Grant
+	input						I_End_Access1,			//Flag: End of Access
+	input						I_End_Access2,			//Flag: End of Access
 	output	logic				O_Commit,				//Commit Request
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src2,		//Inter-Lane Connect
@@ -588,6 +590,8 @@ module Lane_Unit
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),
 		.I_St_Grant(		I_St_Grant				),
+		.I_End_Access1(		I_End_Access1			),
+		.I_End_Access2(		I_End_Access2			),
 		.O_WB_Dst(			WB_Dst					),
 		.O_WB_Data(			WB_Data					),
 		.O_Math_Done(		Math_Done				),

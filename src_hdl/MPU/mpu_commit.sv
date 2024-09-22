@@ -73,7 +73,7 @@ module Commit_MPU
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			for ( int i=0; i<NUM_ENTRY_HAZARD; ++i  ) begin
-			IssueInfo[ i ]		<= '0;
+				IssueInfo[ i ]		<= '0;
 			end
 		end
 		else if ( I_Req_Issue | I_Req_Commit ) begin

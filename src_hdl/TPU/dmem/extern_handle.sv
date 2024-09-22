@@ -39,6 +39,9 @@ module extern_handle
 );
 
 
+	//ToDo
+	localparam int NOTIFY_DATA		= -1;
+
 	localparam int	WIDTH_BUFF		= $clog2(BUFF_SIZE);
 
 	localparam int	HALF_BUFF_SIZE	= (BUFF_SIZE+1) / 2;
@@ -120,20 +123,20 @@ module extern_handle
 	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_ST_RUN;
 	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_LD_RUN;
 
-	assign is_Ld_Notified		= 0;//ToDo
+	assign Run_St_Service		= St_Req & is_FSM_Extern_Run;
+	assign Run_Ld_Service		= Ld_Req & is_FSM_Extern_Run;
 
-	assign Run_St_Service		= 0;//ToDo
-	assign Run_Ld_Service		= 0;//ToDo
+	assign is_Ld_Notified		= ( I_Ld_Data == NOTIFY_DATA ) & is_FSM_Extern_Ld_Run;
 
-	assign Output_St_Config		= 0;//ToDo
-	assign Output_Ld_Config		= 0;//ToDo
+	assign Output_St_Config		= St_Req & ( FSM_Extern_Serv == FSM_EXTERN_RECV_SET );
+	assign Output_Ld_Config		= Ld_Req & ( FSM_Extern_Serv == FSM_EXTERN_RECV_SET );
 
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
 
-	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1:0];
-	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1:0];
+	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1];
+	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1];
 
 
 	// Set Access-Config
@@ -264,11 +267,14 @@ module extern_handle
 			end
 			FSM_EXTERN_RECV_BASE: begin
 				if ( I_Req ) begin
-					FSM_Extern_Serv	<= FSM_EXTERN_RUN;
+					FSM_Extern_Serv	<= FSM_EXTERN_RECV_SET;
 				end
 				else begin
 					FSM_Extern_Serv	<= FSM_EXTERN_RECV_BASE;
 				end
+			end
+			FSM_EXTERN_RECV_SET: begin
+				FSM_Extern_Serv	<= FSM_EXTERN_RUN;
 			end
 			FSM_EXTERN_RUN: begin
 				if ( I_Ld_Term | I_St_Term | I_Rls ) begin
@@ -376,7 +382,7 @@ module extern_handle
 	end
 
 	//Store Buffer
-	RingBuffCTRL_Re #(
+	RingBuffCTRL #(
 		.NUM_ENTRY(			BUFF_SIZE				)
 	) RingBuffCTRL
 	(
@@ -384,8 +390,6 @@ module extern_handle
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Update(			),//ToDo
-		.I_UpdateLen(		),//ToDo
 		.O_WAddr(			Wr_Ptr					),
 		.O_RAddr(			Rd_Ptr					),
 		.O_Full(			Full					),

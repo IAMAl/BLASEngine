@@ -104,8 +104,8 @@ import pkg_mpu::fsm_extern_ld;
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
 
-	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1:0];
-	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1:0];
+	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1];
+	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1];
 
 	// Storing to Buffer
 	assign Store_Buff_St		= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
@@ -122,10 +122,10 @@ import pkg_mpu::fsm_extern_ld;
 									( Store_Buff_Ld ) ?	I_Ld_Data :
 														0;
 
-	assign Store_Length			= 1;//ToDo
-	assign Run_St_Service		= 1;//ToDo
-	assign Run_Ld_Service		= 1;//ToDo
-	assign is_Ld_Notified		= 1;//ToDo
+	assign Store_Length			= I_Req & ( FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_LENGTH );
+	assign Run_St_Service		= St_Req & is_FSM_Extern_Run;
+	assign Run_Ld_Service		= Ld_Req & is_FSM_Extern_Run;
+	assign is_Ld_Notified		= ( I_Ld_Data == NOTIFY_DATA ) & is_FSM_Extern_Ld_Run;
 
 	// IF
 	assign O_Req				= Load_Buff_St & ~Empty;

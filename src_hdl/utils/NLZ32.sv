@@ -16,6 +16,7 @@ module NLZ32
 	output	logic				O_Valid				//Flag: Validation
 );
 
+
 	logic						Valid0;
 	logic						Valid1;
 	logic						Valid2;

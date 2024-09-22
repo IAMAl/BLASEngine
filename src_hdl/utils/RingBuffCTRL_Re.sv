@@ -26,6 +26,7 @@ module RingBuffCTRL_Re
     output  [$clog2(NUM_ENTRY):0]	O_Num				//Remained Number of Entries
 );
 
+
 	localparam int WIDTH_BUFF	= $clog2(NUM_ENTRY);
 
 

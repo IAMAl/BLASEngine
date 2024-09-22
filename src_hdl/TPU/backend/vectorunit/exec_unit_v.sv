@@ -33,6 +33,8 @@ module ExecUnit_V
 	input						I_Ld_Grant,				//Grant for Loading
 	input						I_St_Ready,				//Ready to Store
 	input						I_St_Grant,				//Grant for Storing
+	input						I_End_Access1,			//End of Access
+	input						I_End_Access2,			//End of Access
 	output	index_t				O_WB_Dst,				//Write-Back Index
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output	issue_no_t			O_WB_IssueNo,			//Issue (Commit) No
@@ -130,7 +132,7 @@ module ExecUnit_V
 		.I_Ld_Grant(		I_Ld_Grant[1]			),
 		.I_St_Ready(		I_St_Ready[1]			),
 		.I_St_Grant(		I_St_Grant[1]			),
-		.I_End_Access(		),//ToDo
+		.I_End_Access(		I_End_Access1			),
 		.O_Token(			Ld_Token[1]				),
 		.O_WB_Data(			Ld_Data[1]				),
 		.O_LdSt_Done(		O_LdSt_Done2			)
@@ -153,7 +155,7 @@ module ExecUnit_V
 		.I_Ld_Grant(		I_Ld_Grant[0]			),
 		.I_St_Ready(		I_St_Ready[0]			),
 		.I_St_Grant(		I_St_Grant[0]			),
-		.I_End_Access(		),//ToDo
+		.I_End_Access(		I_End_Access2			),
 		.O_Token(			Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
 		.O_LdSt_Done(		O_LdSt_Done1			)

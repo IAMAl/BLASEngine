@@ -26,6 +26,7 @@ module RingBuff
     output  [WIDTH_ENTRY:0]		O_Num				//Remained Number of Entries
 );
 
+
 	TYPE	Data				[NUM_ENTRY-1:0];
 
 	logic	[WIDTH_ENTRY-1:0]	WPtr;

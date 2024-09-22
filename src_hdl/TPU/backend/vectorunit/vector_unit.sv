@@ -27,6 +27,7 @@ module Vector_Unit
 	input	v_grant_t			I_Ld_Grant,				//Flag: Grant
 	input	v_ready_t			I_St_Ready,				//Flag: Ready
 	input	v_grant_t			I_St_Grant,				//Flag: Grant
+	input	v_ready_t			I_End_Access,			//Flag: End of Access
 	output	logic				O_Commmit_Req,			//Commit Request
 	output	lane_t				O_Status				//Status on Lane
 );
@@ -71,6 +72,8 @@ module Vector_Unit
 			.I_Ld_Grant(		I_Ld_Grant[ i ]			),
 			.I_St_Ready(		I_St_Ready[ i ]			),
 			.I_St_Grant(		I_St_Grant[ i ]			),
+			.I_End_Access1(		I_End_Access[ i ][0]	),
+			.I_End_Access2(		I_End_Access[ i ][1]	),
 			.O_Commit(			Commit[ i ]				),
 			.I_Lane_Data_Src1(	Lane_Data_Src1			),
 			.I_Lane_Data_Src2(	Lane_Data_Src2			),

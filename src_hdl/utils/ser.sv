@@ -38,8 +38,6 @@ module Ser
 	assign O_Valud				= Valid;
 	assign O_Data				= ( Valid ) ? Data : '0;
 
-	assign Index				= Count;
-
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

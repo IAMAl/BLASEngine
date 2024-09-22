@@ -45,6 +45,7 @@ module req_handle
 	logic						R_Grant2;
 	logic						R_Grant3;
 
+
 	assign O_GrantVld 			=  R_Grant1 | R_Grant2;
 	assign O_GrantNo 			= ~R_Grant1 & R_Grant2;
 

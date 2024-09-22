@@ -28,7 +28,6 @@ module Des
 	localparam int	WIDTH_COUNT	= $clog2(COUNT_VAL);
 
 
-
 	logic	[WIDTH_OUTPUT-1:0]	Shift_Data;
 
 	logic						Valid;

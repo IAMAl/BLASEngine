@@ -16,6 +16,7 @@ module NLZ8
 	output	logic				O_Valid				//Flag: Validation
 );
 
+
 	always_comb begin
 		case ( I_Data )
 		8'b???????1: assign O_Num = 0;

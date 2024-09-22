@@ -26,6 +26,7 @@ module SRL_Unit
 	output  data_t				O_Data,					//Output Data
 );
 
+
 	logic						En_Shift;
 	logic						En_Rotate;
 	logic						En_Logic;

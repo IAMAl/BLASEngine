@@ -35,6 +35,7 @@ module Scalar_Unit
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grant,				//Flag: Grant
+	input	[1:0]				I_End_Access,			//Flag: End of Access
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
@@ -421,6 +422,7 @@ module Scalar_Unit
 	PACUnit PACUnit (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Req_St(			I_Req_St				),
 		.I_Req(				PAC_Req					),
 		.I_Stall(			Stall_PCU				),
 		.I_Sel_CondValid(	WB_Sel_CondValid		),
@@ -448,7 +450,7 @@ module Scalar_Unit
 		.I_St_Instr(		I_Instr					),
 		.I_Req_Ld(			Req_IFetch				),
 		.I_Ld_Address(		PC						),
-		.I_St_Address(		),//ToDo
+		.I_St_Address(		PC						),
 		.O_Ld_Instr(		Instruction				)
 	);
 
@@ -760,6 +762,8 @@ module Scalar_Unit
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),
 		.I_St_Grant(		I_St_Grant				),
+		.I_End_Access1(		I_End_Access1			),
+		.I_End_Access2(		I_End_Access2			),
 		.O_WB_Dst(			WB_Dst					),
 		.O_WB_Data(			WB_Data					),
 		.O_WB_IssueNo(		WB_IssueNo				),
