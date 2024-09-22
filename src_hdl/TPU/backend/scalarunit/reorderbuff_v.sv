@@ -16,7 +16,7 @@ module ReorderBuff_V
 )(
 	input						clock,
 	input						reset,
-	input	[NUM_ENTRY-1:0]		I_En_Lane,
+	input	[NUM_ENTRY-1:0]		I_En_Lane,				//En_Lane
 	input						I_Store,				//Store Issue No
 	input	issue_no_t			I_Issue_No,				//Storing Issue No
 	input						I_Commit_Grant,			//Commit Grant

@@ -1,25 +1,35 @@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	BLASEngine
+//	Copyright (C) 2024  Shigeyuki TAKANO
+//
+//  GNU AFFERO GENERAL PUBLIC LICENSE
+//	version 3.0
+//
+//	Module Name:	LdStUnit
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module LdStUnit (
 	input						clock,
 	input						reset,
-	input						I_Stall,
-	input						I_Commit_Grant,
-	input						I_Req,
-	input	command_t			I_Command,
-	input	data_t				I_Src_Src_Data1,
-	input	data_t				I_Src_Src_Data2,
-	input	data_t				I_Src_Src_Data3,
-	input	ldst_t				O_LdSt,
-	input	data_t				I_Ld_Data,
-	input	data_t				O_St_Data,
-	input						I_Ld_Ready,
-	input						I_Ld_Grant,
-	input						I_St_Ready,
-	input						I_St_Grant,
-	input						I_End_Access,
-	input	TYPE				O_Token,
-	input	data_t				O_WB_Data,
-	input						O_LdSt_Done,
+	input						I_Stall,				//Stall Request
+	input						I_Commit_Grant,			//Grant of Commit
+	input						I_Req,					//Request from Network Stage
+	input	command_t			I_Command,				//Command
+	input	data_t				I_Src_Data1,			//Source Data
+	input	data_t				I_Src_Data2,			//Source Data
+	input	data_t				I_Src_Data3,			//Source Data
+	input	ldst_t				O_LdSt,					//Load/Store Command
+	input	data_t				I_Ld_Data,				//Loaded Data
+	input	data_t				O_St_Data,				//Storing Data
+	input						I_Ld_Ready,				//Ready to Load
+	input						I_Ld_Grant,				//Grant for Loading
+	input						I_St_Ready,				//Ready to Store
+	input						I_St_Grant,				//Grant for Storing
+	input						I_End_Access,			//End of Access
+	input	TYPE				O_Token,				//Command
+	input	data_t				O_WB_Data,				//Write-Back Data
+	input						O_LdSt_Done,			//Access Done
 );
 
 	logic						Ld_Req;

@@ -26,7 +26,7 @@ import pkg_tpu::instr_t;
 	input						I_Ack_ThMem,			//Ack from Thread Memory
 	input						I_No_ThMem,				//N/A Response from Thread Memory
 	input						I_Commit,				//Commit Notification
-	output						O_St_Instr,
+	output						O_St_Instr,				//Instruction to Store into Memory
 	output	instr_t				O_Instr,				//Instruction
 	input						I_Req,					//Request from TPU
 	input	data_t				I_Data,					//Data from TPU

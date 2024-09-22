@@ -6,7 +6,7 @@ module LoadStoreUnit
 	input						I_Req,
 	input						I_St_Req,				//Flag: Activate Store Unit
 	input						I_Ld_Req,				//Flag: Activate Load Unit
-	input						I_Ack_Ld,
+	input						I_Ack_Ld,				//Flag: Acknowledge for Loading
 	input						I_Store,				//Flag: Request is Store
 	input						I_Stall,				//Force Stalling by Local Memory
 	input	address_t			I_Length,				//Vector-Length for Load/Store

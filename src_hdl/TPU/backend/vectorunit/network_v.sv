@@ -19,7 +19,7 @@ module Network_V
 	input						clock,
 	input						reset,
 	input						I_Stall,
-	input						I_Req,
+	input						I_Req,					//Request from Reg-Read
 	input	[6:0]				I_Sel_Path,				//Path Selects
 	input	[4:0]				I_Sel_Path_WB,			//Path Selects
 	input	data_t				I_Scalar_Data,			//Data from Scalar Unit
