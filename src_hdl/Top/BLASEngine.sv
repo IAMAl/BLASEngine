@@ -43,8 +43,8 @@ module BLASEngine
 	logic						Commit_Req;
 	mpu_issue_no_t				Commit_No;
 
-	logic						TPU_CLM_Commit_Req	[NUM_CLMS-1:0];
-	mpu_issue_no_t				TPU_CLM_Commit_No	[NUM_CLMS-1:0];
+	logic						TPU_Commit_Req	[NUM_CLMS-1:0];
+	mpu_issue_no_t				TPU_Commit_No	[NUM_CLMS-1:0];
 
 
 	logic						Route_I_Req		[NUM_ROWS+1:0][NUM_CLMS-1:0];
@@ -143,8 +143,8 @@ module BLASEngine
 		.I_En_TPU(			TPU_En_Exe				),
 		.I_Req(				Issue_Req				),
 		.I_Issue_No(		Issue_No				),
-		.I_Commit_Req(		TPU_CLM_Commit_Req		),
-		.I_Commit_No(		TPU_CLM_Commit_No		),
+		.I_Commit_Req(		TPU_Commit_Req			),
+		.I_Commit_No(		TPU_Commit_No			),
 		.O_Commit_Req(		Commit_Req				),
 		.O_Commit_No(		Commit_No				),
 		.O_Full(			)//ToDo
@@ -153,11 +153,11 @@ module BLASEngine
 
 	always_comb begin
 		for ( int clm=0; clm<NUM_CLMS; ++clm ) begin
-
-			TPU_CLM_Commit_Req[ clm ]	= TPU_Term[0][ clm ];//ToDo
-			TPU_CLM_Commit_No[ clm ]	= TPU_IssueNo[0][ clm ];//ToDo
-
 			for ( int row=0; row<NUM_ROWS; ++row ) begin
+
+				TPU_Commit_Req[ NUM_CLMS*row + clm ]	= TPU_Term[0][ clm ];
+				TPU_Commit_No[ NUM_CLMS*row + clm ]		= TPU_IssueNo[0][ clm ];
+
 				RAM_S_LdSt[ row ][ clm ][0]		= TPU_S_LdSt[ row ][ clm ][0];
 				RAM_S_Ld_Data[ row ][ clm ][0]	= TPU_S_Ld_Data[ row ][ clm ][0];
 				RAM_S_St_Data[ row ][ clm ][0]	= TPU_S_St_Data[ row ][ clm ][0];

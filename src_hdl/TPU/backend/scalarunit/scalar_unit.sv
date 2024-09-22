@@ -210,9 +210,9 @@ module Scalar_Unit
 	pipe_index_t				PipeReg_Index;
 	pipe_index_reg_t			PipeReg_IdxRF;
 	pipe_index_reg_t			PipeReg_IdxRR;
-	pipe_reg_t					PipeReg_RR;//ToDo
-	pipe_net_t					PipeReg_RR_Net;//ToDo
-	pipe_exe_t					PipeReg_Net;//ToDo
+	pipe_reg_t					PipeReg_RR;
+	pipe_net_t					PipeReg_RR_Net;
+	pipe_exe_t					PipeReg_Net;
 	pipe_exe_t					PipeReg_Exe;
 
 

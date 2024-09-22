@@ -21,8 +21,8 @@ module Router
 	input	[WIDTH_DATA-1:0]	I_Data,					//Data from Forward Path
 	output						O_Req_A,				//Request for Branch Path
 	output						O_Req_B,				//Request for Branch Path
-	output						O_Rls_A,
-	output						O_Rls_B,
+	output						O_Rls_A,				//Release for Branch Path
+	output						O_Rls_B,				//Release for Branch Path
 	output	[WIDTH_DATA-1:0]	O_Data_A,				//Data for Branch Path
 	output	[WIDTH_DATA-1:0]	O_Data_B,				//Data for Branch Path
 	output						O_Req,					//Request for Backward Path

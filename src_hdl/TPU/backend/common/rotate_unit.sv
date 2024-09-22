@@ -24,22 +24,22 @@ module Rotate_Unit
 );
 
 
-localparam	LOG_WIDTHD			= $clog2(WIDTH_DATA)-1;
+	localparam	LOG_WIDTHD			= $clog2(WIDTH_DATA)-1;
 
-reg	[WIDTH_DAYA-1:0]			ResultData;
-
-
-assign O_Valid					= I_En;
-assign O_Data					= ( I_En ) ? ResultData : '0;
-assign O_Token					= ( I_En ) ? I_Token	: '0;
+	reg	[WIDTH_DAYA-1:0]			ResultData;
 
 
-always_comn begin
-	case ( I_Token.instr.op.OpCode )
-		2'b00: assign ResultData	= ( I_Data1 << I_Data2[LOG_WIDTHD:0] ) | ( I_Data1 >> ( LOG_WIDTHD -  I_Data2[LOG_WIDTHD:0] ) );
-		2'b10: assign ResultData	= ( I_Data1 >> I_Data2[LOG_WIDTHD:0] ) | ( I_Data1 << ( LOG_WIDTHD -  I_Data2[LOG_WIDTHD:0] ) );
-		default: assign ResultData	= '0;
-	endcase
-end
+	assign O_Valid					= I_En;
+	assign O_Data					= ( I_En ) ? ResultData : '0;
+	assign O_Token					= ( I_En ) ? I_Token	: '0;
+
+
+	always_comb begin
+		case ( I_Token.instr.op.OpCode )
+			2'b00: assign ResultData	= ( I_Data1 << I_Data2[LOG_WIDTHD:0] ) | ( I_Data1 >> ( LOG_WIDTHD -  I_Data2[LOG_WIDTHD:0] ) );
+			2'b10: assign ResultData	= ( I_Data1 >> I_Data2[LOG_WIDTHD:0] ) | ( I_Data1 << ( LOG_WIDTHD -  I_Data2[LOG_WIDTHD:0] ) );
+			default: assign ResultData	= '0;
+		endcase
+	end
 
 endmodule
