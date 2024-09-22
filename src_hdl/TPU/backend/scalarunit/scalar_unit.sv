@@ -271,6 +271,23 @@ module Scalar_Unit
 	assign PipeReg_Index.path		= PipeReg_Idx.path;
 
 
+	//// Packing for Register File Access
+	assign PipeReg_IdxRF.v			= PipeReg_Idx.instr.v;
+	assign PipeReg_IdxRF.op			= PipeReg_Idx.instr.op;
+
+	//	Write-Back
+	assign PipeReg_IdxRF.dst		= PipeReg_Idx.dst;
+
+	//	Indeces
+	assign PipeReg_IdxRF.slice_len	= PipeReg_Idx.instr.slice_len;
+
+	//	Issue-No
+	assign PipeReg_IdxRF.issue_no	= PipeReg_Idx.issue_no;
+
+	//	Path
+	assign PipeReg_IdxRF.path		= PipeReg_Idx.path;
+
+
 	//// Register Read/Write Stage
 
 	//	Capture Read Data
@@ -580,16 +597,16 @@ module Scalar_Unit
 	);
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Idx.src1.v		),
-		.I_Odd2(			PipeReg_Idx.src2.v		),
-		.I_Odd3(			PipeReg_Idx.src3.v		),
+		.I_Odd1(			PipeReg_Index.src1.v	),
+		.I_Odd2(			PipeReg_Index.src2.v	),
+		.I_Odd3(			PipeReg_Index.src3.v	),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
-		.O_Index_Src1(		PipeReg_Index.src1.idx	),
-		.O_Index_Src2(		PipeReg_Index.src2.idx	),
-		.O_Index_Src3(		PipeReg_Index.src3.idx	),
-		.O_Index_Src4(		PipeReg_Index.src4.idx	)
+		.O_Index_Src1(		PipeReg_IdxRF.src1.idx	),
+		.O_Index_Src2(		PipeReg_IdxRF.src2.idx	),
+		.O_Index_Src3(		PipeReg_IdxRF.src3.idx	),
+		.O_Index_Src4(		PipeReg_IdxRF.src4.idx	)
 	);
 
 	//	Pipeline Register
@@ -598,7 +615,7 @@ module Scalar_Unit
 			PipeReg_IdxRR	<= '0;
 		end
 		else if ( I_En ) begin
-			PipeReg_IdxRR	<= PipeReg_Index;
+			PipeReg_IdxRR	<= PipeReg_IdxRF;
 		end
 	end
 
@@ -608,7 +625,7 @@ module Scalar_Unit
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Idx.src3.v, PipeReg_Idx.src2.v, PipeReg_Idx.src1.v };
+			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
 		end
 	end
 

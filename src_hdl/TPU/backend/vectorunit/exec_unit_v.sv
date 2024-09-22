@@ -16,7 +16,6 @@ module ExecUnit_V
 )(
 	input						clock,
 	input						reset,
-	input						I_Lane_En,//ToDo
 	input						I_Stall,
 	input						I_Req,
 	input	issue_no_t			I_Issue_No,
