@@ -44,7 +44,7 @@ module Vector_Unit
 
 	assign O_Commmit_Req		= &( ~( I_En_Lane ^ Commit ) );
 
-	assign O_Scalar_Data		= Scalar_Data[0];//ToDo
+	assign O_Scalar_Data		= Scalar_Data[ I_Scalar_Data[$clog2(NUM_LANES)-1:0] ];
 
 
 	//Vector-Lane Generation
