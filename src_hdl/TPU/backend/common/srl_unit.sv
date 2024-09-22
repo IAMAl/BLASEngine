@@ -17,16 +17,13 @@ module SRL_Unit
 	input						clock,
 	input						reset,
 	input						I_En,
-	input   opt_t 				I_Op,
 	input						I_Grant,
 	input	TYPE				I_Token,
 	input   data_t				I_Data1,
 	input   data_t				I_Data2,
-	input   issue_no_t			I_Issue_No,
 	output  data_t				O_Valid,
 	output	TYPE				O_Token,
 	output  data_t				O_Data,
-	output  issue_no_t			O_Issue_No
 );
 
 	logic						En_Shift;
@@ -41,27 +38,23 @@ module SRL_Unit
 	data_t						Data_Rotate;
 	data_t						Data_Logic;
 
-	index_t						Token_Shift;
-	index_t						Token_Rotate;
-	index_t						Token_Logic;
-
-	issue_not					Issue_No_Shift;
-	issue_not					Issue_No_Rotate;
-	issue_not					Issue_No_Logic;
+	TYPE						Token_Shift;
+	TYPE						Token_Rotate;
+	TYPE						Token_Logic;
 
 	data_t						ResultData;
 	issue_no_t					ResultINo;
-	index_t						ResultToken;
+	TYPE						ResultToken;
 
 	logic						Valid;
 	data_t						C2;
-	index_t						Token;
+	TYPE						Token;
 	issue_no_t					Issue_No;
 
 
-	assign En_Shift				= I_En & ( I_Op.OpClass == 2'b00 ) & ~( Valid & I_Grant );
-	assign En_Rotate			= I_En & ( I_Op.OpClass == 2'b01 ) & ~( Valid & I_Grant );
-	assign En_Logic				= I_En & ( I_Op.OpClass == 2'b10 ) & ~( Valid & I_Grant );
+	assign En_Shift				= I_En & ( I_Token.instr.op.OpClass == 2'b00 ) & ~( Valid & I_Grant );
+	assign En_Rotate			= I_En & ( I_Token.instr.op.OpClass == 2'b01 ) & ~( Valid & I_Grant );
+	assign En_Logic				= I_En & ( I_Token.instr.op.OpClass == 2'b10 ) & ~( Valid & I_Grant );
 
 	assign Data_Shift1			= ( En_Shift ) ?	I_Data1 : 0;
 	assign Data_Shift2			= ( En_Shift ) ?	I_Data2 : 0;
@@ -74,11 +67,10 @@ module SRL_Unit
 	assign O_Valid				= Valid;
 	assign O_Data				= C2;
 	assign O_Token				= Token;
-	assign O_Issue_No			= Issue_No;
 
 
 	always_comb begin
-		case ( I_Op.OpClass )
+		case ( I_Token.instr.op.OpClass )
 			2'b00: assign ResultData	= Data_Shift;
 			2'b01: assign ResultData	= Data_Rotate;
 			2'b10: assign ResultData	= Data_Logic;
@@ -87,7 +79,7 @@ module SRL_Unit
 	end
 
 	always_comb begin
-		case ( I_Op.OpClass )
+		case ( I_Token.instr.op.OpClass )
 			2'b00: assign ResultToken	= Token_Shift;
 			2'b01: assign ResultToken	= Token_Rotate;
 			2'b10: assign ResultToken	= Token_Logic;
@@ -96,7 +88,7 @@ module SRL_Unit
 	end
 
 	always_comb begin
-		case ( I_Op.OpClass )
+		case ( I_Token.instr.op.OpClass )
 			2'b00: assign ResultINo		= Issue_No_Shift;
 			2'b01: assign ResultINo		= Issue_No_Roate;
 			2'b10: assign ResultINo		= Issue_No_Logic;
@@ -109,19 +101,16 @@ module SRL_Unit
 		if ( reset ) begin
 			Valid			<= 1'b0;
 			Token			<= 0;
-			Issue_No		<= 0;
 			C2				<= 0;
 		end
 		else if ( I_En ) begin
 			Valid			<= 1'b1;
 			Token			<= ResultToken;
-			Issue_No		<= ResultINo;
 			C2				<= ResultData;
 		end
 		else if ( I_Grant ) begin
 			Valid			<= 1'b0;
 			Token			<= 0;
-			Issue_No		<= 0;
 			C2				<= 0;
 		end
 	end
@@ -132,11 +121,9 @@ module SRL_Unit
 	) Shift_Unit
 	(
 		.I_En(				En_Shift				),
-		.I_OP(				I_Op					),
 		.I_Token(			I_Token					),
 		.I_Data1(			Data_Shift1				),
 		.I_Data2(			Data_Shift2				),
-		.I_Issue_No(		I_Issue_No				),
 		.O_Valid(			Valid_Shift				),
 		.O_Data(			Data_Shift				),
 		.O_Token(			Token_Shift				),
@@ -148,11 +135,9 @@ module SRL_Unit
 	) Rotate_Unit
 	(
 		.I_En(				En_Rotate				),
-		.I_OP(				I_Op					),
 		.I_Token(			I_Token					),
 		.I_Data1(			Data_Rotate				),
 		.I_Data2(			Data_Rotate				),
-		.I_Issue_No(		I_Issue_No				),
 		.O_Valid(			Valid_Rotate			),
 		.O_Data(			Data_Rotate				),
 		.O_Token(			Token_Rotate			),
@@ -164,11 +149,9 @@ module SRL_Unit
 	) Logic_Unit
 	(
 		.I_En(				En_Logic				),
-		.I_OP(				I_Op					),
 		.I_Token(			I_Token					),
 		.I_Data1(			Data_Logic1				),
 		.I_Data2(			Data_Logic2				),
-		.I_Issue_No(		Issue_No_Logic			),
 		.O_Valid(			Valid_Logic				),
 		.O_Data(			Data_Logic				),
 		.O_Token(			Token_Logic				),

@@ -22,17 +22,14 @@ module MA_Unit
 	input						I_En,
 	input						I_Stall,
 	input						I_Grant,
-	input   opt_t 				I_Op,
 	input	issue_no_t			I_Pres_Issue_No,
 	input   data_t				I_Data1,
 	input   data_t				I_Data2,
 	input   data_t				I_Data3,
 	input	TYPE				I_Token,
-	input   issue_no_t			I_Issue_No,
 	output  data_t				O_Valid,
 	output  data_t				O_Data,
 	output	TYPE				O_Token,
-	output  issue_no_t			O_Issue_No,
 	output						O_Stall
 );
 
@@ -40,31 +37,21 @@ module MA_Unit
 	logic						En_Add;
 	logic						En_Mlt;
 
-	op_t						Op_Add;
-	op_t						Op_Mlt;
-
-	op_t						Op;
 
 	data_t						Data1_Add;
 	data_t						Data2_Add;
 	data_t						Data1_Mlt;
 	data_t						Data2_Mlt;
 
-	index_t						Index_Add;
-	index_t						Index_Mlt;
-
-	issue_no_t					Issue_No_Add;
-	issue_no_t					Issue_No_Mlt;
+	TYPE						Token_Add;
+	TYPE						Token_Mlt;
 
 
 	data_t						Add_Data;
 	data_t						Mlt_Data;
 
-	index_t						Add_Token;
-	index_t						Mlt_Token;
-
-	issue_no_t					Add_Issue_No;
-	issue_no_t					Mlt_Issue_No;
+	TYPE						Add_Token;
+	TYPE						Mlt_Token;
 
 
 	logic						Chain_Mlt;
@@ -91,45 +78,23 @@ module MA_Unit
 	assign O_Token				= ( LifeAdd > LifeMlt ) ?	Add_Token :
 															Mlt_Token;
 
-	assign O_Issue_No			= ( LifeAdd > LifeMlt ) ?	Add_Issue_No :
-															Mlt_Issue_No;
 
 	assign is_Adder				= I_En & ( I_Op.OpClass == 2'b00 );
 	assign is_Mlter				= I_En & ( I_Op.OpClass == 2'b01 );
 
-	assign is_MAC				= ( Op.OpClass == 2'b01 ) & ( Op.OpCode == 2'b10 );
-	assign is_MAD				= ( Op.OpClass == 2'b01 ) & ( Op.OpCode == 2'b11 );
+	assign is_MAC				= ( Token.instr.op.OpClass == 2'b01 ) & ( Token.instr.op.OpCode == 2'b10 );
+	assign is_MAD				= ( Token.instr.op.OpClass == 2'b01 ) & ( Token.instr.op.OpCode == 2'b11 );
 
 
-	assign Op_Add				= ( is_Adder ) ?	I_Op :
-									( is_MAD ) ?	Op :
-									( is_MAC ) ?	Op :
-													'0;
-
-	assign Op_Mlt				= ( is_Mlter ) ?	I_Op :
-									( is_MAD ) ?	I_Op :
-									( is_MAC ) ?	I_Op :
-													'0;
-
-	assign Index_Add			= ( is_Adder ) ?	I_Token :
+	assign Token_Add			= ( is_Adder ) ?	I_Token :
 									( is_MAD ) ?	Mlt_Token :
 									( is_MAC ) ?	Mlt_Token :
 													'0;
 
-	assign Index_Mlt			= ( is_Mlter ) ?	I_Token :
+	assign Token_Mlt			= ( is_Mlter ) ?	I_Token :
 									( is_MAD ) ?	I_Token :
 									( is_MAC ) ?	I_Token :
 													'0;
-
-	assign Issue_No_Add			= ( is_Adder ) ?	I_Issue_No :
-									( is_MAD ) ?	Mlt_Issue_No :
-									( is_MAC ) ?	Mlt_Issue_No :
-													0;
-
-	assign Issue_No_Mlt			= ( is_Mlter ) ?	I_Issue_No :
-									( is_MAD ) ?	I_Issue_No :
-									( is_MAC ) ?	I_Issue_No :
-													0;
 
 	assign Data1_Add			= ( is_Adder ) ?	I_Data1 :
 									( is_MAD ) ?	Mlt_Data :
@@ -156,29 +121,23 @@ module MA_Unit
 		iAdd_Unit Add_Unit
 		(
 			.I_En(				En_Add					),
-			.I_Op(				Op_Add					),
 			.I_Data1(			Data1_Add				),
 			.I_Data2(			Data2_Add				),
-			.I_Token(			Index_Add				),
-			.I_Issue_No(		Issue_No_Add			),
+			.I_Token(			Token_Add				),
 			.O_Valid(			Add_Valid				),
 			.O_Data(			Add_Data				),
-			.O_Token(			Add_Token				),
-			.O_Issue_No(		Add_Issue_No			)
+			.O_Token(			Add_Token				)
 		);
 
 		iMlt_Unit Mlt_Unit
 		(
 			.I_En(				En_Mlt					),
-			.I_Op(				Op_Mlt					),
 			.I_Data1(			Data1_Mlt				),
 			.I_Data2(			Data2_Mlt				),
-			.I_Token(			Index_Mlt				),
-			.I_Issue_No(		Issue_No_Mlt			),
+			.I_Token(			Token_Mlt				),
 			.O_Valid(			Mlt_Valid				),
 			.O_Data(			Mlt_Data				),
 			.O_Token(			Mlt_Token				),
-			.O_Issue_No(		Mlt_Issue_No			)
 		);
 	`else
 		fAdd_Unit #(
@@ -186,15 +145,12 @@ module MA_Unit
 		) Add_Unit
 		(
 			.I_En(				En_Add					),
-			.I_Op(				Op_Add					),
 			.I_Data1(			Data1_Add				),
 			.I_Data2(			Data2_Add				),
-			.I_Token(			Index_Add				),
-			.I_Issue_No(		Issue_No_Add			),
+			.I_Token(			Token_Add				),
 			.O_Valid(			Add_Valid				),
 			.O_Data(			Add_Data				),
-			.O_Token(			Add_Token				),
-			.O_Issue_No(		Add_Issue_No			)
+			.O_Token(			Add_Token				)
 		);
 
 		fMlt_Unit #(
@@ -202,15 +158,12 @@ module MA_Unit
 		) Mlt_Unit
 		(
 			.I_En(				En_Mlt					),
-			.I_Op(				Op_Mlt					),
 			.I_Data1(			Data1_Mlt				),
 			.I_Data2(			Data2_Mlt				),
-			.I_Token(			Index_Mlt				),
-			.I_Issue_No(		Issue_No_Mlt			),
+			.I_Token(			Token_Mlt				),
 			.O_Valid(			Mlt_Valid				),
 			.O_Data(			Mlt_Data				),
-			.O_Token(			Mlt_Token				),
-			.O_Issue_No(		Mlt_Issue_No			)
+			.O_Token(			Mlt_Token				)
 		);
 	`endif
 
@@ -225,9 +178,7 @@ module MA_Unit
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
 		.I_Grant(			I_Grant					),
-		.I_Issue_No(		I_Issue_No				),
-		.I_Op(				I_Op					),
-		.O_Op(				Op						),
+		.I_Issue_No(		I_Pres_Issue_No			),
 		.I_Token(			I_Token					),
 		.O_Token(			O_Token					),
 		.O_Chain_Mlt(		Chain_Mlt				),

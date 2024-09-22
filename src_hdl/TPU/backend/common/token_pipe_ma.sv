@@ -21,8 +21,6 @@ module token_pipe_ma
 	input						I_Stall,				//Stall
 	input						I_Grant,				//Grant to Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
-	input	op_t				I_Op,					//OpCode
-	output	op_t				O_Op,					//OpCode
 	input	TYPE				I_Token,				//Input Token
 	output	TYPE				O_Token,				//Output Token
 	output						O_Chain_Mlt,
@@ -62,48 +60,43 @@ module token_pipe_ma
 	TYPE						Token;
 	op_t						Op;
 
-	op_t						OBuffMlt		[DEPTH_MLT-1:0];
-	op_t						OBuffAdd		[DEPTH_ADD-1:0];
 
 	TYPE						TBuffMlt		[DEPTH_MLT-1:0];
 	TYPE						TBuffAdd		[DEPTH_ADD-1:0];
 
 
-	assign Valid				= I_Token.v & ( I_Op.OpType == 2'b00 );
+	assign Valid				= I_Token.v & ( I_Token,instr.op.OpType == 2'b00 );
 
-	assign Token				= ( TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 ) ) ?	TBuffMlt[ RPtr_Mlt ] :
-									( TBuffAdd[ RPtr_Add ].v & ( OBuffAdd[ RPtr_Add ].OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ] :
-																											I_Token;
+	assign Token				= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ] :
+									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ] :
+																														I_Token;
 
-	assign Op					= ( TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 ) ) ?	OBuffMlt[ RPtr_Mlt ] :
-									( TBuffAdd[ RPtr_Add ].v & ( OBuffAdd[ RPtr_Add ].OpCode == 2'b10 ) ) ?	OBuffAdd[ RPtr_Add ] :
-																											I_Op;
+	assign Op					= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ].instr.op :
+									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ].instr.op :
+																														I_Token,instr.op;
 
 
 	assign LifeMlt				= I_Issue_No - TBuffMlt[ RPtr_Mlt ].issue_no;
 	assign LifeAdd				= I_Issue_No - TBuffAdd[ RPtr_Add ].issue_no;
 	assign is_Mlt_Old			= LifeMlt > LifeAdd;
-	assign SelOut				= is_Mlt_Old & ~&OBuffMlt[ RPtr_Mlt ].OpCode;
+	assign SelOut				= is_Mlt_Old & ~&TBuffMlt[ RPtr_Mlt ].instr.op.OpCode;
 
 
 	assign O_Token				= (    SelOut & TBuffMlt[ RPtr_Mlt ].v ) ?	TBuffMlt[ RPtr_Mlt ] :
 									( ~SelOut & TBuffAdd[ RPtr_Add ].v ) ?	TBuffAdd[ RPtr_Add ] :
 																			'0;
 
-	assign O_Op					= (    SelOut & OBuffMlt[ RPtr_Mlt ].v ) ?	OBuffMlt[ RPtr_Mlt ] :
-									( ~SelOut & OBuffAdd[ RPtr_Add ].v ) ?	OBuffAdd[ RPtr_Add ] :
-																			'0;
 
 	assign O_Stall				= Full_Mlt | Full_Add;
 
-	assign O_Chain_Mlt			= TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 );
-	assign O_Chain_Add			= TBuffAdd[ RPtr_Add ].v & ( OBuffAdd[ RPtr_Add ].OpCode == 2'b10 ) & ~O_Chain_Mlt;
+	assign O_Chain_Mlt			= TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 );
+	assign O_Chain_Add			= TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) & ~O_Chain_Mlt;
 
 
-	assign We_Mlt				= ~Full_Mlt & ( ( Valid & ( I_Op.OpClass == 2'b01 ) ) | ( TBuffMlt[ RPtr_Mlt ].v & ( OBuffMlt[ RPtr_Mlt ].OpCode == 2'b11 ) ) );
+	assign We_Mlt				= ~Full_Mlt & ( ( Valid & ( I_Token,instr.op.OpClass == 2'b01 ) ) | ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 ) ) );
 	assign Re_Mlt				= ~Empty_Mlt & ~I_Stall & TBuffMlt[ RPtr_Mlt ].v & I_Grant;
 
-	assign We_Add				= ~Full_Add & ( ( Valid & ( I_Op.OpClass == 2'b00 ) ) | ( TBuffAdd[ RPtr_Add ].v & ( OBuffAdd[ RPtr_Add ].OpCode == 2'b10 ) ) );
+	assign We_Add				= ~Full_Add & ( ( Valid & ( I_Token,instr.op.OpClass == 2'b00 ) ) | ( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) ) );
 	assign Re_Add				= ~Empty_Add & ~I_Stall & TBuffAdd[ RPtr_Add ].v & I_Grant;
 
 
@@ -111,12 +104,10 @@ module token_pipe_ma
 		if ( reset ) begin
 			for ( int i=0; i<DEPTH_MLT; ++i ) begin
 				TBuffMlt[ i ]			<= '0;
-				OBuffMlt[ i ]			<= '0;
 			end
 			else if ( We_Mlt | Re_Mlt ) begin
 				if ( We_Mlt ) begin
 					TBuffMlt[ WPtr_Mlt ]	<= Token;
-					OBuffMlt[ WPtr_Mlt ]	<= Op;
 				end
 
 				if ( Re_Mlt ) begin
@@ -130,12 +121,10 @@ module token_pipe_ma
 		if ( reset ) begin
 			for ( int i=0; i<DEPTH_MLT; ++i ) begin
 				TBuffAdd[ i ]			<= '0;
-				OBuffAdd[ i ]			<= '0;
 			end
 			else if ( We_Add | Re_Add ) begin
 				if ( We_Add ) begin
 					TBuffAdd[ WPtr_Add ]	<= Token;
-					OBuffAdd[ WPtr_Add ]	<= Op;
 				end
 
 				if ( Re_Add ) begin

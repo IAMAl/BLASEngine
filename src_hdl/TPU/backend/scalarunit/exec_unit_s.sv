@@ -44,9 +44,8 @@ module ExecUnit_S
 
 
 	logic						ALU_Req;
-	TYPE						ALU_Token;
 	data_t						ALU_Data;
-	issue_no_t					ALU_IssueNo;
+	TYPE						ALU_Token;
 
 	logic						LdSt_Req		[1:0];
 	data_t						Ld_Data			[1:0];
@@ -67,7 +66,7 @@ module ExecUnit_S
 	assign LdSt_Req[1]			= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &   I_Command.instr.op.OpClass[0];
 
 
-	assign LifeALU				= I_Issue_No - ALU_IssueNo;
+	assign LifeALU				= I_Issue_No - ALU_Token.issue_no;
 	assign LifeLdSt1			= I_Issue_No - Ld_Token[0].issue_no;
 	assign LifeLdSt2			= I_Issue_No - Ld_Token[0].issue_no;
 
@@ -77,7 +76,7 @@ module ExecUnit_S
 	assign is_LifeALU			= LifeALU > LifeLdSt;
 
 
-	assign O_Dst				= ( is_LifeALU ) ?		ALU_Token.dst :
+	assign O_WB_Dst				= ( is_LifeALU ) ?		ALU_Token.dst :
 									( is_LifeLdSt2 ) ?	Ld_Token[1].dst :
 														Ld_Token[0].dst;
 
@@ -85,9 +84,9 @@ module ExecUnit_S
 									( is_LifeLdSt2 ) ?	Ld_Data[1] :
 														Ld_Data[0];
 
-	assign O_WB_IssueNo			= ( is_LifeALU ) ?		ALU_IssueNo :
-									( is_LifeLdSt2 ) ?	Ld_Token[1] :
-														Ld_Token[0];
+	assign O_WB_IssueNo			= ( is_LifeALU ) ?		ALU_Token.issue_no :
+									( is_LifeLdSt2 ) ?	Ld_Token[1].issue_no :
+														Ld_Token[0].issue_no;
 
 
 	ALU #(
@@ -105,7 +104,6 @@ module ExecUnit_S
 		.I_Src_Data3(		I_Src_Data3				),
 		.O_WB_Token(		ALU_Token				),
 		.O_WB_Data(			ALU_Data				),
-		.O_WB_IssueNo(		ALU_IssueNo				),
 		.O_ALU_Done(		O_Math_Done				)
 	);
 

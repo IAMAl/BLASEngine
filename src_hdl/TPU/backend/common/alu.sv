@@ -25,7 +25,6 @@ module ALU
 	input	data_t				I_Src_Data3,
 	output	TYPE				O_WB_Token,
 	output	data_t				O_WB_Data,
-	output	issue_no_t			O_WB_IssueNo,
 	output						O_ALU_Done
 );
 
@@ -84,12 +83,7 @@ module ALU
 	data_t						Data_Cnvt;
 	data_t						Data_SRL;
 
-	issue_no_t					Issue_No_MA;
-	issue_no_t					Issue_No_iDIV;
-	issue_no_t					Issue_No_Cnvt;
-	issue_no_t					Issue_No_SRL;
 	TYPE						Token_MA;
-
 	TYPE						Token_iDiv;
 	TYPE						Token_Cnvt;
 	TYPE						Token_SRL;
@@ -128,10 +122,10 @@ module ALU
 	assign SRL_Data2			= ( En_SRL ) ?	I_Src_Data2 : 0;
 
 
-	assign Life_MA				= I_Issue_No - Issue_No_MA;
-	assign Life_iDiv			= I_Issue_No - Issue_No_MA;
-	assign Life_Cnvt			= I_Issue_No - Issue_No_MA;
-	assign Life_SRL				= I_Issue_No - Issue_No_MA;
+	assign Life_MA				= I_Issue_No - Token_MA.issue_no;
+	assign Life_iDiv			= I_Issue_No - Token_iDiv.issue_no;
+	assign Life_Cnvt			= I_Issue_No - Token_Cnvt.issue_no;
+	assign Life_SRL				= I_Issue_No - Token_SRL.issue_no;
 
 	assign Sel_MA_iDiv			= ( Life_MA > Life_iDiv ) ? 	2'b00 : 2'b01;
 	assign Sel_Cnvt_SRL			= ( Life_Cnvt > Life_SRL ) ?	2'b10 : 2'b11;
@@ -170,12 +164,6 @@ module ALU
 									( Sel == 2'b11 ) ?	Token_SRL :
 														0;
 
-	assign O_WB_IssueNo			= (   Sel == 2'b00 ) ?	Issue_No_MA :
-									( Sel == 2'b01 ) ?	Issue_No_iDiv :
-									( Sel == 2'b10 ) ?	Issue_No_Cnvt :
-									( Sel == 2'b11 ) ?	Issue_No_SRL :
-														0;
-
 	assign O_WB_Data			= (   Sel == 2'b00 ) ?	Data_MA :
 									( Sel == 2'b01 ) ?	Data_iDiv :
 									( Sel == 2'b10 ) ?	Data_Cnvt :
@@ -193,15 +181,12 @@ module ALU
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				En_MA					),
-		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			MA_Data1				),
 		.I_Data2(			MA_Data2				),
 		.I_Data3(			MA_Data3				),
 		.I_Token(			MA_Token				),
-		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_MA				),
 		.O_Data1(			Data_MA					),
-		.O_Issue_No(		Issue_No_MA				),
 		.O_Token(			Token_MA				)
 	);
 
@@ -210,14 +195,11 @@ module ALU
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				En_iDIV					),
-		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			iDIV_Data1				),
 		.I_Data2(			iDIV_Data2				),
 		.I_Token(			iDiv_Token				),
-		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_iDIV				),
 		.O_Data(			Data_iDIV				),
-		.O_Issue_No(		Issue_No_iDIV			),
 		.O_Token(			Token_iDiv				)
 	);
 
@@ -226,29 +208,25 @@ module ALU
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				En_Cnvt					),
-		.I_OP(				I_Command.instr.op		),
 		.I_Token(			Cnvt_Token				),
 		.I_Data1(			Cnvt_Data1				),
-		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_Cnvt				),
 		.O_Data(			Data_Cnvt				),
-		.O_Issue_No(		Issue_No_Cnvt			),
 		.O_Token(			Token_Cnvt				)
 	);
 
-	SRL_Unit SRL_Unit
+	SRL_Unit #(
+		.TYPE(				TYPE					)
+	) SRL_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				En_SRL					),
-		.I_OP(				I_Command.instr.op		),
 		.I_Data1(			SRL_Data1				),
 		.I_Data2(			SRL_Data2				),
 		.I_Token(			SRL_Token				),
-		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_SRL				),
 		.O_Data(			Data_SRL				),
-		.O_Issue_No(		Issue_No_SRL			),
 		.O_Token(			Token_SRL				)
 	);
 

@@ -11,17 +11,17 @@
 
 module iMlt_Unit
 	import pkg_tpu::*;
-(
+#(
+	parameter type TYPE			= pipe_exe_tmp_t
+)(
 	input						I_En,
-	input   opt_t 				I_Op,
 	input   data_t				I_Data1,
 	input   data_t				I_Data2,
-	input	index_t				I_Index,
+	input	TYPE				I_Token,
 	input   issue_no_t			I_Issue_No,
 	output  data_t				O_Valid,
 	output  data_t				O_Data,
-	output	index_t				O_Index,
-	output  issue_no_t			O_Issue_No
+	output	TYPE				O_Token
 );
 
 
@@ -34,7 +34,7 @@ module iMlt_Unit
 	logic	[WIDTH_DAYA-1:0]	ResultData;
 
 
-	assign is_Signed			= |I_Op.OpCode;
+	assign is_Signed			= |I_Token.instr.op.OpCode;
 	assign is_Sign				= I_Data1[WIDTH_DATA-1] ^ I_Data2[WIDTH_DATA-1];
 
 
@@ -49,7 +49,6 @@ module iMlt_Unit
 																ResultData
 									) :
 									0;
-	assign O_Index				= ( I_En ) ? I_Index	: '0;
-	assign O_Issue_No			= ( I_En ) ? I_Issue_No : '0:
+	assign O_Token				= ( I_En ) ? I_Token	: '0;
 
 endmodule

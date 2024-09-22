@@ -569,7 +569,6 @@ module Lane_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.O_WB_Dst(			WB_Dst					),
 		.O_WB_Data(			WB_Data					),
-		.O_WB_IssueNo(								),
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
