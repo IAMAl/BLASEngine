@@ -341,6 +341,7 @@ import pkg_mpu::fsm_extern_ld;
 		endcase
 	end
 
+
 	//Store Buffer
 	RingBuffCTRL_Re #(
 		.NUM_ENTRY(			BUFF_SIZE				)

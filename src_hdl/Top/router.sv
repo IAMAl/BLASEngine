@@ -49,7 +49,7 @@ module Router
 	logic						Req_B;
 	logic						Rls_A;
 	logic						Rls_B;
-	
+
 	logic						Req;
 	logic						Rls;
 
@@ -123,14 +123,14 @@ module Router
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Req_A			<=1'b0;
+			Req_A			<= 1'b0;
 		end
 
 		else if ( I_Req & ~Run & ~is_Matched ) begin
 			Req_A			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Req_A			<=1'b0;
+			Req_A			<= 1'b0;
 		end
 		else if ( Run & ~R_is_Matched ) begin
 			Req_A			<= I_Req;
@@ -145,7 +145,7 @@ module Router
 			Req_B			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Req_B			<=1'b0;
+			Req_B			<= 1'b0;
 		end
 		else if ( Run & R_is_Matched ) begin
 			Req_B			<= I_Req;
@@ -154,13 +154,13 @@ module Router
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Rls_A			<=1'b0;
+			Rls_A			<= 1'b0;
 		end
 		else if ( I_Rls & ~Run & ~is_Matched ) begin
 			Rls_A			<= 1'b1;
 		end
 		else if ( ~Run ) begin
-			Rls_A			<=1'b0;
+			Rls_A			<= 1'b0;
 		end
 		else if ( Run & ~R_is_Matched ) begin
 			Rls_A			<= I_Rls;

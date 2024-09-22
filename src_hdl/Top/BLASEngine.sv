@@ -36,15 +36,15 @@ module BLASEngine
 	tpu_row_clm_t				TPU_En_Exe;
 	tpu_row_clm_t				TPU_Req;
 
-	logic						TPU_Term			[NUM_ROWS+1:0][NUM_CLMS-1:0];
-	logic						TPU_Nack			[NUM_ROWS+1:0][NUM_CLMS-1:0];
-	mpu_issue_no_t				TPU_IssueNo			[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	logic						TPU_Term		[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	logic						TPU_Nack		[NUM_ROWS+1:0][NUM_CLMS-1:0];
+	mpu_issue_no_t				TPU_IssueNo		[NUM_ROWS+1:0][NUM_CLMS-1:0];
 
 	logic						Commit_Req;
 	mpu_issue_no_t				Commit_No;
 
-	logic						TPU_Commit_Req	[NUM_CLMS-1:0];
-	mpu_issue_no_t				TPU_Commit_No	[NUM_CLMS-1:0];
+	logic						TPU_Commit_Req	[NUM_ROWS*NUM_CLMS-1:0];
+	mpu_issue_no_t				TPU_Commit_No	[NUM_ROWS*NUM_CLMS-1:0];
 
 
 	logic						Route_I_Req		[NUM_ROWS+1:0][NUM_CLMS-1:0];
@@ -67,11 +67,11 @@ module BLASEngine
 	logic						Route_Bwd_Rls	[NUM_ROWS+1:0][NUM_CLMS:0];
 
 
-	s_ldst_t					TPU_S_LdSt	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
-	v_ldst_t					TPU_V_LdSt	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	s_ldst_t					TPU_S_LdSt		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
+	v_ldst_t					TPU_V_LdSt		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
 
-	s_ldst_t					RAM_S_LdSt	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
-	v_ldst_t					RAM_V_LdSt	[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	s_ldst_t					RAM_S_LdSt		[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
+	v_ldst_t					RAM_V_LdSt		[NUM_ROWS+1:0][NUM_CLMS-1:0][1:0];
 
 
 	data_t						TPU_S_Ld_Data	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0];
@@ -154,7 +154,6 @@ module BLASEngine
 	always_comb begin
 		for ( int clm=0; clm<NUM_CLMS; ++clm ) begin
 			for ( int row=0; row<NUM_ROWS; ++row ) begin
-
 				TPU_Commit_Req[ NUM_CLMS*row + clm ]	= TPU_Term[0][ clm ];
 				TPU_Commit_No[ NUM_CLMS*row + clm ]		= TPU_IssueNo[0][ clm ];
 

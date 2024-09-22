@@ -83,6 +83,7 @@ module fAdd_Unit
 		end
 	end
 
+
 	RingBuffCTRL #(
 		.NUM_ENTRY(			DEPTH_PIPE					)
 	) RingBuffCTRL
