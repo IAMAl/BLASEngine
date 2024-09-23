@@ -31,7 +31,7 @@ module Logic_Unit
 	assign O_Token				= ( I_En ) ? I_Token	: '0;
 
 
-	always_comn begin
+	always_comb begin
 		case ( I_Token.instr.op.OpCode )
 			2'b00: assign ResultData	= ~I_Data1;
 			2'b01: assign ResultData	= I_Data1 & I_Data2;

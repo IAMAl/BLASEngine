@@ -32,7 +32,7 @@ module Lane_Unit
 	input	[1:0]				I_St_Grat,				//Flag: Grant
 	input						I_End_Access1,			//Flag: End of Access
 	input						I_End_Access2,			//Flag: End of Access
-	output	logic				O_Commit,				//Commit Request
+	output						O_Commit,				//Commit Request
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src2,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src3,		//Inter-Lane Connect
@@ -42,7 +42,7 @@ module Lane_Unit
 	output	data_t				O_Lane_Data_Src2,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_Src3,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_WB,			//Inter-Lane Connect
-	output	logic				O_Status				//Lane Status
+	output						O_Status				//Lane Status
 );
 
 

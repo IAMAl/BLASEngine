@@ -109,6 +109,7 @@ module ExecUnit_S
 		.O_ALU_Done(		O_Math_Done				)
 	);
 
+
 	LdStUnit LdStUnit_Odd (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -131,6 +132,7 @@ module ExecUnit_S
 		.O_WB_Data(			Ld_Data[1]				),
 		.O_LdSt_Done(		O_LdSt_Done2			)
 	);
+
 
 	LdStUnit LdStUnit_Evn (
 		.clock(				clock					),

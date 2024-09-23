@@ -25,13 +25,13 @@ module ReorderBuff_S
     input   issue_no_t          I_Commit_No_LdSt2,		//Commit No from LdSt Unit-2
     input   issue_no_t          I_Commit_No_Math,		//Commit No from Math Unit
 	input						I_Commit_Grant,			//Commit Grant
-	output	logic				O_Commit_Req,			//Commit Request to Hazard Unit
+	output						O_Commit_Req,			//Commit Request to Hazard Unit
 	output	issue_no_t			O_Commit_No,			//Commit Number
 	output						O_Commited_LdSt1,		//Commit Grant to LdSt Unit-1
 	output						O_Commited_LdSt2,		//Commit Grant to LdSt Unit-2
 	output						O_Commited_Math,		//Commit Grant to Math Unit
-	output	logic				O_Full,					//State in Full
-	output	logic				O_Empty					//State in Empty
+	output						O_Full,					//State in Full
+	output						O_Empty					//State in Empty
 );
 
 

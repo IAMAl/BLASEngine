@@ -8,7 +8,7 @@ module agu
 	input	address_t			I_Length,				//Vector-Length for Load/Store
 	input	address_t			I_Stride,				//Stride-Factor for Load/Store
 	input	address_t			I_Base_Addr,			//Load/Store Base Address
-	output	logic				O_Req,					//Access-Request
+	output						O_Req,					//Access-Request
 	output	address_t			O_Address,				//Access-Address
 	output						O_End_Access			//Flag: End of Access
 );

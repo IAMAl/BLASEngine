@@ -381,6 +381,7 @@ module extern_handle
 		endcase
 	end
 
+
 	//Store Buffer
 	RingBuffCTRL #(
 		.NUM_ENTRY(			BUFF_SIZE				)

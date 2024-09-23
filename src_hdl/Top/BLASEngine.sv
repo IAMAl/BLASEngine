@@ -36,6 +36,10 @@ module BLASEngine
 	tpu_row_clm_t				TPU_En_Exe;
 	tpu_row_clm_t				TPU_Req;
 
+
+	logic						CoomitAgg_Full;
+
+
 	logic						TPU_Term		[NUM_ROWS+1:0][NUM_CLMS-1:0];
 	logic						TPU_Nack		[NUM_ROWS+1:0][NUM_CLMS-1:0];
 	mpu_issue_no_t				TPU_IssueNo		[NUM_ROWS+1:0][NUM_CLMS-1:0];
@@ -147,7 +151,7 @@ module BLASEngine
 		.I_Commit_No(		TPU_Commit_No			),
 		.O_Commit_Req(		Commit_Req				),
 		.O_Commit_No(		Commit_No				),
-		.O_Full(			)//ToDo
+		.O_Full(			CoomitAgg_Full			)
 	);
 
 
@@ -278,9 +282,11 @@ module BLASEngine
 				.O_Nack(		TPU_Nack[ row ][ clm ]			)
 			);
 
+
 			DMem DMem_TPU (
 				.clock(			clock							),
 				.reset(			reset							),
+				.I_Stall(		CoomitAgg_Full					),
 				.I_Rt_Req(		Route_I_Req[ row ][ clm ]		),
 				.I_Rt_Data(		Route_I_Data[ row ][ clm ]		),
 				.I_Rt_Rls(		Route_I_Rls[ row ][ clm ]		),
@@ -310,6 +316,7 @@ module BLASEngine
 		DMem TDMem (
 			.clock(			clock							),
 			.reset(			reset							),
+			.I_Stall(		CoomitAgg_Full					),
 			.I_Rt_Req(		Route_I_Req[0][ clm ]			),
 			.I_Rt_Data(		Route_I_Data[0][ clm ]			),
 			.I_Rt_Els(		Route_I_Rls[0][ clm ]			),
@@ -332,9 +339,11 @@ module BLASEngine
 			.O_V_St_Grant(	RAM_V_St_Grant[0][ clm ]		)
 		);
 
+
 		DMem BDMem (
 			.clock(			clock							),
 			.reset(			reset							),
+			.I_Stall(		CoomitAgg_Full					),
 			.I_Rt_Req(		Route_I_Req[NUM_ROWS][ clm ]	),
 			.I_Rt_Data(		Route_I_Data[NUM_ROWS][ clm ]	),
 			.O_Rt_Req(		Route_O_Req[NUM_ROWS][ clm ]	),

@@ -31,7 +31,7 @@ module token_pipe_ldst
 	input	TYPE				I_Token,				//Input Token
 	output	TYPE				O_Token,				//Output Token
 	output						O_Stall,				//Stall Request
-	output						O_Empty
+	output						O_Empty					//Flag: Empty in Buffer
 );
 
 

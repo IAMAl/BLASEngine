@@ -19,7 +19,7 @@ module Scalar_Unit
 	input						I_En,					//Enable Execution
 	input						I_Empty,				//Empty on Buffer
 	input						I_Req_St,				//Store Request for Instructions
-	output	logic				O_Ack_St,				//Acknowledge for Storing
+	output						O_Ack_St,				//Acknowledge for Storing
 	input	instr_t				I_Instr,				//Instruction from Buffer
 	input	id_t				I_ThreadID,				//Thread-ID
 	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
@@ -43,6 +43,7 @@ module Scalar_Unit
 	output	state_t				O_State,				//Scalar Unit Status
 	output						O_Term					//Flag: Termination
 );
+
 
 	localparam int	LANE_ID = 0;
 
@@ -474,7 +475,7 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Req_IW					),
-		.I_Slice(			),//ToDo
+		.I_Slice(			Dst_Slice				),
 		.I_Req_Issue(		W_Req_Issue				),
 		.I_Instr(			Instr_IW				),
 		.I_Commit_Req(		Commit_Req				),

@@ -165,6 +165,7 @@ module LdStUnit (
 		.O_Stall(			Ld_Stall					)
 	);
 
+
 	ldst_unit #(
 		.DEPTH_BUFF(		16							),
 		.DEPTH_BUFF_LDST(	DEPTH_BUFF_LDST				),

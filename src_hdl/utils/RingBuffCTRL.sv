@@ -20,8 +20,8 @@ module RingBuffCTRL
 	input						I_Re,				//Read-Enable
 	output	[WIDTH_ENTRY-1:0]	O_WAddr,			//Write Address
 	output	[WIDTH_ENTRY-1:0]	O_RAddr,			//Read Address
-	output	logic				O_Full,				//Flag: Full
-	output	logic				O_Empty,			//Flag: Empty
+	output						O_Full,				//Flag: Full
+	output						O_Empty,			//Flag: Empty
     output  [WIDTH_ENTRY:0]		O_Num				//Remained Number of Entries
 );
 

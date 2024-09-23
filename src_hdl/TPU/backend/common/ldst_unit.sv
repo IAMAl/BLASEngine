@@ -109,6 +109,7 @@ module ldst_unit
 		.O_Num(				Num							)
 	);
 
+
 	token_pipe_ldst #(
 		.DEPTH_BUFF(		DEPTH_BUFDF_LDST			),
 		.TYPE(				TYPE						)

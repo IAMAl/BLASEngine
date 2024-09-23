@@ -24,11 +24,11 @@ import pkg_mpu::fsm_extern_ld;
 	output						O_Req,					//Request to Extern
 	output	data_t				O_Data,					//Data to Extern
 	input						I_Ld_Req,				//Request from Data Memory
-	input						I_Ld_Grant,
+	input						I_Ld_Grant,				//Grant for Request
 	input	data_t				I_Ld_Data,				//Data from Data Memory
 	input						I_Ld_Rls,				//End of Loading
 	output						O_St_Req,				//Request Storing to Data Memory
-	input						I_St_Grant,
+	input						I_St_Grant,				//Grant for Request
 	output	data_t				O_St_Data,				//Storing Data to Data Memory
 	output						O_St_Rls				//End of Storing
 );

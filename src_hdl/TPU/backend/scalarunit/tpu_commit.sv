@@ -19,9 +19,9 @@ module Commit_TPU
 	input						I_Commit_Req_V,			//Commit Request from Vector Unit
 	input	issue_no_t			I_Commit_No_S,			//Commit No from Scalar Unit
 	input	issue_no_t			I_Commit_No_V,			//Commit No from Vector Unit
-	output	logic				O_Commit_Grant_S,		//Commit Grant to Scalar Commit Unit
-	output	logic				O_Commit_Grant_V,		//Commit Grant to Vector Commit Unit
-	output	logic				O_Commit_Req,			//Commit Request to Hazard Unit
+	output						O_Commit_Grant_S,		//Commit Grant to Scalar Commit Unit
+	output						O_Commit_Grant_V,		//Commit Grant to Vector Commit Unit
+	output						O_Commit_Req,			//Commit Request to Hazard Unit
 	input	issue_no_t			O_Commit_No				//Commit No to Hazard Unit
 );
 

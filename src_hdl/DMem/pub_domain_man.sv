@@ -31,12 +31,12 @@ module pub_domain_man
 	input						I_GrantVld_Ld,
 	input	[1:0]				I_GrantNo_St,
 	input	[1:0]				I_GrantNo_Ld,
-	output	logic				O_St_Ready1,
-	output	logic				O_St_Ready2,
-	output	logic				O_St_Ready3,
-	output	logic				O_Ld_Ready1,
-	output	logic				O_Ld_Ready2,
-	output	logic				O_Ld_Ready3,
+	output						O_St_Ready1,
+	output						O_St_Ready2,
+	output						O_St_Ready3,
+	output						O_Ld_Ready1,
+	output						O_Ld_Ready2,
+	output						O_Ld_Ready3,
 	output						O_Set_Config_St,
 	output						O_Set_Config_Ld
 );

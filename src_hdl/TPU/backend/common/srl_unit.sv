@@ -131,6 +131,7 @@ module SRL_Unit
 		.O_Issue_No(		Issue_No_Shift			)
 	);
 
+
 	Rotate_Unit #(
 		.TYPE(				TYPE					)
 	) Rotate_Unit
@@ -144,6 +145,7 @@ module SRL_Unit
 		.O_Token(			Token_Rotate			),
 		.O_Issue_No(		Issue_No_Rotate			)
 	);
+
 
 	Logic_Unit #(
 		.TYPE(				TYPE					)

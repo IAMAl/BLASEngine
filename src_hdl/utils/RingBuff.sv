@@ -21,8 +21,8 @@ module RingBuff
 	input						I_Re,				//Read-Enable
 	input	TYPE				I_Data,				//Input Data
 	output	TYPE				O_Data,				//Output Data
-	output	logic				O_Full,				//Flag: Full
-	output	logic				O_Empty,			//Flag: Empty
+	output						O_Full,				//Flag: Full
+	output						O_Empty,			//Flag: Empty
     output  [WIDTH_ENTRY:0]		O_Num				//Remained Number of Entries
 );
 

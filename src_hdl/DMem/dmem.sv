@@ -27,6 +27,7 @@ module DMem
 	output	[1:0]				O_St_Grant				//Flag: Grant for Request
 	);
 
+
 	DMem_Body DMem_Body (
 		.clock(				clock					),
 		.reset(				reset					),

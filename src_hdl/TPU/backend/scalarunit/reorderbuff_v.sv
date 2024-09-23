@@ -21,10 +21,10 @@ module ReorderBuff_V
 	input	issue_no_t			I_Issue_No,				//Storing Issue No
 	input						I_Commit_Grant,			//Commit Grant
 	input						I_Commit_Req,			//Commit Request from Vector Unit
-	output	logic				O_Commit_Req,			//Commit Request
+	output						O_Commit_Req,			//Commit Request
 	output	issue_no_t			O_Commit_No,			//Commit No
-	output	logic				O_Full,					//State in Full
-	output	logic				O_Empty					//State in Empty
+	output						O_Full,					//State in Full
+	output						O_Empty					//State in Empty
 );
 
 

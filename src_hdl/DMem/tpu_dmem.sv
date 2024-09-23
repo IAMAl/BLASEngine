@@ -3,6 +3,7 @@ module DMem
 (
 	input						clock,
 	input						reset,
+	input						I_Stall,				//Stall
 	input						I_Rt_Req,				//Request from Router
 	input	data_t				I_Rt_Data,				//Data from Router
 	input	logic				I_Rt_Rls,				//Release Token from Router
@@ -33,14 +34,14 @@ module DMem
 	input	data_t				I_St_Data2,				//Store Data
 	output	data_t				O_Ld_Data1,				//Load Data
 	output	data_t				O_Ld_Data2,				//Load Data
-	output	logic				O_St_Grant1,			//Grant for Store Req
-	output	logic				O_St_Grant2,			//Grant for Store Req
-	output	logic				O_Ld_Grant1,			//Grant for Load Req
-	output	logic				O_Ld_Grant2,			//Grant for Load Req
-	output	logic				O_St_Ready1,			//Ready to Store
-	output	logic				O_St_Ready2,			//Ready to Store
-	output	logic				O_Ld_Ready1,			//Ready to Load
-	output	logic				O_Ld_Ready2				//Ready to Load
+	output						O_St_Grant1,			//Grant for Store Req
+	output						O_St_Grant2,			//Grant for Store Req
+	output						O_Ld_Grant1,			//Grant for Load Req
+	output						O_Ld_Grant2,			//Grant for Load Req
+	output						O_St_Ready1,			//Ready to Store
+	output						O_St_Ready2,			//Ready to Store
+	output						O_Ld_Ready1,			//Ready to Load
+	output						O_Ld_Ready2				//Ready to Load
 );
 
 
@@ -166,13 +167,13 @@ module DMem
 
 	assign Extern_St_Term		= End_St;
 	assign Extern_Ld_Term		= End_Ld;
-	assign Extern_St_Grant		= St_Grant3;
-	assign Extern_Ld_Grant		= Ld_Grant3;
+	assign Extern_St_Grant		= St_Grant3 & ~I_Stall;
+	assign Extern_Ld_Grant		= Ld_Grant3 & ~I_Stall;
 
 
-	assign O_Ld_Data1			= (  Ld_Grant1 ) ?	Ld_Data : 0;
-	assign O_Ld_Data2			= (  Ld_Grant2 ) ?	Ld_Data : 0;
-	assign Extern_Ld_Data		= (  Ld_Grant3 ) ?	Ld_Data : 0;
+	assign O_Ld_Data1			= ( Ld_Grant1 ) ?	Ld_Data : 0;
+	assign O_Ld_Data2			= ( Ld_Grant2 ) ?	Ld_Data : 0;
+	assign Extern_Ld_Data		= ( Ld_Grant3 ) ?	Ld_Data : 0;
 
 	assign O_St_Grant1			= St_Grant1;
 	assign O_St_Grant2			= St_Grant2;
@@ -313,6 +314,7 @@ module DMem
 	(
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Stall(			I_Stall					),
 		.I_St_Base(			St_Base					),
 		.I_Ld_Base(			Ld_Base					),
 		.I_St_Grant1(		St_Grant1				),
@@ -339,7 +341,7 @@ module DMem
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Set_Cfg_St				),
-		.I_Stall(			~St_Valid				),
+		.I_Stall(			~St_Valid | I_Stall		),
 		.I_Length(			Length_St				),
 		.I_Stride(			Stride_St				),
 		.I_Base_Addr(		St_Base					),
@@ -352,7 +354,7 @@ module DMem
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				Set_Cfg_Ld				),
-		.I_Stall(			~Ld_Valid				),
+		.I_Stall(			~Ld_Valid | I_Stall		),
 		.I_Length(			Length_Ld				),
 		.I_Stride(			Stride_Ld				),
 		.I_Base_Addr(		Ld_Base					),

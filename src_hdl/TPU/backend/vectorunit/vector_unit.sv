@@ -28,7 +28,7 @@ module Vector_Unit
 	input	v_ready_t			I_St_Ready,				//Flag: Ready
 	input	v_grant_t			I_St_Grant,				//Flag: Grant
 	input	v_ready_t			I_End_Access,			//Flag: End of Access
-	output	logic				O_Commmit_Req,			//Commit Request
+	output						O_Commmit_Req,			//Commit Request
 	output	lane_t				O_Status				//Status on Lane
 );
 
