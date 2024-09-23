@@ -34,8 +34,8 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
     - OpCode [1:0]
 	    - 00		Unsigned Multiplication
 	    - 01		Signed Multiplication
-	    - 10		Multiply-Acc
-	    - 11		Multiply-Add
+	    - 10		Multiply-Add
+	    - 11		Multiply-Acc
 - 10		Divider
 	- OpCode [1:0]
 		- 00		Unsigned Division
@@ -47,25 +47,26 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 	    - 00		Int32 to Float32
 	    - 01		Move
 	    - 10		Output Scalar Data
-	    - 11		Bit-Reverse
+	    - 11		Reserved
 ### Vector Unit
 - 00		Adder
 	- OpCode [1:0]
 	    - 00		Addition
 	    - 01		Subtraction
-        - 1x		Reserved
+        - 10		Add-Multipy
+        - 11		Sub-Multipy
 - 01		Multiplier
 	- OpCode [1:0]
 	    - 00		Multiplication
 	    - 01		Reserved
-	    - 10		Add-Multiply
-	    - 11		Multiply-Add
+	    - 10		Multiply-Add
+	    - 11		Multiply-Acc
 - 10		Reserved
 - 11		Convert
 	- OpCode [1:0]
 	    - 00		Float32 to Int32
 	    - 01		Move
-		- 10		Input Scalar Data
+		- 10		Output Scalar Data
 	    - 11		Reserved
 
 ## 3. Conditional	[1:0]
@@ -100,16 +101,12 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 	    - 01		Greater than
 	    - 10		Lesser than or Equal
 	    - 11		Not Equal
-- 01		Set Mask
-	- Opcode [1:0]
-	    - 00 Set Mask All One
-		- 01 Reserved
-		- 1x Reserved
+- 01		Reserved
 - 10		Mask Handle
     - Opcode [1:0]
 		- 00 Enable Masked Operation
 		- 01 Disable Masked Operation
-		- 10 Reserved
+		- 10 Set Mask All One
 		- 11 Set Mask by True of Follower Comparing
 - 11		Selector
 	- Opcode [1:0]
