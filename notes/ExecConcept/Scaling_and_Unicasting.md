@@ -5,7 +5,7 @@
 <div align="center">
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/TPU_Unicast.png"
        alt="Transposition"
-       title="Transposing Matrix"
-       width="700px"
+       title="Unicasting from Scalar Unit"
+       width="650px"
   />
 </div>
