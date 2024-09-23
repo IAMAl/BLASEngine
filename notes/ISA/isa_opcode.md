@@ -58,7 +58,7 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 - 01		Multiplier
 	- OpCode [1:0]
 	    - 00		Multiplication
-	    - 01		Reserved
+	    - 01		Multiply-Sub
 	    - 10		Multiply-Add
 	    - 11		Multiply-Acc
 - 10		Reserved
