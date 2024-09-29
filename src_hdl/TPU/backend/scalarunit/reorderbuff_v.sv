@@ -81,7 +81,7 @@ module ReorderBuff_V
 			if ( I_Store ) begin
 				Commit_V[ WNo ].v		<= 1'b1;
 				Commit_V[ WNo ].issue_no<= I_Issue_No;
-				Commit_V[ WNo ].en_lane	<= 
+				Commit_V[ WNo ].en_lane	<= I_En_Lane;
 				Commit_V[ WNo ].commit	<= 0;
 			end
 

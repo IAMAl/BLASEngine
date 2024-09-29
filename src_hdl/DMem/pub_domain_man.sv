@@ -17,28 +17,28 @@ module pub_domain_man
 )(
 	input						clock,
 	input						reset,
-	input	address_t			I_St_Base,
-	input	address_t			I_Ld_Base,
-	input						I_St_Grant1,
-	input						I_St_Grant2,
-	input						I_St_Grant3,
-	input						I_Ld_Grant1,
-	input						I_Ld_Grant2,
-	input						I_Ld_Grant3,
-	input						I_St_End,
-	input						I_Ld_End,
-	input						I_GrantVld_St,
-	input						I_GrantVld_Ld,
-	input	[1:0]				I_GrantNo_St,
-	input	[1:0]				I_GrantNo_Ld,
-	output						O_St_Ready1,
-	output						O_St_Ready2,
-	output						O_St_Ready3,
-	output						O_Ld_Ready1,
-	output						O_Ld_Ready2,
-	output						O_Ld_Ready3,
-	output						O_Set_Config_St,
-	output						O_Set_Config_Ld
+	input	address_t			I_St_Base,				//Store Base Adress
+	input	address_t			I_Ld_Base,				//Load Base Adress
+	input						I_St_Grant1,			//Grant for Storing
+	input						I_St_Grant2,			//Grant for Storeing
+	input						I_St_Grant3,			//Grant for Storing (Extern)
+	input						I_Ld_Grant1,			//Grant for Loading
+	input						I_Ld_Grant2,			//Grant for Loading
+	input						I_Ld_Grant3,			//Grant for Loading (Extern)
+	input						I_St_End,				//End of Storing
+	input						I_Ld_End,				//End of Loading
+	input						I_GrantVld_St,			//Grant Validation
+	input						I_GrantVld_Ld,			//Grant Validation
+	input	[1:0]				I_GrantNo_St,			//Grant No
+	input	[1:0]				I_GrantNo_Ld,			//Grant No
+	output						O_St_Ready1,			//Ready to Store
+	output						O_St_Ready2,			//Ready to Store
+	output						O_St_Ready3,			//Ready to Store (Extern)
+	output						O_Ld_Ready1,			//Ready to Load
+	output						O_Ld_Ready2,			//Ready to Load
+	output						O_Ld_Ready3,			//Ready to Load (Extern)
+	output						O_Set_Config_St,		//Set Configuration
+	output						O_Set_Config_Ld			//Set Configuration
 );
 
 
