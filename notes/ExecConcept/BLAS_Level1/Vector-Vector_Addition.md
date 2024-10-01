@@ -4,7 +4,7 @@
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/VectorOp.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/VectorOP.png"
        alt="HTML image alt text"
        title="Vector Additon"
        width="600px"
