@@ -2,6 +2,14 @@
 
 ベクトルとベクトルの乗算、つまり内積演算はBLASEngineでは3通りの実装方法があります。
 
+<div align="center">
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/VecotrOp.png"
+       alt="HTML image alt text"
+       title="Vector Multiplication"
+       width="600px"
+  />
+</div>
+
 ## 方法1：古典ベクトル演算
 
 これは一つのレーン内で内積を行うレジスタファイルに収まるベクトル長を中心とした方法です。
