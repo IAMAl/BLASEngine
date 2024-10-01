@@ -19,3 +19,11 @@
 これはベクトルの一次元を3次元に分割します。
 アルゴリズム上forループ構造の最内側ループを古典ベクトル演算、その外側ループを各レーンにマップし、最外ループは分岐命令を使用して実装します。
 それぞれのレーンで演算を行います。
+
+<div align="center">
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/MatrixOP.png"
+       alt="HTML image alt text"
+       title="Matrix Addition"
+       width="600px"
+  />
+</div>
