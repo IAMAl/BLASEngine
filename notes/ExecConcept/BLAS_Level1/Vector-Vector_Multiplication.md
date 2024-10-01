@@ -3,7 +3,7 @@
 ベクトルとベクトルの乗算、つまり内積演算はBLASEngineでは3通りの実装方法があります。
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/VecotrOp.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/VectorOp.png"
        alt="HTML image alt text"
        title="Vector Multiplication"
        width="600px"
