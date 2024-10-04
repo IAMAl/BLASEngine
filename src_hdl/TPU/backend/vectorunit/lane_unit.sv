@@ -319,6 +319,7 @@ module Lane_Unit
 		.O_Index(			Dst_RegFile_Index		)
 	);
 
+
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
 	) Index1
@@ -341,6 +342,7 @@ module Lane_Unit
 		.O_Slice(			PipeReg_Index.src1.slice),
 		.O_Index(			Index_Src1				)
 	);
+
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
@@ -365,6 +367,7 @@ module Lane_Unit
 		.O_Index(			Index_Src2				)
 	);
 
+
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
 	) Index3
@@ -387,6 +390,7 @@ module Lane_Unit
 		.O_Slice(			PipeReg_Index.src3.slice),
 		.O_Index(			Index_Src3				)
 	);
+
 
 	RF_Index_Sel RF_Index_Sel (
 		.I_Odd1(			PipeReg_Index.src1.v	),
@@ -436,6 +440,7 @@ module Lane_Unit
 		.O_Data_Src2(		RF_Odd_Data2			)
 	);
 
+
 	RegFile RegFile_Even (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -448,6 +453,7 @@ module Lane_Unit
 		.O_Data_Src1(		RF_Even_Data1			),
 		.O_Data_Src2(		RF_Even_Data2			)
 	);
+
 
 	RF_Data_Sel RF_Data_Sel (
 		.I_Odd1(			Sel[0]					),
@@ -520,6 +526,7 @@ module Lane_Unit
 		.O_Slice(									),
 		.O_Index(			Net_Index				)
 	);
+
 
 	Network_V #(
 		.NUM_LANES(			NUM_LANES				),

@@ -530,6 +530,7 @@ module Scalar_Unit
 		.O_Index(			Dst_RegFile_Index		)
 	);
 
+
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
 	) Index1
@@ -552,6 +553,7 @@ module Scalar_Unit
 		.O_Slice(			PipeReg_Index.src1.slice),
 		.O_Index(			Index_Src1				)
 	);
+
 
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
@@ -576,6 +578,7 @@ module Scalar_Unit
 		.O_Index(			Index_Src2				)
 	);
 
+
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
 	) Index3
@@ -598,6 +601,7 @@ module Scalar_Unit
 		.O_Slice(			PipeReg_Index.src3.slice),
 		.O_Index(			Index_Src3				)
 	);
+
 
 	RF_Index_Sel RF_Index_Sel (
 		.I_Odd1(			PipeReg_Index.src1.v	),
@@ -647,6 +651,7 @@ module Scalar_Unit
 		.O_Data_Src2(		RF_Odd_Data2			)
 	);
 
+
 	RegFile RegFile_Even (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -659,6 +664,7 @@ module Scalar_Unit
 		.O_Data_Src1(		RF_Even_Data1			),
 		.O_Data_Src2(		RF_Even_Data2			)
 	);
+
 
 	RF_Data_Sel RF_Data_Sel (
 		.I_Odd1(			Sel[0]					),
@@ -801,6 +807,7 @@ module Scalar_Unit
 		.O_Empty(			Empty_RB_S				)
 	);
 
+
 	//	 Commit Unit for Vector Unit
 	ReorderBuff_V #(
 		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
@@ -818,6 +825,7 @@ module Scalar_Unit
 		.O_Full(			Full_RB_V				),
 		.O_Empty(			Empty_RB_V				)
 	);
+
 
 	// Commit Request Selecter
 	Commit_TPU Commit_TPU (

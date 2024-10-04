@@ -42,17 +42,20 @@ module NLZ32
 		.O_Valid(			Valid0						)
 	);
 
+
 	NLZ8 NLZ1 (
 		.I_Data(			I_Data[15:8]				),
 		.O_Num(				Num1						),
 		.O_Valid(			Valid1						)
 	);
 
+
 	NLZ8 NLZ2 (
 		.I_Data(			I_Data[23:16]				),
 		.O_Num(				Num2						),
 		.O_Valid(			Valid2						)
 	);
+
 
 	NLZ8 NLZ3 (
 		.I_Data(			I_Data[31:24]				),

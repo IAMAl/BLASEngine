@@ -74,7 +74,7 @@ module FrontEnd
 		if ( reset ) begin
 			R_Instr			<= '0;
 		end
-		else if ( R_Req ) begin
+		else if ( I_Req ) begin
 			R_Instr			<= I_Instr;
 		end
 	end
@@ -98,8 +98,8 @@ module FrontEnd
 		else if ( R_Term ) begin
 			R_IssueNo		<= '0;
 		end
-		else if ( R_Instr.v & is_FSM_TPU_SCALAR ) begin
-			R_IssueNo		<= R_Instr;
+		else if ( I_Req & is_FSM_TPU_SCALAR ) begin
+			R_IssueNo		<= I_IssueNo;
 		end
 	end
 

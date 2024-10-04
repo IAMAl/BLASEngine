@@ -279,6 +279,7 @@ module DMem
 		.O_GrantNo(			St_GrantNo				)
 	);
 
+
 	req_handle req_handle_ld (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -307,6 +308,7 @@ module DMem
 		.O_GrantVld(		Ld_GrantVld				),
 		.O_GrantNo(			Ld_GrantNo				)
 	);
+
 
 	pub_domain_man #(
 		.NUM_ENTRY(			32						)
@@ -337,6 +339,7 @@ module DMem
 		.O_Set_Config_Ld(	Set_Config_Ld			)
 	);
 
+
 	agu agu_st (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -349,6 +352,7 @@ module DMem
 		.O_Req(				Req_St					),
 		.O_End_Access(		End_St					)
 	);
+
 
 	agu agu_ld (
 		.clock(				clock					),
