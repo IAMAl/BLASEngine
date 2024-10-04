@@ -163,21 +163,21 @@ module HazardCheck_TPU
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY_HAZARD; ++i ) begin
 			is_Matched_i_dst_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.dst.v  & ( TabHazard[ i ].dst.idx  == I_Instr.dst.idx );
-			is_Matched_i_dst_i_src1[ i ]		= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr.dst.idx );
-			is_Matched_i_dst_i_src2[ i ]		= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr.dst.idx );
-			is_Matched_i_dst_i_src3[ i ]		= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr.dst.idx );
+			is_Matched_i_dst_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr.dst.idx );
+			is_Matched_i_dst_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr.dst.idx );
+			is_Matched_i_dst_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr.dst.idx );
 
-			is_Matched_i_src1_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src1.v & ( TabHazard[ i ].dst.idx  == I_Instr.src1.idx );
+			is_Matched_i_src1_i_dst[ i ]	= TabHazard[ i ].instr.dst.v  & I_Instr.src1.v & ( TabHazard[ i ].dst.idx  == I_Instr.src1.idx );
 			is_Matched_i_src1_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].src1.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
 			is_Matched_i_src1_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src1.v & ( TabHazard[ i ].src2.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
 			is_Matched_i_src1_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src1.v & ( TabHazard[ i ].src3.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].slice_length != 0 );
 
-			is_Matched_i_src2_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src2.v & ( TabHazard[ i ].dst.idx  == I_Instr.src2.idx );
+			is_Matched_i_src2_i_dst[ i ]	= TabHazard[ i ].instr.dst.v  & I_Instr.src2.v & ( TabHazard[ i ].dst.idx  == I_Instr.src2.idx );
 			is_Matched_i_src2_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src2.v & ( TabHazard[ i ].src1.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
 			is_Matched_i_src2_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].src2.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
 			is_Matched_i_src2_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src2.v & ( TabHazard[ i ].src3.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].slice_length != 0 );
 
-			is_Matched_i_src3_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.src3.v & ( TabHazard[ i ].dst.idx  == I_Instr.src3.idx );
+			is_Matched_i_src3_i_dst[ i ]	= TabHazard[ i ].instr.dst.v  & I_Instr.src3.v & ( TabHazard[ i ].dst.idx  == I_Instr.src3.idx );
 			is_Matched_i_src3_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src3.v & ( TabHazard[ i ].src1.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
 			is_Matched_i_src3_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src3.v & ( TabHazard[ i ].src2.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
 			is_Matched_i_src3_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].src3.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].slice_length != 0 );
