@@ -45,9 +45,6 @@ module DMem
 );
 
 
-	logic						Ld_Req;
-	logic						ST_Req;
-
 	logic						Ld_GrantVld;
 	logic						St_GrantVld;
 	logic						Ld_GrantNo;
@@ -99,6 +96,7 @@ module DMem
 	logic						St_Req;
 	data_t						St_Data;
 
+	logic						Ld_Req;
 	data_t						Ld_Data;
 
 	data_t						Extern_St_Data;

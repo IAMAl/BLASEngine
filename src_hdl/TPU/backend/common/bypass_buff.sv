@@ -251,6 +251,7 @@ module BypassBuff
 		.O_Enc(				NoSrc1					)
 	);
 
+
 	Encoder #(
 		.NUM_ENTRY(			BUFF_SIZE				)
 	) EncSrc2
@@ -258,6 +259,7 @@ module BypassBuff
 		.I_Data(			is_Matched_Src2			),
 		.O_Enc(				NoSrc2					)
 	);
+
 
 	Encoder #(
 		.NUM_ENTRY(			BUFF_SIZE				)
