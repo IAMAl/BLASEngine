@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	iAdd_Unit
+//	Module Name:	Cnvt_Unit
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module iAdd_Unit
+module Cnvt_Unit
 	import pkg_tpu::*;
 #(
 	parameter type TYPE			= pipe_exe_tmp_t

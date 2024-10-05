@@ -27,12 +27,12 @@ module iDiv_Unit
 	logic						is_Signed;
 	logic						is_Sub;
 
-	logic	[WIDTH_DAYA:0]		Not_Data2;
+	logic	[WIDTH_DATA:0]		Not_Data2;
 
 	logic	[WIDTH_DATA:0]		Src_Data1;
 	logic	[WIDTH_DATA:0]		Src_Data2;
 
-	logic	[WIDTH_DAYA:0]		ResultData;
+	logic	[WIDTH_DATA:0]		ResultData;
 
 
 	assign is_Signed			= I_Token.instr.op.OpCode[1];
@@ -46,7 +46,7 @@ module iDiv_Unit
 	assign ResultData			= Src_Data1 + Not_Data2 + is_Sub;
 
 	assign O_Valid				= I_En;
-	assign O_Data				= ( I_En ) ? ResultData[WIKDTH_DATA-1:0] : '0;
+	assign O_Data				= ( I_En ) ? ResultData[WIDTH_DATA-1:0] : '0;
 	assign O_Token				= ( I_En ) ? I_Token	: '0;
 
 endmodule
