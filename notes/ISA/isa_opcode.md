@@ -11,8 +11,8 @@ Total 9-bit.
 Unit Sel (Unit Selector) bit-field selects scalar unit or vector unit and its execution unit cluster.
 
 ### [2] Scalar/Vector Unit Select
-- 0		Scalar Unit
-- 1		Vector Unit
+- 0			Scalar Unit
+- 1			Vector Unit
 
 ### [1:0] Execution Cluster Select
 - 00		Arithmetic Unit
@@ -91,7 +91,7 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 	- Opcode [1:0]
 		- 00 Enable All Lanes
 		- 01 Reserved
-		- 10 Write Lane-Enable Register
+		- 10 Write Lane Status Register
 		- 11 Read Lane Status Register
 
 ### Vector Unit
