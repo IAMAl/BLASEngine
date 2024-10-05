@@ -10,8 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IndexUnit
-import pkg_tpu::*;
-import pkg_mpu::*;
+	import pkg_tpu::*;
+	import pkg_mpu::*;
 #(
 	parameter int LANE_ID		= 0
 )(

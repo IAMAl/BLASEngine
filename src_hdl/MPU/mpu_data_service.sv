@@ -10,10 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module DataService_MPU
-import pkg_tpu::*;
-import pkg_mpu::*;
-import pkg_mpu::fsm_extern_st;
-import pkg_mpu::fsm_extern_ld;
+	import pkg_tpu::*;
+	import pkg_mpu::*;
+	import pkg_mpu::fsm_extern_st;
+	import pkg_mpu::fsm_extern_ld;
 #(
 	parameter int	BUFF_SIZE	= 128
 )(

@@ -15,7 +15,7 @@ module HazardCheck_TPU
 	input	index_t				I_Index_Src1,			//Index for Source-1
 	input	index_t				I_Index_Src2,			//Index for Source-2
 	input	index_t				I_Index_Src3,			//Index fpr Source-3
-	input						I_Slice,				//Flaag: Index-Sllicing
+	input						I_Slice,				//Flaag: Index-Slicing
 	input						I_Req_Commit,			//Request to Commit
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,			//Commit (Issued) No.
 	output						O_Req_Issue,			//Request to Next Stage

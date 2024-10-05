@@ -10,10 +10,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module IF_MPU
-import pkg_top::*;
-import pkg_mpu::*;
-import pkg_tpu::*;
-import pkg_tpu::instr_t;
+	import pkg_top::*;
+	import pkg_mpu::*;
+	import pkg_tpu::*;
+	import pkg_tpu::instr_t;
 (
 	input						clock,
 	input						reset,
