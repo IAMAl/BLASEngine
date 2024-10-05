@@ -17,8 +17,8 @@ module fAdd_Unit
 )(
 	input						I_En,					//Enable to Execute
 	input						I_Stall,				//Stall Request
-	input   float				I_Data1,				//Source Operand
-	input   float				I_Data2,				//Source Operand
+	input   data_t				I_Data1,				//Source Operand
+	input   data_t				I_Data2,				//Source Operand
 	input	TYPE				I_Token,				//Command
 	input   issue_no_t			I_Issue_No,				//Current Issue No
 	output  data_t				O_Valid,				//Output Valid
@@ -35,7 +35,7 @@ module fAdd_Unit
 	logic						Valid;
 	data_t						Data;
 	index_t						Token;
-	float						ResultData;
+	data_t						ResultData;
 
 	logic						We;
 	logic						Re;

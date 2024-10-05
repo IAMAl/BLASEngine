@@ -17,8 +17,8 @@ module fMlt_Unit
 )(
 	input						I_En,					//Enable to Execute
 	input						I_Stall,				//Stall Request
-	input   float				I_Data1,				//Source Operand
-	input   float				I_Data2,				//Source Operand
+	input   data_t				I_Data1,				//Source Operand
+	input   data_t				I_Data2,				//Source Operand
 	input	TYPE				I_Token,				//Command
 	output  data_t				O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
@@ -31,7 +31,7 @@ module fMlt_Unit
 	logic						Valid;
 	data_t						Data;
 	TYPE						Token;
-	float						ResultData;
+	data_t						ResultData;
 
 	logic						We;
 	logic						Re;

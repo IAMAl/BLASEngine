@@ -15,7 +15,7 @@ module MA_Unit
 	parameter int DEPTH_MLT		= 3,
 	parameter int DEPTH_ADD		= 1,
 	parameter type TYPE			= pipe_exe_tmp_t,
-	parameter bool INT_UNIT		= true
+	parameter bool INT_UNIT		= 1
 )(
 	input						clock,
 	input						reset,

@@ -12,7 +12,8 @@
 module ALU
 	import pkg_tpu::*;
 #(
-	parameter type TYPE			= pipe_exe_tmp_t
+	parameter type TYPE			= pipe_exe_tmp_t,
+	parameter bool INT_UNIT		= 1
 )(
 	input						clock,
 	input						reset,
@@ -74,12 +75,12 @@ module ALU
 
 
 	logic						Valid_MA;
-	logic						Valid_;
+	logic						Valid_iDiv;
 	logic						Valid_Cnvt;
 	logic						Valid_SRL;
 
 	data_t						Data_MA;
-	data_t						Data_iDIV;
+	data_t						Data_iDiv;
 	data_t						Data_Cnvt;
 	data_t						Data_SRL;
 
@@ -167,7 +168,7 @@ module ALU
 	assign O_WB_Data			= (   Sel == 2'b00 ) ?	Data_MA :
 									( Sel == 2'b01 ) ?	Data_iDiv :
 									( Sel == 2'b10 ) ?	Data_Cnvt :
-									( Sel == 2'b11 ) ?	Daat_SRL :
+									( Sel == 2'b11 ) ?	Data_SRL :
 														0;
 
 
@@ -175,7 +176,7 @@ module ALU
 		.DEPTH_MLT(			3						),
 		.DEPTH_ADD(			1						),
 		.TYPE(				TYPE					),
-		.INT_UNit(			true					)
+		.INT_UNIT(			INT_UNIT				)
 	) MA_Unit
 	(
 		.clock(				clock					),
@@ -200,7 +201,7 @@ module ALU
 		.I_Data2(			iDIV_Data2				),
 		.I_Token(			iDiv_Token				),
 		.O_Valid(			Valid_iDIV				),
-		.O_Data(			Data_iDIV				),
+		.O_Data(			Data_iDiv				),
 		.O_Token(			Token_iDiv				)
 	);
 

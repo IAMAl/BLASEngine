@@ -26,7 +26,7 @@ module Shift_Unit
 
 	localparam	LOG_WIDTHD			= $clog2(WIDTH_DATA)-1;
 
-	reg	[WIDTH_DAYA-1:0]			ResultData;
+	reg	[WIDTH_DATA-1:0]			ResultData;
 
 
 	assign O_Valid					= I_En;

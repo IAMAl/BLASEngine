@@ -29,10 +29,10 @@ module ExecUnit_S
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output	data_t				O_St_Data1,				//Storing Data
 	output	data_t				O_St_Data2,				//Storing Data
-	input						I_Ld_Ready,				//Ready to Load
-	input						I_Ld_Grant,				//Grant for Loading
-	input						I_St_Ready,				//Ready to Store
-	input						I_St_Grant,				//Grant for Storing
+	input	[1:0]				I_Ld_Ready,				//Ready to Load
+	input	[1:0]				I_Ld_Grant,				//Grant for Loading
+	input	[1:0]				I_St_Ready,				//Ready to Store
+	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
 	output	index_t				O_WB_Dst,				//Write-Back Index

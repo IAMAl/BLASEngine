@@ -24,7 +24,7 @@ module Logic_Unit
 );
 
 
-	reg	[WIDTH_DAYA-1:0]		ResultData;
+	reg	[WIDTH_DATA-1:0]		ResultData;
 
 
 	assign O_Valid				= I_En;

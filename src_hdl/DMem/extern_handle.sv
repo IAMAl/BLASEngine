@@ -47,8 +47,6 @@ module extern_handle
 	localparam int	HALF_BUFF_SIZE	= (BUFF_SIZE+1) / 2;
 	localparam int	WIDTH_HALF_BUFF	= $clog2(HALF_BUFF_SIZE);
 
-	localparam int	NOTIFY_DATA		= -1;
-
 
 	logic						is_FSM_Extern_Run;
 	logic						is_FSM_Extern_Recv_Stride;
