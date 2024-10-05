@@ -66,7 +66,7 @@ module ldst_unit
 	assign O_Data				= ( Re ) ?	Data_Buff[ RPtr ] : '0;
 	assign O_Stall				= Full | Stall;
 
-	assign O_Token				= ( Term ) Token : '0;
+	assign O_Token				= ( Term ) ? Token : '0;
 
 
 	always_ff @( posedge clock ) begin
@@ -74,10 +74,10 @@ module ldst_unit
 			for ( int i=0; i<DEPTH_BUFF; ++i ) begin
 				Data_Buff[ i ]		<= '0;
 			end
+			end
 			else if ( We ) begin
 				Data_Buff[ WPtr ]	<= I_Data;
 			end
-		end
 	end
 
 	always_ff @( posedge clock ) begin
@@ -111,7 +111,7 @@ module ldst_unit
 
 
 	token_pipe_ldst #(
-		.DEPTH_BUFF(		DEPTH_BUFDF_LDST			),
+		.DEPTH_BUFF(		DEPTH_BUFF_LDST			  ),
 		.TYPE(				TYPE						)
 	) token_pipe_ldst
 	(

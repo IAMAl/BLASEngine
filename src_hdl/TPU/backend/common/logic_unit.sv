@@ -20,7 +20,7 @@ module Logic_Unit
 	input	TYPE				I_Token,				//Command
 	output  data_t				O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
-	output	TYPE				O_Token,				//Command
+	output	TYPE				O_Token 				//Command
 );
 
 

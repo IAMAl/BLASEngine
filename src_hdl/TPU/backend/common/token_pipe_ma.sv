@@ -105,6 +105,7 @@ module token_pipe_ma
 			for ( int i=0; i<DEPTH_MLT; ++i ) begin
 				TBuffMlt[ i ]			<= '0;
 			end
+		end
 			else if ( We_Mlt | Re_Mlt ) begin
 				if ( We_Mlt ) begin
 					TBuffMlt[ WPtr_Mlt ]	<= Token;
@@ -114,7 +115,6 @@ module token_pipe_ma
 					TBuffMlt[ RPtr_Mlt ].v	<= 1'b0;
 				end
 			end
-		end
 	end
 
 	always_ff @( posedge clock ) begin
@@ -122,6 +122,7 @@ module token_pipe_ma
 			for ( int i=0; i<DEPTH_MLT; ++i ) begin
 				TBuffAdd[ i ]			<= '0;
 			end
+		end
 			else if ( We_Add | Re_Add ) begin
 				if ( We_Add ) begin
 					TBuffAdd[ WPtr_Add ]	<= Token;
@@ -131,12 +132,11 @@ module token_pipe_ma
 					TBuffAdd[ RPtr_Add ].v	<= 1'b0;
 				end
 			end
-		end
 	end
 
 
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_MLT					),
+		.NUM_ENTRY(			DEPTH_MLT					)
 	) RingBuffCTRL_Mlt
 	(
 		.clock(				clock						),
@@ -152,7 +152,7 @@ module token_pipe_ma
 
 
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_ADD					),
+		.NUM_ENTRY(			DEPTH_ADD					)
 	) RingBuffCTRL_Add
 	(
 		.clock(				clock						),

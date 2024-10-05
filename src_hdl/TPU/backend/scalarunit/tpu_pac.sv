@@ -113,10 +113,10 @@ module PACUnit
 		if ( reset ) begin
 			R_St			<= 1'b0;
 		end
-		else ( I_Req ) begin
+		else if ( I_Req ) begin
 			R_St			<= 1'b0;
 		end
-		else ( I_Req_St ) begin
+		else if ( I_Req_St ) begin
 			R_St			<= 1'b1;
 		end
 	end

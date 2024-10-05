@@ -23,7 +23,7 @@ module SRL_Unit
 	input   data_t				I_Data2,				//Source Operand
 	output  data_t				O_Valid,				//Output Valid
 	output	TYPE				O_Token,				//Command
-	output  data_t				O_Data,					//Output Data
+	output  data_t				O_Data					//Output Data
 );
 
 
@@ -91,7 +91,7 @@ module SRL_Unit
 	always_comb begin
 		case ( I_Token.instr.op.OpClass )
 			2'b00: assign ResultINo		= Issue_No_Shift;
-			2'b01: assign ResultINo		= Issue_No_Roate;
+			2'b01: assign ResultINo		= Issue_No_Rotate;
 			2'b10: assign ResultINo		= Issue_No_Logic;
 			default: assign ResultINo	= '0;
 		endcase

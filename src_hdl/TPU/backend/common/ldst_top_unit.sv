@@ -9,11 +9,17 @@
 //	Module Name:	LdStUnit
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module LdStUnit (
+module LdStUnit
+	import	pkg_tpu::*;
+#(
+	parameter int DEPTH_BUFF_LDST	= 8,
+	parameter type TYPE				= pipe_exe_tmp_t
+)(
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall Request
 	input						I_Commit_Grant,			//Grant of Commit
+	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input						I_Req,					//Request from Network Stage
 	input	command_t			I_Command,				//Command
 	input	data_t				I_Src_Data1,			//Source Data
@@ -29,7 +35,7 @@ module LdStUnit (
 	input						I_End_Access,			//End of Access
 	input	TYPE				O_Token,				//Command
 	input	data_t				O_WB_Data,				//Write-Back Data
-	input						O_LdSt_Done,			//Access Done
+	input						O_LdSt_Done 			//Access Done
 );
 
 
@@ -129,10 +135,10 @@ module LdStUnit (
 	assign O_LdSt.st.base		= St_Base;
 
 
-	assign O_Token				= (  LifeLd >  LifeSt ) ;	Ld_Token :
+	assign O_Token				= (  LifeLd >  LifeSt ) ?	Ld_Token :
 															St_Token;
 
-	assign O_WB_Data			= Ld_Data :
+	assign O_WB_Data			= Ld_Data;
 
 	assign O_LdSt_Done			= Ld_Commit_Req | St_Commit_Req;
 

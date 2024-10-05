@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	AGU
+//	Module Name:	agu
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module AGU
+module agu
 	import pkg_tpu::*;
 (
 	input						clock,

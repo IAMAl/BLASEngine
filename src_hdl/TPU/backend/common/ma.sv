@@ -15,7 +15,7 @@ module MA_Unit
 	parameter int DEPTH_MLT		= 3,
 	parameter int DEPTH_ADD		= 1,
 	parameter type TYPE			= pipe_exe_tmp_t,
-	paramter bool INT_UNit		= true
+	parameter bool INT_UNIT		= true
 )(
 	input						clock,
 	input						reset,
@@ -60,6 +60,9 @@ module MA_Unit
 
 	issue_no_t					LifeAdd;
 	issue_no_t					LifeMlt;
+	
+	issue_not_t                Add_Issue_No;
+	issue_not_t                Mlt_Issue_No;
 
 
 	assign LiFeAdd				= I_Pres_Issue_No - Add_Issue_No;
