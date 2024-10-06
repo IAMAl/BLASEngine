@@ -42,7 +42,7 @@ module Commit_MPU
 
 
 	// Check First Entry can be committed or not
-	assign Commit				= Valid[ RNo ] & IssedInfo[ RNo ].Commit;
+	assign Commit				= Valid[ RNo ] & IssueInfo[ RNo ].Commit;
 
 	// Commit Request
 	assign O_Req_Commit			= R_Commit;
@@ -66,7 +66,7 @@ module Commit_MPU
 			R_Issue_No		<= 1'b0;
 		end
 		else if ( Commit ) begin
-			R_Issue_No		<= IssedInfo[ RNo ].IsseNo;
+			R_Issue_No		<= IssueInfo[ RNo ].IssueNo;
 		end
 	end
 
@@ -101,7 +101,7 @@ module Commit_MPU
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Offset(			'0						),
+		//.I_Offset(			'0						),
 		.O_WAddr(			WNo						),
 		.O_RAddr(			RNo						),
 		.O_Full(			Full					),

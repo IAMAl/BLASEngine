@@ -20,10 +20,10 @@ module HazardCheck_TPU
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,			//Commit (Issued) No.
 	output						O_Req_Issue,			//Request to Next Stage
 	output						O_Issue_Instr,			//Issue(Dispatch) Instruction
-	output						O_RAR_Hzard,			//RAR-Hazard
-	output						O_RAW_Hzard,			//RAW-Hazard
-	output						O_WAR_Hzard,			//WAR-Hazard
-	output						O_WAW_Hzard,			//WAW-Hazard
+	output						O_RAR_Hazard,			//RAR-Hazard
+	output						O_RAW_Hazard,			//RAW-Hazard
+	output						O_WAR_Hazard,			//WAR-Hazard
+	output						O_WAW_Hazard,			//WAW-Hazard
 	output	issue_no_t			O_Rd_Ptr				//Read Pointer to Commit Unit
 );
 
@@ -133,10 +133,10 @@ module HazardCheck_TPU
 	assign O_Issue_Instr.Imm_Data		= TabHazard[ RNo ].Imm_Data;
 	assign O_Issue_Instr.Issue_No		= RNo;
 
-	assign O_RAR_Hzard			= R_RAR_Hzard;
-	assign O_RAW_Hzard			= R_RAW_Hazard;
-	assign O_WAR_Hzard			= R_WAR_Hazard;
-	assign O_WAW_Hzard			= R_WAW_Hazard;
+	assign O_RAR_Hazard			= R_RAR_Hazard;
+	assign O_RAW_Hazard			= R_RAW_Hazard;
+	assign O_WAR_Hazard			= R_WAR_Hazard;
+	assign O_WAW_Hazard			= R_WAW_Hazard;
 
 
 	//// Referenced at Commit Select Unit

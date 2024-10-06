@@ -7,7 +7,7 @@ module SkipCTRL
 	input						reset,
 	input						I_Req,					//Request to Skip
 	input						I_Stall,				//Stall
-	input	mask_t				I_Mask_Value,			//Mask Value
+	input	mask_t				I_Mask_Data,			//Mask Value
 	input	index_t				I_Index_Start,			//Start Index
 	input	index_t				I_Index_Length,			//Length of Access
 	output						O_Req,					//Request
@@ -29,8 +29,8 @@ module SkipCTRL
 
 	assign Run					= I_Req;
 
-	assign Rotated_Mask			= ( I_Mask_Value >> I_Index_Start ) |
-									( I_Mask_Value << ( NUM_ENTRY_REGFILE - I_Index_Start ) );
+	assign Rotated_Mask			= ( I_Mask_Data >> I_Index_Start ) |
+									( I_Mask_Data << ( NUM_ENTRY_REGFILE - I_Index_Start ) );
 
 	assign End_Skip				= ( NLZ_Value >= I_Index_Length ) & Run;
 	assign O_End				= End_Skip;

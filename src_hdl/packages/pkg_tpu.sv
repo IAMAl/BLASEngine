@@ -109,6 +109,8 @@ package pkg_tpu;
 	typedef	data_t	[NUM_LANES-1:0]			lane_t;
 
 	//	Data Memory Flag
+	typedef	logic							s_ready_t;
+	typedef	logic							s_grant_t;
 	typedef	logic	[NUM_LANES-1:0]			v_ready_t;
 	typedef	logic	[NUM_LANES-1:0]			v_grant_t;
 
@@ -136,10 +138,13 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		logic							slice;
-		index_t							idx;
+		index_s_t						idx;
 		logic		[6:0]				sel;
+		logic		[1:0]				no;
 		sel_t							dst_sel;
+		logic		[1:0]				path;
 		index_t							window;
+		index_t							slice_len;
 	} dst_t;
 
 	typedef struct packed {
@@ -147,6 +152,7 @@ package pkg_tpu;
 		logic							slice;
 		index_t							idx;
 		logic		[6:0]				sel;
+		logic		[1:0]				no;
 		sel_t							src_sel;
 		index_t							window;
 	} idx_t;
@@ -183,7 +189,7 @@ package pkg_tpu;
 	////Execution Steering
 	//	Hazard Table used in Scalar unit
 	typedef struct packed {
-		instr_t							instr;
+		instruction_t					instr;
 		logic							commit;
 	} iw_t;
 
@@ -286,9 +292,9 @@ package pkg_tpu;
 		logic							v;
 		op_t							op;
 		dst_t							dst;
-		data_t							data1;
-		data_t							data2;
-		data_t							data3;
+		reg_idx_t						src1;
+		reg_idx_t						src2;
+		reg_idx_t						src3;
 		index_t							idx1;
 		index_t							idx2;
 		index_t							idx3;
@@ -300,8 +306,7 @@ package pkg_tpu;
 	//	Execuution Stage (First)
 	typedef struct packed {
 		logic							v;
-		op_t							op;
-		dst_t							dst;
+		instruction_t					instr;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
@@ -365,7 +370,7 @@ package pkg_tpu;
 
 	////ETC
 	//	Enum for Index Select
-	typedef enum [1:0] {
+	typedef enum logic [1:0] {
 		INDEX_ORIG				= 2'h0,
 		INDEX_CONST				= 2'h1,
 		INDEX_LANE				= 2'h2,

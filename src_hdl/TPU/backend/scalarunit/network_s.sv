@@ -57,8 +57,8 @@ module Network_S
 	assign Sel_Path_WB			= I_Sel_Path_WB;
 
 	assign Src_Index1			= I_Src_Idx1;
-	assign Src_Index2			= I_Src_Idx1;
-	assign Src_Index3			= I_Src_Idx1;
+	assign Src_Index2			= I_Src_Idx2;
+	assign Src_Index3			= I_Src_Idx3;
 
 	assign Src_Data1			= I_Src_Data1;
 	assign Src_Data2			= I_Src_Data2;

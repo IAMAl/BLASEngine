@@ -35,7 +35,7 @@ module TPU
 	input	v_grant_t			I_V_Ld_Grant,			//Flag: Grant
 	input	v_ready_t			I_V_St_Ready,			//Flag: Ready
 	input	v_grant_t			I_V_St_Grant,			//Flag: Grant
-	input	v_ready_t			I_S_End_Access,			//Flag: End of Access
+	input	v_ready_t			I_V_End_Access,			//Flag: End of Access
 	output	mpu_issue_no_t		O_IssueNo,				//Thread's Issue No
 	output						O_Term,					//Flag: Termination
 	output						O_Nack					//Flag: Not-Acknowledge
@@ -138,15 +138,15 @@ module TPU
 		.O_Ack_St(			Ack_St					),
 		.I_Instr(			Instr					),
 		.I_ThreadID(		ThreadID				),
-		.I_Commmit_Req_V(	Commmit_Req_V			),
+		.I_Commit_Req_V(	Commmit_Req_V			),
 		.I_Scalar_Data(		In_Scalar_Data			),
 		.O_Scalar_Data(		Out_Scalar_Data			),
 		.O_LdSt1(			O_S_LdSt[0]				),
 		.O_LdSt2(			O_S_LdSt[1]				),
-		.I_Ld_Data(			I_S_Ld_Data[0]			),
-		.I_Ld_Data(			I_S_Ld_Data[1]			),
-		.O_St_Data(			O_S_St_Data[0]			),
-		.O_St_Data(			O_S_St_Data[1]			),
+		.I_Ld_Data1(		I_S_Ld_Data[0]			),
+		.I_Ld_Data2(		I_S_Ld_Data[1]			),
+		.O_St_Data1(		O_S_St_Data[0]			),
+		.O_St_Data2(		O_S_St_Data[1]			),
 		.I_Ld_Ready(		I_S_Ld_Ready			),
 		.I_Ld_Grant(		I_S_Ld_Grant			),
 		.I_St_Ready(		I_S_St_Ready			),

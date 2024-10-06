@@ -129,7 +129,7 @@ module HazardCheck_MPU
 			end
 
 			if ( I_Req_Commit ) begin
-				ThreadID[ I_Issued_No ].Commmit	<= 1'b1;
+				ThreadID[ I_Issued_No ].Commit	<= 1'b1;
 			end
 
 			if ( I_Req & R_Req ) begin
@@ -137,8 +137,7 @@ module HazardCheck_MPU
 
 				ThreadID[ WNo ].Src		<= 1'b1;
 				ThreadID[ WNo ].Src_ID	<= I_ThreadID_S;
-				ThreadID[ WNo ].Commmit	<= 1'b0;
-				ThreadID[ WNo ].Count	<= ThreadID[ WNo - 1'b1 ].Count + 1'b1;
+				ThreadID[ WNo ].Commit	<= 1'b0;
 			end
 			else if ( I_Req & ~R_Req ) begin
 				Valid[ WNo ]			<= 1'b1;
@@ -146,8 +145,7 @@ module HazardCheck_MPU
 				ThreadID[ WNo ].ID		<= I_ThreadID_S;
 				ThreadID[ WNo ].Src		<= 1'b0;
 				ThreadID[ WNo ].Src_ID	<= 0;
-				ThreadID[ WNo ].Commmit	<= 1'b0;
-				ThreadID[ WNo ].Count	<= 1;
+				ThreadID[ WNo ].Commit	<= 1'b0;
 			end
 		end
 	end
@@ -164,7 +162,7 @@ module HazardCheck_MPU
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Offset(			Offset					),
+		//.I_Offset(			Offset					),
 		.O_WAddr(			WNo						),
 		.O_RAddr(			Issue_No				),
 		.O_Full(			Full					),

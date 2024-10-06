@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Dispatch_MPU
+	import pkg_tpu::instr_t;
 	import pkg_mpu::*;
 (
 	input						clock,
@@ -18,11 +19,12 @@ module Dispatch_MPU
 	input	id_t				I_ThreadID,				//Scalar Thread-ID from Hazard Check Unit
 	output						O_Req_Lookup,			//Request to MapMan Unit
 	output	id_t				O_ThreadID,				//Scalar Thread-ID to Commit Unit
-	input						I_Ack,					//Ack from MapMan Unit
+	input						I_Ack_LookUp,					//Ack from MapMan Unit
 	input	lookup_t			I_ThreadInfo,			//Instr Memory Info from MapMan Unit
 	output						O_Ld,					//Load Instruction
 	output	mpu_address_t		O_Address,				//Loading Address
 	input	instr_t				I_Instr,				//Loaded Instruction
+	output						O_Req,					//Issue Request
 	output	instr_t				O_Instr,				//Send Loaded Instructions to TPUs
 	output	mpu_issue_no_t		O_IssueNo,				//Issue No
 	input	mpu_issue_no_t		I_IssueNo,				//Issue No
@@ -65,9 +67,12 @@ module Dispatch_MPU
 	logic						R_LdD1;
 
 
+	assign O_Req				= FSM_Dispatch >= FSM_DPC_SEND_THREADID;
+
+
 	// Set when Ack has come
 	//	Ack comes from MapMan having Base Address and Length used for loading
-	assign Set_Address			= I_Ack;
+	assign Set_Address			= I_Ack_LookUp;
 	assign Loading				= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
 
 	// Check Loading is ended
@@ -88,7 +93,7 @@ module Dispatch_MPU
 	assign O_Address			= R_Address;
 
 	// Send Thread (Instructions) to TPU
-	assign O_Instr.valid		= R_LdD1;
+	assign O_Instr.v			= R_LdD1;
 	assign O_Instr.instr		= R_Instr;
 	assign O_Send_Thread		=   FSM_Dispatch == FSM_DPC_SEND_INSTRS;
 	assign O_End_Send			= ( FSM_Dispatch == FSM_DPC_SEND_INSTRS ) & End_Load;
@@ -173,7 +178,7 @@ module Dispatch_MPU
 				end
 			end
 			FSM_DPC_GETINFO: begin
-				if ( I_Ack ) begin
+				if ( I_Ack_LookUp ) begin
 					FSM_Dispatch	<= FSM_DPC_SEND_THREADID;
 				end
 				else begin

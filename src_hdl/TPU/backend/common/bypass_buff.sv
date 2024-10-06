@@ -19,12 +19,15 @@ module BypassBuff
 	input						I_Stall,				//Force Stalling
 	input	dst_t				I_WB_Index,				//Write-back Index
 	input	data_t				I_WB_Data,				//Write-back Data
-	input	reg_t				I_Src1,					//Source Data
-	input	reg_t				I_Src2,					//Source Data
-	input	reg_t				I_Src3,					//Source Data
-	output	reg_t				O_Src1,					//Source Data
-	output	reg_t				O_Src2,					//Source Data
-	output	reg_t				O_Src3,					//Source Data
+	input	index_t				I_Idx1,
+	input	index_t				I_Idx2,
+	input	index_t				I_Idx3,
+	input	data_t				I_Src1,					//Source Data
+	input	data_t				I_Src2,					//Source Data
+	input	data_t				I_Src3,					//Source Data
+	output	data_t				O_Src1,					//Source Data
+	output	data_t				O_Src2,					//Source Data
+	output	data_t				O_Src3,					//Source Data
 	output						O_Full					//Full in Buffer
 );
 
@@ -78,7 +81,7 @@ module BypassBuff
 
 
 	logic						valid			[BUFF_SIZE-1:0];
-	reg_t						Buff_Index		[BUFF_SIZE-1:0];
+	index_t						Buff_Index		[BUFF_SIZE-1:0];
 	data_t						Buff_Data		[BUFF_SIZE-1:0];
 
 

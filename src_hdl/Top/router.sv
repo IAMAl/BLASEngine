@@ -56,7 +56,6 @@ module Router
 	logic	[WIDTH_DATA-1:0]	DataA;
 	logic	[WIDTH_DATA-1:0]	DataB;
 
-	logic						Req;
 	logic	[WIDTH_DATA-1:0]	Data;
 
 	logic						Run;

@@ -32,7 +32,7 @@ module PathSel
 	output	lane_t				O_Lane_Data_Src1,				//Data to Lanes
 	output	lane_t				O_Lane_Data_Src2,				//Data to Lanes
 	output	lane_t				O_Lane_Data_Src3,				//Data to Lanes
-	output	lane_t				O_Lane_WB_Data					//Data to Lanes
+	output	lane_t				O_Lane_Data_WB					//Data to Lanes
 );
 
 
@@ -94,6 +94,6 @@ module PathSel
 	assign O_Lane_Data_Src1[LANE_ID]	= ( I_Req )	?		I_Src_Data1 : '0;
 	assign O_Lane_Data_Src2[LANE_ID]	= ( I_Req )	?		I_Src_Data2 : '0;
 	assign O_Lane_Data_Src3[LANE_ID]	= ( I_Req )	?		I_Src_Data3 : '0;
-	assign O_Lane_WB_Data[LANE_ID]		= I_Lane_Data_WB;
+	assign O_Lane_Data_WB[LANE_ID]		= I_Lane_Data_WB;
 
 endmodule

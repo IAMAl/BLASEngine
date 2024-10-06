@@ -17,6 +17,7 @@ module pub_domain_man
 )(
 	input						clock,
 	input						reset,
+	input						I_Stall,				//Stall
 	input	address_t			I_St_Base,				//Store Base Adress
 	input	address_t			I_Ld_Base,				//Load Base Adress
 	input						I_St_Grant1,			//Grant for Storing
@@ -78,19 +79,19 @@ module pub_domain_man
 	address_t					TabBAddr	[NUM_ENTRY-1:0];
 
 
-	assign Event_St_Grant1		= ~R_St_Grant1 & I_St_Grant1;
-	assign Event_St_Grant2		= ~R_St_Grant2 & I_St_Grant2;
-	assign Event_St_Grant3		= ~R_St_Grant3 & I_St_Grant3;
+	assign Event_St_Grant1		= ~R_St_Grant1 & I_St_Grant1 & ~I_Stall;
+	assign Event_St_Grant2		= ~R_St_Grant2 & I_St_Grant2 & ~I_Stall;
+	assign Event_St_Grant3		= ~R_St_Grant3 & I_St_Grant3 & ~I_Stall;
 
-	assign Event_Ld_Grant1		= ~R_Ld_Grant1 & I_Ld_Grant1;
-	assign Event_Ld_Grant2		= ~R_Ld_Grant2 & I_Ld_Grant2;
-	assign Event_Ld_Grant3		= ~R_Ld_Grant3 & I_Ld_Grant3;
+	assign Event_Ld_Grant1		= ~R_Ld_Grant1 & I_Ld_Grant1 & ~I_Stall;
+	assign Event_Ld_Grant2		= ~R_Ld_Grant2 & I_Ld_Grant2 & ~I_Stall;
+	assign Event_Ld_Grant3		= ~R_Ld_Grant3 & I_Ld_Grant3 & ~I_Stall;
 
-	assign Hit_St				= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St );
-	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant3 ) & ( |is_Hit_Ld );
+	assign Hit_St				= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St ) & ~I_Stall;
+	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant3 ) & ( |is_Hit_Ld ) & ~I_Stall;
 
-	assign Set_St				= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ~( |is_Hit_St );
-	assign Clr_Ld				= I_Ld_End & Hit_Ld;
+	assign Set_St				= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ~( |is_Hit_St ) & ~I_Stall;
+	assign Clr_Ld				= I_Ld_End & Hit_Ld & ~I_Stall;
 
 	assign Ready_St				= ~R_Stored[ SetNo ];
 	assign Ready_Ld				=  R_Stored[ ClrNo ];

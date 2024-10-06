@@ -16,6 +16,7 @@ module ExecUnit_V
 )(
 	input						clock,
 	input						reset,
+	input						I_En,
 	input						I_Stall,				//Stall
 	input						I_Req,					//Request from Network Stage
 	input	issue_no_t			I_Issue_No,				//Current Issue No
@@ -41,7 +42,8 @@ module ExecUnit_V
 	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
-	output						O_Cond					//Condition
+	output						O_Cond,					//Condition
+	output						O_Lane_En
 );
 
 
@@ -93,25 +95,25 @@ module ExecUnit_V
 														Ld_Token[0];
 
 
+	assign O_Lane_En			= 1'b1;//ToDo
+
+
 	MA_Unit #(
 		.DEPTH_MLT(			7						),
 		.DEPTH_ADD(			5						),
 		.TYPE(				TYPE					),
-		.INT_UNit(			0						)
+		.INT_UNIT(			0						)
 	) fMA_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_En(				En_MAU					),
-		.I_OP(				I_Command.instr.op		),
+		.I_En(				I_En					),
 		.I_Data1(			I_Src_Data1				),
 		.I_Data2(			I_Src_Data2				),
 		.I_Data3(			I_Src_Data3				),
 		.I_Token(			MA_Token				),
-		.I_Issue_No(		I_Command.issue_no		),
 		.O_Valid(			Valid_MAU				),
-		.O_Data1(			Data_MAU				),
-		.O_Issue_No(		Issue_No_MAU			),
+		.O_Data(			Data_MAU				),
 		.O_Token(			Token_MAU				)
 	);
 

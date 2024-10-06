@@ -88,15 +88,6 @@ module SRL_Unit
 		endcase
 	end
 
-	always_comb begin
-		case ( I_Token.instr.op.OpClass )
-			2'b00: assign ResultINo		= Issue_No_Shift;
-			2'b01: assign ResultINo		= Issue_No_Rotate;
-			2'b10: assign ResultINo		= Issue_No_Logic;
-			default: assign ResultINo	= '0;
-		endcase
-	end
-
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -127,8 +118,7 @@ module SRL_Unit
 		.I_Data2(			Data_Shift2				),
 		.O_Valid(			Valid_Shift				),
 		.O_Data(			Data_Shift				),
-		.O_Token(			Token_Shift				),
-		.O_Issue_No(		Issue_No_Shift			)
+		.O_Token(			Token_Shift				)
 	);
 
 
@@ -142,8 +132,7 @@ module SRL_Unit
 		.I_Data2(			Data_Rotate				),
 		.O_Valid(			Valid_Rotate			),
 		.O_Data(			Data_Rotate				),
-		.O_Token(			Token_Rotate			),
-		.O_Issue_No(		Issue_No_Rotate			)
+		.O_Token(			Token_Rotate			)
 	);
 
 
@@ -157,8 +146,7 @@ module SRL_Unit
 		.I_Data2(			Data_Logic2				),
 		.O_Valid(			Valid_Logic				),
 		.O_Data(			Data_Logic				),
-		.O_Token(			Token_Logic				),
-		.O_Issue_No(		Issue_No_Logic			)
+		.O_Token(			Token_Logic				)
 	);
 
 endmodule

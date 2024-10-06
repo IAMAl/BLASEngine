@@ -19,7 +19,8 @@ module token_pipe_ldst
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall
-	input						I_Grant,				//Access-Grant
+	input						I_Commit_Grant,
+	input						I_Access_Grant,			//Access-Grant
 	input						I_Req,					//Access-Request
 	input	address_t			I_Length,				//Access-Length
 	input	address_t			I_Stride,				//Stride Factor
@@ -62,7 +63,7 @@ module token_pipe_ldst
 
 
 	assign We					= ~Full & I_Req;
-	assign Re					= ~Empty & I_Grant;
+	assign Re					= ~Empty & I_Access_Grant;
 
 
 	always_ff @( posedge clock ) begin
@@ -75,7 +76,7 @@ module token_pipe_ldst
 
 
 	RingBuffCTRL #(
-		.NUM_ENTRY(			DEPTH_BUFF					),
+		.NUM_ENTRY(			DEPTH_BUFF					)
 	) RingBuffCTRL_DMem
 	(
 		.clock(				clock						),

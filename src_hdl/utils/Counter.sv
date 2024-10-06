@@ -16,14 +16,15 @@ module Counter #(
 	input						reset,
 	input						I_Clr,					//Clear Counter
 	input						I_En,					//Enable to Count
-	output	[WIDHT_COUNT-1:0]	O_CountVal				//Count Value
+	output	[WIDHT_COUNT-1:0]	O_Val					//Count Value
 );
 
 
 	logic	[WIDHT_COUNT-1:0]	R_CountVal;
 
 
-	assign O_CountVal			= R_CountVal;
+	assign O_Val			= R_CountVal;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -33,7 +34,7 @@ module Counter #(
 			R_CountVal		<= 0;
 		end
 		else if ( I_En ) begin
-			R_CountVal		<= O_CountVal + 1'b1;
+			R_CountVal		<= R_CountVal + 1'b1;
 		end
 	end
 

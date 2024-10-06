@@ -1,4 +1,4 @@
-module DMem
+module DMem_Body
 	import pkg_tpu::*;
 (
 	input						clock,

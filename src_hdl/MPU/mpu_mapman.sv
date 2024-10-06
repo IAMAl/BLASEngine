@@ -82,7 +82,7 @@ module MapMan_MPU
 	always_comb begin
 		for ( int i=0; SIZE_TAB_MAPMAN; ++i ) begin
 			Valid[ i ]		= TabInstr[ i ].Valid;
-			is_Matched[ i ]	= Valid[ i ] & ( TanInstr[ WNo ].ThreadID == I_ThreadID_Ld );
+			is_Matched[ i ]	= Valid[ i ] & ( TabInstr[ WNo ].ThreadID == I_ThreadID_Ld );
 		end
 	end
 
@@ -122,7 +122,7 @@ module MapMan_MPU
 		else if ( I_Req_St | I_Req_Lookup ) begin
 			if ( I_Req_St ) begin
 				TabInstr[ WNo ].Valid		<= 1'b1;
-				TanInstr[ WNo ].ThreadID	<= I_ThreadID_St;
+				TabInstr[ WNo ].ThreadID	<= I_ThreadID_St;
 				TabInstr[ WNo ].Length		<= I_Length_St;
 				TabInstr[ WNo ].Address		<= R_Used_Size;
 			end
@@ -186,7 +186,7 @@ module MapMan_MPU
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Offset(			0						),
+		//.I_Offset(			0						),
 		.O_WAddr(			WNo						),
 		.O_RAddr(									),
 		.O_Full(			Full					),

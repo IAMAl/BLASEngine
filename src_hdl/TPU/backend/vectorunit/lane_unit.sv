@@ -23,20 +23,19 @@ module Lane_Unit
 	input	instr_t				I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
-	output	ldst_t				O_LdSt,					//Load/Store Command
-	input	ld_data_t			I_LdData,				//Loaded Data
-	output	st_data_t			O_StData,				//Storing Data
+	output	s_ldst_t			O_LdSt,					//Load/Store Command
+	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
+	output	s_ldst_data_t		O_St_Data,				//Storing Data
 	input	[1:0]				I_Ld_Ready,				//Flag: Ready
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
-	input	[1:0]				I_St_Grat,				//Flag: Grant
+	input	[1:0]				I_St_Grant,				//Flag: Grant
 	input						I_End_Access1,			//Flag: End of Access
 	input						I_End_Access2,			//Flag: End of Access
 	output						O_Commit,				//Commit Request
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src2,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src3,		//Inter-Lane Connect
-	input	lane_t				I_Lane_Data_WB,			//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_WB,			//Inter-Lane Connect
 	output	data_t				O_Lane_Data_Src1,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_Src2,		//Inter-Lane Connect
@@ -75,7 +74,7 @@ module Lane_Unit
 	data_t						Pre_Src_Data3;
 
 
-	stat_v_t					Status;
+	state_t						Status;
 
 
 	index_t						Src_Idx1;
@@ -89,7 +88,7 @@ module Lane_Unit
 	logic	[4:0]				Config_Path_WB;
 
 
-	logic						Dst_Sel;
+	logic						Sel_Dst;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
@@ -108,7 +107,7 @@ module Lane_Unit
 
 
 	logic						En;
-	logic						Lane_En;
+	logic						Lane_Enable;
 	logic						Lane_CTRL_Rst;
 	logic						Lane_CTRL_Set;
 
@@ -126,7 +125,7 @@ module Lane_Unit
 
 
 	//// Lane-Enable
-	Lane_Unit Lane_Unit (
+	Lane_En_V Lane_En_V (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				I_En					),
@@ -135,7 +134,7 @@ module Lane_Unit
 		.I_Index(			Dst_Index				),
 		.I_Status(			Status					),
 		.O_State(			O_Status				),
-		.O_En(				Lane_En					)
+		.O_En(				Lane_Enable				)
 	);
 
 
@@ -215,17 +214,14 @@ module Lane_Unit
 	assign V_State_Data.data		= Mask_Data;
 	assign V_State_Data.src_sel		= '0;
 
-	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) ?	V_State_Data :
-										( PipeReg_RR.src1.v ) ?					PipeReg_RR.src1 :
-																				'0;
+	assign PipeReg_RR_Net.src1		=( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1 :
+																'0;
 
-	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'h3 ) ?	V_State_Data :
-										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
-																				'0;
+	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2 :
+																'0;
 
-	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'h3 ) ?	V_State_Data :
-										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
-																				'0;
+	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3 :
+																'0;
 
 	//	Slice Length
 	assign PipeReg_RR_Net.slice_len	= PipeReg_RR.slice_len;
@@ -258,9 +254,9 @@ module Lane_Unit
 
 
 	//// Write-Back
-	assign Dst_Sel				= B_Index.dst_sel.unit_no;
+	assign Dst_Sel				= WB_Dst.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Dst.slice;
-	assign Dst_Index			= WB_Dst.idx;
+	assign Dst_Index			= WB_Dst.idx[WIDTH_INDEX-1:0];
 	assign Dst_Index_Window		= WB_Dst.window;
 	assign Dst_Index_Length		= WB_Dst.slice_len;
 
@@ -272,14 +268,15 @@ module Lane_Unit
 	assign is_WB_BR				= WB_Dst.dst_sel == 2'h2;
 	assign is_WB_VU				= WB_Dst.dst_sel == 2'h3;
 
-	assign WB_Req_Even			= ~Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_Req_Odd			=  Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_We_Even			= ~Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_We_Odd			=  Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Dst.idx : '0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Dst.idx : '0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :	'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? W_WB_Data :	'0;
+	assign Sel_Dst				= WB_Dst.idx[WIDTH_INDEX+2];
+	assign WB_Req_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx : '0;
+	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx : '0;
+	assign WB_Data_Even			= ( ~Sel_Dst ) ? W_WB_Data :	'0;
+	assign WB_Data_Odd			= (  Sel_Dst ) ? W_WB_Data :	'0;
 
 	assign Config_Path_W		= WB_Dst.path;
 
@@ -510,7 +507,7 @@ module Lane_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			~Lane_En				),
+		.I_Stall(			~Lane_Enable			),
 		.I_Req(				PipeReg_RR_Net.net.v	),
 		.I_MaskedRead(		'0						),
 		.I_Slice(			PipeReg_RR_Net.net.slice),
@@ -533,7 +530,7 @@ module Lane_Unit
 		.LANE_ID(			LANE_ID					)
 	) Network_V
 	(
-		.I_Stall(			~Lane_En				),
+		.I_Stall(			~Lane_Enable			),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),
@@ -544,17 +541,16 @@ module Lane_Unit
 		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
 		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),
 		.I_Lane_Data_WB(	I_Lane_Data_WB			),
-		.I_Src_Data1(		PipeReg_RR_Net.data1	),
-		.I_Src_Data2(		PipeReg_RR_Net.data2	),
-		.I_Src_Data3(		PipeReg_RR_Net.data3	),
+		.I_Src_Data1(	PipeReg_RR_Net.src1.data	),
+		.I_Src_Data2(	PipeReg_RR_Net.src2.data	),
+		.I_Src_Data3(	PipeReg_RR_Net.src3.data	),
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
-		.I_WB_DstIdx(		WB_Dst.index			),
+		.I_WB_Index(		WB_Dst.index			),
 		.I_WB_Data(			WB_Data					),
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
-		.O_Src_Data3(		PipeReg_Net.data3		),
 		.O_Src_Data3(		PipeReg_Net.data3		),
 		.O_WB_Data(			W_WB_Data				),
 		.O_Lane_Data_Src1(	O_Lane_Data_Src1		),
@@ -580,7 +576,7 @@ module Lane_Unit
 	ExecUnit_V ExecUnit_V (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Lane_En(			Lane_En					),
+		.I_En(				Lane_Enable				),
 		.I_Stall(			Stall					),
 		.I_Req(				PipeReg_Exe.v			),
 		.I_Command(			PipeReg_Exe.command		),
@@ -589,10 +585,10 @@ module Lane_Unit
 		.I_Src_Data3(		PipeReg_Exe.data3		),
 		.O_LdSt1(			O_LdSt1					),
 		.O_LdSt2(			O_LdSt2					),
-		.I_Ld_Data1(		I_LdData1				),
-		.I_Ld_Data2(		I_LdData2				),
-		.O_St_Data1(		O_StData1				),
-		.O_St_Data2(		O_StData2				),
+		.I_Ld_Data1(		I_Ld_Data[0]			),
+		.I_Ld_Data2(		I_Ld_Data[1]			),
+		.O_St_Data1(		O_St_Data[0]			),
+		.O_St_Data2(		O_St_Data[1]			),
 		.I_Ld_Ready(		I_Ld_Ready				),
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),

@@ -21,8 +21,8 @@ module Vector_Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data
 	output	data_t				O_Scalar_Data,			//Scalar Data
 	output	v_ldst_t			O_LdSt,					//Load Request
-	input	v_ldst_data_t		I_LdData,				//Loaded Data
-	output	v_ldst_data_t		O_StData,				//Storing Data
+	input	v_ldst_data_t		I_Ld_Data,				//Loaded Data
+	output	v_ldst_data_t		O_St_Data,				//Storing Data
 	input	v_ready_t			I_Ld_Ready,				//Flag: Ready
 	input	v_grant_t			I_Ld_Grant,				//Flag: Grant
 	input	v_ready_t			I_St_Ready,				//Flag: Ready
@@ -62,12 +62,9 @@ module Vector_Unit
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),
 			.O_Scalar_Data(		Scalar_Data[ i ]		),
-			.O_LdSt1(			O_LdSt[ i ][0]			),
-			.O_LdSt1(			O_LdSt[ i ][1]			),
-			.I_Ld_Data1(		I_LdData[ i ][0]		),
-			.I_Ld_Data2(		I_LdData[ i ][1]		),
-			.O_St_Data1(		O_StData[ i ][0]		),
-			.O_St_Data2(		O_StData[ i ][1]		),
+			.O_LdSt(			O_LdSt[ i ]				),
+			.I_Ld_Data(			I_Ld_Data[ i ]			),
+			.O_St_Data(			O_St_Data[ i ]			),
 			.I_Ld_Ready(		I_Ld_Ready[ i ]			),
 			.I_Ld_Grant(		I_Ld_Grant[ i ]			),
 			.I_St_Ready(		I_St_Ready[ i ]			),
@@ -79,10 +76,10 @@ module Vector_Unit
 			.I_Lane_Data_Src2(	Lane_Data_Src2			),
 			.I_Lane_Data_Src3(	Lane_Data_Src3			),
 			.I_Lane_Data_WB(	Lane_Data_WB			),
-			.O_Lane_Src1(		Lane_Data_Src1[ i ]		),
-			.O_Lane_Src2(		Lane_Data_Src2[ i ]		),
-			.O_Lane_Src3(		Lane_Data_Src3[ i ]		),
-			.O_Lane_WB(			Lane_Data_WB[ i ]		),
+			.O_Lane_Data_Src1(	Lane_Data_Src1[ i ]		),
+			.O_Lane_Data_Src2(	Lane_Data_Src2[ i ]		),
+			.O_Lane_Data_Src3(	Lane_Data_Src3[ i ]		),
+			.O_Lane_Data_WB(	Lane_Data_WB[ i ]		),
 			.O_Status(			O_Status[ i ]			)
 		);
 	end

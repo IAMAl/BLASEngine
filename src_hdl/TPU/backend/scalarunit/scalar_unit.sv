@@ -22,7 +22,7 @@ module Scalar_Unit
 	output						O_Ack_St,				//Acknowledge for Storing
 	input	instr_t				I_Instr,				//Instruction from Buffer
 	input	id_t				I_ThreadID,				//Thread-ID
-	input						I_Commmit_Req_V,		//Commit Request from Vector Unit
+	input						I_Commit_Req_V,		//Commit Request from Vector Unit
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
 	output	ldst_t				O_LdSt1,				//Load Request
@@ -40,7 +40,7 @@ module Scalar_Unit
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
 	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
-	output	state_t				O_State,				//Scalar Unit Status
+	output	state_t				O_Status,				//Scalar Unit Status
 	output						O_Term					//Flag: Termination
 );
 
@@ -135,7 +135,7 @@ module Scalar_Unit
 	logic						Lane_Re;
 	data_t						Lane_Data;
 	logic	[NUM_LANES-1:0]		We_V_State;
-	logic	[NUM_LANES-1:0]		V_State_Data;
+	reg_idx_t					V_State_Data;
 
 
 	data_t						V_State;
@@ -158,6 +158,7 @@ module Scalar_Unit
 
 	logic						WB_En;
 
+	logic						Sel_Dst;
 	dst_t						WB_Dst;
 	data_t						WB_Data;;
 	logic						WB_Req_Even;
@@ -188,6 +189,7 @@ module Scalar_Unit
 	issue_no_t					Commit_No_LdSt1;
 	issue_no_t					Commit_No_LdSt2;
 	issue_no_t					Commit_No_Math;
+	issue_no_t					Hazard;
 	logic						Commit_Req_S;
 	issue_no_t					Commit_No_S;
 	logic						Commited_LdSt1;
@@ -219,12 +221,12 @@ module Scalar_Unit
 
 
 	//// Output Status
-	assign O_State				= State;
+	assign O_Status				= State;
 
 
 	//// Select Scalar unit or Vector unit backend
-	assign S_Command			= ( ~Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign O_V_Command			= (  Instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign S_Command			= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign O_V_Command			= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 
 
 	//// Instruction Fetch Stage
@@ -238,11 +240,11 @@ module Scalar_Unit
 
 	//// Scalar unit's Back-end Pipeline
 	//	Command
-	assign PipeReg_Idx.v			= S_Command.instr.v;
+	assign PipeReg_Idx.v			= S_Command.v;
 	assign PipeReg_Idx.op			= S_Command.instr.op;
 
 	//	Write-Back
-	assign PipeReg_Idx.sdt			= S_Command.dst;
+	assign PipeReg_Idx.dst			= S_Command.instr.dst;
 
 	//	Indeces
 	assign PipeReg_Idx.slice_len	= S_Command.instr.slice_len;
@@ -257,14 +259,14 @@ module Scalar_Unit
 
 	//// Index Update Stage
 	//	Command
-	assign PipeReg_Index.v			= PipeReg_Idx.instr.v;
-	assign PipeReg_Index.op			= PipeReg_Idx.instr.op;
+	assign PipeReg_Index.v			= PipeReg_Idx.v;
+	assign PipeReg_Index.op			= PipeReg_Idx.op;
 
 	//	Write-Back
 	assign PipeReg_Index.dst		= PipeReg_Idx.dst;
 
 	//	Indeces
-	assign PipeReg_Index.slice_len	= PipeReg_Idx.instr.slice_len;
+	assign PipeReg_Index.slice_len	= PipeReg_Idx.slice_len;
 
 	//	Issue-No
 	assign PipeReg_Index.issue_no	= PipeReg_Idx.issue_no;
@@ -274,14 +276,14 @@ module Scalar_Unit
 
 
 	//// Packing for Register File Access
-	assign PipeReg_IdxRF.v			= PipeReg_Idx.instr.v;
-	assign PipeReg_IdxRF.op			= PipeReg_Idx.instr.op;
+	assign PipeReg_IdxRF.v			= PipeReg_Idx.v;
+	assign PipeReg_IdxRF.op			= PipeReg_Idx.op;
 
 	//	Write-Back
 	assign PipeReg_IdxRF.dst		= PipeReg_Idx.dst;
 
 	//	Indeces
-	assign PipeReg_IdxRF.slice_len	= PipeReg_Idx.instr.slice_len;
+	assign PipeReg_IdxRF.slice_len	= PipeReg_Idx.slice_len;
 
 	//	Issue-No
 	assign PipeReg_IdxRF.issue_no	= PipeReg_Idx.issue_no;
@@ -333,8 +335,7 @@ module Scalar_Unit
 	assign PAC_Data				= ( is_WB_BR ) ? WB_Data : '0;
 	assign PAC_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src3.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src4.src_sel.no == 2'h2 );
+									( PipeReg_RR.src3.src_sel.no == 2'h2 );
 
 
 	//// Lane-Enable
@@ -342,8 +343,7 @@ module Scalar_Unit
 	assign Lane_Data			= ( is_WB_VU ) ? WB_Data : '0;
 	assign Lane_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
-									( PipeReg_RR.src3.src_se3.no == 2'h3 ) |
-									( PipeReg_RR.src4.src_se3.no == 2'h3 );
+									( PipeReg_RR.src3.src_sel.no == 2'h3 );
 
 
 	//// Nwtwork
@@ -351,10 +351,10 @@ module Scalar_Unit
 
 	//	Capture Data
 	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
-	assign PipeReg_Net.op		= PipeReg_RR_Net.op;
+	assign PipeReg_Net.instr.op	= PipeReg_RR_Net.op;
 
 	//	Write-Back
-	assign PipeReg_Net.dst		= PipeReg_RR_Net.dst;
+	assign PipeReg_Net.instr.dst= PipeReg_RR_Net.dst;
 
 	//	Slice Length
 	assign PipeReg_Net.slice_len= PipeReg_RR_Net.slice_len;
@@ -370,9 +370,9 @@ module Scalar_Unit
 	//  Network Path
 	assign Config_Path_WB		= WB_Dst.path;
 
-	assign Dst_Sel				= B_Index.dst_sel.unit_no;
+	assign Dst_Sel				= WB_Dst.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Dst.slice;
-	assign Dst_Index			= WB_Dst.idx;
+	assign Dst_Index			= WB_Dst.idx[WIDTH_INDEX-1:0];
 	assign Dst_Index_Window		= WB_Dst.window;
 	assign Dst_Index_Length		= WB_Dst.slice_len;
 
@@ -380,14 +380,15 @@ module Scalar_Unit
 	assign is_WB_BR				= WB_Dst.dst_sel.no == 2'h2;
 	assign is_WB_VU				= WB_Dst.dst_sel.no == 2'h3;
 
-	assign WB_Req_Even			= ~Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_Req_Odd			=  Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_We_Even			= ~Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_We_Odd			=  Dst_Sel & WB_Dst.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Dst.idx :	'0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Dst.idx :	'0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 		'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 		'0;
+	assign Sel_Dst				= WB_Dst.idx[WIDTH_INDEX+2:0];
+	assign WB_Req_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx :	'0;
+	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx :	'0;
+	assign WB_Data_Even			= ( ~Sel_Dst ) ? WB_Data : 		'0;
+	assign WB_Data_Odd			= (  Sel_Dst ) ? WB_Data : 		'0;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
 
@@ -482,17 +483,17 @@ module Scalar_Unit
 		.I_Commit_No(		Commit_No				),
 		.O_Req_Issue(		Req_Issue				),
 		.O_Instr(			Instr					),
-		.O_RAR_Hzard(		RAR_Hazard				),
-		.O_RAW_Hzard(								),
-		.O_WAR_Hzard(								),
-		.O_WAW_Hzard(								),
+		.O_RAR_Hazard(		RAR_Hazard				),
+		.O_RAW_Hazard(								),
+		.O_WAR_Hazard(								),
+		.O_WAW_Hazard(								),
 		.O_Rd_Ptr(			Rd_Ptr					)
 	);
 
 
 	//// Stall Control
 	Stall_Ctrl Stall_Ctrl (
-		.I_PCU_Wait(		PAC_Wait				),
+		.I_PAC_Wait(		PAC_Wait				),
 		.I_Hazard(			RAR_Hazard				),
 		.I_Slice(			Slice					),
 		.I_Bypass_Buff_Full(Bypass_Buff_Full		),
@@ -722,9 +723,9 @@ module Scalar_Unit
 		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
 		.I_Sel_ALU_Src2(	PipeReg_RR_Net.src2.v	),
 		.I_Sel_ALU_Src3(	PipeReg_RR_Net.src3.v	),
-		.I_Src_Data1(		PipeReg_RR_Net.data1	),
-		.I_Src_Data2(		PipeReg_RR_Net.data2	),
-		.I_Src_Data3(		PipeReg_RR_Net.data3	),
+		.I_Src_Data1(	PipeReg_RR_Net.src1.data	),
+		.I_Src_Data2(	PipeReg_RR_Net.src2.data	),
+		.I_Src_Data3(	PipeReg_RR_Net.src3.data	),
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
@@ -755,12 +756,12 @@ module Scalar_Unit
 		.I_Stall(			Stall_Math				),
 		.I_Req(				PipeReg_Exe.v			),
 		.I_Issue_No(		IW_IssueNo				),
-		.I_Command(			PipeReg_Exe.command		),
+		.I_Command(			PipeReg_Exe.instr		),
 		.I_Src_Data1(		PipeReg_Exe.data1		),
 		.I_Src_Data2(		PipeReg_Exe.data2		),
 		.I_Src_Data3(		PipeReg_Exe.data3		),
 		.O_LdSt1(			O_LdSt1					),
-		.O_LdSt1(			O_LdSt2					),
+		.O_LdSt2(			O_LdSt2					),
 		.I_Ld_Data1(		I_Ld_Data1				),
 		.I_Ld_Data2(		I_Ld_Data2				),
 		.O_St_Data1(		O_St_Data1				),
@@ -796,7 +797,7 @@ module Scalar_Unit
 		.I_Commit_Req_Math(	Commmit_Req_Math		),
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
-		.I_Commit_No_LMath(	Commit_No_Math			),
+		.I_Commit_No_Math(	Commit_No_Math			),
 		.I_Commit_Grant(	Commit_Grant_S			),
 		.O_Commit_Req(		Commit_Req_S			),
 		.O_Commit_No(		Commit_No_S				),
@@ -818,7 +819,7 @@ module Scalar_Unit
 		.I_En_Lane(			O_Lane_En				),
 		.I_Store(			Store_V					),
 		.I_Issue_No(		IW_IssueNo				),
-		.I_Commmit_Req(		I_Commmit_Req_V			),
+		.I_Commit_Req(		I_Commit_Req_V			),
 		.I_Commit_Grant(	Commit_Grant_V			),
 		.O_Commit_Req(		Commit_Req_V			),
 		.O_Commit_No(		Commit_No_V				),

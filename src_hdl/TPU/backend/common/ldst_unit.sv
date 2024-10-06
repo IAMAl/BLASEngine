@@ -21,7 +21,7 @@ module ldst_unit
 	input						reset,
 	input						I_Stall,				//Stall
 	input						I_Commit_Grant,			//Grant to Commit
-	input						I_Acceess_Grant,		//Access-Grant
+	input						I_Access_Grant,			//Access-Grant
 	input						I_Valid,				//Valid
 	input	data_t				I_Data,					//Data
 	output	data_t				O_Data,					//Data
@@ -87,7 +87,7 @@ module ldst_unit
 		else if ( I_Term ) begin
 			Run				<= 1'b0;
 		end
-		else if ( ~Empty_Ldst & I_Acceess_Grant ) begin
+		else if ( ~Empty_Ldst & I_Access_Grant ) begin
 			Run				<= 1'b1;
 		end
 	end
@@ -119,7 +119,7 @@ module ldst_unit
 		.reset(				reset						),
 		.I_Stall(			I_Stall						),
 		.I_Commit_Grant(	I_Commit_Grant				),
-		.I_Acceess_Grant(	I_Acceess_Grant				),
+		.I_Access_Grant(	I_Access_Grant				),
 		.I_Req(				I_Req						),
 		.I_Length(			I_Length					),
 		.I_Stride(			I_Stride					),

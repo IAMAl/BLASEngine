@@ -13,7 +13,7 @@ module ALU
 	import pkg_tpu::*;
 #(
 	parameter type TYPE			= pipe_exe_tmp_t,
-	parameter bool INT_UNIT		= 1
+	parameter int INT_UNIT		= 1
 )(
 	input						clock,
 	input						reset,
@@ -187,15 +187,15 @@ module ALU
 		.I_Data3(			MA_Data3				),
 		.I_Token(			MA_Token				),
 		.O_Valid(			Valid_MA				),
-		.O_Data1(			Data_MA					),
+		.O_Data(			Data_MA					),
 		.O_Token(			Token_MA				)
 	);
 
 
 	iDiv_Unit iDiv_Unit
 	(
-		.clock(				clock					),
-		.reset(				reset					),
+		//.clock(				clock					),
+		//.reset(				reset					),
 		.I_En(				En_iDIV					),
 		.I_Data1(			iDIV_Data1				),
 		.I_Data2(			iDIV_Data2				),
@@ -208,8 +208,8 @@ module ALU
 
 	Cnvt_Unit Cnvt_Unit
 	(
-		.clock(				clock					),
-		.reset(				reset					),
+		//.clock(				clock					),
+		//.reset(				reset					),
 		.I_En(				En_Cnvt					),
 		.I_Token(			Cnvt_Token				),
 		.I_Data1(			Cnvt_Data1				),

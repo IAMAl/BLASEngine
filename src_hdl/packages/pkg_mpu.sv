@@ -81,7 +81,7 @@ package pkg_mpu;
 		id_t							ID;
 		logic							Src;
 		logic	[WIDTH_THREADID-1:0]	Src_ID;
-		logic							Commmit;
+		logic							Commit;
 	} mpu_tab_hazard_t;
 
 	//MapMan Table
@@ -95,8 +95,8 @@ package pkg_mpu;
 	//Commit Table Entry
 	typedef struct packed {
 		logic							Valid;
-		logic	[WIDTH_NUM_ISSUE-1:0]	IsseNo;
-		logic							Commmit;
+		logic	[WIDTH_NUM_ISSUE-1:0]	IssueNo;
+		logic							Commit;
 	} mpu_tab_commit_t;
 
 	//MPU Status

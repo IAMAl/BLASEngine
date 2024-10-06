@@ -15,7 +15,7 @@ module MA_Unit
 	parameter int DEPTH_MLT		= 3,
 	parameter int DEPTH_ADD		= 1,
 	parameter type TYPE			= pipe_exe_tmp_t,
-	parameter bool INT_UNit		= true
+	parameter int INT_UNIT		= 1
 )(
 	input						clock,
 	input						reset,
@@ -34,7 +34,7 @@ module MA_Unit
 );
 
 
-	localparam int WIDTH_BUFF	= clog2(DEPTH_MLT);
+	localparam int WIDTH_BUFF	= $clog2(DEPTH_MLT);
 
 	logic						En_Add;
 	logic						En_Mlt;
@@ -64,6 +64,13 @@ module MA_Unit
 	issue_no_t					LifeMlt;
 
 
+
+	logic						LiFeAdd;
+	logic						LiFeMlt;
+	issue_no_t					Add_Issue_No;
+	issue_no_t					Mlt_Issue_No;
+
+
 	logic						We;
 	logic						Re;
 	logic	[WIDTH_BUFF-1:0]	Wno;
@@ -74,6 +81,8 @@ module MA_Unit
 	data_t						Buff_Src3	[DEPTH_MLT-1:0];
 
 
+	assign Add_Isssue_No		= Add_Token.issue_no;
+	assign Mlt_Isssue_No		= Mlt_Token.issue_no;
 	assign LiFeAdd				= I_Pres_Issue_No - Add_Issue_No;
 	assign LiFeMlt				= I_Pres_Issue_No - Mlt_Issue_No;
 
