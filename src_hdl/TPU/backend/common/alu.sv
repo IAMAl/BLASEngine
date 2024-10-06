@@ -20,7 +20,7 @@ module ALU
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input						I_Stall,				//Stall Request
 	input						I_Req,					//Request from Network Stage
-	input	command_t			I_Command,				//Command
+	input	TYPE				I_Command,				//Command
 	input	data_t				I_Src_Data1,			//Source Data
 	input	data_t				I_Src_Data2,			//Source Data
 	input	data_t				I_Src_Data3,			//Source Data
@@ -90,13 +90,13 @@ module ALU
 	TYPE						Token_SRL;
 
 
-	assign is_Arith				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
-	assign is_SRL				= I_Req & ( I_Command.instr.op.OpType == 2'b10 );
+	assign is_Arith				= I_Req & ( I_Command.op.OpType == 2'b00 );
+	assign is_SRL				= I_Req & ( I_Command.op.OpType == 2'b10 );
 
-	assign is_Adder				= I_Command.instr.op.OpClass == 2'b00;
-	assign is_Mult				= I_Command.instr.op.OpClass == 2'b01;
-	assign is_Div				= I_Command.instr.op.OpClass == 2'b10;
-	assign is_Cnvt				= I_Command.instr.op.OpClass == 2'b11;
+	assign is_Adder				= I_Command.op.OpClass == 2'b00;
+	assign is_Mult				= I_Command.op.OpClass == 2'b01;
+	assign is_Div				= I_Command.op.OpClass == 2'b10;
+	assign is_Cnvt				= I_Command.op.OpClass == 2'b11;
 
 
 	assign En_MA				= is_Arith & ( is_Adder | is_Mult );

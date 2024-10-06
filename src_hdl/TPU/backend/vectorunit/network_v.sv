@@ -26,6 +26,7 @@ module Network_V
 	input						I_Sel_ALU_Src1,			//Source Select
 	input						I_Sel_ALU_Src2,			//Source Select
 	input						I_Sel_ALU_Src3,			//Source Select
+	input	index_t				I_Slice_Len,
 	input	lane_t				I_Lane_Data_Src1,		//Lane Data
 	input	lane_t				I_Lane_Data_Src2,		//Lane Data
 	input	lane_t				I_Lane_Data_Src3,		//Lane Data
@@ -131,6 +132,7 @@ module Network_V
 		.I_Stall(			I_Stall					),
 		.I_WB_Index(		I_WB_Index				),
 		.I_WB_Data(			I_WB_Data				),
+		.I_Slice_Len(		I_Slice_Len				),
 		.I_Idx1(			Src_Index1				),
 		.I_Idx2(			Src_Index2				),
 		.I_Idx3(			Src_Index3				),

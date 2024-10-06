@@ -20,18 +20,14 @@ module IndexUnit
 	input						I_Stall,				//Force Stalling
 	input						I_Req,					//Request from Hazard-Check Stage
 	input						I_MaskedRead,			//Flag: Masked Access to Register File
-	input						I_Slice,				//Flag: Index-Slicing
-	input	[6:0]				I_Sel,					//Select Sources
-	input	index_s_t			I_Index,				//Index Value
+	input	idx_t				I_Index,				//Index Value
 	input	index_t				I_Window,				//Window for Slicing
 	input	index_t				I_Length,				//Length for Slicing
 	input	id_t				I_ThreadID,				//Thread-ID
 	input	index_t				I_Constant,				//Constant
 	input						I_Sign,					//Config: Sign
 	input	mask_t				I_Mask_Data,			//Mask
-	output						O_Req,					//Request to Register-Read Stage
-	output						O_Slice,				//Flag: Index-Slicing
-	output	index_t				O_Index					//Index Value
+	output	idx_t				O_Index					//Index Value
 );
 
 
@@ -69,6 +65,7 @@ module IndexUnit
 	logic						R_Req;
 	logic						R_Sel;
 	index_t						R_Index;
+	idx_t						R_Idx_Cfg;
 	index_t						R_Base_Index;
 	index_t						R_Length;
 	index_t						R_Window;
@@ -82,13 +79,13 @@ module IndexUnit
 	assign Next					= R_Index == R_Window;
 
 	//Parsing Selector Values
-	assign Sel_a				= I_Sel[1:0];
-	assign Sel_b				= I_Sel[3:2];
-	assign Sel_c				= I_Sel[5:4];
-	assign Sel_s				= I_Sel[6];
+	assign Sel_a				= I_Index.sel[1:0];
+	assign Sel_b				= I_Index.sel[3:2];
+	assign Sel_c				= I_Index.sel[5:4];
+	assign Sel_s				= I_Index.sel[6];
 
 	//Enable Slicing
-	assign En_Slice				= ( I_Req & I_Slice ) | ( R_Sel & ~I_Stall );
+	assign En_Slice				= ( I_Req & I_Index.slice ) | ( R_Sel & ~I_Stall );
 
 	//End of Slicing
 	assign End_Count			= CountVal == R_Length;
@@ -96,7 +93,7 @@ module IndexUnit
 	//Select Index Value
 	assign Index				= ( Req_SkipOp ) ?				Index_Offset :
 									( R_Sel ) ?					R_Index + OffsetVal + 1'b1 :
-																I_Index[WIDTH_INDEX-1:0];
+																I_Index.idx;
 
 	//Sign: Subtraction
 	assign sign					= I_Sign;
@@ -126,8 +123,15 @@ module IndexUnit
 
 	//Output Actual Index
 	assign O_Req				= R_Req | R_Sel | I_Req | SkipReq;
-	assign O_Slice				= ( R_Req ) ? R_Sel :	I_Req & I_Slice;
-	assign O_Index				= ( R_Req ) ? R_Index : I_Index;
+	assign O_Slice				= ( R_Req ) ? R_Sel :	I_Req & I_Index.slice;
+
+	assign O_Index.v			= ( R_Req ) ? R_Idx_Cfg.v | SkipReq | R_Sel :	I_Index.v & I_Req;
+	assign O_Index.slice		= ( R_Req ) ? R_Idx_Cfg.slice :					I_Index.slice;
+	assign O_Index.sel			= ( R_Req ) ? R_Idx_Cfg.sel :					I_Index.sel;
+	assign O_Index.no			= ( R_Req ) ? R_Idx_Cfg.no :					I_Index.no;
+	assign O_Index.window		= ( R_Req ) ? R_Idx_Cfg.v :						I_Index.window;
+	assign O_Index.src_sel		= ( R_Req ) ? R_Idx_Cfg.v :						I_Index.src_sel;
+	assign O_Index.idx			= ( R_Req ) ? R_Index :							I_Index.idx;
 
 
 	always_ff @( posedge clock ) begin
@@ -149,7 +153,7 @@ module IndexUnit
 		else if ( SkipEnd ) begin
 			R_MaskedRead	<= 1'b0;
 		end
-		else if ( I_Req & ~I_Stall & I_Slice ) begin
+		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
 			R_MaskedRead	<= I_MaskedRead;
 		end
 	end
@@ -161,7 +165,7 @@ module IndexUnit
 		else if ( End_Count ) begin
 			R_Sel			<= 1'b0;
 		end
-		else if ( I_Req & ~I_Stall & I_Slice ) begin
+		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
 			R_Sel			<= 1'b1;
 		end
 	end
@@ -174,7 +178,16 @@ module IndexUnit
 			R_Index			<= Index_val;
 		end
 		else if ( I_Req & ~I_Stall ) begin
-			R_Index			<= I_Index;
+			R_Index			<= I_Index.idx;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Idx_Cfg			<= 0;
+		end
+		else if ( I_Req & ~I_Stall ) begin
+			R_Idx_Cfg			<= I_Index;
 		end
 	end
 
@@ -182,7 +195,7 @@ module IndexUnit
 		if ( reset ) begin
 			R_Base_Index	<= 0;
 		end
-		else if ( I_Req & ~I_Stall & I_Slice ) begin
+		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
 			R_Base_Index	<= I_Index;
 		end
 	end
@@ -191,7 +204,7 @@ module IndexUnit
 		if ( reset ) begin
 			R_Length		<= 0;
 		end
-		else if ( I_Req & ~I_Stall & I_Slice ) begin
+		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
 			R_Length		<= I_Length;
 		end
 	end
@@ -200,7 +213,7 @@ module IndexUnit
 		if ( reset ) begin
 			R_Window		<= 0;
 		end
-		else if ( I_Req & ~I_Stall & I_Slice ) begin
+		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
 			R_Window		<= I_Window;
 		end
 	end

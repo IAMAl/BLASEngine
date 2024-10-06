@@ -138,11 +138,11 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		logic							slice;
-		index_s_t						idx;
+		index_t							idx;
 		logic		[6:0]				sel;
 		logic		[1:0]				no;
-		sel_t							dst_sel;
 		logic		[1:0]				path;
+		sel_t							dst_sel;
 		index_t							window;
 		index_t							slice_len;
 	} dst_t;
@@ -153,8 +153,8 @@ package pkg_tpu;
 		index_t							idx;
 		logic		[6:0]				sel;
 		logic		[1:0]				no;
-		sel_t							src_sel;
 		index_t							window;
+		sel_t							src_sel;
 	} idx_t;
 
 	typedef struct packed {
@@ -177,6 +177,7 @@ package pkg_tpu;
 		index_t							slice_len;
 		imm_t							imm;
 		logic	[16:0]					path;
+		logic							mread;
 	} instruction_t;
 
 	//	Instruction + Valid
@@ -219,7 +220,7 @@ package pkg_tpu;
 
 	////Command for Vector Unit
 	typedef struct packed {
-		instr_t							instr;
+		instruction_t					instr;
 		issue_no_t						issue_no;
 	} command_t;
 
@@ -259,6 +260,7 @@ package pkg_tpu;
 		index_t							slice_len;
 		issue_no_t						issue_no;
 		logic	[16:0]					path;
+		logic							mread;
 	} pipe_index_t;
 
 	typedef struct packed {
@@ -319,6 +321,7 @@ package pkg_tpu;
 	//	Execution Stage (Intermediate)
 	typedef struct packed {
 		logic							v;
+		op_t							op;
 		dst_t							dst;
 		index_t							slice_len;
 		issue_no_t						issue_no;

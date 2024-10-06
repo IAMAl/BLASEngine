@@ -24,6 +24,7 @@ module Network_S
 	input						I_Sel_ALU_Src1,			//Source Select
 	input						I_Sel_ALU_Src2,			//Source Select
 	input						I_Sel_ALU_Src3,			//Source Select
+	input	index_t				I_Slice_Len,
 	input	data_t				I_Src_Data1,			//Data from RegFile
 	input	data_t				I_Src_Data2,			//Data From RegFile
 	input	data_t				I_Src_Data3,			//Data From RegFile
@@ -84,6 +85,7 @@ module Network_S
 		.I_Stall(			I_Stall					),
 		.I_WB_Index(		I_WB_Index				),
 		.I_WB_Data(			I_WB_Data				),
+		.I_Slice_Len(		I_Slice_Len				),
 		.I_Idx1(			Src_Index1				),
 		.I_Idx2(			Src_Index2				),
 		.I_Idx3(			Src_Index3				),

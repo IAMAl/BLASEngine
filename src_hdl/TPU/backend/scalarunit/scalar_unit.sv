@@ -107,9 +107,9 @@ module Scalar_Unit
 	logic						Dst_RegFile_Slice;
 	index_t						Dst_RegFile_Index;
 
-	index_t						Index_Src1;
-	index_t						Index_Src2;
-	index_t						Index_Src3;
+	idx_t						Index_Src1;
+	idx_t						Index_Src2;
+	idx_t						Index_Src3;
 
 	logic						Req_Index_Dst;
 
@@ -216,6 +216,7 @@ module Scalar_Unit
 	pipe_index_reg_t			PipeReg_IdxRR;
 	pipe_reg_t					PipeReg_RR;
 	pipe_net_t					PipeReg_RR_Net;
+	pipe_net_t					PipeReg_Set_Net;
 	pipe_exe_t					PipeReg_Net;
 	pipe_exe_t					PipeReg_Exe;
 
@@ -296,11 +297,11 @@ module Scalar_Unit
 
 	//	Capture Read Data
 	//	Command
-	assign PipeReg_RR_Net.v			= PipeReg_RR.v;
-	assign PipeReg_RR_Net.op		= PipeReg_RR.op;
+	assign PipeReg_Set_Net.v		= PipeReg_RR.v;
+	assign PipeReg_Set_Net.op		= PipeReg_RR.op;
 
 	//	Write-Back
-	assign PipeReg_RR_Net.dst		= PipeReg_RR.dst;
+	assign PipeReg_Set_Net.dst		= PipeReg_RR.dst;
 
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
@@ -308,26 +309,26 @@ module Scalar_Unit
 	assign V_State_Data.data		= V_State;
 	assign V_State_Data.src_sel		= '0;
 
-	assign PipeReg_RR_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) ?	V_State_Data :
+	assign PipeReg_Set_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) ?	V_State_Data :
 										( PipeReg_RR.src1.v ) ?					PipeReg_RR.src1 :
 																				'0;
 
-	assign PipeReg_RR_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'h3 ) ?	V_State_Data :
+	assign PipeReg_Set_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'h3 ) ?	V_State_Data :
 										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
 																				'0;
 
-	assign PipeReg_RR_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'h3 ) ?	V_State_Data :
+	assign PipeReg_Set_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'h3 ) ?	V_State_Data :
 										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
 																				'0;
 
 	//	Slice Length
-	assign PipeReg_RR_Net.slice_len	= PipeReg_RR.slice_len;
+	assign PipeReg_Set_Net.slice_len	= PipeReg_RR.slice_len;
 
 	//	Issue-No
-	assign PipeReg_RR_Net.issue_no	= PipeReg_RR.issue_no;
+	assign PipeReg_Set_Net.issue_no	= PipeReg_RR.issue_no;
 
 	//	Path
-	assign PipeReg_RR_Net.path		= PipeReg_RR.path;
+	assign PipeReg_Set_Net.path		= PipeReg_RR.path;
 
 
 	///// Write-Back to PAC
@@ -372,7 +373,7 @@ module Scalar_Unit
 
 	assign Dst_Sel				= WB_Dst.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Dst.slice;
-	assign Dst_Index			= WB_Dst.idx[WIDTH_INDEX-1:0];
+	assign Dst_Index			= WB_Dst;
 	assign Dst_Index_Window		= WB_Dst.window;
 	assign Dst_Index_Length		= WB_Dst.slice_len;
 
@@ -517,8 +518,6 @@ module Scalar_Unit
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			Dst_Slice				),
-		.I_Sel(				Dst_Sel					),
 		.I_Index(			Dst_Index				),
 		.I_Window(			Dst_Index_Window		),
 		.I_Length(			Dst_Index_Length		),
@@ -526,8 +525,6 @@ module Scalar_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				Dst_RegFile_Req			),
-		.O_Slice(			Dst_RegFile_Slice		),
 		.O_Index(			Dst_RegFile_Index		)
 	);
 
@@ -541,17 +538,13 @@ module Scalar_Unit
 		.I_Stall(			Stall_RegFile_Odd		),
 		.I_Req(				PipeReg_Idx.src1.v		),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src1.slice	),
-		.I_Sel(				PipeReg_Idx.src1.sel	),
-		.I_Index(			PipeReg_Idx.src1.idx	),
+		.I_Index(			PipeReg_Idx.src1		),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src1.v	),
-		.O_Slice(			PipeReg_Index.src1.slice),
 		.O_Index(			Index_Src1				)
 	);
 
@@ -565,17 +558,13 @@ module Scalar_Unit
 		.I_Stall(			Stall_RegFile_Odd		),
 		.I_Req(				PipeReg_Idx.src2.v		),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src2.slice	),
-		.I_Sel(				PipeReg_Idx.src2.sel	),
-		.I_Index(			PipeReg_Idx.src2.idx	),
+		.I_Index(			PipeReg_Idx.src2		),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src2.v	),
-		.O_Slice(			PipeReg_Index.src2.slice),
 		.O_Index(			Index_Src2				)
 	);
 
@@ -589,17 +578,13 @@ module Scalar_Unit
 		.I_Stall(			Stall_RegFile_Even		),
 		.I_Req(				PipeReg_Idx.src3.v		),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Slice(			PipeReg_Idx.src3.slice	),
-		.I_Sel(				PipeReg_Idx.src3.sel	),
-		.I_Index(			PipeReg_Idx.src3.idx	),
+		.I_Index(			PipeReg_Idx.src3		),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Req(				PipeReg_Index.src3.v	),
-		.O_Slice(			PipeReg_Index.src3.slice),
 		.O_Index(			Index_Src3				)
 	);
 
@@ -611,10 +596,10 @@ module Scalar_Unit
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
-		.O_Index_Src1(		PipeReg_IdxRF.src1.idx	),
-		.O_Index_Src2(		PipeReg_IdxRF.src2.idx	),
-		.O_Index_Src3(		PipeReg_IdxRF.src3.idx	),
-		.O_Index_Src4(		PipeReg_IdxRF.src4.idx	)
+		.O_Index_Src1(		PipeReg_IdxRF.src1		),
+		.O_Index_Src2(		PipeReg_IdxRF.src2		),
+		.O_Index_Src3(		PipeReg_IdxRF.src3		),
+		.O_Index_Src4(		PipeReg_IdxRF.src4		)
 	);
 
 	//	Pipeline Register
@@ -686,7 +671,7 @@ module Scalar_Unit
 			PipeReg_RR_Net	<= '0;
 		end
 		else if ( I_En ) begin
-			PipeReg_RR_Net	<= PipeReg_RR;
+			PipeReg_RR_Net	<= PipeReg_Set_Net;
 		end
 	end
 
@@ -723,6 +708,7 @@ module Scalar_Unit
 		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
 		.I_Sel_ALU_Src2(	PipeReg_RR_Net.src2.v	),
 		.I_Sel_ALU_Src3(	PipeReg_RR_Net.src3.v	),
+		.I_Slice_Len(		PipeReg_RR_Net.slice_len),
 		.I_Src_Data1(	PipeReg_RR_Net.src1.data	),
 		.I_Src_Data2(	PipeReg_RR_Net.src2.data	),
 		.I_Src_Data3(	PipeReg_RR_Net.src3.data	),

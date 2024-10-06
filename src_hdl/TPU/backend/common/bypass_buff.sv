@@ -19,9 +19,10 @@ module BypassBuff
 	input						I_Stall,				//Force Stalling
 	input	dst_t				I_WB_Index,				//Write-back Index
 	input	data_t				I_WB_Data,				//Write-back Data
-	input	index_t				I_Idx1,
-	input	index_t				I_Idx2,
-	input	index_t				I_Idx3,
+	input	index_t				I_Slice_Len,
+	input	idx_t				I_Idx1,
+	input	idx_t				I_Idx2,
+	input	idx_t				I_Idx3,
 	input	data_t				I_Src1,					//Source Data
 	input	data_t				I_Src2,					//Source Data
 	input	data_t				I_Src3,					//Source Data
@@ -81,7 +82,7 @@ module BypassBuff
 
 
 	logic						valid			[BUFF_SIZE-1:0];
-	index_t						Buff_Index		[BUFF_SIZE-1:0];
+	idx_t						Buff_Index		[BUFF_SIZE-1:0];
 	data_t						Buff_Data		[BUFF_SIZE-1:0];
 
 
@@ -102,7 +103,7 @@ module BypassBuff
 
 	assign O_Src1				= ( Update_Src1 ) ?	Buff_Data[ NoSrc1 ] :
 									( Hit_Src1 ) ?	Buff_Data[ Rd_Ptr ] :
-									I_Src1;
+													I_Src1;
 
 	assign O_Src2				= ( Update_Src2 ) ?	Buff_Data[ NoSrc2 ] :
 									( Hit_Src2 ) ?	Buff_Data[ Rd_Ptr ] :
@@ -113,18 +114,18 @@ module BypassBuff
 													I_Src3;
 
 
-	assign Last_Src1			= Run_Slice_Src1 ^ ( I_Src1.idx == Len_Src1 );
-	assign Last_Src2			= Run_Slice_Src2 ^ ( I_Src2.idx == Len_Src2 );
-	assign Last_Src3			= Run_Slice_Src3 ^ ( I_Src3.idx == Len_Src3 );
+	assign Last_Src1			= Run_Slice_Src1 ^ ( I_Idx1.idx == Len_Src1 );
+	assign Last_Src2			= Run_Slice_Src2 ^ ( I_Idx2.idx == Len_Src2 );
+	assign Last_Src3			= Run_Slice_Src3 ^ ( I_Idx3.idx == Len_Src3 );
 
 	assign Clr					= Last_Src1 & Last_Src2 & Last_Src3;
 
 
 	always_comb begin
 		for ( int i=0; i<BUFF_SIZE; ++i ) begin
-			is_Matched_Src1[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src1.v & ( Buff_Index[ i ].idx == I_Src1.idx );
-			is_Matched_Src2[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src2.v & ( Buff_Index[ i ].idx == I_Src2.idx );
-			is_Matched_Src3[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Src3.v & ( Buff_Index[ i ].idx == I_Src3.idx );
+			is_Matched_Src1[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Idx1.v & ( Buff_Index[ i ].idx == I_Idx1.idx );
+			is_Matched_Src2[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Idx2.v & ( Buff_Index[ i ].idx == I_Idx2.idx );
+			is_Matched_Src3[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Idx3.v & ( Buff_Index[ i ].idx == I_Idx3.idx );
 		end
 	end
 
@@ -152,7 +153,7 @@ module BypassBuff
 		else if ( Last_Src1 ) begin
 			Run_Slice_Src1	<= 1'b0;
 		end
-		else if ( I_Src1.v & ( I_Src1.slice_len != 0 ) ) begin
+		else if ( I_Idx1.v & ( I_Slice_Len != 0 ) ) begin
 			Run_Slice_Src1	<= 1'b1;
 		end
 	end
@@ -164,7 +165,7 @@ module BypassBuff
 		else if ( Last_Src2 ) begin
 			Run_Slice_Src2	<= 1'b0;
 		end
-		else if ( I_Src2.v & ( I_Src2.slice_len != 0 ) ) begin
+		else if ( I_Idx2.v & ( I_Slice_Len != 0 ) ) begin
 			Run_Slice_Src2	<= 1'b1;
 		end
 	end
@@ -176,7 +177,7 @@ module BypassBuff
 		else if ( Last_Src3 ) begin
 			Run_Slice_Src3	<= 1'b0;
 		end
-		else if (  I_Src3.v & ( I_Src3.slice_len != 0 ) ) begin
+		else if (  I_Idx3.v & ( I_Slice_Len != 0 ) ) begin
 			Run_Slice_Src3	<= 1'b1;
 		end
 	end
@@ -186,8 +187,8 @@ module BypassBuff
 		if ( reset ) begin
 			Len_Src1		<= 0;
 		end
-		else if ( I_Src1.v & ( I_Src1.slice_len != 0 ) ) begin
-			Len_Src1		<= I_Src1.slice_len + I_Src1.idx;
+		else if ( I_Idx1.v & ( I_Slice_Len != 0 ) ) begin
+			Len_Src1		<= I_Slice_Len + I_Idx1.idx;
 		end
 	end
 
@@ -195,8 +196,8 @@ module BypassBuff
 		if ( reset ) begin
 			Len_Src2		<= 0;
 		end
-		else if ( I_Src2.v & ( I_Src2.slice_len != 0 ) ) begin
-			Len_Src2		<= I_Src2.slice_len + I_Src2.idx;
+		else if ( I_Idx2.v & ( I_Slice_Len != 0 ) ) begin
+			Len_Src2		<= I_Slice_Len + I_Idx2.idx;
 		end
 	end
 
@@ -204,8 +205,8 @@ module BypassBuff
 		if ( reset ) begin
 			Len_Src3		<= 0;
 		end
-		else if ( I_Src3.v & ( I_Src3.slice_len != 0 ) ) begin
-			Len_Src3		<= I_Src3.slice_len + I_Src3.idx;
+		else if ( I_Idx3.v & ( I_Slice_Len != 0 ) ) begin
+			Len_Src3		<= I_Slice_Len + I_Idx3.idx;
 		end
 	end
 

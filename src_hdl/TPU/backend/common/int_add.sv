@@ -35,8 +35,8 @@ module iAdd_Unit
 	logic	[WIDTH_DATA:0]		ResultData;
 
 
-	assign is_Signed			= I_Token.instr.op.OpCode[1];
-	assign is_Sub				= I_Token.instr.op.OpCode[0];
+	assign is_Signed			= I_Token.op.OpCode[1];
+	assign is_Sub				= I_Token.op.OpCode[0];
 
 
 	assign Src_Data1			= ( is_Signed ) ? { I_Data1[WIDTH_DATA-1], I_Data1 } : { 1'b0, I_Data1 };

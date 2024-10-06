@@ -50,7 +50,7 @@ module fAdd_Unit
 	index_t						PipeToken		[DEPTH_PIPE-1:0];
 
 
-	assign is_Sub				= I_Token.instr.op.OpCode[0];
+	assign is_Sub				= I_Token.op.OpCode[0];
 	assign ResultData			= ( is_Sub ) ? I_Data1 - I_Data2 : I_Data1 + I_Data2;
 
 	assign Valid				= I_En;

@@ -118,8 +118,8 @@ module LdStUnit
 	assign Sel_St2				= LifeSt <= LifeSt;
 
 
-	assign Ld_Req				= I_Command.instr.v & ( I_Command.instr.op.OPType == 2'b11 ) & ~I_Command.instr.op.OpClass;
-	assign St_Req				= I_Command.instr.v & ( I_Command.instr.op.OPType == 2'b11 ) &  I_Command.instr.op.OpClass;
+	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass;
+	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass;
 
 	assign St_Data				= I_Src_Data1;
 

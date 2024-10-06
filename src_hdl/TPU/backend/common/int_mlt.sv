@@ -33,7 +33,7 @@ module iMlt_Unit
 	logic	[WIDTH_DAYA-1:0]	ResultData;
 
 
-	assign is_Signed			= |I_Token.instr.op.OpCode;
+	assign is_Signed			= |I_Token.op.OpCode;
 	assign is_Sign				= I_Data1[WIDTH_DATA-1] ^ I_Data2[WIDTH_DATA-1];
 
 

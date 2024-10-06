@@ -53,6 +53,8 @@ module ExecUnit_V
 	issue_no_t					MAU_IssueNo;
 	logic						Valid_MAU;
 
+	TYPE						Token_MAU;
+
 	logic						LdSt_Req		[1:0];
 	data_t						Ld_Data			[1:0];
 	TYPE						Ld_Token		[1:0];

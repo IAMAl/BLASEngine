@@ -28,7 +28,7 @@ package pkg_mpu;
 	localparam int WIDTH_THREAD_LEN 	= $clog2(NUM_ENTRY_STH);
 
 	//Thread Memory Size
-	localparam int SIZE_THREAD_MEM		= 8192;
+	localparam int SIZE_THREAD_MEM		= 4096;
 	localparam int WIDTH_SIZE_TMEM		= $clog2(SIZE_THREAD_MEM);
 
 	//Mimimum Number of Threads handled by MPU

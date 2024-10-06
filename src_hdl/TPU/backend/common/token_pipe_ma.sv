@@ -65,21 +65,21 @@ module token_pipe_ma
 	TYPE						TBuffAdd		[DEPTH_ADD-1:0];
 
 
-	assign Valid				= I_Token.v & ( I_Token.instr.op.OpType == 2'b00 );
+	assign Valid				= I_Token.v & ( I_Token.op.OpType == 2'b00 );
 
-	assign Token				= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ] :
-									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ] :
+	assign Token				= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ] :
+									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ] :
 																														I_Token;
 
-	assign Op					= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ].instr.op :
-									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ].instr.op :
-																														I_Token.instr.op;
+	assign Op					= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ].op :
+									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ].op :
+																														I_Token.op;
 
 
 	assign LifeMlt				= I_Issue_No - TBuffMlt[ RPtr_Mlt ].issue_no;
 	assign LifeAdd				= I_Issue_No - TBuffAdd[ RPtr_Add ].issue_no;
 	assign is_Mlt_Old			= LifeMlt > LifeAdd;
-	assign SelOut				= is_Mlt_Old & ~&TBuffMlt[ RPtr_Mlt ].instr.op.OpCode;
+	assign SelOut				= is_Mlt_Old & ~&TBuffMlt[ RPtr_Mlt ].op.OpCode;
 
 
 	assign O_Token				= (    SelOut & TBuffMlt[ RPtr_Mlt ].v ) ?	TBuffMlt[ RPtr_Mlt ] :
@@ -89,14 +89,14 @@ module token_pipe_ma
 
 	assign O_Stall				= Full_Mlt | Full_Add;
 
-	assign O_Chain_Mlt			= TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 );
-	assign O_Chain_Add			= TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) & ~O_Chain_Mlt;
+	assign O_Chain_Mlt			= TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 );
+	assign O_Chain_Add			= TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].op.OpCode == 2'b10 ) & ~O_Chain_Mlt;
 
 
-	assign We_Mlt				= ~Full_Mlt & ( ( Valid & ( I_Token.instr.op.OpClass == 2'b01 ) ) | ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].instr.op.OpCode == 2'b11 ) ) );
+	assign We_Mlt				= ~Full_Mlt & ( ( Valid & ( I_Token.op.OpClass == 2'b01 ) ) | ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) );
 	assign Re_Mlt				= ~Empty_Mlt & ~I_Stall & TBuffMlt[ RPtr_Mlt ].v & I_Grant;
 
-	assign We_Add				= ~Full_Add & ( ( Valid & ( I_Token.instr.op.OpClass == 2'b00 ) ) | ( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].instr.op.OpCode == 2'b10 ) ) );
+	assign We_Add				= ~Full_Add & ( ( Valid & ( I_Token.op.OpClass == 2'b00 ) ) | ( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].op.OpCode == 2'b10 ) ) );
 	assign Re_Add				= ~Empty_Add & ~I_Stall & TBuffAdd[ RPtr_Add ].v & I_Grant;
 
 

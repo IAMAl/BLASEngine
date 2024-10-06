@@ -62,31 +62,31 @@ module ReorderBuff_S
 
 	// Send Commit Request
 	assign O_Commit_Req			= Re;
-	assign O_Commit_No			= Commit_S[RNo].Issue_No;
+	assign O_Commit_No			= Commit_S[RNo].issue_no;
 
 	// State of Buffer
 	assign O_Full				= Full;
 	assign O_Empty				= Empty;
 
 	// Buffer Handling
-	assign En_Commit			= Commit_S[RNo].Valid & Commit_S[RNo].Commit;
+	assign En_Commit			= Commit_S[RNo].v & Commit_S[RNo].commit;
 	assign Re					= En_Commit & I_Commit_Grant;
 	assign We					= I_Store & ~Full;
 
 
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			Set_Commit[ i ]	= Commit_S[ i ].Valid & (
-										( Commit_S[ i ].Issue_No == I_Commit_No_LdSt1 ) |
-										( Commit_S[ i ].Issue_No == I_Commit_No_LdSt2 ) |
-										( Commit_S[ i ].Issue_No == I_Commit_No_Math )
+			Set_Commit[ i ]	= Commit_S[ i ].v & (
+										( Commit_S[ i ].issue_no == I_Commit_No_LdSt1 ) |
+										( Commit_S[ i ].issue_no == I_Commit_No_LdSt2 ) |
+										( Commit_S[ i ].issue_no == I_Commit_No_Math )
 									);
 		end
 	end
 
     always_comb begin
         for ( int i=0; i<NUM_ENTRY; ++i ) begin
-            Clr_Valid[ i ]     = Commit_S[ i ].Valid & Commit_S[ i ].Commit;
+            Clr_Valid[ i ]     = Commit_S[ i ].v & Commit_S[ i ].commit;
         end
     end
 
@@ -144,18 +144,18 @@ module ReorderBuff_S
 		end
 		else if ( I_Store | ( Set_Commit != 0) | ( Clr_Valid != 0 ) ) begin
 			if ( I_Store ) begin
-				Commit_S[ WNo ].Valid	<= 1'b1;
-				Commit_S[ WNo ].Issue_No<= I_Issue_No;
-				Commit_S[ WNo ].Commit	<= 1'b0;
+				Commit_S[ WNo ].v	<= 1'b1;
+				Commit_S[ WNo ].issue_no<= I_Issue_No;
+				Commit_S[ WNo ].commit	<= 1'b0;
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit_S[ i ].Commit	<= Commit_V[ i ].Commi | Set_Commit[ i ];
+				Commit_S[ i ].commit	<= Commit_S[ i ].commit | Set_Commit[ i ];
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit_S[ i ].Valid		<= Commit_S[ i ].Valid &  ~Clr_Valid[ i ];
-				Commit_S[ i ].Commit	<= Commit_S[ i ].Commit & ~Clr_Valid[ i ];
+				Commit_S[ i ].v			<= Commit_S[ i ].v &  ~Clr_Valid[ i ];
+				Commit_S[ i ].commit	<= Commit_S[ i ].commit & ~Clr_Valid[ i ];
 			end
 		end
 	end

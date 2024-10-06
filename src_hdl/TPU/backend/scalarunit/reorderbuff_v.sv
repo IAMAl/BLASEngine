@@ -47,7 +47,7 @@ module ReorderBuff_V
 
 	// Send Commit Request
 	assign O_Commit_Req			= Re;
-	assign O_Commit_No			= Commit_V[ RNo ].Issue_No;
+	assign O_Commit_No			= Commit_V[ RNo ].issue_no;
 
 	// State of Buffer
 	assign O_Full				= Full;

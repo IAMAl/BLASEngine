@@ -33,7 +33,7 @@ module Logic_Unit
 
 
 	always_comb begin
-		case ( I_Token.instr.op.OpCode )
+		case ( I_Token.op.OpCode )
 			2'b00: assign ResultData	= ~I_Data1;
 			2'b01: assign ResultData	= I_Data1 & I_Data2;
 			2'b10: assign ResultData	= I_Data1 | I_Data2;

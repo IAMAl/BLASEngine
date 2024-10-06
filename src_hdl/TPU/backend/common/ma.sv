@@ -100,11 +100,11 @@ module MA_Unit
 															Mlt_Token;
 
 
-	assign is_Adder				= I_En & ( I_Token.instr.op.OpClass == 2'b00 );
-	assign is_Mlter				= I_En & ( I_Token.instr.op.OpClass == 2'b01 );
+	assign is_Adder				= I_En & ( I_Token.op.OpClass == 2'b00 );
+	assign is_Mlter				= I_En & ( I_Token.op.OpClass == 2'b01 );
 
-	assign is_MAC				= ( Token.instr.op.OpClass == 2'b01 ) & ( Token.instr.op.OpCode == 2'b10 );
-	assign is_MAD				= ( Token.instr.op.OpClass == 2'b01 ) & ( Token.instr.op.OpCode == 2'b11 );
+	assign is_MAC				= ( I_Token.op.OpClass == 2'b01 ) & ( I_Token.op.OpCode == 2'b10 );
+	assign is_MAD				= ( I_Token.op.OpClass == 2'b01 ) & ( I_Token.op.OpCode == 2'b11 );
 
 
 	assign Token_Add			= ( is_Adder ) ?	I_Token :

@@ -53,9 +53,9 @@ module SRL_Unit
 	issue_no_t					Issue_No;
 
 
-	assign En_Shift				= I_En & ( I_Token.instr.op.OpClass == 2'b00 ) & ~( Valid & I_Grant );
-	assign En_Rotate			= I_En & ( I_Token.instr.op.OpClass == 2'b01 ) & ~( Valid & I_Grant );
-	assign En_Logic				= I_En & ( I_Token.instr.op.OpClass == 2'b10 ) & ~( Valid & I_Grant );
+	assign En_Shift				= I_En & ( I_Token.op.OpClass == 2'b00 ) & ~( Valid & I_Grant );
+	assign En_Rotate			= I_En & ( I_Token.op.OpClass == 2'b01 ) & ~( Valid & I_Grant );
+	assign En_Logic				= I_En & ( I_Token.op.OpClass == 2'b10 ) & ~( Valid & I_Grant );
 
 	assign Data_Shift1			= ( En_Shift ) ?	I_Data1 : 0;
 	assign Data_Shift2			= ( En_Shift ) ?	I_Data2 : 0;
@@ -71,7 +71,7 @@ module SRL_Unit
 
 
 	always_comb begin
-		case ( I_Token.instr.op.OpClass )
+		case ( I_Token.op.OpClass )
 			2'b00: assign ResultData	= Data_Shift;
 			2'b01: assign ResultData	= Data_Rotate;
 			2'b10: assign ResultData	= Data_Logic;
@@ -80,7 +80,7 @@ module SRL_Unit
 	end
 
 	always_comb begin
-		case ( I_Token.instr.op.OpClass )
+		case ( I_Token.op.OpClass )
 			2'b00: assign ResultToken	= Token_Shift;
 			2'b01: assign ResultToken	= Token_Rotate;
 			2'b10: assign ResultToken	= Token_Logic;
