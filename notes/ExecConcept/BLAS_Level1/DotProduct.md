@@ -5,7 +5,7 @@
 <div align="center">
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/DotProduct.png"
        alt="HTML image alt text"
-       title="Vector Multiplication"
+       title="Dot-Product"
        width="600px"
   />
 </div>
@@ -14,7 +14,7 @@
 
 これは一つのレーン内で内積を行うレジスタファイルに収まるベクトル長を中心とした方法です。
 スライシングを使用してレジスタファイル内の連続した複数の要素を各サイクルで読み出し時系列で乗算を行い累和も行います。
-最後に類和の結果をレジスタ移動命令で取り出します。
+最後に累和の結果をレジスタ移動命令で取り出します。
 この方法は分岐命令を必要としないことと、一つの命令で内積演算を実現できるので分岐予測器を持たないBLASEngineにとって都合の良い方法と言えます。
 従ってこの方法は時系列で演算を行いますがオーバーヘッドのない演算方法です。
 
