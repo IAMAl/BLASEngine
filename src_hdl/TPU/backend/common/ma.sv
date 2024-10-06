@@ -15,7 +15,7 @@ module MA_Unit
 	parameter int DEPTH_MLT		= 3,
 	parameter int DEPTH_ADD		= 1,
 	parameter type TYPE			= pipe_exe_tmp_t,
-	parameter bool INT_UNIT		= 1
+	parameter bool INT_UNit		= true
 )(
 	input						clock,
 	input						reset,
@@ -33,6 +33,8 @@ module MA_Unit
 	output						O_Stall					//Stall Request
 );
 
+
+	localparam int WIDTH_BUFF	= clog2(DEPTH_MLT);
 
 	logic						En_Add;
 	logic						En_Mlt;
@@ -60,9 +62,16 @@ module MA_Unit
 
 	issue_no_t					LifeAdd;
 	issue_no_t					LifeMlt;
-	
-	issue_not_t                Add_Issue_No;
-	issue_not_t                Mlt_Issue_No;
+
+
+	logic						We;
+	logic						Re;
+	logic	[WIDTH_BUFF-1:0]	Wno;
+	logic	[WIDTH_BUFF-1:0]	Rno;
+	logic						Full;
+	logic						Empty;
+
+	data_t						Buff_Src3	[DEPTH_MLT-1:0];
 
 
 	assign LiFeAdd				= I_Pres_Issue_No - Add_Issue_No;
@@ -82,8 +91,8 @@ module MA_Unit
 															Mlt_Token;
 
 
-	assign is_Adder				= I_En & ( I_Op.OpClass == 2'b00 );
-	assign is_Mlter				= I_En & ( I_Op.OpClass == 2'b01 );
+	assign is_Adder				= I_En & ( I_Token.instr.op.OpClass == 2'b00 );
+	assign is_Mlter				= I_En & ( I_Token.instr.op.OpClass == 2'b01 );
 
 	assign is_MAC				= ( Token.instr.op.OpClass == 2'b01 ) & ( Token.instr.op.OpCode == 2'b10 );
 	assign is_MAD				= ( Token.instr.op.OpClass == 2'b01 ) & ( Token.instr.op.OpCode == 2'b11 );
@@ -105,8 +114,8 @@ module MA_Unit
 													0;
 
 	assign Data2_Add			= ( is_Adder ) ?	I_Data2 :
-									( is_MAD ) ?	I_Data3 :
-									( is_MAC ) ?	C1 :
+									( is_MAD ) ?	Data3 :
+									( is_MAC ) ?	Data3 :
 													0;
 
 	assign Data1_Mlt			= ( is_Mlter ) ?	I_Data1 :
@@ -119,6 +128,18 @@ module MA_Unit
 									( is_MAC ) ?	I_Data2 :
 													0;
 
+
+	assign We					= I_Token.v & ( is_MAD | is_MAC );
+	assign Re					= ~Empty & ( Chain_Mlt | Chain_Add );
+
+	assign Data3				= Buff_Src3[ RNo ];
+
+
+	always_ff @( posedge clock ) begin
+		if ( We ) begin
+			Buff_Src3[ WNo ]	<= I_Data3;
+		end
+	end
 
 	`ifdef INT_UNit
 		iAdd_Unit Add_Unit
@@ -189,6 +210,23 @@ module MA_Unit
 		.O_Chain_Mlt(		Chain_Mlt				),
 		.O_Chain_Add(		Chain_Add				),
 		.O_Stall(			O_Stall					)
+	);
+
+
+	//// Module: Ring-Buffer Controller
+	RingBuffCTRL #(
+		.NUM_ENTRY(			DEPTH_MLT				)
+	) RingBuffCTRL
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.O_WAddr(			WNo						),
+		.O_RAddr(			RNo						),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(										)
 	);
 
 endmodule
