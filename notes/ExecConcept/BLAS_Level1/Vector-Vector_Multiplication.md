@@ -1,6 +1,6 @@
 # Vector-Vector Multiplication Note
 
-ベクトルとベクトルの乗算、つまり内積演算はBLASEngineでは3通りの実装方法があります。
+ベクトルとベクトルの乗算はBLASEngineでは3通りの実装方法があります。
 
 <div align="center">
   <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/VectorOP.png"
