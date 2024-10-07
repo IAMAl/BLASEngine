@@ -19,10 +19,10 @@ module BypassBuff
 	input						I_Stall,				//Force Stalling
 	input	dst_t				I_WB_Index,				//Write-back Index
 	input	data_t				I_WB_Data,				//Write-back Data
-	input	index_t				I_Slice_Len,
-	input	idx_t				I_Idx1,
-	input	idx_t				I_Idx2,
-	input	idx_t				I_Idx3,
+	input	index_t				I_Slice_Len,			//SLice Length
+	input	idx_t				I_Idx1,					//Index
+	input	idx_t				I_Idx2,					//Index
+	input	idx_t				I_Idx3,					//Index
 	input	data_t				I_Src1,					//Source Data
 	input	data_t				I_Src2,					//Source Data
 	input	data_t				I_Src3,					//Source Data

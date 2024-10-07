@@ -26,7 +26,7 @@ module Network_V
 	input						I_Sel_ALU_Src1,			//Source Select
 	input						I_Sel_ALU_Src2,			//Source Select
 	input						I_Sel_ALU_Src3,			//Source Select
-	input	index_t				I_Slice_Len,
+	input	index_t				I_Slice_Len,			//SLice Length
 	input	lane_t				I_Lane_Data_Src1,		//Lane Data
 	input	lane_t				I_Lane_Data_Src2,		//Lane Data
 	input	lane_t				I_Lane_Data_Src3,		//Lane Data

@@ -19,7 +19,7 @@ module Dispatch_MPU
 	input	id_t				I_ThreadID,				//Scalar Thread-ID from Hazard Check Unit
 	output						O_Req_Lookup,			//Request to MapMan Unit
 	output	id_t				O_ThreadID,				//Scalar Thread-ID to Commit Unit
-	input						I_Ack_LookUp,					//Ack from MapMan Unit
+	input						I_Ack_LookUp,			//Ack from MapMan Unit
 	input	lookup_t			I_ThreadInfo,			//Instr Memory Info from MapMan Unit
 	output						O_Ld,					//Load Instruction
 	output	mpu_address_t		O_Address,				//Loading Address

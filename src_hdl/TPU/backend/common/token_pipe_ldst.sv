@@ -19,7 +19,7 @@ module token_pipe_ldst
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall
-	input						I_Commit_Grant,
+	input						I_Commit_Grant,			//Commit Grant
 	input						I_Access_Grant,			//Access-Grant
 	input						I_Req,					//Access-Request
 	input	address_t			I_Length,				//Access-Length
