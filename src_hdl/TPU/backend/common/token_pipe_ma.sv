@@ -67,13 +67,13 @@ module token_pipe_ma
 
 	assign Valid				= I_Token.v & ( I_Token.op.OpType == 2'b00 );
 
-	assign Token				= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ] :
+	assign Token				= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) ?	TBuffMlt[ RPtr_Mlt ] :
 									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ] :
-																														I_Token;
+																												I_Token;
 
-	assign Op					= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) ?		TBuffMlt[ RPtr_Mlt ].op :
+	assign Op					= ( TBuffMlt[ RPtr_Mlt ].v & ( TBuffMlt[ RPtr_Mlt ].op.OpCode == 2'b11 ) ) ?	TBuffMlt[ RPtr_Mlt ].op :
 									( TBuffAdd[ RPtr_Add ].v & ( TBuffAdd[ RPtr_Add ].op.OpCode == 2'b10 ) ) ?	TBuffAdd[ RPtr_Add ].op :
-																														I_Token.op;
+																												I_Token.op;
 
 
 	assign LifeMlt				= I_Issue_No - TBuffMlt[ RPtr_Mlt ].issue_no;

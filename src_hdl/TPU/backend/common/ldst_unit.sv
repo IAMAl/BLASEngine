@@ -96,7 +96,7 @@ module ldst_unit
 
 
 	token_pipe_ldst #(
-		.DEPTH_BUFF(		DEPTH_BUFF_LDST			  ),
+		.DEPTH_BUFF(		DEPTH_BUFF_LDST			 	),
 		.TYPE(				TYPE						)
 	) token_pipe_ldst
 	(
