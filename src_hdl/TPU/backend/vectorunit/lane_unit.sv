@@ -157,7 +157,7 @@ module Lane_Unit
 
 			PipeReg_Idx.src1		<= I_Command.instr.src1;
 			PipeReg_Idx.src2		<= I_Command.instr.src2;
-			PipeReg_Idx.src3		<= I_Command.instr.src2;
+			PipeReg_Idx.src3		<= I_Command.instr.src3;
 
 			//	Path
 			PipeReg_Idx.path		<= I_Command.instr.path;
@@ -270,8 +270,8 @@ module Lane_Unit
 	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
 	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
 	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx : '0;
-	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx : '0;
+	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx :	'0;
+	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx :	'0;
 	assign WB_Data_Even			= ( ~Sel_Dst ) ? W_WB_Data :	'0;
 	assign WB_Data_Odd			= (  Sel_Dst ) ? W_WB_Data :	'0;
 
