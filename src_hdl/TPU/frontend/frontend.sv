@@ -93,13 +93,25 @@ module FrontEnd
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
+			IssueNo		<= '0;
+		end
+		else if ( R_Term ) begin
+			IssueNo		<= '0;
+		end
+		else if ( I_Req &  is_FSM_TPU_RUN ) begin
+			IssueNo		<= I_IssueNo;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
 			R_IssueNo		<= '0;
 		end
 		else if ( R_Term ) begin
 			R_IssueNo		<= '0;
 		end
-		else if ( I_Req & is_FSM_TPU_SCALAR ) begin
-			R_IssueNo		<= I_IssueNo;
+		else if ( R_Req & is_FSM_TPU_SCALAR ) begin
+			R_IssueNo		<= IssueNo;
 		end
 	end
 
@@ -191,10 +203,10 @@ module FrontEnd
 			end
 			FSM_TPU_INSTR: begin
 				if ( R_Term & R_Instr.v ) begin
-					R_FSM_TPU_FrontEnd	<= FSM_TPU_INSTR;
+					R_FSM_TPU_FrontEnd	<= FSM_TPU_FE_INIT;
 				end
 				else begin
-					R_FSM_TPU_FrontEnd	<= FSM_TPU_SIMT;
+					R_FSM_TPU_FrontEnd	<= FSM_TPU_INSTR;
 				end
 			end
 			default: begin
