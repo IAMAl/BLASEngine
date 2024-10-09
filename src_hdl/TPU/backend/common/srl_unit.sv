@@ -44,13 +44,11 @@ module SRL_Unit
 	TYPE						Token_Logic;
 
 	data_t						ResultData;
-	issue_no_t					ResultINo;
 	TYPE						ResultToken;
 
 	logic						Valid;
 	data_t						C2;
 	TYPE						Token;
-	issue_no_t					Issue_No;
 
 
 	assign En_Shift				= I_En & ( I_Token.op.OpClass == 2'b00 ) & ~( Valid & I_Grant );

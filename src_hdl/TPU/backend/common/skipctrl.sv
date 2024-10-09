@@ -36,7 +36,7 @@ module SkipCTRL
 	assign O_End				= End_Skip;
 
 	assign O_Req				= Run & ~End_Skip;
-	assign O_Index_Offset		= ( Run ) ? NLZ_Value : '0;
+	assign O_Index_Offset		= ( Run & ~End_Skip ) ? NLZ_Value : '0;
 
 
 	always_ff @( posedge clock ) begin
