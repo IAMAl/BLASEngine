@@ -186,7 +186,6 @@ module MapMan_MPU
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		//.I_Offset(			0						),
 		.O_WAddr(			WNo						),
 		.O_RAddr(									),
 		.O_Full(			Full					),

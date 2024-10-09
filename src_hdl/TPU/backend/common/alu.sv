@@ -133,22 +133,21 @@ module ALU
 
 
 	always_comb begin
-		case (  { Sel_Cnvt_SRL, Sel_MA_iDiv }  )
+		case ( { Sel_Cnvt_SRL, Sel_MA_iDiv } )
 			4'b1000: begin
 				assign Sel		= ( Life_Cnvt > Life_MA ) ?		2'b10 : 2'b00;
-
 			end
 			4'b1001: begin
 				assign Sel		= ( Life_Cnvt > Life_iDiv ) ?	2'b10 : 2'b01;
-
 			end
 			4'b1100: begin
 				assign Sel		= ( Life_iDiv > Life_MA ) ?		2'b11 : 2'b00;
-
 			end
 			4'b1101: begin
 				assign Sel		= ( Life_iDiv > Life_iDiv ) ?	2'b11 : 2'b01;
-
+			end
+			default: begin
+				assign Sel		= 2'b00;
 			end
 		endcase
 	end

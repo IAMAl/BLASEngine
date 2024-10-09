@@ -12,11 +12,11 @@
 module StatusCtrl
 	import	pkg_tpu::*;
 (
-		input					clock,
-		input					reset,
-		input					I_Req,					//Request to Update
-		input	data_t			I_Diff_Data,			//Diff Value from Adder
-		output	state_t			O_Status				//Status Values
+	input						clock,
+	input						reset,
+	input						I_Req,					//Request to Update
+	input	data_t				I_Diff_Data,			//Diff Value from Adder
+	output	state_t				O_Status				//Status Values
 );
 
 

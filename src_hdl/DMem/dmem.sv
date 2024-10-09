@@ -34,7 +34,7 @@ module DMem
 	output	v_grant_t			O_V_Ld_Grant,			//Flag: Grant for Request
 	output	v_ready_t			O_V_St_Ready,			//Flag: Ready to Service
 	output	v_grant_t			O_V_St_Grant			//Flag: Grant for Request
-	);
+);
 
 
 	DMem_Body DMem_S (

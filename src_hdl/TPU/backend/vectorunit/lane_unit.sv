@@ -112,6 +112,13 @@ module Lane_Unit
 	logic						Lane_CTRL_Set;
 
 
+	logic						Stall_RegFile_Dst;
+	logic						Stall_RegFile_Odd;
+	logic						Stall_RegFile_Even;
+	logic						Stall_Network;
+	logic						Stall_ExecUnit;
+
+
 	logic						Req_Issue;
 
 	pipe_index_t				PipeReg_Idx;
@@ -266,10 +273,10 @@ module Lane_Unit
 	assign is_WB_VU				= WB_Dst.dst_sel == 2'h3;
 
 	assign Sel_Dst				= WB_Dst.idx[WIDTH_INDEX+2];
-	assign WB_Req_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
+	assign WB_Req_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Even;
+	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Odd
+	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Dst;
+	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Dst;
 	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx :	'0;
 	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx :	'0;
 	assign WB_Data_Even			= ( ~Sel_Dst ) ? W_WB_Data :	'0;
@@ -287,6 +294,14 @@ module Lane_Unit
 
 	//// Commit Request
 	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
+
+
+	//// Stall Control
+	assign Stall_RegFile_Dst	= ~Lane_Enable;
+	assign Stall_RegFile_Odd	= ~Lane_Enable;
+	assign Stall_RegFile_Even	= ~Lane_Enable;
+	assign Stall_Network		= ~Lane_Enable;
+	assign Stall_ExecUnit		= ~Lane_Enable;
 
 
 	//// Index Update Stage
@@ -487,7 +502,7 @@ module Lane_Unit
 		.LANE_ID(			LANE_ID					)
 	) Network_V
 	(
-		.I_Stall(			~Lane_Enable			),
+		.I_Stall(			Stall_Network			),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),
@@ -535,7 +550,7 @@ module Lane_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				Lane_Enable				),
-		.I_Stall(			Stall					),
+		.I_Stall(			Stall_ExecUnit			),
 		.I_Req(				PipeReg_Exe.v			),
 		.I_Command(			PipeReg_Exe.instr		),
 		.I_Src_Data1(		PipeReg_Exe.data1		),

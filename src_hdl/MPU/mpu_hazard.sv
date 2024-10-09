@@ -162,7 +162,6 @@ module HazardCheck_MPU
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		//.I_Offset(			Offset					),
 		.O_WAddr(			WNo						),
 		.O_RAddr(			Issue_No				),
 		.O_Full(			Full					),

@@ -210,6 +210,7 @@ module Scalar_Unit
 	logic						Commit_Req;
 	issue_no_t					Commit_No;
 
+
 	pipe_index_t				PipeReg_Idx;
 	pipe_index_t				PipeReg_Index;
 	pipe_index_reg_t			PipeReg_IdxRF;
@@ -322,7 +323,7 @@ module Scalar_Unit
 																				'0;
 
 	//	Slice Length
-	assign PipeReg_Set_Net.slice_len	= PipeReg_RR.slice_len;
+	assign PipeReg_Set_Net.slice_len= PipeReg_RR.slice_len;
 
 	//	Issue-No
 	assign PipeReg_Set_Net.issue_no	= PipeReg_RR.issue_no;
@@ -419,6 +420,14 @@ module Scalar_Unit
 									( PipeReg_Idx.src2.idx == '0 ) &
 									( PipeReg_Idx.src3.idx == '0 )
 								);
+
+
+	//// Stall Control
+	assign Stall_RegFile_Dst	= ~Lane_Enable;
+	assign Stall_RegFile_Odd	= ~Lane_Enable;
+	assign Stall_RegFile_Even	= ~Lane_Enable;
+	assign Stall_Network		= ~Lane_Enable;
+	assign Stall_ExecUnit		= ~Lane_Enable;
 
 
 	//// Program Address Control

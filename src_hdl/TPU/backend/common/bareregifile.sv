@@ -32,7 +32,7 @@ module BareRegFile
 	data_t						src_data1;
 	data_t						src_data2;
 
-	data_t						RegFile	[NUM_ENTRY_REGFILE-1:0];
+	data_t						RegFile		[NUM_ENTRY_REGFILE-1:0];
 
 
 	assign Index_Src1			= ( I_Re1 ) ? I_Index_Src1 : 0;

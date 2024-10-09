@@ -85,8 +85,6 @@ module ThrreadMem_MPU
 
 
 	//// Send Instructions to Dispatch Unit
-	//assign O_Instr_Ld.valid		= R_Req_Ld;
-	//assign O_Instr_Ld.instr		= R_Instr_Ld;
 	assign O_Instr_Ld			= R_Instr_Ld;
 
 
