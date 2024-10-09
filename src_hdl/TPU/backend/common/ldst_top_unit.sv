@@ -52,9 +52,6 @@ module LdStUnit
 	address_t					Ld_Base;
 	address_t					St_Base;
 
-	logic						Ld_Commit_Req;
-	logic						St_Commit_Req;
-
 	issue_no_t					Ld_Commit_No;
 	issue_no_t					St_Commit_No;
 
@@ -83,8 +80,16 @@ module LdStUnit
 	logic						St_Commit_Grant;
 
 
+	assign Ld_Commit_No			= Ld_Commit_Token.issue_no;
+	assign St_Commit_No			= St_Commit_Token.issue_no;
+
 	assign LifeLd				= I_Issue_No - Ld_Commit_No;
 	assign LifeSt				= I_Issue_No - St_Commit_No;
+
+
+	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass;
+	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass;
+
 
 	assign Ld_Valid				= Ld_Req;
 	assign St_Valid				= St_Req;
@@ -92,7 +97,6 @@ module LdStUnit
 
 	assign Ld_Term				= I_End_Access;
 	assign St_Term				= I_End_Access;
-
 
 	assign Ld_Commit_Grant		= I_Commit_Grant;
 	assign St_Commit_Grant		= I_Commit_Grant;
@@ -109,17 +113,6 @@ module LdStUnit
 	assign St_Token.slice_len	= I_Command.instr.slice_len;
 	assign St_Token.issue_no	= I_Command.issue_no;
 	assign St_Token.path		= I_Command.instr.path;
-
-
-	assign Sel_Ld1				= LifeLd >  LifeLd;
-	assign Sel_Ld2				= LifeLd <= LifeLd;
-
-	assign Sel_St1				= LifeSt >  LifeSt;
-	assign Sel_St2				= LifeSt <= LifeSt;
-
-
-	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass;
-	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass;
 
 	assign St_Data				= I_Src_Data1;
 
@@ -140,7 +133,7 @@ module LdStUnit
 
 	assign O_WB_Data			= Ld_Data;
 
-	assign O_LdSt_Done			= Ld_Commit_Req | St_Commit_Req;
+	assign O_LdSt_Done			= Ld_Term | St_Term;
 
 
 	ldst_unit #(
@@ -159,9 +152,9 @@ module LdStUnit
 		.O_Data(			Ld_Data						),
 		.I_Term(			Ld_Term						),
 		.I_Req(				Ld_Req						),
-		.I_Length(			I_Src_Src_Data1				),
-		.I_Stride(			I_Src_Src_Data2				),
-		.I_Base(			I_Src_Src_Data3				),
+		.I_Length(			I_Src_Data1					),
+		.I_Stride(			I_Src_Data2					),
+		.I_Base(			I_Src_Data3					),
 		.O_Req(				Ld_Req						),
 		.O_Length(			Ld_Length					),
 		.O_Stride(			Ld_Stride					),
@@ -188,9 +181,9 @@ module LdStUnit
 		.O_Data(			O_St_Data					),
 		.I_Term(			St_Term						),
 		.I_Req(				St_Req						),
-		.I_Length(			I_Src_Src_Data1				),
-		.I_Stride(			I_Src_Src_Data2				),
-		.I_Base(			I_Src_Src_Data3				),
+		.I_Length(			I_Src_Data1					),
+		.I_Stride(			I_Src_Data2					),
+		.I_Base(			I_Src_Data3					),
 		.O_Req(				St_Req						),
 		.O_Length(			St_Length					),
 		.O_Stride(			St_Stride					),

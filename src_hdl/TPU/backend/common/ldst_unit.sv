@@ -56,29 +56,14 @@ module ldst_unit
 	logic						Run;
 
 
-	data_t						Data_Buff		[DEPTH_BUFF-1:0];
-
-
-	assign We					= I_Valid;
-	assign Re					= ~Empty & ~I_Stall & I_Commit_Grant;
-	assign Term					= Run & I_Term;
-
-	assign O_Data				= ( Re ) ?	Data_Buff[ RPtr ] : '0;
-	assign O_Stall				= Full | Stall;
+	assign We					= ~I_Stall & I_Valid;
+	assign Re					= ~I_Stall & I_Commit_Grant;
+	assign Term					= ~I_Stall & Run & I_Term;
 
 	assign O_Token				= ( Term ) ? Token : '0;
 
+	assign O_Stall				= Full | Full_Buff;
 
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			for ( int i=0; i<DEPTH_BUFF; ++i ) begin
-				Data_Buff[ i ]		<= '0;
-			end
-			end
-			else if ( We ) begin
-				Data_Buff[ WPtr ]	<= I_Data;
-			end
-	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -87,7 +72,7 @@ module ldst_unit
 		else if ( I_Term ) begin
 			Run				<= 1'b0;
 		end
-		else if ( ~Empty_Ldst & I_Access_Grant ) begin
+		else if ( ~Empty & I_Access_Grant ) begin
 			Run				<= 1'b1;
 		end
 	end
@@ -104,8 +89,8 @@ module ldst_unit
 		.I_Re(				Re							),
 		.I_Data(			I_Data						),
 		.O_Data(			O_Data						),
-		.O_Full(			Full						),
-		.O_Empty(			Empty						),
+		.O_Full(			Full_Buff					),
+		.O_Empty(			Empty_Buff					),
 		.O_Num(				Num							)
 	);
 
@@ -130,8 +115,8 @@ module ldst_unit
 		.O_Base(			O_Base						),
 		.I_Token(			I_Token						),
 		.O_Token(			Token						),
-		.O_Stall(			Stall						),
-		.O_Empty(			Empty_Ldst					)
+		.O_Full(			Full						),
+		.O_Empty(			Empty						)
 	);
 
 endmodule

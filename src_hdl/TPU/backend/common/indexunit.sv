@@ -141,7 +141,7 @@ module IndexUnit
 		else if ( SkipEnd ) begin
 			R_Req			<= 1'b0;
 		end
-		else begin
+		else if ( I_Index.slice ) begin
 			R_Req			<= I_Req;
 		end
 	end
@@ -153,7 +153,7 @@ module IndexUnit
 		else if ( SkipEnd ) begin
 			R_MaskedRead	<= 1'b0;
 		end
-		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
+		else if ( I_Req & I_Index.slice & ~I_Stall ) begin
 			R_MaskedRead	<= I_MaskedRead;
 		end
 	end
@@ -165,7 +165,7 @@ module IndexUnit
 		else if ( End_Count ) begin
 			R_Sel			<= 1'b0;
 		end
-		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
+		else if ( I_Req & I_Index.slice & ~I_Stall ) begin
 			R_Sel			<= 1'b1;
 		end
 	end
