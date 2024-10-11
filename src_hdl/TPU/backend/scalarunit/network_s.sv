@@ -21,9 +21,9 @@ module Network_S
 	input						I_Req,					//Request from Reg-Read
 	input	[1:0]				I_Sel_Path,				//Path Selects
 	input	[1:0]				I_Sel_Path_WB,			//Path Selects
-	input						I_Sel_ALU_Src1,			//Source Select
-	input						I_Sel_ALU_Src2,			//Source Select
-	input						I_Sel_ALU_Src3,			//Source Select
+	input						I_Sel_ALU_Src1,			//Source Select ToDo
+	input						I_Sel_ALU_Src2,			//Source Select ToDo
+	input						I_Sel_ALU_Src3,			//Source Select ToDO
 	input	index_t				I_Slice_Len,			//Slice Length
 	input	data_t				I_Src_Data1,			//Data from RegFile
 	input	data_t				I_Src_Data2,			//Data From RegFile

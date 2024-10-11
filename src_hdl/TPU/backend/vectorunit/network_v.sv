@@ -22,7 +22,7 @@ module Network_V
 	input						I_Req,					//Request from Reg-Read
 	input	[6:0]				I_Sel_Path,				//Path Selects
 	input	[4:0]				I_Sel_Path_WB,			//Path Selects
-	input	data_t				I_Scalar_Data,			//Data from Scalar Unit
+	input	data_t				I_Scalar_Data,			//Data from Scalar Unit ToDo
 	input						I_Sel_ALU_Src1,			//Source Select
 	input						I_Sel_ALU_Src2,			//Source Select
 	input						I_Sel_ALU_Src3,			//Source Select

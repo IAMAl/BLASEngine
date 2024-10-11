@@ -28,9 +28,9 @@ module LdStUnit
 	input	ldst_t				O_LdSt,					//Load/Store Command
 	input	data_t				I_Ld_Data,				//Loaded Data
 	input	data_t				O_St_Data,				//Storing Data
-	input						I_Ld_Ready,				//Ready to Load
+	input						I_Ld_Ready,				//Ready to Load ToDo
 	input						I_Ld_Grant,				//Grant for Loading
-	input						I_St_Ready,				//Ready to Store
+	input						I_St_Ready,				//Ready to Store ToDO
 	input						I_St_Grant,				//Grant for Storing
 	input						I_End_Access,			//End of Access
 	input	TYPE				O_Token,				//Command

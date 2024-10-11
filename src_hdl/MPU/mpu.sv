@@ -117,9 +117,11 @@ module MPU
 		.O_Req(				Dmem_O_Req				),
 		.O_Data(			Dmem_O_Data				),
 		.I_Ld_Req(			I_Ld_Req				),
+		.I_Ld_Grant(		),//ToDO
 		.I_Ld_Data(			I_Ld_Data				),
 		.I_Ld_Rls(			I_Ld_Rls				),
 		.O_St_Req(			O_St_Req				),
+		.I_St_Grant(		),//ToDo
 		.O_St_Data(			O_St_Data				),
 		.O_St_Rls(			O_St_Rls				)
 	);

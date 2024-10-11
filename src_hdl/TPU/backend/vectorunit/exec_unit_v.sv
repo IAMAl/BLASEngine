@@ -36,13 +36,13 @@ module ExecUnit_V
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
-	output	index_t				O_WB_Dst,				//Write-Back Index
+	output	index_t				O_WB_Dst,				//Write-Back Index ToDo
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output	issue_no_t			O_WB_IssueNo,			//Issue (Commit) No
-	output						O_Math_Done,			//Execution Done
+	output						O_Math_Done,			//Execution Done ToDO
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
-	output						O_Cond,					//Condition
+	output						O_Cond,					//Condition ToDo
 	output						O_Lane_En
 );
 

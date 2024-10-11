@@ -4,7 +4,7 @@ module HazardCheck_TPU
 	input						clock,
 	input						reset,
 	input						I_Req_Issue,			//Request from Previous Stage
-	input						I_Req,					//Request to Work
+	input						I_Req,					//Request to Work ToDo
 	input	instr_t				I_Instr,				//Instruction
 	input						I_Req_Commit,			//Request to Commit
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,			//Commit (Issued) No.

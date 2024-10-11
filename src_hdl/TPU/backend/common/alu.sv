@@ -18,7 +18,7 @@ module ALU
 	input						clock,
 	input						reset,
 	input	issue_no_t			I_Issue_No,				//Current Issue No
-	input						I_Stall,				//Stall Request
+	input						I_Stall,				//Stall Request ToDO
 	input						I_Req,					//Request from Network Stage
 	input	TYPE				I_Command,				//Command
 	input	data_t				I_Src_Data1,			//Source Data

@@ -23,8 +23,8 @@ module Scalar_Unit
 	input	instr_t				I_Instr,				//Instruction from Buffer
 	input	id_t				I_ThreadID,				//Thread-ID
 	input						I_Commit_Req_V,			//Commit Request from Vector Unit
-	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
-	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
+	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit ToDo
+	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit ToDo
 	output	ldst_t				O_LdSt1,				//Load Request
 	output	ldst_t				O_LdSt2,				//Load Request
 	input	data_t				I_Ld_Data1,				//Loaded Data
@@ -35,7 +35,7 @@ module Scalar_Unit
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grant,				//Flag: Grant
-	input	[1:0]				I_End_Access,			//Flag: End of Access
+	input	[1:0]				I_End_Access,			//Flag: End of Access ToDo
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit

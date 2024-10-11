@@ -104,16 +104,19 @@ module pub_domain_man
 	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrantVld_Ld & Ready_Ld;
 	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrantVld_Ld & Ready_Ld;
 
+	assign O_Set_Config_St		= Hit_St;
+	assign O_Set_Config_Ld		= Hit_Ld;
+
 
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			is_Hit_St[ i ]	= ( TabBAddr[ i ] & I_St_Base ) & R_Valid[ i ];
+			is_Hit_St[ i ]	= ( TabBAddr[ i ] == I_St_Base ) & R_Valid[ i ];
 		end
 	end
 
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
-			is_Hit_Ld[ i ]	= ( TabBAddr[ i ] & I_Ld_Base ) & R_Valid[ i ];
+			is_Hit_Ld[ i ]	= ( TabBAddr[ i ] == I_Ld_Base ) & R_Valid[ i ];
 		end
 	end
 

@@ -23,7 +23,7 @@ module DataService_MPU
 	input	data_t				I_Data,					//Data from Extern
 	output						O_Req,					//Request to Extern
 	output	data_t				O_Data,					//Data to Extern
-	input						I_Ld_Req,				//Request from Data Memory
+	input						I_Ld_Req,				//Request from Data Memory ToDo
 	input						I_Ld_Grant,				//Grant for Request
 	input	data_t				I_Ld_Data,				//Data from Data Memory
 	input						I_Ld_Rls,				//End of Loading

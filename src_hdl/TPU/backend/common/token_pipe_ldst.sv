@@ -19,7 +19,7 @@ module token_pipe_ldst
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall
-	input						I_Commit_Grant,			//Commit Grant
+	input						I_Commit_Grant,			//Commit Grant ToDo
 	input						I_Access_Grant,			//Access-Grant
 	input						I_Req,					//Access-Request
 	input	address_t			I_Length,				//Access-Length
@@ -29,7 +29,7 @@ module token_pipe_ldst
 	output	address_t			O_Length,				//Access-Length
 	output	address_t			O_Stride,				//Stride Factor
 	output	address_t			O_Base,					//Base Address
-	input	TYPE				I_Token,				//Input Token
+	input	TYPE				I_Token,				//Input Token ToDo
 	output	TYPE				O_Token,				//Output Token
 	output						O_Stall,				//Stall Request
 	output						O_Empty					//Flag: Empty in Buffer

@@ -41,7 +41,7 @@ module ExecUnit_S
 	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
-	output						O_Cond					//Condition
+	output						O_Cond					//Condition ToDo
 );
 
 

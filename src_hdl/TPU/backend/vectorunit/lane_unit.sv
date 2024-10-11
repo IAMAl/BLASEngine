@@ -21,9 +21,9 @@ module Lane_Unit
 	input						I_En,					//Enable Execution
 	input	instr_t				I_ThreadID,				//SIMT Thread-ID
 	input	instr_t				I_Command,				//Execution Command
-	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
-	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
-	output	s_ldst_t			O_LdSt,					//Load/Store Command
+	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit ToDo
+	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit ToDo
+	output	s_ldst_t			O_LdSt,					//Load/Store Command ToDo
 	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
 	output	s_ldst_data_t		O_St_Data,				//Storing Data
 	input	[1:0]				I_Ld_Ready,				//Flag: Ready

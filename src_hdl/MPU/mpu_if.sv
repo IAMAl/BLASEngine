@@ -73,6 +73,7 @@ module IF_MPU
 	assign O_St_Instr			=	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) & I_Data_IF.v;
 	assign O_Instr				= 	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) ? I_Data_IF.data :	'0;
 
+	assign O_Req_IF				= ;//ToDo
 	assign O_Data_IF.v			= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Req;
 	assign O_Data_IF.data		= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Req ) ?	I_Data : '0;
 
