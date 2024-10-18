@@ -21,8 +21,8 @@ module Lane_Unit
 	input						I_En,					//Enable Execution
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	instr_t				I_Command,				//Execution Command
-	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit ToDo
-	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit ToDo
+	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
+	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
 	output	s_ldst_t			O_LdSt1,				//Load/Store Command
 	output	s_ldst_t			O_LdSt2,				//Load/Store Command
 	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
@@ -95,7 +95,7 @@ module Lane_Unit
 	logic	[4:0]				Config_Path_WB;
 
 
-	logic						Sel_Dst;
+	logic						Dst_Sel;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
@@ -234,7 +234,13 @@ module Lane_Unit
 	//	Write-Back
 	assign PipeReg_Set_Net.dst		= PipeReg_RR.dst;
 
-
+	//	Read-Enable
+	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
+										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
+										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~R_Re_c;
+	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
+										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
+										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~R_Re_c;
 
 	//	Read Data
 	assign PipeReg_Set_Net.src1.v		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.v :
@@ -306,15 +312,12 @@ module Lane_Unit
 	assign is_WB_BR				= WB_Token.dst_sel == 2'h2;
 	assign is_WB_VU				= WB_Token.dst_sel == 2'h3;
 
-	assign Sel_Dst				= WB_Token.idx[WIDTH_INDEX+2];
-	assign WB_Req_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Even & ~R_Re_c;
-	assign WB_Req_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Odd  & ~R_Re_c;
-	assign WB_We_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
-	assign WB_We_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
-	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Token.idx :	'0;
-	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Token.idx :	'0;
-	assign WB_Data_Even			= ( ~Sel_Dst ) ? W_WB_Data :	'0;
-	assign WB_Data_Odd			= (  Sel_Dst ) ? W_WB_Data :	'0;
+	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
+	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.idx :	'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.idx :	'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :	'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? W_WB_Data :	'0;
 
 	assign We_c					= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b00 ) &
 									( WB_Token.instr.op.OpClass == 2'b11 ) &

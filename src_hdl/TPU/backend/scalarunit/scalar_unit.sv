@@ -23,8 +23,8 @@ module Scalar_Unit
 	input	instr_t				I_Instr,				//Instruction from Buffer
 	input	id_t				I_ThreadID,				//Thread-ID
 	input						I_Commit_Req_V,			//Commit Request from Vector Unit
-	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit ToDo
-	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit ToDo
+	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
+	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
 	output	ldst_t				O_LdSt1,				//Load Request
 	output	ldst_t				O_LdSt2,				//Load Request
 	input	data_t				I_Ld_Data1,				//Loaded Data
@@ -162,7 +162,7 @@ module Scalar_Unit
 
 	logic						WB_En;
 
-	logic						Sel_Dst;
+	logic						Dst_Sel;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
@@ -316,23 +316,41 @@ module Scalar_Unit
 	//	Write-Back
 	assign PipeReg_Set_Net.dst		= PipeReg_RR.dst;
 
+	//	Read-Enable
+	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
+										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
+										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~R_Re_c;
+	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
+										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
+										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~R_Re_c;
+
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
 	assign V_State_Data.idx			= '0;
 	assign V_State_Data.data		= V_State;
 	assign V_State_Data.src_sel		= '0;
 
-	assign PipeReg_Set_Net.src1		= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) ?	V_State_Data :
-										( PipeReg_RR.src1.v ) ?					PipeReg_RR.src1 :
-																				'0;
+	assign PipeReg_Set_Net.src1.v		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.v :
+																	'0;
+	assign PipeReg_Set_Net.src1.idx		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.idx :
+																	'0;
+	assign PipeReg_Set_Net.src1.src_sel	= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.src_sel :
+																	'0;
 
-	assign PipeReg_Set_Net.src2		= ( PipeReg_RR.src2.src_sel.no == 2'h3 ) ?	V_State_Data :
-										( PipeReg_RR.src2.v ) ?					PipeReg_RR.src2 :
-																				'0;
+	assign PipeReg_Set_Net.src2.v		= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.v :
+																	'0;
+	assign PipeReg_Set_Net.src2.idx		= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.idx :
+																	'0;
+	assign PipeReg_Set_Net.src2.src_sel	= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.src_sel :
+																	'0;
 
-	assign PipeReg_Set_Net.src3		= ( PipeReg_RR.src3.src_sel.no == 2'h3 ) ?	V_State_Data :
-										( PipeReg_RR.src3.v ) ?					PipeReg_RR.src3 :
-																				'0;
+	assign PipeReg_Set_Net.src3.v		= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.v :
+																	'0;
+	assign PipeReg_Set_Net.src3.idx		= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.idx :
+																	'0;
+	assign PipeReg_Set_Net.src3.src_sel	= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.src_sel :
+																	'0;
+
 
 	//	Slice Length
 	assign PipeReg_Set_Net.slice_len= PipeReg_RR.slice_len;
@@ -394,15 +412,12 @@ module Scalar_Unit
 	assign is_WB_BR				= WB_Token.dst_sel.no == 2'h2;
 	assign is_WB_VU				= WB_Token.dst_sel.no == 2'h3;
 
-	assign Sel_Dst				= WB_Token.idx[WIDTH_INDEX+2:0];
-	assign WB_Req_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF;
-	assign WB_Req_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF;
-	assign WB_We_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF;
-	assign WB_We_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Token.idx :	'0;
-	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Token.idx :	'0;
-	assign WB_Data_Even			= ( ~Sel_Dst ) ? WB_Data : 		'0;
-	assign WB_Data_Odd			= (  Sel_Dst ) ? WB_Data : 		'0;
+	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF;
+	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.idx :	'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.idx :	'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 		'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 		'0;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
 
@@ -452,11 +467,9 @@ module Scalar_Unit
 
 
 	//// End of Execution
-	assign O_Term				= PipeReg_Idx.src1.v & PipeReg_Idx.src2.v & PipeReg_Idx.src3.v & (
-									( PipeReg_Idx.src1.idx == '0 ) &
-									( PipeReg_Idx.src2.idx == '0 ) &
-									( PipeReg_Idx.src3.idx == '0 )
-								);
+	assign O_Term				= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b01 ) &
+									( WB_Token.instr.op.OpClass == 2'b01 ) &
+									( WB_Token.instr.op.OpCode == 2'b11 );
 
 
 	//// Stall Control
@@ -586,7 +599,7 @@ module Scalar_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Odd		),
+		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src1.v		),
 		.I_En_II(			0						),
 		.I_MaskedRead(		MaskedRead				),
@@ -608,7 +621,7 @@ module Scalar_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Odd		),
+		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src2.v		),
 		.I_En_II(			0						),
 		.I_MaskedRead(		MaskedRead				),
@@ -630,7 +643,7 @@ module Scalar_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Even		),
+		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src3.v		),
 		.I_En_II(			0						),
 		.I_MaskedRead(		MaskedRead				),
@@ -705,7 +718,7 @@ module Scalar_Unit
 	RegFile RegFile_Odd (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_Req_Odd				),
+		.I_Req(				Req_Odd					),
 		.I_We(				WB_We_Odd				),
 		.I_Index_Dst(		WB_Index_Odd			),
 		.I_Data(			WB_Data_Odd				),
@@ -719,7 +732,7 @@ module Scalar_Unit
 	RegFile RegFile_Even (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_Req_Even				),
+		.I_Req(				Req_Even				),
 		.I_We(				WB_We_Even				),
 		.I_Index_Dst(		WB_Index_Even			),
 		.I_Data(			WB_Data_Even			),

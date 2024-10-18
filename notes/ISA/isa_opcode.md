@@ -85,7 +85,8 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 	- OpCode [1:0]
 	    - 00		Relative Jump width Constant
 	    - 01		Relative Jump width Source
-	    - 1x		Reserved
+	    - 10		Reserved
+		- 11		Termination
 - 10		Branch
 	- OpCode [1:0]
 	    - 00		Relative Branch width Constant
