@@ -24,6 +24,8 @@ module ALU
 	input	data_t				I_Src_Data1,			//Source Data
 	input	data_t				I_Src_Data2,			//Source Data
 	input	data_t				I_Src_Data3,			//Source Data
+	input						I_Re_p0,
+	input						I_Re_p1,
 	output	TYPE				O_WB_Token,				//Write-Back Information
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output						O_ALU_Done				//Executed
@@ -184,6 +186,8 @@ module ALU
 		.I_Data1(			MA_Data1				),
 		.I_Data2(			MA_Data2				),
 		.I_Data3(			MA_Data3				),
+		.I_Re_p0(			I_Re_p0					),
+		.I_Re_p1(			I_Re_p1					),
 		.I_Token(			MA_Token				),
 		.O_Valid(			Valid_MA				),
 		.O_Data(			Data_MA					),

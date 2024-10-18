@@ -35,6 +35,8 @@ module ExecUnit_S
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
+	input						I_Re_p0,
+	input						I_Re_p1,
 	output	index_t				O_WB_Token,				//Write-Back Index
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output	TYPE				O_WB_IssueNo,			//Issue (Commit) No
@@ -130,6 +132,8 @@ module ExecUnit_S
 		.I_Src_Data1(		I_Src_Data1				),
 		.I_Src_Data2(		I_Src_Data2				),
 		.I_Src_Data3(		I_Src_Data3				),
+		.I_Re_p0(			I_Re_p0					),
+		.I_Re_p1(			I_Re_p1					),
 		.O_WB_Token(		ALU_Token				),
 		.O_WB_Data(			ALU_Data				),
 		.O_ALU_Done(		O_Math_Done				)

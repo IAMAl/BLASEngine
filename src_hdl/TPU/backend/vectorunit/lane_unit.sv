@@ -56,8 +56,6 @@ module Lane_Unit
 	data_t						RF_Even_Data2;
 
 
-	logic						We_p0;
-	logic						We_p1;
 	logic						Re_p0;
 	logic						Re_p1;
 
@@ -128,7 +126,7 @@ module Lane_Unit
 	logic						Lane_CTRL_Rst;
 	logic						Lane_CTRL_Set;
 
-
+	logic						Stall_Index_Calc;
 	logic						Stall_RegFile_Dst;
 	logic						Stall_RegFile_Odd;
 	logic						Stall_RegFile_Even;
@@ -237,14 +235,29 @@ module Lane_Unit
 
 
 	//	Read Data
-	assign PipeReg_Set_Net.src1		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1 :
-																'0;
+	assign PipeReg_Set_Net.src1.v		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.v :
+																	'0;
+	assign PipeReg_Set_Net.src1.idx		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.idx :
+																	'0;
+	assign PipeReg_Set_Net.src1.src_sel	= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.src_sel :
+																	'0;
+	assign PipeReg_Set_Net.src1.data	= ( RegMov_Rd ) ? 			R_Scalar_Data :
+											( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.data :
+																	'0;
 
-	assign PipeReg_Set_Net.src2		= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2 :
-																'0;
+	assign PipeReg_Set_Net.src2.v		= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.v :
+																	'0;
+	assign PipeReg_Set_Net.src2.idx		= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.idx :
+																	'0;
+	assign PipeReg_Set_Net.src2.src_sel	= ( PipeReg_RR.src2.v ) ?	PipeReg_RR.src2.src_sel :
+																	'0;
 
-	assign PipeReg_Set_Net.src3		= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3 :
-																'0;
+	assign PipeReg_Set_Net.src3.v		= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.v :
+																	'0;
+	assign PipeReg_Set_Net.src3.idx		= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.idx :
+																	'0;
+	assign PipeReg_Set_Net.src3.src_sel	= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.src_sel :
+																	'0;
 
 	//	Slice Length
 	assign PipeReg_Set_Net.slice_len= PipeReg_RR.slice_len;
@@ -316,11 +329,6 @@ module Lane_Unit
 	assign MaskReg_Re			= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src3.src_sel.no == 2'h2 );
-	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
-
-
-	//// Commit Request
-	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
 
 
 	//// Reg Move
@@ -328,9 +336,17 @@ module Lane_Unit
 									( PipeReg_Idx.op.OPClass == 2'b11 ) &
 									( PipeReg_Idx.op.OPCode == 2'b10 );
 
-	assign RegMov_Rd			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
+	assign RegMov_Wt			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
 									( PipeReg_Idx.op.OPClass == 2'b11 ) &
-									( PipeReg_Idx.op.OPCode == 2'b10 );
+									( PipeReg_Idx.op.OPCode == 2'b11 );
+
+
+	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
+
+
+	//// Commit Request
+	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
+
 
 	//// Stall Control
 	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall;
@@ -450,24 +466,26 @@ module Lane_Unit
 		end
 	end
 
-	AuxRegs #(
-		.LANE_ID(			LANE_ID					),
-	) AuxRegs
-	(
+
+	AuxRegs AuxRegs (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Re(				Re_c					),
-		.I_We(				We_c					),
+		.I_Re(				RegMov_Rd				),
+		.I_We(				RegMov_Wt				),
 		.I_Src_Command(		PipeReg_IdxRR			),
 		.I_Dst_Command(		WB_Token				),
-		.O_We_p0(			We_p0					),
-		.O_We_p1(			We_p1					),
 		.O_Re_p0(			Re_p0					),
 		.O_Re_p1(			Re_p1					),
-		.O_Re_c(			Re_c					)
+		.O_Re_c(			Re_c					),
+		.I_Data(			W_WB_Data				),
+		.O_Data(			R_Scalar_Data			),
+		.I_SWe(				),//ToDo
+		.I_Scalar_Data(		I_Scalar_Data			),
+		.O_Scalar_Data(		O_Scalar_Data			),
 	);
+
 
 	logic	[2:0]			Sel;
 	always_ff @( posedge clock ) begin
@@ -528,7 +546,7 @@ module Lane_Unit
 		.I_Data_Src2(		RF_Odd_Data2			),
 		.I_Data_Src3(		RF_Even_Data1			),
 		.I_Data_Src4(		RF_Even_Data2			),
-		.O_Data_Src1(		PipeReg_RR.src1.data	),
+		.O_Data_Src1(		Src1_Data				),
 		.O_Data_Src2(		PipeReg_RR.src2.data	),
 		.O_Data_Src3(		PipeReg_RR.src3.data	)
 	);
@@ -595,7 +613,7 @@ module Lane_Unit
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
-		.I_WB_Index(		WB_Token.idx				),
+		.I_WB_Index(		WB_Token.idx			),
 		.I_WB_Data(			WB_Data					),
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
@@ -643,8 +661,6 @@ module Lane_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.I_End_Access1(		I_End_Access1			),
 		.I_End_Access2(		I_End_Access2			),
-		.I_We_p0(			We_p0					),
-		.I_We_p1(			We_p1					),
 		.I_Re_p0(			Re_p0					),
 		.I_Re_p1(			Re_p1					),
 		.O_WB_Token(		WB_Token				),

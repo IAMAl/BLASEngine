@@ -73,6 +73,8 @@ module Scalar_Unit
 	logic						Stall_IW_St;
 	logic						Stall_IW_Ld;
 	logic						Stall_IW;
+
+	logic						Stall_Index_Calc;
 	logic						Stall_RegFile_Dst;
 	logic						Stall_RegFile_Odd;
 	logic						Stall_RegFile_Even;
@@ -100,6 +102,12 @@ module Scalar_Unit
 	logic						RAR_Hazard;
 
 	instr_t						S_Command;
+
+
+	logic						We_p0;
+	logic						We_p1;
+	logic						Re_p0;
+	logic						Re_p1;
 
 
 	logic						Dst_Slice;
@@ -398,6 +406,9 @@ module Scalar_Unit
 
 	assign Bypass_IssueNo		= WB_IssueNo;
 
+	assign We_c					= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b00 ) &
+									( WB_Token.instr.op.OpClass == 2'b11 ) &
+									( WB_Token.instr.op.OpCode == 2'b11 );
 
 	//	Write-Back to Cond Register
 	assign WB_En				= B_Token.v & is_WB_BR;
@@ -409,6 +420,16 @@ module Scalar_Unit
 	assign MaskReg_Re			= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src3.src_sel.no == 2'h2 );
+
+
+	//// Reg Move
+	assign RegMov_Rd			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
+									( PipeReg_Idx.op.OPClass == 2'b11 ) &
+									( PipeReg_Idx.op.OPCode == 2'b10 );
+
+	assign RegMov_Wt			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
+									( PipeReg_Idx.op.OPClass == 2'b11 ) &
+									( PipeReg_Idx.op.OPCode == 2'b11 );
 
 
 	//// Commit
@@ -644,6 +665,27 @@ module Scalar_Unit
 		end
 	end
 
+
+	AuxRegs AuxRegs (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_ThreadID(		I_ThreadID				),
+		.I_Stall(			Stall_Index_Calc		),
+		.I_Re(				RegMov_Rd				),
+		.I_We(				RegMov_Wt				),
+		.I_Src_Command(		PipeReg_IdxRR			),
+		.I_Dst_Command(		WB_Token				),
+		.O_Re_p0(			Re_p0					),
+		.O_Re_p1(			Re_p1					),
+		.O_Re_c(			Re_c					),
+		.I_Data(			W_WB_Data				),
+		.O_Data(			R_Scalar_Data			),
+		.I_SWe(				),//ToDo
+		.I_Scalar_Data(		I_Scalar_Data			),
+		.O_Scalar_Data(		O_Scalar_Data			),
+	);
+
+
 	logic	[2:0]			Sel;
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -804,6 +846,8 @@ module Scalar_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.I_End_Access1(		I_End_Access1			),
 		.I_End_Access2(		I_End_Access2			),
+		.I_Re_p0(			Re_p0					),
+		.I_Re_p1(			Re_p1					),
 		.O_WB_Dst(			WB_Token				),
 		.O_WB_Data(			WB_Data					),
 		.O_WB_IssueNo(		WB_IssueNo				),

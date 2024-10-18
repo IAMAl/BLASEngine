@@ -36,8 +36,6 @@ module ExecUnit_V
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
-	input						I_We_p0,
-	input						I_We_p1,
 	input						I_Re_p0,
 	input						I_Re_p1,
 	output	TYPE				O_WB_Token,				//Write-Back Info
