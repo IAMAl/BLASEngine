@@ -36,13 +36,11 @@ module ExecUnit_V
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
-	output	index_t				O_WB_Dst,				//Write-Back Index ToDo
+	output	TYPE				O_WB_Token,				//Write-Back Info
 	output	data_t				O_WB_Data,				//Write-Back Data
-	output	issue_no_t			O_WB_IssueNo,			//Issue (Commit) No
 	output						O_Math_Done,			//Execution Done ToDO
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
-	output						O_Cond,					//Condition ToDo
 	output						O_Lane_En
 );
 
@@ -63,10 +61,22 @@ module ExecUnit_V
 	issue_no_t					LifeLdSt1;
 	issue_no_t					LifeLdSt2;
 	issue_no_t					LifeLdSt;
+	issue_no_t					LifeMv;
 
 	logic						is_LifeMAU;
 	logic						is_LifeLdSt2;
 
+
+	logic						We;
+	logic						Re;
+	data_t						Mv_Data;
+
+
+	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
+	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
+	assign RegMove				= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) &
+										( I_Command.instr.op.OpClass == 2'b11 ) &
+										( |I_Command.instr.op.OpCode );
 
 	assign MAU_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
 
@@ -77,6 +87,8 @@ module ExecUnit_V
 	assign LifeMAU				= I_Issue_No - MAU_IssueNo;
 	assign LifeLdSt1			= I_Issue_No - Ld_Token[0].issue_no;
 	assign LifeLdSt2			= I_Issue_No - Ld_Token[0].issue_no;
+	assign LifeMv				= I_Issue_No - Mv_Token.issue_no;
+
 
 	assign is_LifeLdSt2			= LifeLdSt2 > LifeLdSt1;
 	assign LifeLdSt				= ( is_LifeLdSt2 ) ? LifeLdSt2 : LifeLdSt1;
@@ -84,17 +96,15 @@ module ExecUnit_V
 	assign is_LifeMAU			= LifeMAU > LifeLdSt;
 
 
-	assign O_Dst				= ( is_LifeMAU ) ?		Token_MAU.dst :
-									( is_LifeLdSt2 ) ?	Ld_Token[1].dst :
-														Ld_Token[0].dst;
-
-	assign O_WB_Data			= ( is_LifeMAU ) ?		MAU_Data :
-									( is_LifeLdSt2 ) ?	Ld_Data[1] :
-														Ld_Data[0];
-
-	assign O_WB_IssueNo			= ( is_LifeMAU ) ?		MAU_IssueNo :
+	assign O_WB_Token			= ( Re ) ?				Mv_Token :
+									( is_LifeMAU ) ?	Token_MAU :
 									( is_LifeLdSt2 ) ?	Ld_Token[1] :
 														Ld_Token[0];
+
+	assign O_WB_Data			= ( Re ) ?				Mv_Data :
+									( is_LifeMAU ) ?	MAU_Data :
+									( is_LifeLdSt2 ) ?	Ld_Data[1] :
+														Ld_Data[0];
 
 
 	assign O_Lane_En			= 1'b1;//ToDo
@@ -165,6 +175,37 @@ module ExecUnit_V
 		.O_Token(			Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
 		.O_LdSt_Done(		O_LdSt_Done1			)
+	);
+
+
+	RingBuff #(
+		.NUM_ENTRY(			8						),
+		.TYPE(				TYPE					)
+	) RegMoveBuff (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.I_Data(			I_Command				),
+		.O_Data(			Mv_Token				),
+		.O_Full(									),
+		.O_Empty(									),
+		.O_Num(										)
+	);
+
+	RingBuff #(
+		.NUM_ENTRY(			8						),
+		.TYPE(				data_t					)
+	) RegMoveBuff (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.I_Data(			I_Src_Data1				),
+		.O_Data(			Mv_Data					),
+		.O_Full(									),
+		.O_Empty(									),
+		.O_Num(										)
 	);
 
 endmodule

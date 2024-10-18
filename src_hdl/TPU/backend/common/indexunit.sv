@@ -27,7 +27,8 @@ module IndexUnit
 	input	index_t				I_Constant,				//Constant
 	input						I_Sign,					//Config: Sign
 	input	mask_t				I_Mask_Data,			//Mask
-	output	idx_t				O_Index					//Index Value
+	output	idx_t				O_Index,				//Index Value
+	output						O_Done					//ENd of Slicing
 );
 
 
@@ -132,6 +133,9 @@ module IndexUnit
 	assign O_Index.window		= ( R_Req ) ? R_Idx_Cfg.v :						I_Index.window;
 	assign O_Index.src_sel		= ( R_Req ) ? R_Idx_Cfg.v :						I_Index.src_sel;
 	assign O_Index.idx			= ( R_Req ) ? R_Index :							I_Index.idx;
+
+
+	assign O_Done				= End_Count;
 
 
 	always_ff @( posedge clock ) begin

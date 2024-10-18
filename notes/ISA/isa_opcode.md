@@ -6,6 +6,7 @@ Operation COde's bit-field is;
 
 Total 9-bit.
 
+
 ## 1. Unit Selector [2:0]
 
 Unit Sel (Unit Selector) bit-field selects scalar unit or vector unit and its execution unit cluster.
@@ -21,6 +22,7 @@ Unit Sel (Unit Selector) bit-field selects scalar unit or vector unit and its ex
 - 11		Load/Store Unit
 
 Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique point is scalar unit and vector unit have same instruction bit-field assignment and every field has same roles.
+
 
 ## 2. Arithmetic Unit [1:0]
 ### Scalar Unit
@@ -45,9 +47,10 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 - 11		Convert
 	- OpCode [1:0]
 	    - 00		Int32 to Float32
-	    - 01		Move
-	    - 10		Output Scalar Data
-	    - 11		Reserved
+		- 01		Reg-File Move
+	    - 10		Reg Move Read
+	    - 11		Reg Move Write
+
 ### Vector Unit
 - 00		Adder
 	- OpCode [1:0]
@@ -65,9 +68,10 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 - 11		Convert
 	- OpCode [1:0]
 	    - 00		Float32 to Int32
-	    - 01		Move
-		- 10		Output Scalar Data
-	    - 11		Reserved
+		- 10		Reg-File Move
+	    - 01		Reg Move Read
+	    - 11		Reg Move Write
+
 
 ## 3. Conditional	[1:0]
 ### Scalar Unit
@@ -107,7 +111,7 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 		- 00 Enable Masked Operation
 		- 01 Disable Masked Operation
 		- 10 Set Mask All One
-		- 11 Set Mask by True of Follower Comparing
+		- 11 Set Mask by Follower Comparing
 - 11		Selector
 	- Opcode [1:0]
 		- 00 max()
@@ -144,7 +148,7 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 	    - 01		Power of Any
 	    - 10		Logarithm of Two
 	    - 11		Reserved
-- 10 Reserved
+- 01 Reserved
 - 1x		Reserved
 
 
@@ -197,9 +201,19 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 	    - 10		Word Store
 	    - 11		Reserved
 
+
 ## 6. Constant Operation Flag ConstSel[1:0]
 
 - 00 No Constant
 - 01 Source-1 Constant (Access-Length in case of Ld/St)
 - 10 Source-2 Constant (Stride Factor in case of Ld/St)
 - 11 Source-3 Constant (Base Address in case of Ld/St)
+
+
+## 7. Reg Move
+
+Dst/Src Index Map
+- 6h00	p0	Pipeline Register-0
+- 6h01	p1	Pipeline Register-1
+- 6h08	c0	Constant Register-0
+- 6h09	c1	Constant Register-1

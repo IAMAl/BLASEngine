@@ -35,15 +35,14 @@ module ExecUnit_S
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
-	output	index_t				O_WB_Dst,				//Write-Back Index
+	output	index_t				O_WB_Token,				//Write-Back Index
 	output	data_t				O_WB_Data,				//Write-Back Data
-	output	issue_no_t			O_WB_IssueNo,			//Issue (Commit) No
+	output	TYPE				O_WB_IssueNo,			//Issue (Commit) No
 	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
 	output						O_Ld_Stall,				//Stall for Loading
-	output						O_St_Stall,				//Stall for Storing
-	output						O_Cond					//Condition ToDo
+	output						O_St_Stall				//Stall for Storing
 );
 
 
@@ -59,6 +58,7 @@ module ExecUnit_S
 	issue_no_t					LifeLdSt1;
 	issue_no_t					LifeLdSt2;
 	issue_no_t					LifeLdSt;
+	issue_no_t					LifeMv;
 
 	logic						is_LifeALU;
 	logic						is_LifeLdSt2;
@@ -70,6 +70,16 @@ module ExecUnit_S
 	logic						St_Stall_Odd;
 	logic						St_Stall
 
+	logic						We;
+	logic						Re;
+	data_t						Mv_Data;
+
+
+	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
+	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
+	assign RegMove				= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) &
+										( I_Command.instr.op.OpClass == 2'b11 ) &
+										( |I_Command.instr.op.OpCode );
 
 	assign ALU_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
 
@@ -87,15 +97,18 @@ module ExecUnit_S
 	assign is_LifeALU			= LifeALU > LifeLdSt;
 
 
-	assign O_WB_Dst				= ( is_LifeALU ) ?		ALU_Token.dst :
-									( is_LifeLdSt2 ) ?	Ld_Token[1].dst :
-														Ld_Token[0].dst;
+	assign O_WB_Token			= ( Re ) ?				Mv_Token :
+									( is_LifeALU ) ?	ALU_Token :
+									( is_LifeLdSt2 ) ?	Ld_Token[1] :
+														Ld_Token[0];
 
-	assign O_WB_Data			= ( is_LifeALU ) ?		ALU_Data :
+	assign O_WB_Data			= ( Re ) ?				Mv_Data :
+									( is_LifeALU ) ?	ALU_Data :
 									( is_LifeLdSt2 ) ?	Ld_Data[1] :
 														Ld_Data[0];
 
-	assign O_WB_IssueNo			= ( is_LifeALU ) ?		ALU_Token.issue_no :
+	assign O_WB_IssueNo			= ( Re ) ?				Mv_Token.issue_no :
+									( is_LifeALU ) ?	ALU_Token.issue_no :
 									( is_LifeLdSt2 ) ?	Ld_Token[1].issue_no :
 														Ld_Token[0].issue_no;
 
@@ -172,6 +185,37 @@ module ExecUnit_S
 		.O_Ld_Stall(		Ld_Stall_Evn			),
 		.O_ST_Stall(		St_Stall_Evn			),
 		.O_LdSt_Done(		O_LdSt_Done1			)
+	);
+
+
+	RingBuff #(
+		.NUM_ENTRY(			8						),
+		.TYPE(				TYPE					)
+	) RegMoveBuff (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.I_Data(			I_Command				),
+		.O_Data(			Mv_Token				),
+		.O_Full(									),
+		.O_Empty(									),
+		.O_Num(										)
+	);
+
+	RingBuff #(
+		.NUM_ENTRY(			8						),
+		.TYPE(				data_t					)
+	) RegMoveBuff (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				We						),
+		.I_Re(				Re						),
+		.I_Data(			I_Src_Data1				),
+		.O_Data(			Mv_Data					),
+		.O_Full(									),
+		.O_Empty(									),
+		.O_Num(										)
 	);
 
 endmodule

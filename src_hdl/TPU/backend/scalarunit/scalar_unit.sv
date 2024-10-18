@@ -131,9 +131,6 @@ module Scalar_Unit
 	const_t						Constant;
 	logic						Slice_Dst;
 
-	data_t						Pre_Src_Data2;
-	data_t						Pre_Src_Data3;
-
 
 	logic						Lane_We;
 	logic						Lane_Re;
@@ -153,18 +150,16 @@ module Scalar_Unit
 
 	mask_t						Mask_Data;
 
-	logic	[12:0]				Config_Path;;
-
-
-	logic						is_WB_RF;
-	logic						is_WB_BR;
-	logic						is_WB_VU;
+	logic	[12:0]				Config_Path;
 
 	logic						WB_En;
 
 	logic						Sel_Dst;
-	dst_t						WB_Dst;
-	data_t						WB_Data;;
+	logic						is_WB_RF;
+	logic						is_WB_BR;
+	logic						is_WB_VU;
+	pipe_exe_tmp_t				WB_Token;
+	data_t						WB_Data;
 	logic						WB_Req_Even;
 	logic						WB_Req_Odd;
 	logic						WB_We_Even;
@@ -174,6 +169,11 @@ module Scalar_Unit
 	data_t						WB_Data_Even;
 	data_t						WB_Data_Odd;
 	issue_no_t					WB_IssueNo;
+
+	logic						MaskReg_Ready;
+	logic						MaskReg_Term;
+	logic						MaskReg_We;
+	logic						MaskReg_Re;
 
 	logic	[1:0]				Config_Path_WB;
 	logic						Math_Done;
@@ -337,7 +337,7 @@ module Scalar_Unit
 
 
 	///// Write-Back to PAC
-	assign PAC_We				= WB_Dst.v & is_WB_BR;
+	assign PAC_We				= WB_Token.v & is_WB_BR;
 	assign PAC_Data				= ( is_WB_BR ) ? WB_Data : '0;
 	assign PAC_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
@@ -374,29 +374,41 @@ module Scalar_Unit
 
 	//// Write-Back
 	//  Network Path
-	assign Config_Path_WB		= WB_Dst.path;
+	assign Config_Path_WB		= WB_Token.path;
 
-	assign Dst_Sel				= WB_Dst.dst_sel.unit_no;
-	assign Dst_Slice			= WB_Dst.slice;
-	assign Dst_Index			= WB_Dst;
-	assign Dst_Index_Window		= WB_Dst.window;
-	assign Dst_Index_Length		= WB_Dst.slice_len;
+	assign Dst_Sel				= WB_Token.dst_sel.unit_no;
+	assign Dst_Slice			= WB_Token.slice;
+	assign Dst_Index			= WB_Token;
+	assign Dst_Index_Window		= WB_Token.window;
+	assign Dst_Index_Length		= WB_Token.slice_len;
 
-	assign is_WB_RF				= WB_Dst.dst_sel.no == 2'h1;
-	assign is_WB_BR				= WB_Dst.dst_sel.no == 2'h2;
-	assign is_WB_VU				= WB_Dst.dst_sel.no == 2'h3;
+	assign is_WB_RF				= WB_Token.dst_sel.no == 2'h1;
+	assign is_WB_BR				= WB_Token.dst_sel.no == 2'h2;
+	assign is_WB_VU				= WB_Token.dst_sel.no == 2'h3;
 
-	assign Sel_Dst				= WB_Dst.idx[WIDTH_INDEX+2:0];
-	assign WB_Req_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx :	'0;
-	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx :	'0;
+	assign Sel_Dst				= WB_Token.idx[WIDTH_INDEX+2:0];
+	assign WB_Req_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF;
+	assign WB_Req_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF;
+	assign WB_We_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF;
+	assign WB_We_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF;
+	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Token.idx :	'0;
+	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Token.idx :	'0;
 	assign WB_Data_Even			= ( ~Sel_Dst ) ? WB_Data : 		'0;
 	assign WB_Data_Odd			= (  Sel_Dst ) ? WB_Data : 		'0;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
+
+
+	//	Write-Back to Cond Register
+	assign WB_En				= B_Token.v & is_WB_BR;
+	assign MaskReg_Ready		= ( PipeReg_Idx.op.OpType == 2'b01 ) &
+									( PipeReg_Idx.op.OpClass == 2'b10 ) &
+									( PipeReg_Idx.op.OpCode[1] == 1'b1 );
+	assign MaskReg_Term			= Dst_Done;
+	assign MaskReg_We			= WB_Token.v & is_WB_BR;
+	assign MaskReg_Re			= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.src3.src_sel.no == 2'h2 );
 
 
 	//// Commit
@@ -541,7 +553,8 @@ module Scalar_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Dst_RegFile_Index		)
+		.O_Index(			Dst_RegFile_Index		),
+		.O_Done(									)
 	);
 
 
@@ -561,7 +574,8 @@ module Scalar_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Index_Src1				)
+		.O_Index(			Index_Src1				),
+		.O_Done(									)
 	);
 
 
@@ -581,7 +595,8 @@ module Scalar_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Index_Src2				)
+		.O_Index(			Index_Src2				),
+		.O_Done(									)
 	);
 
 
@@ -601,7 +616,8 @@ module Scalar_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Index_Src3				)
+		.O_Index(			Index_Src3				),
+		.O_Done(									)
 	);
 
 
@@ -702,6 +718,20 @@ module Scalar_Unit
 	);
 
 
+	//// Condition Register
+	CondReg CondReg (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Ready(			MaskReg_Ready			),
+		.I_Term(			MaskReg_Term			),
+		.I_We(				MaskReg_We				),
+		.I_Cond(			Cond_Data				),
+		.I_Status(			Status					),
+		.I_Re(				MaskReg_Re				),
+		.O_Condition(		Condition				)
+	);
+
+
 	//// Lane Enable Register
 	Lane_En Lane_En (
 		.clock(				clock					),
@@ -774,15 +804,14 @@ module Scalar_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.I_End_Access1(		I_End_Access1			),
 		.I_End_Access2(		I_End_Access2			),
-		.O_WB_Dst(			WB_Dst					),
+		.O_WB_Dst(			WB_Token				),
 		.O_WB_Data(			WB_Data					),
 		.O_WB_IssueNo(		WB_IssueNo				),
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
 		.O_Ld_Stall(		Ld_Stall				),
-		.O_St_Stall(		St_Stall				),
-		.O_Cond(			Condition				)
+		.O_St_Stall(		St_Stall				)
 	);
 
 

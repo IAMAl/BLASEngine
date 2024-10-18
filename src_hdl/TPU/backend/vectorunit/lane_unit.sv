@@ -64,6 +64,7 @@ module Lane_Unit
 	logic						Dst_RegFile_Req;
 	logic						Dst_RegFile_Slice;
 	index_t						Dst_RegFile_Index;
+	logic						Dst_Done;
 
 	logic						Sign;
 	const_t						Constant;
@@ -75,10 +76,6 @@ module Lane_Unit
 
 	logic						Ld_Stall;
 	logic						St_Stall;
-
-
-	data_t						Pre_Src_Data2;
-	data_t						Pre_Src_Data3;
 
 
 	state_t						Status;
@@ -99,12 +96,20 @@ module Lane_Unit
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
-	dst_t						WB_Dst;
+	pipe_exe_tmp_t				WB_Token;
 	data_t						WB_Data;
-	data_t						W_WB_Data;
-	logic						Math_Done;
-	logic						Condition;
+	logic						WB_Req_Even;
+	logic						WB_Req_Odd;
+	logic						WB_We_Even;
+	logic						WB_We_Odd;
+	index_t						WB_Index_Even;
+	index_t						WB_Index_Odd;
+	data_t						WB_Data_Even;
+	data_t						WB_Data_Odd;
+	issue_no_t					WB_IssueNo;
 
+	logic						MaskReg_Ready;
+	logic						MaskReg_Term;
 	logic						MaskReg_We;
 	logic						MaskReg_Re;
 
@@ -265,43 +270,56 @@ module Lane_Unit
 
 
 	//// Write-Back
-	assign Dst_Sel				= WB_Dst.dst_sel.unit_no;
-	assign Dst_Slice			= WB_Dst.slice;
-	assign Dst_Index			= WB_Dst.idx;
-	assign Dst_Index_Window		= WB_Dst.window;
-	assign Dst_Index_Length		= WB_Dst.slice_len;
+	assign Dst_Sel				= WB_Token.dst_sel.unit_no;
+	assign Dst_Slice			= WB_Token.slice;
+	assign Dst_Index			= WB_Token.idx;
+	assign Dst_Index_Window		= WB_Token.window;
+	assign Dst_Index_Length		= WB_Token.slice_len;
 
 	//  Network Path
-	assign Config_Path_WB		= WB_Dst.path;
+	assign Config_Path_WB		= WB_Token.path;
 
 	//	Write-Back Target Decision
-	assign is_WB_RF				= WB_Dst.dst_sel == 2'h1;
-	assign is_WB_BR				= WB_Dst.dst_sel == 2'h2;
-	assign is_WB_VU				= WB_Dst.dst_sel == 2'h3;
+	assign is_WB_RF				= WB_Token.dst_sel == 2'h1;
+	assign is_WB_BR				= WB_Token.dst_sel == 2'h2;
+	assign is_WB_VU				= WB_Token.dst_sel == 2'h3;
 
-	assign Sel_Dst				= WB_Dst.idx[WIDTH_INDEX+2];
-	assign WB_Req_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Even;
-	assign WB_Req_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Odd
-	assign WB_We_Even			= ~Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Dst;
-	assign WB_We_Odd			=  Sel_Dst & WB_Dst.v & is_WB_RF & ~Stall_RegFile_Dst;
-	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Dst.idx :	'0;
-	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Dst.idx :	'0;
+	assign Sel_Dst				= WB_Token.idx[WIDTH_INDEX+2];
+	assign WB_Req_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Even;
+	assign WB_Req_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Odd
+	assign WB_We_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst;
+	assign WB_We_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst;
+	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Token.idx :	'0;
+	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Token.idx :	'0;
 	assign WB_Data_Even			= ( ~Sel_Dst ) ? W_WB_Data :	'0;
 	assign WB_Data_Odd			= (  Sel_Dst ) ? W_WB_Data :	'0;
 
-	assign Config_Path_W		= WB_Dst.path;
+	assign Config_Path_W		= WB_Token.path;
 
 	//	Write-Back to Mask Register
-	assign MaskReg_We			= WB_Dst.v & is_WB_BR;
-	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
+	assign MaskReg_Ready		= ( PipeReg_Idx.op.OpType == 2'b01 ) &
+									( PipeReg_Idx.op.OpClass == 2'b10 ) &
+									( PipeReg_Idx.op.OpCode[1] == 1'b1 );
+	assign MaskReg_Term			= Dst_Done;
+	assign MaskReg_We			= WB_Token.v & is_WB_BR;
 	assign MaskReg_Re			= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src3.src_sel.no == 2'h2 );
+	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
 
 
 	//// Commit Request
 	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
 
+
+	//// Reg Move
+	assign RegMov_Rd			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
+									( PipeReg_Idx.op.OPClass == 2'b11 ) &
+									( PipeReg_Idx.op.OPCode == 2'b10 );
+
+	assign RegMov_Rd			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
+									( PipeReg_Idx.op.OPClass == 2'b11 ) &
+									( PipeReg_Idx.op.OPCode == 2'b10 );
 
 	//// Stall Control
 	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall;
@@ -329,7 +347,8 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Dst_RegFile_Index		)
+		.O_Index(			Dst_RegFile_Index		),
+		.O_Done(			Dst_Done				)
 	);
 
 
@@ -349,7 +368,8 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Index_Src1				)
+		.O_Index(			Index_Src1				),
+		.O_Done(									)
 	);
 
 
@@ -369,7 +389,8 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Index_Src2				)
+		.O_Index(			Index_Src2				),
+		.O_Done(									)
 	);
 
 
@@ -389,7 +410,8 @@ module Lane_Unit
 		.I_Constant(		Constant				),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
-		.O_Index(			Index_Src3				)
+		.O_Index(			Index_Src3				),
+		.O_Done(									)
 	);
 
 
@@ -403,7 +425,8 @@ module Lane_Unit
 		.O_Index_Src1(		PipeReg_IdxRF.src1		),
 		.O_Index_Src2(		PipeReg_IdxRF.src2		),
 		.O_Index_Src3(		PipeReg_IdxRF.src3		),
-		.O_Index_Src4(		PipeReg_IdxRF.src4		)
+		.O_Index_Src4(		PipeReg_IdxRF.src4		),
+		.O_Done(									)
 	);
 
 	//	Pipeline Register
@@ -495,7 +518,10 @@ module Lane_Unit
 	MaskReg MaskReg (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Ready(			MaskReg_Ready			),
+		.I_Term(			MaskReg_Term			),
 		.I_We(				MaskReg_We				),
+		.I_Set_One(			Set_One					),
 		.I_Index(			Dst_Index				),
 		.I_Cond(			Cond_Data				),
 		.I_Status(			Status					),
@@ -528,7 +554,7 @@ module Lane_Unit
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
-		.I_WB_Index(		WB_Dst.idx				),
+		.I_WB_Index(		WB_Token.idx				),
 		.I_WB_Data(			WB_Data					),
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
@@ -576,14 +602,13 @@ module Lane_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.I_End_Access1(		I_End_Access1			),
 		.I_End_Access2(		I_End_Access2			),
-		.O_WB_Dst(			WB_Dst					),
+		.O_WB_Token(		WB_Token				),
 		.O_WB_Data(			WB_Data					),
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
 		.O_Ld_Stall(		Ld_Stall				),
 		.O_St_Stall(		ST_Stall				),
-		.O_Cond(			Condition				),
 		.O_Lane_En(			En						)
 	);
 
