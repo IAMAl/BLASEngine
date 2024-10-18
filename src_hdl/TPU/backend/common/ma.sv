@@ -29,6 +29,10 @@ module MA_Unit
 	input	TYPE				I_Token,				//Command
 	output  data_t				O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
+	input						I_Re_p0,
+	input						I_Re_p1,
+	output	data_t				O_Data0,
+	output	data_t				O_Data1,
 	output	TYPE				O_Token,				//Command
 	output						O_Stall					//Stall Request
 );
@@ -98,6 +102,10 @@ module MA_Unit
 
 	assign O_Token				= ( LifeAdd > LifeMlt ) ?	Add_Token :
 															Mlt_Token;
+
+
+	assign O_Data0				= ( I_Re_p0 ) ? Mlt_Data : '0;
+	assign O_Data1				= ( I_Re_p1 ) ? Add_Data : '0;
 
 
 	assign is_Adder				= I_En & ( I_Token.op.OpClass == 2'b00 );

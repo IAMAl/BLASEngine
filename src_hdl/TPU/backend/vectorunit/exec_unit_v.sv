@@ -21,11 +21,11 @@ module ExecUnit_V
 	input						I_Req,					//Request from Network Stage
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input	command_t			I_Command,				//Command
-	input						I_Src_Data1,			//Source Data
-	input						I_Src_Data2,			//Source Data
-	input						I_Src_Data3,			//Source Data
-	output						O_LdSt1,				//Load/Store Command
-	output						O_LdSt2,				//Load/Store Command
+	input	data_t				I_Src_Data1,			//Source Data
+	input	data_t				I_Src_Data2,			//Source Data
+	input	data_t				I_Src_Data3,			//Source Data
+	output	ldst_t				O_LdSt1,				//Load/Store Command
+	output	ldst_t				O_LdSt2,				//Load/Store Command
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output	data_t				O_St_Data1,				//Storing Data
@@ -36,6 +36,10 @@ module ExecUnit_V
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
+	input						I_We_p0,
+	input						I_We_p1,
+	input						I_Re_p0,
+	input						I_Re_p1,
 	output	TYPE				O_WB_Token,				//Write-Back Info
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output						O_Math_Done,			//Execution Done ToDO
@@ -71,12 +75,25 @@ module ExecUnit_V
 	logic						Re;
 	data_t						Mv_Data;
 
+	data_t						PData;
+	data_t						Data0;
+	data_t						Data1;
+
 
 	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
 	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
 	assign RegMove				= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) &
 										( I_Command.instr.op.OpClass == 2'b11 ) &
 										( |I_Command.instr.op.OpCode );
+
+	assign PData				= ( I_Req & ( I_Command.instr.op.OpType == 2'b00 ) &
+									( I_Command.instr.op.OpClass == 2'b11 ) ) ?
+										( I_Command.instr.op.OpCode == 2'b01 ) ?									I_Src_Data1 :
+										( I_Command.instr.op.OpCode == 2'b10 ) ?
+												( I_Command.instr.src1.v & ( I_Command.instr.src1.idx == '0 ) ) ?	Data0 :
+												( I_Command.instr.src1.v & ( I_Command.instr.src1.idx == '1 ) ) ?	Data1 :
+																													'0 :
+																				'0
 
 	assign MAU_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
 
@@ -123,9 +140,13 @@ module ExecUnit_V
 		.I_Data1(			I_Src_Data1				),
 		.I_Data2(			I_Src_Data2				),
 		.I_Data3(			I_Src_Data3				),
+		.I_Re_p0(			I_Re_p0					),
+		.I_Re_p1(			I_Re_p1					),
 		.I_Token(			MA_Token				),
 		.O_Valid(			Valid_MAU				),
 		.O_Data(			Data_MAU				),
+		.O_Data0(			Data0					),
+		.O_Data1(			Data1					),
 		.O_Token(			Token_MAU				)
 	);
 
@@ -201,7 +222,7 @@ module ExecUnit_V
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Data(			I_Src_Data1				),
+		.I_Data(			PData					),
 		.O_Data(			Mv_Data					),
 		.O_Full(									),
 		.O_Empty(									),

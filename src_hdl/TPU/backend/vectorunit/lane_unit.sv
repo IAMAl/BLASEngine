@@ -19,7 +19,7 @@ module Lane_Unit
 	input						clock,
 	input						reset,
 	input						I_En,					//Enable Execution
-	input	instr_t				I_ThreadID,				//SIMT Thread-ID
+	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	instr_t				I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit ToDo
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit ToDo
@@ -56,6 +56,12 @@ module Lane_Unit
 	data_t						RF_Even_Data2;
 
 
+	logic						We_p0;
+	logic						We_p1;
+	logic						Re_p0;
+	logic						Re_p1;
+
+
 	logic						Dst_Slice;
 	logic	[6:0]				Dst_Sel;
 	index_t						Dst_Index;
@@ -84,7 +90,6 @@ module Lane_Unit
 	index_t						Src_Idx1;
 	index_t						Src_Idx2;
 	index_t						Src_Idx3;
-
 
 	mask_t						Mask_Data;
 
@@ -229,6 +234,8 @@ module Lane_Unit
 	//	Write-Back
 	assign PipeReg_Set_Net.dst		= PipeReg_RR.dst;
 
+
+
 	//	Read Data
 	assign PipeReg_Set_Net.src1		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1 :
 																'0;
@@ -285,14 +292,18 @@ module Lane_Unit
 	assign is_WB_VU				= WB_Token.dst_sel == 2'h3;
 
 	assign Sel_Dst				= WB_Token.idx[WIDTH_INDEX+2];
-	assign WB_Req_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Even;
-	assign WB_Req_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Odd
-	assign WB_We_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst;
-	assign WB_We_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst;
+	assign WB_Req_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Even & ~R_Re_c;
+	assign WB_Req_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Odd  & ~R_Re_c;
+	assign WB_We_Even			= ~Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
+	assign WB_We_Odd			=  Sel_Dst & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
 	assign WB_Index_Even		= ( ~Sel_Dst ) ? WB_Token.idx :	'0;
 	assign WB_Index_Odd			= (  Sel_Dst ) ? WB_Token.idx :	'0;
 	assign WB_Data_Even			= ( ~Sel_Dst ) ? W_WB_Data :	'0;
 	assign WB_Data_Odd			= (  Sel_Dst ) ? W_WB_Data :	'0;
+
+	assign We_c					= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b00 ) &
+									( WB_Token.instr.op.OpClass == 2'b11 ) &
+									( WB_Token.instr.op.OpCode == 2'b11 );
 
 	assign Config_Path_W		= WB_Token.path;
 
@@ -358,7 +369,7 @@ module Lane_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Odd		),
+		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src1.v		),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			PipeReg_Idx.src1		),
@@ -379,7 +390,7 @@ module Lane_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Odd		),
+		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src2.v		),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			PipeReg_Idx.src2		),
@@ -400,7 +411,7 @@ module Lane_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Even		),
+		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src3.v		),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			PipeReg_Idx.src3		),
@@ -439,6 +450,25 @@ module Lane_Unit
 		end
 	end
 
+	AuxRegs #(
+		.LANE_ID(			LANE_ID					),
+	) AuxRegs
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_ThreadID(		I_ThreadID				),
+		.I_Stall(			Stall_Index_Calc		),
+		.I_Re(				Re_c					),
+		.I_We(				We_c					),
+		.I_Src_Command(		PipeReg_IdxRR			),
+		.I_Dst_Command(		WB_Token				),
+		.O_We_p0(			We_p0					),
+		.O_We_p1(			We_p1					),
+		.O_Re_p0(			Re_p0					),
+		.O_Re_p1(			Re_p1					),
+		.O_Re_c(			Re_c					)
+	);
+
 	logic	[2:0]			Sel;
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
@@ -446,6 +476,17 @@ module Lane_Unit
 		end
 		else begin
 			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
+		end
+	end
+
+	logic					R_Re_c;
+	logic					We_c;
+	always_ff @( poedge clock ) begin
+		if ( reset ) begin
+			R_Re_c			<= 1'b0;
+		end
+		else begin
+			R_Re_c			<= Re_c;
 		end
 	end
 
@@ -602,6 +643,10 @@ module Lane_Unit
 		.I_St_Grant(		I_St_Grant				),
 		.I_End_Access1(		I_End_Access1			),
 		.I_End_Access2(		I_End_Access2			),
+		.I_We_p0(			We_p0					),
+		.I_We_p1(			We_p1					),
+		.I_Re_p0(			Re_p0					),
+		.I_Re_p1(			Re_p1					),
 		.O_WB_Token(		WB_Token				),
 		.O_WB_Data(			WB_Data					),
 		.O_Math_Done(		Math_Done				),
