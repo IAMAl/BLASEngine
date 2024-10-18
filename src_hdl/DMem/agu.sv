@@ -14,7 +14,7 @@ module agu
 (
 	input						clock,
 	input						reset,
-	input						I_Req,					//Flag: Activate Load/Store Unit
+	input						I_Set_and_Run,					//Flag: Activate Load/Store Unit
 	input						I_Stall,				//Force Stalling by Local Memory
 	input	address_t			I_Length,				//Vector-Length for Load/Store
 	input	address_t			I_Stride,				//Stride-Factor for Load/Store
@@ -50,7 +50,7 @@ module agu
         else if ( End_Access ) begin
             R_Run			<= 1'b0;
         end
-		else if ( I_Req ) begin
+		else if ( I_Set_and_Run ) begin
 			R_Run			<= 1'b1;
 		end
 	end
@@ -61,10 +61,10 @@ module agu
 		if ( reset ) begin
 			R_Length		<= 0;
 		end
-		else if (  R_Run & ( R_Length > 0 ) & ~I_Stall ) begin
+		else if ( R_Run & ~I_Stall ) begin
 			R_Length 		<= R_Length -1'b1;
 		end
-		else if ( I_Req & ~R_Run ) begin
+		else if ( I_Set_and_Run & ~R_Run ) begin
 			R_Length		<= I_Length;
 		end
 	end
@@ -73,7 +73,7 @@ module agu
 		if ( reset ) begin
 			R_Stride		<= 0;
 		end
-		else if ( I_Req & ~R_Run ) begin
+		else if ( I_Set_and_Run & ~R_Run ) begin
 			R_Stride		<= I_Stride;
 		end
 	end
@@ -82,10 +82,10 @@ module agu
 		if ( reset ) begin
 			R_Address		<= 0;
 		end
-		else if ( R_Run ) begin
+		else if ( R_Run & ~I_Stall ) begin
 			R_Address		<= R_Address + R_Stride;
 		end
-		else if ( I_Req & ~R_Run ) begin
+		else if ( I_Set_and_Run & ~R_Run ) begin
 			R_Address		<= I_Base_Addr;
 		end
 	end

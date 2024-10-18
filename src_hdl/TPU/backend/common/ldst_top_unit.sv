@@ -25,17 +25,19 @@ module LdStUnit
 	input	data_t				I_Src_Data1,			//Source Data
 	input	data_t				I_Src_Data2,			//Source Data
 	input	data_t				I_Src_Data3,			//Source Data
-	input	ldst_t				O_LdSt,					//Load/Store Command
+	output	ldst_t				O_LdSt,					//Load/Store Command
 	input	data_t				I_Ld_Data,				//Loaded Data
-	input	data_t				O_St_Data,				//Storing Data
-	input						I_Ld_Ready,				//Ready to Load ToDo
+	output	data_t				O_St_Data,				//Storing Data
+	input						I_Ld_Ready,				//Ready to Load
 	input						I_Ld_Grant,				//Grant for Loading
-	input						I_St_Ready,				//Ready to Store ToDO
+	input						I_St_Ready,				//Ready to Store
 	input						I_St_Grant,				//Grant for Storing
 	input						I_End_Access,			//End of Access
-	input	TYPE				O_Token,				//Command
-	input	data_t				O_WB_Data,				//Write-Back Data
-	input						O_LdSt_Done 			//Access Done
+	output	TYPE				O_Token,				//Command
+	output	data_t				O_WB_Data,				//Write-Back Data
+	output						O_Ld_Stall,				//Stall Request from Loading
+	output						O_St_Stall,				//Stall Request from Storing
+	output						O_LdSt_Done 			//Access Done
 );
 
 
@@ -102,6 +104,10 @@ module LdStUnit
 	assign St_Commit_Grant		= I_Commit_Grant;
 
 
+	assign O_Ld_Stall			= Ld_Stall;
+	assign O_St_Stall			= St_Stall;
+
+
 	assign Ld_Token.v			= Ld_Req;
 	assign Ld_Token.dst			= I_Command.instr.dst;
 	assign Ld_Token.slice_len	= I_Command.instr.slice_len;
@@ -159,6 +165,7 @@ module LdStUnit
 		.O_Length(			Ld_Length					),
 		.O_Stride(			Ld_Stride					),
 		.O_Base(			Ld_Base						),
+		.I_Ready(			I_Ld_Ready					),
 		.I_Token(			Ld_Token					),
 		.O_Token(			Ld_Commit_Token				),
 		.O_Stall(			Ld_Stall					)
@@ -188,6 +195,7 @@ module LdStUnit
 		.O_Length(			St_Length					),
 		.O_Stride(			St_Stride					),
 		.O_Base(			St_Base						),
+		.I_Ready(			I_St_Ready					),
 		.I_Token(			St_Token					),
 		.O_Token(			St_Commit_Token				),
 		.O_Stall(			St_Stall					)

@@ -34,6 +34,7 @@ module ldst_unit
 	output	address_t			O_Length,				//Access-Length
 	output	address_t			O_Stride,				//Stride Factor
 	output	address_t			O_Base,					//Base Address
+	input						I_Ready,				//Ready to Access
 	input	TYPE				I_Token,				//Input Token
 	output	TYPE				O_Token,				//Commit Request
 	output						O_Stall					//Stall Request
@@ -54,6 +55,7 @@ module ldst_unit
 
 
 	logic						Run;
+	logic						Ready;
 
 
 	assign We					= ~I_Stall & I_Valid;
@@ -62,7 +64,7 @@ module ldst_unit
 
 	assign O_Token				= ( Term ) ? Token : '0;
 
-	assign O_Stall				= Full | Full_Buff;
+	assign O_Stall				= Full | Full_Buff ( Runn & ~Ready );
 
 
 	always_ff @( posedge clock ) begin
@@ -74,6 +76,15 @@ module ldst_unit
 		end
 		else if ( ~Empty & I_Access_Grant ) begin
 			Run				<= 1'b1;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Ready	<= 1'b0
+		end
+		begin
+			Ready	<= I_Ready;
 		end
 	end
 

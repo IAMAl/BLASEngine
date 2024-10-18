@@ -81,8 +81,8 @@ module DMem_Body
 	address_t					Address_St;
 	address_t					Address_Ld;
 
-	logic						Set_Cfg_St;
-	logic						Set_Cfg_Ld;
+	logic						Set_Cfg_and_Run_St;
+	logic						Set_Cfg_and_Run_Ld;
 	logic						Set_Config_St;
 	logic						Set_Config_Ld;
 
@@ -98,6 +98,9 @@ module DMem_Body
 
 	logic						Ld_Req;
 	data_t						Ld_Data;
+
+	logic						Stall_Lt;
+	logic						Stall_St;
 
 	data_t						Extern_St_Data;
 	data_t						Extern_Ld_Data;
@@ -153,8 +156,8 @@ module DMem_Body
 	assign St_Base				= { St_Public, St_Offset, Base_Addr_St[POS_MSB_DMEM_ADDR-1:0] };
 	assign Ld_Base				= { Ld_Public, Ld_Offset, Base_Addr_Ld[POS_MSB_DMEM_ADDR-1:0] };
 
-	assign Set_Cfg_St			= Set_Config_St | ( ~R_St_Private & St_Private );
-	assign Set_Cfg_Ld			= Set_Config_Ld | ( ~R_Ld_Private & Ld_Private );
+	assign Set_Cfg_and_Run_St	= Set_Config_St | ( ~R_St_Private & St_Private );
+	assign Set_Cfg_and_Run_Ld	= Set_Config_Ld | ( ~R_Ld_Private & Ld_Private );
 
 
 	assign St_Data				= (   St_Grant1 ) ?	I_St_Data1 :
@@ -163,8 +166,13 @@ module DMem_Body
 													0;
 
 
+	assign Stall_St				= ~St_Valid | I_Stall;
+	assign Stall_Ld				= ~Ld_Valid | I_Stall;
+
+
 	assign Extern_St_Term		= End_St;
 	assign Extern_Ld_Term		= End_Ld;
+
 	assign Extern_St_Grant		= St_Grant3 & ~I_Stall;
 	assign Extern_Ld_Grant		= Ld_Grant3 & ~I_Stall;
 
@@ -173,13 +181,17 @@ module DMem_Body
 	assign O_Ld_Data2			= ( Ld_Grant2 ) ?	Ld_Data : 0;
 	assign Extern_Ld_Data		= ( Ld_Grant3 ) ?	Ld_Data : 0;
 
+
 	assign O_St_Grant1			= St_Grant1;
 	assign O_St_Grant2			= St_Grant2;
+
 	assign O_Ld_Grant1			= Ld_Grant1;
 	assign O_Ld_Grant2			= Ld_Grant2;
 
+
 	assign O_St_Ready1			= St_Ready1 | ( R_St_Private & St_Grant1 );
 	assign O_St_Ready2			= St_Ready2 | ( R_St_Private & St_Grant2 );
+
 	assign O_Ld_Ready1			= Ld_Ready1 | ( R_Ld_Private & Ld_Grant1 );
 	assign O_Ld_Ready2			= Ld_Ready2 | ( R_Ld_Private & Ld_Grant2 );
 
@@ -341,8 +353,8 @@ module DMem_Body
 	agu agu_st (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				Set_Cfg_St				),
-		.I_Stall(			~St_Valid | I_Stall		),
+		.I_Set_and_Run(		Set_Cfg_and_Run_St		),
+		.I_Stall(			Stall_St		),
 		.I_Length(			Length_St				),
 		.I_Stride(			Stride_St				),
 		.I_Base_Addr(		St_Base					),
@@ -355,8 +367,8 @@ module DMem_Body
 	agu agu_ld (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				Set_Cfg_Ld				),
-		.I_Stall(			~Ld_Valid | I_Stall		),
+		.I_Set_and_Run(		Set_Cfg_and_Run_Ld		),
+		.I_Stall(			Stall_Ld				),
 		.I_Length(			Length_Ld				),
 		.I_Stride(			Stride_Ld				),
 		.I_Base_Addr(		Ld_Base					),

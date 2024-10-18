@@ -32,6 +32,7 @@ module FrontEnd
 );
 
 
+	logic						is_FSM_TPU_INIT;
 	logic						is_FSM_TPU_SCALAR;
 	logic						is_FSM_TPU_SIMT;
 	logic						is_FSM_TPU_INSTR;
@@ -55,6 +56,7 @@ module FrontEnd
 
 
 	// FSM State Flag
+	assign is_FSM_TPU_INIT		= R_FSM_TPU_FrontEnd == FSM_TPU_FE_INIT;
 	assign is_FSM_TPU_SCALAR	= R_FSM_TPU_FrontEnd == FSM_TPU_SCALAR;
 	assign is_FSM_TPU_SIMT		= R_FSM_TPU_FrontEnd == FSM_TPU_SIMT;
 	assign is_FSM_TPU_INSTR		= R_FSM_TPU_FrontEnd == FSM_TPU_INSTR;
@@ -67,7 +69,7 @@ module FrontEnd
 	assign O_IssueNo			= R_IssueNo;
 	assign O_ThreadID			= R_ThreadID;
 	assign O_Nack				= R_Full | R_Nack;
-	assign O_Term				= is_FSM_TPU_RUN & ~R_Req;
+	assign O_Term				= is_FSM_TPU_RUN & R_Term;
 
 
 	always_ff @ ( posedge clock ) begin
@@ -98,7 +100,7 @@ module FrontEnd
 		else if ( R_Term ) begin
 			IssueNo		<= '0;
 		end
-		else if ( I_Req &  is_FSM_TPU_RUN ) begin
+		else if ( I_Req & is_FSM_TPU_INIT ) begin
 			IssueNo		<= I_IssueNo;
 		end
 	end

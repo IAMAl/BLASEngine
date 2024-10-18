@@ -23,7 +23,8 @@ module Lane_Unit
 	input	instr_t				I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit ToDo
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit ToDo
-	output	s_ldst_t			O_LdSt,					//Load/Store Command ToDo
+	output	s_ldst_t			O_LdSt1,				//Load/Store Command
+	output	s_ldst_t			O_LdSt2,				//Load/Store Command
 	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
 	output	s_ldst_data_t		O_St_Data,				//Storing Data
 	input	[1:0]				I_Ld_Ready,				//Flag: Ready
@@ -69,6 +70,12 @@ module Lane_Unit
 	logic						Slice_Dst;
 	logic						Stall_RegFile_Odd;
 	logic						Stall_RegFile_Even;
+	logic						Stall_Network;
+	logic						Stall_ExecUnit;
+
+	logic						Ld_Stall;
+	logic						St_Stall;
+
 
 	data_t						Pre_Src_Data2;
 	data_t						Pre_Src_Data3;
@@ -297,9 +304,10 @@ module Lane_Unit
 
 
 	//// Stall Control
-	assign Stall_RegFile_Dst	= ~Lane_Enable;
-	assign Stall_RegFile_Odd	= ~Lane_Enable;
-	assign Stall_RegFile_Even	= ~Lane_Enable;
+	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall;
+	assign Stall_RegFile_Dst	= ~Lane_Enable | Ld_Stall;
+	assign Stall_RegFile_Odd	= ~Lane_Enable | St_Stall;
+	assign Stall_RegFile_Even	= ~Lane_Enable | St_Stall;
 	assign Stall_Network		= ~Lane_Enable;
 	assign Stall_ExecUnit		= ~Lane_Enable;
 
@@ -573,6 +581,8 @@ module Lane_Unit
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
+		.O_Ld_Stall(		Ld_Stall				),
+		.O_St_Stall(		ST_Stall				),
 		.O_Cond(			Condition				),
 		.O_Lane_En(			En						)
 	);

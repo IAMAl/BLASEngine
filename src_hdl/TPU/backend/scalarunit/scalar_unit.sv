@@ -35,7 +35,8 @@ module Scalar_Unit
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grant,				//Flag: Grant
-	input	[1:0]				I_End_Access,			//Flag: End of Access ToDo
+	input	[1:0]				I_End_Access1,			//Flag: End of Access
+	input	[1:0]				I_End_Access2,			//Flag: End of Access
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
@@ -75,8 +76,11 @@ module Scalar_Unit
 	logic						Stall_RegFile_Dst;
 	logic						Stall_RegFile_Odd;
 	logic						Stall_RegFile_Even;
-	logic						Stall_Net;
-	logic						Stall_Math;
+	logic						Stall_Network;
+	logic						Stall_ExecUnit;
+
+	logic						Ld_Stall;
+	logic						St_Stall;
 
 
 	logic						Req_IFetch;
@@ -423,9 +427,10 @@ module Scalar_Unit
 
 
 	//// Stall Control
-	assign Stall_RegFile_Dst	= ~Lane_Enable;
-	assign Stall_RegFile_Odd	= ~Lane_Enable;
-	assign Stall_RegFile_Even	= ~Lane_Enable;
+	assign Stall_Index_Calc		= ~Lane_Enable | Stall_Index;
+	assign Stall_RegFile_Dst	= ~Lane_Enable | Stall_WB;
+	assign Stall_RegFile_Odd	= ~Lane_Enable | Stall_Index;
+	assign Stall_RegFile_Even	= ~Lane_Enable | Stall_Index;
 	assign Stall_Network		= ~Lane_Enable;
 	assign Stall_ExecUnit		= ~Lane_Enable;
 
@@ -507,12 +512,14 @@ module Scalar_Unit
 		.I_Hazard(			RAR_Hazard				),
 		.I_Slice(			Slice					),
 		.I_Bypass_Buff_Full(Bypass_Buff_Full		),
-		.I_Ld_NoReady(		Ld_NoReady				),
+		.I_Ld_Stall(		Ld_Stall				),
+		.I_St_Stall(		St_Stall				),
 		.O_Stall_IF(		Stall_IF				),
 		.O_Stall_IW_St(		Stall_IW_St				),
 		.O_Stall_IW_Ld(		Stall_IW_Ld				),
 		.O_Stall_IW(		Stall_IW				),
-		.O_Stall_Net(		Stall_Net				)
+		.O_Stall_Index(		Stall_Index				),
+		.O_Stall_WB(		Stall_WB				)
 	);
 
 
@@ -710,7 +717,7 @@ module Scalar_Unit
 
 	//// Network Stage
 	Network_S Network_S (
-		.I_Stall(			Stall_Net				),
+		.I_Stall(			Stall_Network			),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),
@@ -748,7 +755,7 @@ module Scalar_Unit
 	ExecUnit_S ExecUnit_S (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_Math				),
+		.I_Stall(			Stall_ExecUnit			),
 		.I_Req(				PipeReg_Exe.v			),
 		.I_Issue_No(		IW_IssueNo				),
 		.I_Command(			PipeReg_Exe.instr		),
@@ -773,6 +780,8 @@ module Scalar_Unit
 		.O_Math_Done(		Math_Done				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
+		.O_Ld_Stall(		Ld_Stall				),
+		.O_St_Stall(		St_Stall				),
 		.O_Cond(			Condition				)
 	);
 

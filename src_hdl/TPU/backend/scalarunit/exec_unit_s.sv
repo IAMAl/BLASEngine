@@ -41,6 +41,8 @@ module ExecUnit_S
 	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
+	output						O_Ld_Stall,				//Stall for Loading
+	output						O_St_Stall,				//Stall for Storing
 	output						O_Cond					//Condition ToDo
 );
 
@@ -60,6 +62,13 @@ module ExecUnit_S
 
 	logic						is_LifeALU;
 	logic						is_LifeLdSt2;
+
+
+	logic						Ld_Stall_Odd;
+	logic						Ld_Stall_Evn;
+
+	logic						St_Stall_Odd;
+	logic						St_Stall
 
 
 	assign ALU_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
@@ -89,6 +98,10 @@ module ExecUnit_S
 	assign O_WB_IssueNo			= ( is_LifeALU ) ?		ALU_Token.issue_no :
 									( is_LifeLdSt2 ) ?	Ld_Token[1].issue_no :
 														Ld_Token[0].issue_no;
+
+
+	assign O_Ld_Stall			= Ld_Stall_Odd | Ld_Stall_Evn;
+	assign O_St_Stall			= St_Stall_Odd | ST_Stall_Evn;
 
 
 	ALU #(
@@ -130,6 +143,8 @@ module ExecUnit_S
 		.I_End_Access(		I_End_Access1			),
 		.O_Token(			Ld_Token[1]				),
 		.O_WB_Data(			Ld_Data[1]				),
+		.O_Ld_Stall(		Ld_Stall_Odd			),
+		.O_ST_Stall(		St_Stall_Odd			),
 		.O_LdSt_Done(		O_LdSt_Done2			)
 	);
 
@@ -154,6 +169,8 @@ module ExecUnit_S
 		.I_End_Access(		I_End_Access2			),
 		.O_Token(			Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
+		.O_Ld_Stall(		Ld_Stall_Evn			),
+		.O_ST_Stall(		St_Stall_Evn			),
 		.O_LdSt_Done(		O_LdSt_Done1			)
 	);
 
