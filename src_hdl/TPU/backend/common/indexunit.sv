@@ -19,6 +19,7 @@ module IndexUnit
 	input						reset,
 	input						I_Stall,				//Force Stalling
 	input						I_Req,					//Request from Hazard-Check Stage
+	input						I_En_II,
 	input						I_MaskedRead,			//Flag: Masked Access to Register File
 	input	idx_t				I_Index,				//Index Value
 	input	index_t				I_Window,				//Window for Slicing
@@ -74,10 +75,16 @@ module IndexUnit
 
 	logic						Req_SkipOp;
 
+	logic						En_II;
+	logic						End_II;
+	logic						Stop_II;
+
 
 	assign Req_SkipOp			= R_MaskedRead | I_MaskedRead;
 
 	assign Next					= R_Index == R_Window;
+
+	assign En_II				= I_Req & I_En_II;
 
 	//Parsing Selector Values
 	assign Sel_a				= I_Index.sel[1:0];
@@ -86,7 +93,7 @@ module IndexUnit
 	assign Sel_s				= I_Index.sel[6];
 
 	//Enable Slicing
-	assign En_Slice				= ( I_Req & I_Index.slice ) | ( R_Sel & ~I_Stall );
+	assign En_Slice				= ( I_Req & I_Index.slice & ~Stop_II ) | ( R_Sel & ~I_Stall & ~Stop_II );
 
 	//End of Slicing
 	assign End_Count			= CountVal == R_Length;
@@ -136,6 +143,8 @@ module IndexUnit
 
 
 	assign O_Done				= End_Count;
+
+	assign End_II				= End_Count;
 
 
 	always_ff @( posedge clock ) begin
@@ -255,6 +264,18 @@ module IndexUnit
 		.O_Req(				SkipReq					),
 		.O_Index_Offset(	Index_Offset			),
 		.O_End(				SkipEnd)
+	);
+
+	IICtrl #(
+		.LANE_ID(			LANE_ID					)
+	) IICtrl
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Stall(			I_Stall					),
+		.I_En_II(			En_II					),
+		.I_Clr_II(			End_II					),
+		.O_Stall(			Stop_II					)
 	);
 
 endmodule

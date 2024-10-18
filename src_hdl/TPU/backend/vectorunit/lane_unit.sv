@@ -184,6 +184,8 @@ module Lane_Unit
 			//	Path
 			PipeReg_Idx.path		<= I_Command.instr.path;
 			PipeReg_Idx.mread		<= I_Command.instr.mread;
+
+			PipeReg_Idx.en_ii		<= I_Command.instr.en_ii;
 		end
 	end
 
@@ -366,6 +368,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
+		.I_En_II(			0						),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			Dst_Index				),
 		.I_Window(			Dst_Index_Window		),
@@ -387,6 +390,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src1.v		),
+		.I_En_II(			PipeReg_Idx.en_ii		),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			PipeReg_Idx.src1		),
 		.I_Window(			IDec_Index_Window		),
@@ -408,6 +412,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src2.v		),
+		.I_En_II(			PipeReg_Idx.en_ii		),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			PipeReg_Idx.src2		),
 		.I_Window(			IDec_Index_Window		),
@@ -429,6 +434,7 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src3.v		),
+		.I_En_II(			PipeReg_Idx.en_ii		),
 		.I_MaskedRead(		PipeReg_Idx.mread		),
 		.I_Index(			PipeReg_Idx.src3		),
 		.I_Window(			IDec_Index_Window		),

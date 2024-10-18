@@ -178,6 +178,7 @@ package pkg_tpu;
 		imm_t							imm;
 		logic	[16:0]					path;
 		logic							mread;
+		logic							en_ii;
 	} instruction_t;
 
 	//	Instruction + Valid
