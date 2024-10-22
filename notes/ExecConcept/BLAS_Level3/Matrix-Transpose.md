@@ -9,7 +9,7 @@ BLASEngineは行列の転地をサポートしています。
 
 
 <div align="center">
-  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/Transpose.png"
+  <img src="https://github.com/IAMAl/BLASEngine/blob/main/notes/ExecConcept/figures/Transpose_Matrix.png"
        alt="Transposition"
        title="Transposing Matrix"
        width="700px"
