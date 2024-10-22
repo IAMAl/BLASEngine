@@ -19,7 +19,7 @@ module IndexUnit
 	input						reset,
 	input						I_Stall,				//Force Stalling
 	input						I_Req,					//Request from Hazard-Check Stage
-	input						I_En_II,
+	input						I_En_II,				//Enable Initiate-Interval
 	input						I_MaskedRead,			//Flag: Masked Access to Register File
 	input	idx_t				I_Index,				//Index Value
 	input	index_t				I_Window,				//Window for Slicing
@@ -29,7 +29,8 @@ module IndexUnit
 	input						I_Sign,					//Config: Sign
 	input	mask_t				I_Mask_Data,			//Mask
 	output	idx_t				O_Index,				//Index Value
-	output						O_Done					//ENd of Slicing
+	output						O_Busy,					//Flag: In Busy State
+	output						O_Done					//Flag: End of Slicing
 );
 
 
@@ -142,6 +143,7 @@ module IndexUnit
 	assign O_Index.idx			= ( R_Req ) ? R_Index :							I_Index.idx;
 
 
+	assign O_Busy				= R_Sel;
 	assign O_Done				= End_Count;
 
 	assign End_II				= End_Count;
