@@ -18,13 +18,12 @@ module Lane_Unit
 )(
 	input						clock,
 	input						reset,
-	input						I_En,					//Enable Execution
+	input						I_Lane_En,				//Enable Execution
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	instr_t				I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
-	output	s_ldst_t			O_LdSt1,				//Load/Store Command
-	output	s_ldst_t			O_LdSt2,				//Load/Store Command
+	output	s_ldst_t			O_LdSt,					//Load/Store Command
 	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
 	output	s_ldst_data_t		O_St_Data,				//Storing Data
 	input	[1:0]				I_Ld_Ready,				//Flag: Ready
@@ -33,7 +32,6 @@ module Lane_Unit
 	input	[1:0]				I_St_Grant,				//Flag: Grant
 	input						I_End_Access1,			//Flag: End of Access
 	input						I_End_Access2,			//Flag: End of Access
-	output						O_Commit,				//Commit Request
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src2,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src3,		//Inter-Lane Connect
@@ -43,6 +41,7 @@ module Lane_Unit
 	output	data_t				O_Lane_Data_Src3,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_WB,			//Inter-Lane Connect
 	output						O_Status				//Lane Status
+	output						O_Commit,				//Commit Request
 );
 
 
@@ -50,16 +49,24 @@ module Lane_Unit
 	idx_t						Index_Src2;
 	idx_t						Index_Src3;
 
+	logic						Index_Src1_Busy;
+	logic						Index_Src2_Busy;
+	logic						Index_Src3_Busy;
+
+
 	data_t						RF_Odd_Data1;
 	data_t						RF_Odd_Data2;
 	data_t						RF_Even_Data1;
 	data_t						RF_Even_Data2;
 
+	logic						RegMov_Wt;
+	logic						RegMov_Rd;
 
 	logic						Re_p0;
 	logic						Re_p1;
 
 
+	logic						Req_Index_Dst;
 	logic						Dst_Slice;
 	logic	[6:0]				Dst_Sel;
 	index_t						Dst_Index;
@@ -68,37 +75,29 @@ module Lane_Unit
 	logic						Dst_RegFile_Req;
 	logic						Dst_RegFile_Slice;
 	index_t						Dst_RegFile_Index;
+	logic						Dst_Busy;
 	logic						Dst_Done;
 
-	logic						Sign;
-	const_t						Constant;
-	logic						Slice_Dst;
-	logic						Stall_RegFile_Odd;
-	logic						Stall_RegFile_Even;
-	logic						Stall_Network;
-	logic						Stall_ExecUnit;
 
-	logic						Ld_Stall;
-	logic						St_Stall;
-
-
-	state_t						Status;
-
-
-	index_t						Src_Idx1;
-	index_t						Src_Idx2;
-	index_t						Src_Idx3;
+	data_t						R_Scalar_Data;
 
 	mask_t						Mask_Data;
 
-	logic	[12:0]				Config_Path;
-	logic	[4:0]				Config_Path_WB;
+
+	logic						Sign;
+	const_t						Constant;
+
+
+	logic						Bypass_Buff_Full;
+
+
 
 
 	logic						Dst_Sel;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
+	logic						WB_En;
 	pipe_exe_tmp_t				WB_Token;
 	data_t						WB_Data;
 	logic						WB_Req_Even;
@@ -117,8 +116,25 @@ module Lane_Unit
 	logic						MaskReg_Re;
 
 
+	logic	[12:0]				Config_Path;
+	logic	[4:0]				Config_Path_WB;
+	logic						Math_Done;
+
+
 	logic						LdSt_Done1;
 	logic						LdSt_Done2;
+
+	logic						Ld_Stall;
+	logic						St_Stall;
+
+	logic						Stall_Index_Calc;
+	logic						Stall_RegFile_Odd;
+	logic						Stall_RegFile_Even;
+	logic						Stall_Network;
+	logic						Stall_ExecUnit;
+	logic						Stall_RegFile_Dst;
+
+	state_t						Status;
 
 
 	logic						En;
@@ -126,15 +142,6 @@ module Lane_Unit
 	logic						Lane_CTRL_Rst;
 	logic						Lane_CTRL_Set;
 
-	logic						Stall_Index_Calc;
-	logic						Stall_RegFile_Dst;
-	logic						Stall_RegFile_Odd;
-	logic						Stall_RegFile_Even;
-	logic						Stall_Network;
-	logic						Stall_ExecUnit;
-
-
-	logic						Req_Issue;
 
 	pipe_index_t				PipeReg_Idx;
 	pipe_index_t				PipeReg_Index;
@@ -151,7 +158,7 @@ module Lane_Unit
 	Lane_En_V Lane_En_V (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_En(				I_En					),
+		.I_En(				I_Lane_En				),
 		.I_Rst(				Lane_CTRL_Rst			),
 		.I_Set(				Lane_CTRL_Set			),
 		.I_Index(			Dst_Index				),
@@ -298,22 +305,25 @@ module Lane_Unit
 
 
 	//// Write-Back
+	//  Network Path
+	assign Config_Path_WB		= WB_Token.path;
+
+	assign Req_Index_Dst		= is_WB_RF & WB_Token.v;
+
 	assign Dst_Sel				= WB_Token.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Token.slice;
 	assign Dst_Index			= WB_Token.idx;
 	assign Dst_Index_Window		= WB_Token.window;
 	assign Dst_Index_Length		= WB_Token.slice_len;
 
-	//  Network Path
-	assign Config_Path_WB		= WB_Token.path;
 
 	//	Write-Back Target Decision
 	assign is_WB_RF				= WB_Token.dst_sel == 2'h1;
 	assign is_WB_BR				= WB_Token.dst_sel == 2'h2;
 	assign is_WB_VU				= WB_Token.dst_sel == 2'h3;
 
-	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
-	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst  & ~We_c;
+	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst & ~We_c;
+	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst & ~We_c;
 	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.idx :	'0;
 	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.idx :	'0;
 	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :	'0;
@@ -326,6 +336,7 @@ module Lane_Unit
 	assign Config_Path_W		= WB_Token.path;
 
 	//	Write-Back to Mask Register
+	assign WB_En				= WB_Token.v & is_WB_BR;
 	assign MaskReg_Ready		= ( PipeReg_Idx.op.OpType == 2'b01 ) &
 									( PipeReg_Idx.op.OpClass == 2'b10 ) &
 									( PipeReg_Idx.op.OpCode[1] == 1'b1 );
@@ -354,7 +365,7 @@ module Lane_Unit
 
 
 	//// Stall Control
-	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall;
+	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall | Bypass_Buff_Full;
 	assign Stall_RegFile_Dst	= ~Lane_Enable | Ld_Stall;
 	assign Stall_RegFile_Odd	= ~Lane_Enable | St_Stall;
 	assign Stall_RegFile_Even	= ~Lane_Enable | St_Stall;
@@ -403,6 +414,7 @@ module Lane_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src1				),
+		.O_Busy(			Index_Src1_Busy			),
 		.O_Done(									)
 	);
 
@@ -425,6 +437,7 @@ module Lane_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src2				),
+		.O_Busy(			Index_Src2_Busy			),
 		.O_Done(									)
 	);
 
@@ -447,6 +460,7 @@ module Lane_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src3				),
+		.O_Busy(			Index_Src3_Busy			),
 		.O_Done(									)
 	);
 
@@ -470,7 +484,7 @@ module Lane_Unit
 		if ( reset ) begin
 			PipeReg_IdxRR	<= '0;
 		end
-		else if ( I_En ) begin
+		else if ( I_Lane_En ) begin
 			PipeReg_IdxRR	<= PipeReg_IdxRF;
 		end
 	end
@@ -658,8 +672,8 @@ module Lane_Unit
 		.I_Src_Data1(		PipeReg_Exe.data1		),
 		.I_Src_Data2(		PipeReg_Exe.data2		),
 		.I_Src_Data3(		PipeReg_Exe.data3		),
-		.O_LdSt1(			O_LdSt1					),
-		.O_LdSt2(			O_LdSt2					),
+		.O_LdSt1(			O_LdSt[0]				),
+		.O_LdSt2(			O_LdSt[1]				),
 		.I_Ld_Data1(		I_Ld_Data[0]			),
 		.I_Ld_Data2(		I_Ld_Data[1]			),
 		.O_St_Data1(		O_St_Data[0]			),

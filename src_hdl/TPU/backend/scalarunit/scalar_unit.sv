@@ -16,27 +16,24 @@ module Scalar_Unit
 (
 	input						clock,
 	input						reset,
-	input						I_En,					//Enable Execution
 	input						I_Empty,				//Empty on Buffer
 	input						I_Req_St,				//Store Request for Instructions
 	output						O_Ack_St,				//Acknowledge for Storing
-	input	instr_t				I_Instr,				//Instruction from Buffer
-	input	id_t				I_ThreadID,				//Thread-ID
 	input						I_Commit_Req_V,			//Commit Request from Vector Unit
+	input						I_En,					//Enable Execution
+	input	id_t				I_ThreadID,				//Thread-ID
+	input	instr_t				I_Instr,				//Instruction from Buffer
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
-	output	ldst_t				O_LdSt1,				//Load Request
-	output	ldst_t				O_LdSt2,				//Load Request
-	input	data_t				I_Ld_Data1,				//Loaded Data
-	input	data_t				I_Ld_Data2,				//Loaded Data
-	output	data_t				O_St_Data1,				//Storing Data
-	output	data_t				O_St_Data2,				//Storing Data
+	output	s_ldst_t			O_LdSt,					//Load Request
+	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
+	output	s_ldst_data_t		O_St_Data,				//Storing Data
 	input	[1:0]				I_Ld_Ready,				//Flag: Ready
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grant,				//Flag: Grant
-	input	[1:0]				I_End_Access1,			//Flag: End of Access
-	input	[1:0]				I_End_Access2,			//Flag: End of Access
+	input						I_End_Access1,			//Flag: End of Access
+	input						I_End_Access2,			//Flag: End of Access
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
@@ -74,16 +71,6 @@ module Scalar_Unit
 	logic						Stall_IW_Ld;
 	logic						Stall_IW;
 
-	logic						Stall_Index_Calc;
-	logic						Stall_RegFile_Dst;
-	logic						Stall_RegFile_Odd;
-	logic						Stall_RegFile_Even;
-	logic						Stall_Network;
-	logic						Stall_ExecUnit;
-
-	logic						Ld_Stall;
-	logic						St_Stall;
-
 
 	logic						Req_IFetch;
 
@@ -94,9 +81,9 @@ module Scalar_Unit
 
 	logic						Req_IW;
 	logic						Req_Issue;
-	logic						W_Req_Issue;
+	logic						IW_Req_Issue;
 	issue_no_t					IW_IssueNo;
-	instr_t						Instr_IW;
+	instr_t						IW_Instr;
 	issue_no_t					Rd_Ptr;
 
 	logic						RAR_Hazard;
@@ -104,12 +91,28 @@ module Scalar_Unit
 	instr_t						S_Command;
 
 
-	logic						We_p0;
-	logic						We_p1;
+	idx_t						Index_Src1;
+	idx_t						Index_Src2;
+	idx_t						Index_Src3;
+
+	logic						Index_Src1_Busy;
+	logic						Index_Src2_Busy;
+	logic						Index_Src3_Busy;
+
+
+	data_t						RF_Odd_Data1;
+	data_t						RF_Odd_Data2;
+	data_t						RF_Even_Data1;
+	data_t						RF_Even_Data2;
+
+	logic						RegMov_Wt;
+	logic						RegMov_Rd;
+
 	logic						Re_p0;
 	logic						Re_p1;
 
 
+	logic						Req_Index_Dst;
 	logic						Dst_Slice;
 	logic	[6:0]				Dst_Sel;
 	index_t						Dst_Index;
@@ -118,54 +121,29 @@ module Scalar_Unit
 	logic						Dst_RegFile_Req;
 	logic						Dst_RegFile_Slice;
 	index_t						Dst_RegFile_Index;
-
-	idx_t						Index_Src1;
-	idx_t						Index_Src2;
-	idx_t						Index_Src3;
-
-	logic						Req_Index_Dst;
-
-	data_t						RF_Odd_Data1;
-	data_t						RF_Odd_Data2;
-	data_t						RF_Even_Data1;
-	data_t						RF_Even_Data2;
+	logic						Dst_Busy;
+	logic						Dst_Done;
 
 
-	logic						Bypass_Buff_Full;
-
+	data_t						R_Scalar_Data;
 
 	logic						MaskedRead;
+	mask_t						Mask_Data;
+
+
 	logic						Sign;
 	const_t						Constant;
 	logic						Slice_Dst;
 
 
-	logic						Lane_We;
-	logic						Lane_Re;
-	data_t						Lane_Data;
-	logic	[NUM_LANES-1:0]		We_V_State;
-	reg_idx_t					V_State_Data;
+	logic						Bypass_Buff_Full;
 
-
-	data_t						V_State;
-
-	state_t						State;
-	state_t						Status;
-
-	logic						Store_S;
-	logic						Store_V;
-
-
-	mask_t						Mask_Data;
-
-	logic	[12:0]				Config_Path;
-
-	logic						WB_En;
 
 	logic						Dst_Sel;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
+	logic						WB_En;
 	pipe_exe_tmp_t				WB_Token;
 	data_t						WB_Data;
 	logic						WB_Req_Even;
@@ -183,16 +161,42 @@ module Scalar_Unit
 	logic						MaskReg_We;
 	logic						MaskReg_Re;
 
+
+	logic	[12:0]				Config_Path;
 	logic	[1:0]				Config_Path_WB;
 	logic						Math_Done;
 	logic						Condition;
 	issue_no_t					Bypass_IssueNo;
 
 
-	logic						Ld_NoReady;
-	logic						Slice;
 	logic						LdSt_Done1;
 	logic						LdSt_Done2;
+
+	logic						Ld_Stall;
+	logic						St_Stall;
+
+
+	logic						Stall_Index_Calc;
+	logic						Stall_RegFile_Odd;
+	logic						Stall_RegFile_Even;
+	logic						Stall_Network;
+	logic						Stall_ExecUnit;
+	logic						Stall_RegFile_Dst;
+
+	state_t						State;
+	state_t						Status;
+
+
+	logic	[NUM_LANES-1:0]		We_V_State;
+	reg_idx_t					V_State_Data;
+	data_t						V_State;
+
+
+	logic						Store_S;
+	logic						Store_V;
+
+
+	logic						Slice;
 
 
 	logic						Commmit_Req_LdSt1;
@@ -223,6 +227,11 @@ module Scalar_Unit
 	issue_no_t					Commit_No;
 
 
+	logic						Lane_We;
+	logic						Lane_Re;
+	data_t						Lane_Data;
+
+
 	pipe_index_t				PipeReg_Idx;
 	pipe_index_t				PipeReg_Index;
 	pipe_index_reg_t			PipeReg_IdxRF;
@@ -249,7 +258,7 @@ module Scalar_Unit
 
 	//// Hazard Detect Stage
 	assign Req_IW				= ~Stall_IW_St;
-	assign W_Req_Issue			= ~Stall_IW_Ld & ~Stall_IW;
+	assign IW_Req_Issue			= ~Stall_IW_Ld & ~Stall_IW;
 
 
 	//// Scalar unit's Back-end Pipeline
@@ -270,6 +279,9 @@ module Scalar_Unit
 	//	Path
 	assign PipeReg_Idx.path			= S_Command.instr.path;
 
+	// Masked Reading from RF
+	assign MaskedRead				= S_Command.mread;
+
 
 	//// Index Update Stage
 	//	Command
@@ -287,6 +299,9 @@ module Scalar_Unit
 
 	//	Path
 	assign PipeReg_Index.path		= PipeReg_Idx.path;
+
+	// Masking
+	assign Mask_Data				= '0;
 
 
 	//// Packing for Register File Access
@@ -332,7 +347,8 @@ module Scalar_Unit
 
 	assign PipeReg_Set_Net.src1.v		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.v :
 																	'0;
-	assign PipeReg_Set_Net.src1.idx		= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.idx :
+	assign PipeReg_Set_Net.src1.idx		= ( RegMov_Rd ) ?			R_Scalar_Data :
+											( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.idx :
 																	'0;
 	assign PipeReg_Set_Net.src1.src_sel	= ( PipeReg_RR.src1.v ) ?	PipeReg_RR.src1.src_sel :
 																	'0;
@@ -402,6 +418,8 @@ module Scalar_Unit
 	//  Network Path
 	assign Config_Path_WB		= WB_Token.path;
 
+	assign Req_Index_Dst		= is_WB_RF & WB_Token.v;
+
 	assign Dst_Sel				= WB_Token.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Token.slice;
 	assign Dst_Index			= WB_Token;
@@ -426,7 +444,7 @@ module Scalar_Unit
 									( WB_Token.instr.op.OpCode == 2'b11 );
 
 	//	Write-Back to Cond Register
-	assign WB_En				= B_Token.v & is_WB_BR;
+	assign WB_En				= WB_Token.v & is_WB_BR;
 	assign MaskReg_Ready		= ( PipeReg_Idx.op.OpType == 2'b01 ) &
 									( PipeReg_Idx.op.OpClass == 2'b10 ) &
 									( PipeReg_Idx.op.OpCode[1] == 1'b1 );
@@ -462,7 +480,6 @@ module Scalar_Unit
 
 	//// Stall-Control
 	//	TB
-	assign Ld_NoReady			= 1'b0;
 	assign Slice				= 1'b0;
 
 
@@ -473,6 +490,7 @@ module Scalar_Unit
 
 
 	//// Stall Control
+	assign Slice				= Index_Src1_Busy | Index_Src2_Busy | Index_Src3_Busy;
 	assign Stall_Index_Calc		= ~Lane_Enable | Stall_Index;
 	assign Stall_RegFile_Dst	= ~Lane_Enable | Stall_WB;
 	assign Stall_RegFile_Odd	= ~Lane_Enable | Stall_Index;
@@ -527,7 +545,7 @@ module Scalar_Unit
 		.I_Term(			O_Term					),
 		.I_Instr(			Instruction				),
 		.O_Req(				Req_IW					),
-		.O_Instr(			Instr_IW				),
+		.O_Instr(			IW_Instr				),
 		.O_Re_Buff(			O_Re_Buff				)
 	);
 
@@ -538,8 +556,8 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Req(				Req_IW					),
 		.I_Slice(			Dst_Slice				),
-		.I_Req_Issue(		W_Req_Issue				),
-		.I_Instr(			Instr_IW				),
+		.I_Req_Issue(		IW_Req_Issue			),
+		.I_Instr(			IW_Instr				),
 		.I_Commit_Req(		Commit_Req				),
 		.I_Commit_No(		Commit_No				),
 		.O_Req_Issue(		Req_Issue				),
@@ -570,7 +588,6 @@ module Scalar_Unit
 
 
 	//// Index Update Stage
-	//// Index Update Stage
 	IndexUnit #(
 		.LANE_ID(			LANE_ID					)
 	) Index_Dst
@@ -589,7 +606,8 @@ module Scalar_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Dst_RegFile_Index		),
-		.O_Done(									)
+		.O_Busy(			Dst_Busy				),
+		.O_Done(			Dst_Done				)
 	);
 
 
@@ -611,6 +629,7 @@ module Scalar_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src1				),
+		.O_Busy(			Index_Src1_Busy			),
 		.O_Done(									)
 	);
 
@@ -633,6 +652,7 @@ module Scalar_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src2				),
+		.O_Busy(			Index_Src2_Busy			),
 		.O_Done(									)
 	);
 
@@ -655,6 +675,7 @@ module Scalar_Unit
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src3				),
+		.O_Busy(			Index_Src3_Busy			),
 		.O_Done(									)
 	);
 
@@ -851,12 +872,12 @@ module Scalar_Unit
 		.I_Src_Data1(		PipeReg_Exe.data1		),
 		.I_Src_Data2(		PipeReg_Exe.data2		),
 		.I_Src_Data3(		PipeReg_Exe.data3		),
-		.O_LdSt1(			O_LdSt1					),
-		.O_LdSt2(			O_LdSt2					),
-		.I_Ld_Data1(		I_Ld_Data1				),
-		.I_Ld_Data2(		I_Ld_Data2				),
-		.O_St_Data1(		O_St_Data1				),
-		.O_St_Data2(		O_St_Data2				),
+		.O_LdSt1(			O_LdSt[0]				),
+		.O_LdSt2(			O_LdSt[1]				),
+		.I_Ld_Data1(		I_Ld_Data[0]			),
+		.I_Ld_Data2(		I_Ld_Data[1]			),
+		.O_St_Data1(		O_St_Data[0]			),
+		.O_St_Data2(		O_St_Data[1]			),
 		.I_Ld_Ready(		I_Ld_Ready				),
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),
