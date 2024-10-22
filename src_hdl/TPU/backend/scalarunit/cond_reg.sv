@@ -14,11 +14,11 @@ module CondReg
 (
 	input						clock,
 	input						reset,
-	input						I_Ready,				//Ready to Set
+	input						I_Ready,			//Ready to Set
 	input						I_Term,				//Termination of Compare
 	input						I_We,				//Write-Enable the Mask Register
 	input	cond_t				I_Cond,				//Condition to Gnerate Flag
-	input	state_t				I_Status,				//Status of Comparing
+	input	state_t				I_Status,			//Status of Comparing
 	input						I_Re,				//Read-Enable
 	output						O_Condition			//Condition Data
 );
