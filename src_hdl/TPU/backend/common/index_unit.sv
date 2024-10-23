@@ -261,7 +261,7 @@ module IndexUnit
 		.I_Req(				Req_SkipOp				),
 		.I_Stall(			I_Stall					),
 		.I_Mask_Data(		I_Mask_Data				),
-		.I_Index_Start(		I_Index					),
+		.I_Index_Start(		I_Index.idx				),
 		.I_Index_Length(	I_Length				),
 		.O_Req(				SkipReq					),
 		.O_Index_Offset(	Index_Offset			),

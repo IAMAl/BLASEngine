@@ -51,8 +51,8 @@ module RingBuffCTRL
 
 
 	//// Output 													////
-    assign O_WAddr				= W_WPtr[$clog2(NUM_ENTRY)-1:0];
-	assign O_RAddr				= W_RPtr[$clog2(NUM_ENTRY)-1:0];
+    assign O_WAddr				= W_WPtr[$clog2(NUM_ENTRY+1)-1:0];
+	assign O_RAddr				= W_RPtr[$clog2(NUM_ENTRY+1)-1:0];
     assign O_Num        	    = ( W_CNT[WIDTH_BUFF+1] ) ?	R_WCNT - R_RCNT + NUM_ENTRY :
 															W_CNT[WIDTH_BUFF:0];
 

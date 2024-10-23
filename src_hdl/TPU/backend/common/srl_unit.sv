@@ -70,19 +70,19 @@ module SRL_Unit
 
 	always_comb begin
 		case ( I_Token.op.OpClass )
-			2'b00: assign ResultData	= Data_Shift;
-			2'b01: assign ResultData	= Data_Rotate;
-			2'b10: assign ResultData	= Data_Logic;
-			default: assign ResultData	= '0;
+			2'b00: ResultData	= Data_Shift;
+			2'b01: ResultData	= Data_Rotate;
+			2'b10: ResultData	= Data_Logic;
+			default: ResultData	= '0;
 		endcase
 	end
 
 	always_comb begin
 		case ( I_Token.op.OpClass )
-			2'b00: assign ResultToken	= Token_Shift;
-			2'b01: assign ResultToken	= Token_Rotate;
-			2'b10: assign ResultToken	= Token_Logic;
-			default: assign ResultToken	= '0;
+			2'b00: ResultToken	= Token_Shift;
+			2'b01: ResultToken	= Token_Rotate;
+			2'b10: ResultToken	= Token_Logic;
+			default: ResultToken	= '0;
 		endcase
 	end
 

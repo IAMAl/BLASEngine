@@ -33,44 +33,44 @@ module RF_Data_Sel
 	always_comb begin
 		case ( Sel )
 			3'h0: begin
-				assign O_Data_Src1	= I_Data_Src1;
-				assign O_Data_Src2	= I_Data_Src2;
-				assign O_Data_Src3	= '0;
+				O_Data_Src1	= I_Data_Src1;
+				O_Data_Src2	= I_Data_Src2;
+				O_Data_Src3	= '0;
 			end
 			3'h1: begin
-				assign O_Data_Src1	= I_Data_Src1;
-				assign O_Data_Src2	= I_Data_Src2;
-				assign O_Data_Src3	= I_Data_Src3;
+				O_Data_Src1	= I_Data_Src1;
+				O_Data_Src2	= I_Data_Src2;
+				O_Data_Src3	= I_Data_Src3;
 			end
 			3'h2: begin
-				assign O_Data_Src1	= O_Data_Src1;
-				assign O_Data_Src2	= O_Data_Src3;
-				assign O_Data_Src3	= O_Data_Src2;
+				O_Data_Src1	= O_Data_Src1;
+				O_Data_Src2	= O_Data_Src3;
+				O_Data_Src3	= O_Data_Src2;
 			end
 			3'h3: begin
-				assign O_Data_Src1	= I_Data_Src1;
-				assign O_Data_Src2	= I_Data_Src3;
-				assign O_Data_Src3	= I_Data_Src4;
+				O_Data_Src1	= I_Data_Src1;
+				O_Data_Src2	= I_Data_Src3;
+				O_Data_Src3	= I_Data_Src4;
 			end
 			3'h4: begin
-				assign O_Data_Src1	= I_Data_Src3;
-				assign O_Data_Src2	= I_Data_Src2;
-				assign O_Data_Src3	= I_Data_Src1;
+				O_Data_Src1	= I_Data_Src3;
+				O_Data_Src2	= I_Data_Src2;
+				O_Data_Src3	= I_Data_Src1;
 			end
 			3'h5: begin
-				assign O_Data_Src1	= I_Data_Src3;
-				assign O_Data_Src2	= I_Data_Src2;
-				assign O_Data_Src3	= I_Data_Src4;
+				O_Data_Src1	= I_Data_Src3;
+				O_Data_Src2	= I_Data_Src2;
+				O_Data_Src3	= I_Data_Src4;
 			end
 			3'h6: begin
-				assign O_Data_Src1	= I_Data_Src3;
-				assign O_Data_Src2	= I_Data_Src4;
-				assign O_Data_Src3	= I_Data_Src2;
+				O_Data_Src1	= I_Data_Src3;
+				O_Data_Src2	= I_Data_Src4;
+				O_Data_Src3	= I_Data_Src2;
 			end
 			3'h7: begin
-				assign O_Data_Src1	= I_Data_Src3;
-				assign O_Data_Src2	= I_Data_Src4;
-				assign O_Data_Src3	= '0;
+				O_Data_Src1	= I_Data_Src3;
+				O_Data_Src2	= I_Data_Src4;
+				O_Data_Src3	= '0;
 			end
 		endcase
 	end

@@ -30,10 +30,10 @@ module PathSel
 	output	data_t				O_Src_Data3,					//To Exec Unit
 	input	data_t				I_WB_Data,						//Write-Back Data from Exec Unit
 	output	data_t				O_WB_Data,						//Write-Back Data To RF Unit
-	output	lane_t				O_Lane_Data_Src1,				//Data to Lanes
-	output	lane_t				O_Lane_Data_Src2,				//Data to Lanes
-	output	lane_t				O_Lane_Data_Src3,				//Data to Lanes
-	output	lane_t				O_Lane_Data_WB					//Data to Lanes
+	output	data_t				O_Lane_Data_Src1,				//Data to Lanes
+	output	data_t				O_Lane_Data_Src2,				//Data to Lanes
+	output	data_t				O_Lane_Data_Src3,				//Data to Lanes
+	output	data_t				O_Lane_Data_WB					//Data to Lanes
 );
 
 
@@ -92,9 +92,9 @@ module PathSel
 	assign O_Src_Data3			= ( Sel_Path ) ?	Lane_Data3 :	Src_Data3;
 	assign O_WB_Data			= ( Sel_WB_Path ) ?	Lane_WB_Data :	WB_Data;
 
-	assign O_Lane_Data_Src1[LANE_ID]	= ( I_Req )	?		I_Src_Data1 : '0;
-	assign O_Lane_Data_Src2[LANE_ID]	= ( I_Req )	?		I_Src_Data2 : '0;
-	assign O_Lane_Data_Src3[LANE_ID]	= ( I_Req )	?		I_Src_Data3 : '0;
-	assign O_Lane_Data_WB[LANE_ID]		= I_Lane_Data_WB;
+	assign O_Lane_Data_Src1		= ( I_Req )	?		I_Src_Data1 : '0;
+	assign O_Lane_Data_Src2		= ( I_Req )	?		I_Src_Data2 : '0;
+	assign O_Lane_Data_Src3		= ( I_Req )	?		I_Src_Data3 : '0;
+	assign O_Lane_Data_WB		= I_Lane_Data_WB;
 
 endmodule

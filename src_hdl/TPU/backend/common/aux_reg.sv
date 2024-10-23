@@ -21,7 +21,7 @@ import pkg_mpu::*;
 	input	id_t				I_ThreadID,				//Thread ID
 	input						I_Re,					//Read Enable
 	input						I_We,					//Write Enable
-	input	pipe_index_t		I_Src_Command,			//Command
+	input	pipe_index_reg_t	I_Src_Command,			//Command
 	input	pipe_exe_tmp_t		I_Dst_Command,			//Command
 	output						O_Re_p0,				//Read-Enable Pipeline Reg
 	output						O_Re_p1,				//Read-Enable Pipeline Reg

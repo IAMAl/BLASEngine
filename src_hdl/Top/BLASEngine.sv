@@ -110,6 +110,9 @@ module BLASEngine
 	v_ready_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Ready;
 	v_grant_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Grant;
 
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]		TPU_S_End_Access;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]		TPU_V_End_Access;
+
 
 	MPU MPU (
 		.clock(				clock					),
@@ -268,6 +271,7 @@ module BLASEngine
 				.I_S_St_Ready(	TPU_S_St_Ready[ row ][ clm ]	),
 				.I_S_Ld_Grant(	TPU_S_Ld_Grant[ row ][ clm ]	),
 				.I_S_St_Grant(	TPU_S_St_Grant[ row ][ clm ]	),
+				.I_S_End_Access(TPU_S_End_Access[ row ][ clm ]	),
 				.O_V_LdSt(		TPU_V_LdSt[ row ][ clm ]		),
 				.I_V_Ld_Data(	TPU_V_Ld_Data[ row ][ clm ]		),
 				.O_V_St_Data(	TPU_V_St_Data[ row ][ clm ]		),
@@ -275,6 +279,7 @@ module BLASEngine
 				.I_V_St_Ready(	TPU_V_St_Ready[ row ][ clm ]	),
 				.I_V_Ld_Grant(	TPU_V_Ld_Grant[ row ][ clm ]	),
 				.I_V_St_Grant(	TPU_V_St_Grant[ row ][ clm ]	),
+				.I_V_End_Access(TPU_V_End_Access[ row ][ clm ]	),
 				.O_IssueNo(		TPU_IssueNo[ row ][ clm ]		),
 				.O_Term(		TPU_Term[ row ][ clm ]			),
 				.O_Nack(		TPU_Nack[ row ][ clm ]			)

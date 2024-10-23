@@ -243,6 +243,9 @@ package pkg_tpu;
 	typedef data_t	[1:0]				s_ldst_data_t;
 	typedef s_ldst_data_t[NUM_LANES-1:0]v_ldst_data_t;
 
+	typedef logic	[1:0]				tb_t;
+	typedef tb_t	[NUM_LANES-1:0]		v_2b_t;
+
 
 	////Pipeline Registers
 	//	Hazard Check Stage
@@ -302,7 +305,7 @@ package pkg_tpu;
 		index_t							idx3;
 		index_t							slice_len;
 		issue_no_t						issue_no;
-		logic	[4:0]					path;
+		logic	[16:0]					path;
 	} pipe_net_t;
 
 	//	Execuution Stage (First)

@@ -71,7 +71,6 @@ module BypassBuff
 	logic	[WIDTH_NUM-1:0]		Wr_Ptr;
 	logic	[WIDTH_NUM-1:0]		Rd_Ptr;
 
-
 	logic						Run_Slice_Src1;
 	logic						Run_Slice_Src2;
 	logic						Run_Slice_Src3;
@@ -135,16 +134,16 @@ module BypassBuff
 
 	always_comb begin
 		if ( ( NoSrc1 >= NoSrc2 ) & ( NoSrc1 >= NoSrc3 ) ) begin
-			assign Sel_NoSrc	= NoSrc1;
+			Sel_NoSrc	= NoSrc1;
 		end
 		else if ( ( NoSrc2 >= NoSrc1 ) & ( NoSrc2 >= NoSrc3 ) ) begin
-			assign Sel_NoSrc	= NoSrc2;
+			Sel_NoSrc	= NoSrc2;
 		end
 		else if ( ( NoSrc3 >= NoSrc1 ) & ( NoSrc3 >= NoSrc2 ) ) begin
-			assign Sel_NoSrc	= NoSrc3;
+			Sel_NoSrc	= NoSrc3;
 		end
 		else begin
-			assign Sel_NoSrc	= '0;
+			Sel_NoSrc	= '0;
 		end
 	end
 
@@ -226,17 +225,8 @@ module BypassBuff
 			if ( Clr & Hit ) begin
 				Valid[ Rd_Ptr ]	<= 1'b0;
 			end
-			else if ( Clr & Update & ( Rd_Ptr <= Sel_NoSrc ) ) begin
-				for ( int i=Rd_Ptr; i<Sel_NoSrc; ++i ) begin
-					Valid[ i ]	<= 1'b0;
-				end
-			end
 			else if ( Clr & Update ) begin
-				for ( int i=Sel_NoSrc; i<BUFF_SIZE; ++i ) begin
-					Valid[ i ]	<= 1'b0;
-				end
-
-				for ( int i=0; i<Rd_Ptr; ++i ) begin
+				for ( int i=0; i<BUFF_SIZE; ++i ) begin
 					Valid[ i ]	<= 1'b0;
 				end
 			end

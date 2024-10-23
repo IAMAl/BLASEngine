@@ -77,8 +77,8 @@ module MA_Unit
 
 	logic						We;
 	logic						Re;
-	logic	[WIDTH_BUFF-1:0]	Wno;
-	logic	[WIDTH_BUFF-1:0]	Rno;
+	logic	[WIDTH_BUFF-1:0]	WNo;
+	logic	[WIDTH_BUFF-1:0]	RNo;
 	logic						Full;
 	logic						Empty;
 

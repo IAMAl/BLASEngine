@@ -35,7 +35,7 @@ module TPU
 	input	v_grant_t			I_V_Ld_Grant,			//Flag: Grant
 	input	v_ready_t			I_V_St_Ready,			//Flag: Ready
 	input	v_grant_t			I_V_St_Grant,			//Flag: Grant
-	input	v_ready_t			I_V_End_Access,			//Flag: End of Access
+	input	v_2b_t				I_V_End_Access,			//Flag: End of Access
 	output	mpu_issue_no_t		O_IssueNo,				//Thread's Issue No
 	output						O_Term,					//Flag: Termination
 	output						O_Nack					//Flag: Not-Acknowledge
@@ -64,8 +64,8 @@ module TPU
 	state_t						S_Status;
 
 	command_t					V_Command;
-	lane_t						En_Lane;
-	lane_t						V_Status;
+	v_ready_t					En_Lane;
+	v_ready_t					V_Status;
 
 	logic						Commmit_Req_V;
 

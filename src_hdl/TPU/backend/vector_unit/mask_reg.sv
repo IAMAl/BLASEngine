@@ -19,7 +19,7 @@ module MaskReg
 	input						I_We,					//Write-Enable the Mask Register
 	input						I_Set_One,				//Set All One
 	input	index_t				I_Index,				//Mask-Bit Address (Index)
-	input	cond_t				I_Cond,					//Condition to Gnerate Flag
+	input						I_Cond,					//Condition to Gnerate Flag
 	input	state_t				I_Status,				//Status of Comparing
 	input						I_Re,					//Read-Enable
 	output	mask_t				O_Mask_Data				//Mask Data
@@ -51,7 +51,7 @@ module MaskReg
 			Mask			<= '0;
 		end
 		else if ( I_We & Ready ) begin
-			Mask[ I_Index ]	<= I_Status[ I_Cond ];
+			Mask[ I_Index ]	<= I_Cond;//I_Status[ I_Cond ];
 		end
 		else if ( I_Set_One ) begin
 			Mask			<= -1;

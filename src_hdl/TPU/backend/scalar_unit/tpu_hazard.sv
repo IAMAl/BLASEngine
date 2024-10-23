@@ -24,7 +24,7 @@ module HazardCheck_TPU
 	input						I_Commit_Req,					//Request to Commit
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,					//Commit (Issued) No.
 	output						O_Req_Issue,					//Request to Next Stage
-	output						O_Instr,						//Issue Instruction
+	output	instr_t				O_Instr,						//Issue Instruction
 	output						O_RAR_Hazard,					//RAR-Hazard
 	output						O_RAW_Hazard,					//RAW-Hazard
 	output						O_WAR_Hazard,					//WAR-Hazard
@@ -117,7 +117,8 @@ module HazardCheck_TPU
 
 	assign O_Req_Issue			= R_Req;
 
-	assign O_Instr				= TabHazard[ RNo ].instr;
+	assign O_Instr.v			= R_Req;
+	assign O_Instr.instr		= TabHazard[ RNo ].instr;
 
 	assign O_RAR_Hazard			= R_RAR_Hazard;
 	assign O_RAW_Hazard			= R_RAW_Hazard_Src1 | R_RAW_Hazard_Src2 | R_RAW_Hazard_Src3;

@@ -15,7 +15,7 @@ module Vector_Unit
 (
 	input						clock,
 	input						reset,
-	input	lane_t				I_En_Lane,				//Enable to Execution on Lane
+	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	command_t			I_Command,				//Comamnd to Execute
 	input	data_t				I_Scalar_Data,			//Scalar Data
@@ -27,9 +27,9 @@ module Vector_Unit
 	input	v_grant_t			I_Ld_Grant,				//Flag: Grant
 	input	v_ready_t			I_St_Ready,				//Flag: Ready
 	input	v_grant_t			I_St_Grant,				//Flag: Grant
-	input	v_ready_t			I_End_Access,			//Flag: End of Access
+	input	v_2b_t				I_End_Access,			//Flag: End of Access
 	output						O_Commmit_Req,			//Commit Request
-	output	lane_t				O_Status				//Status on Lane
+	output	v_ready_t			O_Status				//Status on Lane
 );
 
 

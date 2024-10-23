@@ -36,7 +36,7 @@ module Scalar_Unit
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
-	output	lane_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
+	output	v_ready_t			O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
 	output	state_t				O_Status,				//Scalar Unit Status
 	output						O_Term					//Flag: Termination
 );
@@ -138,7 +138,6 @@ module Scalar_Unit
 	logic						Bypass_Buff_Full;
 
 
-	logic						Dst_Sel;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
@@ -432,10 +431,10 @@ module Scalar_Unit
 
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.dst.idx :	'0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.dst.idx :	'0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 			'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 			'0;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? Dst_RegFile_Index :	'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? Dst_RegFile_Index :	'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 				'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 				'0;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
 
@@ -475,8 +474,9 @@ module Scalar_Unit
 
 
 	//// Lane-Enable
-	assign Lane_Enable			= V_State[NUM_LANES*2-1:NUM_LANES];
-	assign O_Lane_En			= Lane_Enable;
+	assign O_Lane_En			= V_State[NUM_LANES*2-1:NUM_LANES];
+
+	assign Lane_Enable			= I_En;
 
 
 	//// Stall-Control
@@ -516,7 +516,7 @@ module Scalar_Unit
 		.I_Timing_WB(		WB_IssueNo				),
 		.I_State(			Status					),
 		.I_Cond(			Condition				),
-		.I_Src(				PAC_Src_Data			),
+		.I_Src(				PAC_Src_Data[9:0]		),
 		.O_IFetch(			Req_IFetch				),
 		.O_Address(			PC						),
 		.O_StallReq(		PAC_Wait				)
@@ -597,13 +597,13 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
-		.I_En_II(			0						),
+		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
 		.I_Index(			Dst_Index				),
 		.I_Window(			Dst_Index_Window		),
 		.I_Length(			Dst_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
-		.I_Constant(		Constant				),
+		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Dst_RegFile_Index		),
@@ -620,13 +620,13 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src1.v		),
-		.I_En_II(			0						),
+		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
 		.I_Index(			PipeReg_Idx.src1		),
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
-		.I_Constant(		Constant				),
+		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src1				),
@@ -649,7 +649,7 @@ module Scalar_Unit
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
-		.I_Constant(		Constant				),
+		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src2				),
@@ -672,7 +672,7 @@ module Scalar_Unit
 		.I_Window(			IDec_Index_Window		),
 		.I_Length(			IDec_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
-		.I_Constant(		Constant				),
+		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src3				),
@@ -828,6 +828,8 @@ module Scalar_Unit
 
 	//// Network Stage
 	Network_S Network_S (
+		.clock(				clock					),
+		.reset(				reset					),
 		.I_Stall(			Stall_Network			),
 		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
@@ -836,9 +838,9 @@ module Scalar_Unit
 		.I_Sel_ALU_Src2(	PipeReg_RR_Net.src2.v	),
 		.I_Sel_ALU_Src3(	PipeReg_RR_Net.src3.v	),
 		.I_Slice_Len(		PipeReg_RR_Net.slice_len),
-		.I_Src_Data1(	PipeReg_RR_Net.src1.data	),
-		.I_Src_Data2(	PipeReg_RR_Net.src2.data	),
-		.I_Src_Data3(	PipeReg_RR_Net.src3.data	),
+		.I_Src_Data1(		PipeReg_RR_Net.src1.data),
+		.I_Src_Data2(		PipeReg_RR_Net.src2.data),
+		.I_Src_Data3(		PipeReg_RR_Net.src3.data),
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),

@@ -35,7 +35,7 @@ module SkipCTRL
 	index_t						NLZ_Value;
 
 	logic						R_Req;
-	logic	[NUM_ENTRY_REGFILE-1:0]	R_Mask;
+	mask_t						R_Mask;
 
 
 	assign Run					= I_Req;
@@ -72,7 +72,7 @@ module SkipCTRL
 	end
 
 
-	NLZ32 NLZ_Index
+	NLZ64 NLZ_Index
 	(
 		.I_Data(			R_Mask					),
 		.O_Num(				NLZ_Value				),
