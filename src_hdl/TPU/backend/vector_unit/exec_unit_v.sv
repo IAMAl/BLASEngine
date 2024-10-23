@@ -80,6 +80,7 @@ module ExecUnit_V
 
 	logic						We;
 	logic						Re;
+	TYPE						Mv_Token;
 	data_t						Mv_Data;
 
 	logic						RegMoveOp;
@@ -100,21 +101,21 @@ module ExecUnit_V
 	assign PMov0				= PMov & ( I_Command.instr.src1.idx == '0 );
 	assign PMov1				= PMov & ( I_Command.instr.src1.idx == '1 );
 
-	assign is_Adder				= I_En & ( I_Token.op.OpClass == 2'b00 );
-	assign is_Mlter				= I_En & ( I_Token.op.OpClass == 2'b01 );
+	assign is_Adder				= I_En & ( I_Command.instr.op.OpClass == 2'b00 );
+	assign is_Mlter				= I_En & ( I_Command.instr.op.OpClass == 2'b01 );
 
-	assign MAU_Token.v			= I_Command.v;
-	assign MAU_Token.op.OPType	= I_Command.op.OPType;
-	assign MAU_Token.op.OPClass	= ( PMov0 ) ?	2'b01 :
+	assign MAU_Token.v			= is_Adder | is_Mlter;
+	assign MAU_Token.op.OpType	= I_Command.instr.op.OpType;
+	assign MAU_Token.op.OpClass	= ( PMov0 ) ?	2'b01 :
 									( PMov1 ) ?	2'b00 :
-												I_Command.op.OPClass;
-	assign MAU_Token.op.OPCode	= ( PMov0 ) ?	2'b00 :
+												I_Command.instr.op.OpClass;
+	assign MAU_Token.op.OpCode	= ( PMov0 ) ?	2'b00 :
 									( PMov1 ) ?	2'b00 :
-												I_Command.op.OPCode;
-	assign MAU_Token.dst		= I_Command.dst;
-	assign MAU_Token.slice_len	= I_Command.slice_len;
+												I_Command.instr.op.OpCode;
+	assign MAU_Token.dst		= I_Command.instr.dst;
+	assign MAU_Token.slice_len	= I_Command.instr.slice_len;
 	assign MAU_Token.issue_no	= I_Command.issue_no;
-	assign MAU_Token.path		= I_Command.path;
+	assign MAU_Token.path		= I_Command.instr.path;
 
 	assign Src_Data2			= ( PMov0 ) ?	32'h78000000 :
 									( PMov1 ) ? 32'h00000000 :

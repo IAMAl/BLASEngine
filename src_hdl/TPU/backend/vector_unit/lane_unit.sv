@@ -311,28 +311,28 @@ import pkg_mpu::*;
 
 	assign Req_Index_Dst		= is_WB_RF & WB_Token.v;
 
-	assign Dst_Sel				= WB_Token.dst_sel.unit_no;
-	assign Dst_Slice			= WB_Token.slice;
-	assign Dst_Index			= WB_Token.idx;
-	assign Dst_Index_Window		= WB_Token.window;
-	assign Dst_Index_Length		= WB_Token.slice_len;
+	assign Dst_Sel				= WB_Token.dst.dst_sel.unit_no;
+	assign Dst_Slice			= WB_Token.dst.slice;
+	assign Dst_Index			= WB_Token.dst.idx;
+	assign Dst_Index_Window		= WB_Token.dst.window;
+	assign Dst_Index_Length		= WB_Token.dst.slice_len;
 
 
 	//	Write-Back Target Decision
-	assign is_WB_RF				= WB_Token.dst_sel == 2'h1;
-	assign is_WB_BR				= WB_Token.dst_sel == 2'h2;
-	assign is_WB_VU				= WB_Token.dst_sel == 2'h3;
+	assign is_WB_RF				= WB_Token.dst.dst_sel == 2'h1;
+	assign is_WB_BR				= WB_Token.dst.dst_sel == 2'h2;
+	assign is_WB_VU				= WB_Token.dst.dst_sel == 2'h3;
 
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst & ~We_c;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst & ~We_c;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.idx :	'0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.idx :	'0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :	'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? W_WB_Data :	'0;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.dst.idx :	'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.dst.idx :	'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? W_WB_Data :		'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? W_WB_Data :		'0;
 
-	assign We_c					= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b00 ) &
-									( WB_Token.instr.op.OpClass == 2'b11 ) &
-									( WB_Token.instr.op.OpCode == 2'b11 );
+	assign We_c					= WB_Token.v & ( WB_Token.op.OpType == 2'b00 ) &
+									( WB_Token.op.OpClass == 2'b11 ) &
+									( WB_Token.op.OpCode == 2'b11 );
 
 	assign Config_Path_W		= WB_Token.path;
 
@@ -349,13 +349,13 @@ import pkg_mpu::*;
 
 
 	//// Reg Move
-	assign RegMov_Rd			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
-									( PipeReg_Idx.op.OPClass == 2'b11 ) &
-									( PipeReg_Idx.op.OPCode == 2'b10 );
+	assign RegMov_Rd			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.op.OpCode == 2'b10 );
 
-	assign RegMov_Wt			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
-									( PipeReg_Idx.op.OPClass == 2'b11 ) &
-									( PipeReg_Idx.op.OPCode == 2'b11 );
+	assign RegMov_Wt			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.op.OpCode == 2'b11 );
 
 
 	assign Cond_Data			= ( is_WB_BR ) ? W_WB_Data : '0;
@@ -636,7 +636,7 @@ import pkg_mpu::*;
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
-		.I_WB_Index(		WB_Token.idx			),
+		.I_WB_Index(		WB_Token.dst.idx		),
 		.I_WB_Data(			WB_Data					),
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
