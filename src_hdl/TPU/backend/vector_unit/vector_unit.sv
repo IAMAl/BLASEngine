@@ -57,7 +57,7 @@ module Vector_Unit
 		(
 			.clock(				clock					),
 			.reset(				reset					),
-			.I_En(				I_En_Lane[ i ]			),
+			.I_En_Lane(			I_En_Lane[ i ]			),
 			.I_ThreadID(		I_ThreadID				),
 			.I_Command(			I_Command				),
 			.I_Scalar_Data(		I_Scalar_Data			),

@@ -32,8 +32,7 @@ module Scalar_Unit
 	input	[1:0]				I_Ld_Grant,				//Flag: Grant
 	input	[1:0]				I_St_Ready,				//Flag: Ready
 	input	[1:0]				I_St_Grant,				//Flag: Grant
-	input						I_End_Access1,			//Flag: End of Access
-	input						I_End_Access2,			//Flag: End of Access
+	input	[1:0]				I_End_Access,			//Flag: End of Access
 	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
@@ -227,6 +226,7 @@ module Scalar_Unit
 	issue_no_t					Commit_No;
 
 
+	logic						Lane_Enable;
 	logic						Lane_We;
 	logic						Lane_Re;
 	data_t						Lane_Data;
@@ -280,7 +280,7 @@ module Scalar_Unit
 	assign PipeReg_Idx.path			= S_Command.instr.path;
 
 	// Masked Reading from RF
-	assign MaskedRead				= S_Command.mread;
+	assign MaskedRead				= S_Command.instr.mread;
 
 
 	//// Index Update Stage
@@ -334,10 +334,10 @@ module Scalar_Unit
 	//	Read-Enable
 	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
 										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~R_Re_c;
+										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
 	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
 										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~R_Re_c;
+										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
 
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
@@ -420,28 +420,28 @@ module Scalar_Unit
 
 	assign Req_Index_Dst		= is_WB_RF & WB_Token.v;
 
-	assign Dst_Sel				= WB_Token.dst_sel.unit_no;
-	assign Dst_Slice			= WB_Token.slice;
-	assign Dst_Index			= WB_Token;
-	assign Dst_Index_Window		= WB_Token.window;
-	assign Dst_Index_Length		= WB_Token.slice_len;
+	assign Dst_Sel				= WB_Token.dst.dst_sel.unit_no;
+	assign Dst_Slice			= WB_Token.dst.slice;
+	assign Dst_Index			= WB_Token.dst.idx;
+	assign Dst_Index_Window		= WB_Token.dst.window;
+	assign Dst_Index_Length		= WB_Token.dst.slice_len;
 
-	assign is_WB_RF				= WB_Token.dst_sel.no == 2'h1;
-	assign is_WB_BR				= WB_Token.dst_sel.no == 2'h2;
-	assign is_WB_VU				= WB_Token.dst_sel.no == 2'h3;
+	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
+	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
+	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
 
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.idx :	'0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.idx :	'0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 		'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 		'0;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? WB_Token.dst.idx :	'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? WB_Token.dst.idx :	'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 			'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 			'0;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
 
-	assign We_c					= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b00 ) &
-									( WB_Token.instr.op.OpClass == 2'b11 ) &
-									( WB_Token.instr.op.OpCode == 2'b11 );
+	assign We_c					= WB_Token.v & ( WB_Token.op.OpType == 2'b00 ) &
+									( WB_Token.op.OpClass == 2'b11 ) &
+									( WB_Token.op.OpCode == 2'b11 );
 
 	//	Write-Back to Cond Register
 	assign WB_En				= WB_Token.v & is_WB_BR;
@@ -456,13 +456,13 @@ module Scalar_Unit
 
 
 	//// Reg Move
-	assign RegMov_Rd			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
-									( PipeReg_Idx.op.OPClass == 2'b11 ) &
-									( PipeReg_Idx.op.OPCode == 2'b10 );
+	assign RegMov_Rd			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.op.OpCode == 2'b10 );
 
-	assign RegMov_Wt			= ( PipeReg_Idx.op.OPType == 2'b00 ) &
-									( PipeReg_Idx.op.OPClass == 2'b11 ) &
-									( PipeReg_Idx.op.OPCode == 2'b11 );
+	assign RegMov_Wt			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.op.OpCode == 2'b11 );
 
 
 	//// Commit
@@ -475,7 +475,8 @@ module Scalar_Unit
 
 
 	//// Lane-Enable
-	assign O_Lane_En			= V_State[NUM_LANES*2-1:NUM_LANES];
+	assign Lane_Enable			= V_State[NUM_LANES*2-1:NUM_LANES];
+	assign O_Lane_En			= Lane_Enable;
 
 
 	//// Stall-Control
@@ -484,9 +485,9 @@ module Scalar_Unit
 
 
 	//// End of Execution
-	assign O_Term				= WB_Token.v & ( WB_Token.instr.op.OpType == 2'b01 ) &
-									( WB_Token.instr.op.OpClass == 2'b01 ) &
-									( WB_Token.instr.op.OpCode == 2'b11 );
+	assign O_Term				= WB_Token.v & ( WB_Token.op.OpType == 2'b01 ) &
+									( WB_Token.op.OpClass == 2'b01 ) &
+									( WB_Token.op.OpCode == 2'b11 );
 
 
 	//// Stall Control
@@ -718,9 +719,9 @@ module Scalar_Unit
 		.O_Re_c(			Re_c					),
 		.I_Data(			W_WB_Data				),
 		.O_Data(			R_Scalar_Data			),
-		.I_SWe(				),//ToDo
+		.I_SWe(				0						),//ToDo
 		.I_Scalar_Data(		I_Scalar_Data			),
-		.O_Scalar_Data(		O_Scalar_Data			),
+		.O_Scalar_Data(		O_Scalar_Data			)
 	);
 
 
@@ -882,11 +883,11 @@ module Scalar_Unit
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),
 		.I_St_Grant(		I_St_Grant				),
-		.I_End_Access1(		I_End_Access1			),
-		.I_End_Access2(		I_End_Access2			),
+		.I_End_Access1(		I_End_Access[0]			),
+		.I_End_Access2(		I_End_Access[1]			),
 		.I_Re_p0(			Re_p0					),
 		.I_Re_p1(			Re_p1					),
-		.O_WB_Dst(			WB_Token				),
+		.O_WB_Token(		WB_Token				),
 		.O_WB_Data(			WB_Data					),
 		.O_WB_IssueNo(		WB_IssueNo				),
 		.O_Math_Done(		Math_Done				),
@@ -931,7 +932,7 @@ module Scalar_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_En_Lane(			O_Lane_En				),
+		.I_En_Lane(			Lane_Enable				),
 		.I_Store(			Store_V					),
 		.I_Issue_No(		IW_IssueNo				),
 		.I_Commit_Req(		I_Commit_Req_V			),

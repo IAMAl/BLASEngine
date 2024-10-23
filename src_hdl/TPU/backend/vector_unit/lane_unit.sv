@@ -10,7 +10,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Lane_Unit
-	import pkg_tpu::*;
+import pkg_tpu::*;
+import pkg_tpu::instr_t;
+import pkg_mpu::*;
 #(
 	parameter int NUM_LANES		= 16,
 	parameter int WIDTH_LANES	= $clog2(NUM_LANES),
@@ -18,7 +20,7 @@ module Lane_Unit
 )(
 	input						clock,
 	input						reset,
-	input						I_Lane_En,				//Enable Execution
+	input						I_En_Lane,				//Enable Execution
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	instr_t				I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
@@ -40,8 +42,8 @@ module Lane_Unit
 	output	data_t				O_Lane_Data_Src2,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_Src3,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_WB,			//Inter-Lane Connect
-	output						O_Status				//Lane Status
-	output						O_Commit,				//Commit Request
+	output						O_Status,				//Lane Status
+	output						O_Commit				//Commit Request
 );
 
 
@@ -93,7 +95,6 @@ module Lane_Unit
 
 
 
-	logic						Dst_Sel;
 	logic						is_WB_RF;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
@@ -158,7 +159,7 @@ module Lane_Unit
 	Lane_En_V Lane_En_V (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_En(				I_Lane_En				),
+		.I_En(				I_En_Lane				),
 		.I_Rst(				Lane_CTRL_Rst			),
 		.I_Set(				Lane_CTRL_Set			),
 		.I_Index(			Dst_Index				),
@@ -475,8 +476,7 @@ module Lane_Unit
 		.O_Index_Src1(		PipeReg_IdxRF.src1		),
 		.O_Index_Src2(		PipeReg_IdxRF.src2		),
 		.O_Index_Src3(		PipeReg_IdxRF.src3		),
-		.O_Index_Src4(		PipeReg_IdxRF.src4		),
-		.O_Done(									)
+		.O_Index_Src4(		PipeReg_IdxRF.src4		)
 	);
 
 	//	Pipeline Register
@@ -484,7 +484,7 @@ module Lane_Unit
 		if ( reset ) begin
 			PipeReg_IdxRR	<= '0;
 		end
-		else if ( I_Lane_En ) begin
+		else if ( I_En_Lane ) begin
 			PipeReg_IdxRR	<= PipeReg_IdxRF;
 		end
 	end
@@ -504,9 +504,9 @@ module Lane_Unit
 		.O_Re_c(			Re_c					),
 		.I_Data(			W_WB_Data				),
 		.O_Data(			R_Scalar_Data			),
-		.I_SWe(				),//ToDo
+		.I_SWe(				0						),//ToDo
 		.I_Scalar_Data(		I_Scalar_Data			),
-		.O_Scalar_Data(		O_Scalar_Data			),
+		.O_Scalar_Data(		O_Scalar_Data			)
 	);
 
 
@@ -522,7 +522,7 @@ module Lane_Unit
 
 	logic					R_Re_c;
 	logic					We_c;
-	always_ff @( poedge clock ) begin
+	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Re_c			<= 1'b0;
 		end
@@ -692,7 +692,7 @@ module Lane_Unit
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
 		.O_Ld_Stall(		Ld_Stall				),
-		.O_St_Stall(		ST_Stall				),
+		.O_St_Stall(		St_Stall				),
 		.O_Lane_En(			En						)
 	);
 

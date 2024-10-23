@@ -22,7 +22,6 @@ module BLASEngine
 	input						reset,
 	input						I_Req_IF,				//Request from External
 	input	mpu_if_t			I_Data_IF,				//Data from External
-	output						O_Req_IF,				//Request to External
 	output	mpu_if_t			O_Data_IF,				//Data to External
 	output	mpu_stat_t			O_Status,				//System Status
 	output						O_Wait					//Flag: Wait for Thread Program
@@ -117,7 +116,6 @@ module BLASEngine
 		.reset(				reset					),
 		.I_Req_IF(			I_Req_IF				),
 		.I_Data_IF(			I_Data_IF				),
-		.O_Req_IF(			O_Req_IF				),
 		.O_Data_IF(			O_Data_IF				),
 		.O_Req(				Issue_Req				),
 		.O_Instr(			Issue_Instr				),

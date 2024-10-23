@@ -9,8 +9,11 @@
 //	Module Name:	AuxRegs
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module AuxRegs #(
-	import	LANE_ID				= 0
+module AuxRegs
+import pkg_tpu::*;
+import pkg_mpu::*;
+#(
+	parameter int LANE_ID		= 0
 )(
 	input						clock,
 	input						reset,
@@ -27,11 +30,9 @@ module AuxRegs #(
 	output	data_t				O_Data,					//Data too Register-Read path
 	input						I_SWe,					//Write-Enable for Scalar Data
 	input	data_t				I_Scalar_Data,			//Write into Scalar Data
-	output	data_t				O_Scalar_Data,			//Read from Scalar Data
+	output	data_t				O_Scalar_Data			//Read from Scalar Data
 );
 
-
-	data_t						Constant[1:0];
 
 	logic						RegMove_Rd;
 	logic						RegMove_Wt;
@@ -42,35 +43,35 @@ module AuxRegs #(
 	logic						Re_s;
 	logic						We_s;
 
+	data_t						SData_W;
+	data_t						SData_R;
 
-	data_t						SData;
 
+	assign RegMove_Rd			= I_Re & ( I_Src_Command.op.OpType == 2'b00 ) &
+									( I_Src_Command.op.OpClass == 2'b11 ) &
+									( I_Src_Command.op.OpCode == 2'b10 );
 
-	assign RegMove_Rd			= I_Re & ( I_Src_Command.instr.op.OpType == 2'b00 ) &
-									( I_Src_Command.instr.op.OpClass == 2'b11 ) &
-									( I_Src_Command.instr.op.OpCode == 2'b10 );
-
-	assign RegMove_Wt			= I_We & ( I_Src_Command.instr.op.OpType == 2'b00 ) &
-									( I_Src_Command.instr.op.OpClass == 2'b11 ) &
-									( I_Src_Command.instr.op.OpCode == 2'b11 );
+	assign RegMove_Wt			= I_We & ( I_Src_Command.op.OpType == 2'b00 ) &
+									( I_Src_Command.op.OpClass == 2'b11 ) &
+									( I_Src_Command.op.OpCode == 2'b11 );
 
 	assign O_Re_p0				= RegMove_Rd & I_Src_Command.src1.v & ( I_Src_Command.src1.idx == 0 );
-	assign O_Re_p1				= RegMove_Rd & I_Src_Command.src1.v & ( I_Src_Command.scr1.idx == 1 );
+	assign O_Re_p1				= RegMove_Rd & I_Src_Command.src1.v & ( I_Src_Command.src1.idx == 1 );
 
-	assign We_c					= RegMove_Wt & ~( O_We_p0 | O_We_p1 );
+	assign We_c					= RegMove_Wt;
 	assign Re_c					= RegMove_Rd & ~( O_Re_p0 | O_Re_p1 );
 	assign O_Re_c				= Re_c;
 
 
-	assign We_s					= I_We & ( I_Src_Command.instr.op.OpType == 2'b00 ) &
-									( I_Src_Command.instr.op.OpClass == 2'b11 ) &
-									( I_Src_Command.instr.op.OpCode == 2'b11 )  &
-									( I_Src_Command.scr1.idx == 8 );
+	assign We_s					= I_We & ( I_Src_Command.op.OpType == 2'b00 ) &
+									( I_Src_Command.op.OpClass == 2'b11 ) &
+									( I_Src_Command.op.OpCode == 2'b11 )  &
+									( I_Src_Command.src1.idx == 8 );
 
-	assign Re_s					= I_We & ( I_Src_Command.instr.op.OpType == 2'b00 ) &
-									( I_Src_Command.instr.op.OpClass == 2'b11 ) &
-									( I_Src_Command.instr.op.OpCode == 2'b10 )  &
-									( I_Src_Command.scr1.idx == 8 );
+	assign Re_s					= I_We & ( I_Src_Command.op.OpType == 2'b00 ) &
+									( I_Src_Command.op.OpClass == 2'b11 ) &
+									( I_Src_Command.op.OpCode == 2'b10 )  &
+									( I_Src_Command.src1.idx == 8 );
 
 
 	assign O_Data				= ( Re_s ) ? SData_R : '0;

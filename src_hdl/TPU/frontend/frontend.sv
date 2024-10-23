@@ -50,6 +50,7 @@ module FrontEnd
 
 	fsm_frontend_t				R_FSM_TPU_FrontEnd;
 
+	mpu_issue_no_t				IssueNo;
 	mpu_issue_no_t				R_IssueNo;
 	instr_t						R_Instr;
 	id_t						R_ThreadID;

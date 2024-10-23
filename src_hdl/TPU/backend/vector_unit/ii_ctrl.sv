@@ -38,7 +38,7 @@ module IICtrl
 		if ( reset ) begin
 			Run_II		<= 1'b0;
 		end
-		else ( I_Clr_II ) begin
+		else if ( I_Clr_II ) begin
 			Run_II		<= 1'b0;
 		end
 		else if ( I_En_II ) begin
@@ -51,10 +51,10 @@ module IICtrl
 			Count		<= '0;
 		end
 		else if ( I_Clr_II ) begin
-			ount		<= '0;
+			Count		<= '0;
 		end
-		else ( ~I_Stall & ( Run_II | I_En_II ) ) begin
-			Count		<= Count + 1
+		else if ( ~I_Stall & ( Run_II | I_En_II ) ) begin
+			Count		<= Count + 1;
 		end
 	end
 

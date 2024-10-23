@@ -35,8 +35,8 @@ module ExecUnit_S
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
-	input						I_Re_p0,
-	input						I_Re_p1,
+	input						I_Re_p0,				//Read-Enable for Pipeline Register
+	input						I_Re_p1,				//Read-Enable for Pipeline Register
 	output	index_t				O_WB_Token,				//Write-Back Index
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output	TYPE				O_WB_IssueNo,			//Issue (Commit) No
@@ -70,15 +70,16 @@ module ExecUnit_S
 	logic						Ld_Stall_Evn;
 
 	logic						St_Stall_Odd;
-	logic						St_Stall
+	logic						St_Stall_Evn;
 
 	logic						We;
 	logic						Re;
+	TYPE						Mv_Token;
 	data_t						Mv_Data;
 
 
-	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
-	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
+	assign We					= RegMove & ( ( LifeALU != '0 ) | ( LifeLdSt != '0 ) );
+	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeALU );
 	assign RegMove				= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) &
 										( I_Command.instr.op.OpClass == 2'b11 ) &
 										( |I_Command.instr.op.OpCode );
@@ -116,7 +117,7 @@ module ExecUnit_S
 
 
 	assign O_Ld_Stall			= Ld_Stall_Odd | Ld_Stall_Evn;
-	assign O_St_Stall			= St_Stall_Odd | ST_Stall_Evn;
+	assign O_St_Stall			= St_Stall_Odd | St_Stall_Evn;
 
 
 	ALU #(
@@ -161,7 +162,7 @@ module ExecUnit_S
 		.O_Token(			Ld_Token[1]				),
 		.O_WB_Data(			Ld_Data[1]				),
 		.O_Ld_Stall(		Ld_Stall_Odd			),
-		.O_ST_Stall(		St_Stall_Odd			),
+		.O_St_Stall(		St_Stall_Odd			),
 		.O_LdSt_Done(		O_LdSt_Done2			)
 	);
 
@@ -187,7 +188,7 @@ module ExecUnit_S
 		.O_Token(			Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
 		.O_Ld_Stall(		Ld_Stall_Evn			),
-		.O_ST_Stall(		St_Stall_Evn			),
+		.O_St_Stall(		St_Stall_Evn			),
 		.O_LdSt_Done(		O_LdSt_Done1			)
 	);
 
@@ -195,7 +196,7 @@ module ExecUnit_S
 	RingBuff #(
 		.NUM_ENTRY(			8						),
 		.TYPE(				TYPE					)
-	) RegMoveBuff (
+	) RegMoveTokenBuff (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_We(				We						),
@@ -210,7 +211,8 @@ module ExecUnit_S
 	RingBuff #(
 		.NUM_ENTRY(			8						),
 		.TYPE(				data_t					)
-	) RegMoveBuff (
+	) RegMoveDataBuff
+	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_We(				We						),

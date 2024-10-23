@@ -34,8 +34,8 @@ module RegFile
 	data_t						R_Data_Src2;
 
 
-	assign Re1					= I_Req & I_Index_Src1.v & ( I_Index_Src1.no == 2'h1 );
-	assign Re2					= I_Req & I_Index_Src2.v & ( I_Index_Src2.no == 2'h1 );
+	assign Re1					= I_Req & I_Index_Src1.v & ( I_Index_Src1.src_sel.no == 2'h1 );
+	assign Re2					= I_Req & I_Index_Src2.v & ( I_Index_Src2.src_sel.no == 2'h1 );
 
 	assign O_Data_Src1			= Data_Src1;
 

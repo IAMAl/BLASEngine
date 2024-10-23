@@ -19,7 +19,6 @@ module IF_MPU
 	input						reset,
 	input						I_Req_IF,				//Request from External
 	input	mpu_if_t			I_Data_IF,				//Data from External
-	output						O_Req_IF,				//Request to External
 	output	mpu_if_t			O_Data_IF,				//Data to External
 	input						I_Ack_Dispatch,			//Ack from Dispatcher
 	input						I_Ack_MapMan,			//Ack from Map Manager
@@ -73,7 +72,6 @@ module IF_MPU
 	assign O_St_Instr			=	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) & I_Data_IF.v;
 	assign O_Instr				= 	  ( R_FSM_IF_MPU == FSM_ST_CAPTURE_ID_IF_MPU ) ? I_Data_IF.data :	'0;
 
-	assign O_Req_IF				= ;//ToDo
 	assign O_Data_IF.v			= 	  ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Req;
 	assign O_Data_IF.data		= 	( ( R_FSM_IF_MPU == FSM_LD_DATA_IF_MPU ) & I_Req ) ?	I_Data : '0;
 

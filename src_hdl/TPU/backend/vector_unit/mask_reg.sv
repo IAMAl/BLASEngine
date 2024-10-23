@@ -17,7 +17,7 @@ module MaskReg
 	input						I_Ready,				//Ready to Set
 	input						I_Term,					//Termination of Compare
 	input						I_We,					//Write-Enable the Mask Register
-	input						I_Set_One				//Set All One
+	input						I_Set_One,				//Set All One
 	input	index_t				I_Index,				//Mask-Bit Address (Index)
 	input	cond_t				I_Cond,					//Condition to Gnerate Flag
 	input	state_t				I_Status,				//Status of Comparing

@@ -31,7 +31,8 @@ module token_pipe_ldst
 	input	TYPE				I_Token,				//Input Token
 	output	TYPE				O_Token,				//Output Token
 	output						O_Stall,				//Stall Request
-	output						O_Empty					//Flag: Empty in Buffer
+	output						O_Empty,				//Flag: Empty in Buffer
+	output						O_Full					//Flag: Full in Buffer
 );
 
 
@@ -58,6 +59,7 @@ module token_pipe_ldst
 
 	assign O_Token				= BuffToken[ RPtr ];
 	assign O_Stall				= Full;
+	assign O_Full				= Full;
 	assign O_Empty				= Empty;
 
 

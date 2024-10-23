@@ -15,7 +15,7 @@ module Stall_Ctrl (
 	input						I_Slice,				//Slicing is Used
 	input						I_Bypass_Buff_Full,		//Buffer-Full in Network
 	input						I_Ld_Stall,				//Stall for Loading
-	input						I_St_Stall				//Stall for Storing
+	input						I_St_Stall,				//Stall for Storing
 	output						O_Stall_IF,				//Stall to Fetch instruction
 	output						O_Stall_IW_St,			//Stall to Store in instruction window
 	output						O_Stall_IW_Ld,			//Stall to Load from instruction window

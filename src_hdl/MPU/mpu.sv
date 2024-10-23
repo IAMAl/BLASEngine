@@ -18,7 +18,6 @@ module MPU
 	input							reset,
 	input							I_Req_IF,			//Request from External
 	input	mpu_if_t				I_Data_IF,			//Data from External
-	input							O_Req_IF,			//Request to External
 	output	mpu_if_t				O_Data_IF,			//Data to External
 	output							O_Req,				//Issue Request
 	output	instr_t					O_Instr,			//Instruction Stream to TPU
@@ -91,7 +90,6 @@ module MPU
 		.reset(				reset					),
 		.I_Req_IF(			I_Req_IF				),
 		.I_Data_IF(			I_Data_IF				),
-		.O_Req_IF(			O_Req_IF				),
 		.O_Data_IF(			O_Data_IF				),
 		.I_Ack_Dispatch(	End_Send_Thread			),
 		.I_Ack_MapMan(		Ack_St					),

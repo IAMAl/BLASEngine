@@ -130,10 +130,10 @@ module HazardCheck_TPU
 
 
 	//// Forming Indeces for Mixing Scalar and Vector Units
-	assign Index_Dst			= { I_is_Vec, I_Instr.dst.no,  I_Instr.dst.idx };
-	assign Index_Src1			= { I_is_Vec, I_Instr.src1.no, I_Instr.src1.idx };
-	assign Index_Src2			= { I_is_Vec, I_Instr.src1.no, I_Instr.src2.idx };
-	assign Index_Src3			= { I_is_Vec, I_Instr.src1.no, I_Instr.src3.idx };
+	assign Index_Dst			= { I_is_Vec, I_Instr.dst.dst_sel.no,  I_Instr.dst.idx };
+	assign Index_Src1			= { I_is_Vec, I_Instr.src1.src_sel.no, I_Instr.src1.idx };
+	assign Index_Src2			= { I_is_Vec, I_Instr.src1.src_sel.no, I_Instr.src2.idx };
+	assign Index_Src3			= { I_is_Vec, I_Instr.src1.src_sel.no, I_Instr.src3.idx };
 
 
 	//// Storing to Table

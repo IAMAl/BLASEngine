@@ -260,6 +260,7 @@ package pkg_tpu;
 		issue_no_t						issue_no;
 		logic	[16:0]					path;
 		logic							mread;
+		logic							en_ii;
 	} pipe_index_t;
 
 	typedef struct packed {

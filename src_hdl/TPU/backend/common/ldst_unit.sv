@@ -64,7 +64,7 @@ module ldst_unit
 
 	assign O_Token				= ( Term ) ? Token : '0;
 
-	assign O_Stall				= Full | Full_Buff ( Run & ~Ready );
+	assign O_Stall				= Full | ( Full_Buff & ( Run & ~Ready ) );
 
 
 	always_ff @( posedge clock ) begin
@@ -81,7 +81,7 @@ module ldst_unit
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Ready	<= 1'b0
+			Ready	<= 1'b0;
 		end
 		begin
 			Ready	<= I_Ready;
