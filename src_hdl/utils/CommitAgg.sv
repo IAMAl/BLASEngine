@@ -18,7 +18,7 @@ module CommitAgg
 )(
 	input						clock,
 	input						reset,
-	input	[NUM_TPU-1:0]		I_En_TPU,
+	input	[NUM_TPU-1:0]		I_En_TPU,				//Enable to Execute on TPU
 	input						I_Req,					//Issue Request
 	input	mpu_issue_no_t		I_Issue_No,				//Issue Number
 	input	tpu_row_clm_t		I_Commit_Req,			//Commit Request

@@ -45,7 +45,7 @@ module IFetch
 	// Reqd-Enable to Instruction Buffer
 	assign O_Re_Buff			= ~R_Empty;
 
-
+	// Delayed to Retime
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Req_D1		<= 1'b0;
@@ -55,6 +55,7 @@ module IFetch
 		end
 	end
 
+	// Capturing Request
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Req			<= 1'b0;
@@ -64,6 +65,7 @@ module IFetch
 		end
 	end
 
+	// Capturing State of Insgtruction Memory
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Empty			<= 1'b0;
@@ -94,6 +96,7 @@ module IFetch
 		end
 	end
 
+	// Instruction Register
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Instr			<= '0;

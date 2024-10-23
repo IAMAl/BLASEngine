@@ -22,7 +22,7 @@ module Network_V
 	input						I_Req,					//Request from Reg-Read
 	input	[6:0]				I_Sel_Path,				//Path Selects
 	input	[4:0]				I_Sel_Path_WB,			//Path Selects
-	input	data_t				I_Scalar_Data,			//Data from Scalar Unit ToDo
+	input	data_t				I_Scalar_Data,			//Data from Scalar Unit
 	input						I_Sel_ALU_Src1,			//Source Select
 	input						I_Sel_ALU_Src2,			//Source Select
 	input						I_Sel_ALU_Src3,			//Source Select
@@ -104,6 +104,7 @@ module Network_V
 		.I_Req(				Req						),
 		.I_Sel_Path(		Sel_Path				),
 		.I_Sel_Path_WB(		I_Sel_Path_WB			),
+		.I_Scalar_Data(		I_Scalar_Data			),
 		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),
 		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
 		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),

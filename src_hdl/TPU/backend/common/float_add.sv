@@ -20,7 +20,6 @@ module fAdd_Unit
 	input   data_t				I_Data1,				//Source Operand
 	input   data_t				I_Data2,				//Source Operand
 	input	TYPE				I_Token,				//Command
-	input   issue_no_t			I_Issue_No,				//Current Issue No
 	output  data_t				O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
 	output	TYPE				O_Token					//Command

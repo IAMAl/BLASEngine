@@ -15,7 +15,7 @@ module HazardCheck_TPU
 	input						clock,
 	input						reset,
 	input						I_Req_Issue,			//Request from Previous Stage
-	input						I_Req,					//Request to Work ToDo
+	input						I_Req,					//Request to Work
 	input	instr_t				I_Instr,				//Instruction
 	input						I_Req_Commit,			//Request to Commit
 	input	[WIDTH_BUFF-1:0]	I_Commit_No,			//Commit (Issued) No.
@@ -132,6 +132,8 @@ module HazardCheck_TPU
 	logic						Slice2;
 	logic						Slice3;
 
+	logic						Req_Issue;
+
 
 	assign Sel_Unit				= I_Instr.op.Sel_Unit;
 	assign Valid_Dst			= I_Instr.dst.v;
@@ -222,6 +224,16 @@ module HazardCheck_TPU
 	//// Buffer Control
 	assign We					= Req_Issue & ~Full;
 	assign Re					= Valud_Issue & ~Empty;
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Req_Issue		<= 1'b0;
+		end
+		begin
+			Req_Issue		<= I_Req;
+		end
+	end
 
 
 	//// Storing to Table

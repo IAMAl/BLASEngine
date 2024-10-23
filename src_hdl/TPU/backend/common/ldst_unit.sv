@@ -64,7 +64,7 @@ module ldst_unit
 
 	assign O_Token				= ( Term ) ? Token : '0;
 
-	assign O_Stall				= Full | Full_Buff ( Runn & ~Ready );
+	assign O_Stall				= Full | Full_Buff ( Run & ~Ready );
 
 
 	always_ff @( posedge clock ) begin
@@ -114,7 +114,6 @@ module ldst_unit
 		.clock(				clock						),
 		.reset(				reset						),
 		.I_Stall(			I_Stall						),
-		.I_Commit_Grant(	I_Commit_Grant				),
 		.I_Access_Grant(	I_Access_Grant				),
 		.I_Req(				I_Req						),
 		.I_Length(			I_Length					),

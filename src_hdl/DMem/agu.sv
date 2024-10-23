@@ -14,7 +14,7 @@ module agu
 (
 	input						clock,
 	input						reset,
-	input						I_Set_and_Run,					//Flag: Activate Load/Store Unit
+	input						I_Set_and_Run,			//Flag: Activate Load/Store Unit
 	input						I_Stall,				//Force Stalling by Local Memory
 	input	address_t			I_Length,				//Vector-Length for Load/Store
 	input	address_t			I_Stride,				//Stride-Factor for Load/Store

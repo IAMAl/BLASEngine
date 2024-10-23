@@ -15,19 +15,19 @@ module AuxRegs #(
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Stall Request
-	input	id_t				I_ThreadID,
+	input	id_t				I_ThreadID,				//Thread ID
 	input						I_Re,					//Read Enable
 	input						I_We,					//Write Enable
 	input	pipe_index_t		I_Src_Command,			//Command
 	input	pipe_exe_tmp_t		I_Dst_Command,			//Command
-	output						O_Re_p0,
-	output						O_Re_p1,
-	output						O_Re_c,
-	input	data_t				I_Data,
-	output	data_t				O_Data,
-	input						I_SWe,
-	input	data_t				I_Scalar_Data,
-	output	data_t				O_Scalar_Data,
+	output						O_Re_p0,				//Read-Enable Pipeline Reg
+	output						O_Re_p1,				//Read-Enable Pipeline Reg
+	output						O_Re_c,					//Read-Enable Constant Reg
+	input	data_t				I_Data,					//Data from WB path
+	output	data_t				O_Data,					//Data too Register-Read path
+	input						I_SWe,					//Write-Enable for Scalar Data
+	input	data_t				I_Scalar_Data,			//Write into Scalar Data
+	output	data_t				O_Scalar_Data,			//Read from Scalar Data
 );
 
 
@@ -77,6 +77,8 @@ module AuxRegs #(
 	assign O_Scalar_Data		= SData_W;
 
 
+	//// Scalar Data Register
+	// Scalar Data Register for Writing
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			SData_W				<= '0;
@@ -86,6 +88,7 @@ module AuxRegs #(
 		end
 	end
 
+	// Scalar Data REgister for Reading
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			SData_R				<= '0;

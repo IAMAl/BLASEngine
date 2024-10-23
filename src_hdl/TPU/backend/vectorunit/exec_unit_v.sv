@@ -36,11 +36,11 @@ module ExecUnit_V
 	input	[1:0]				I_St_Grant,				//Grant for Storing
 	input						I_End_Access1,			//End of Access
 	input						I_End_Access2,			//End of Access
-	input						I_Re_p0,
-	input						I_Re_p1,
+	input						I_Re_p0,				//REad-Enable for Pipeline Register
+	input						I_Re_p1,				//REad-Enable for Pipeline Register
 	output	TYPE				O_WB_Token,				//Write-Back Info
 	output	data_t				O_WB_Data,				//Write-Back Data
-	output						O_Math_Done,			//Execution Done ToDO
+	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
 	output						O_Lane_En
@@ -139,6 +139,9 @@ module ExecUnit_V
 	assign LifeLdSt				= ( is_LifeLdSt2 ) ? LifeLdSt2 : LifeLdSt1;
 
 	assign is_LifeMAU			= LifeMAU > LifeLdSt;
+
+
+	assign O_Math_Done			= Token_MAU.v;
 
 
 	assign O_WB_Token			= ( Re ) ?				Mv_Token :

@@ -103,15 +103,18 @@ module BypassBuff
 
 	assign O_Src1				= ( Update_Src1 ) ?	Buff_Data[ NoSrc1 ] :
 									( Hit_Src1 ) ?	Buff_Data[ Rd_Ptr ] :
-													I_Src1;
+									( I_Idx1.v ) ?	I_Src1 :
+													'0;
 
 	assign O_Src2				= ( Update_Src2 ) ?	Buff_Data[ NoSrc2 ] :
 									( Hit_Src2 ) ?	Buff_Data[ Rd_Ptr ] :
-													I_Src2;
+									( I_Idx2.v ) ?	I_Src2 :
+													'0;
 
 	assign O_Src3				= ( Update_Src3 ) ?	Buff_Data[ NoSrc3 ] :
 									( Hit_Src3 ) ?	Buff_Data[ Rd_Ptr ] :
-													I_Src3;
+									( I_Idx3.v ) ?	I_Src3 :
+													'0;
 
 
 	assign Last_Src1			= Run_Slice_Src1 ^ ( I_Idx1.idx == Len_Src1 );

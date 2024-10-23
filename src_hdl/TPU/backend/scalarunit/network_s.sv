@@ -21,9 +21,9 @@ module Network_S
 	input						I_Req,					//Request from Reg-Read
 	input	[1:0]				I_Sel_Path,				//Path Selects
 	input	[1:0]				I_Sel_Path_WB,			//Path Selects
-	input						I_Sel_ALU_Src1,			//Source Select ToDo
-	input						I_Sel_ALU_Src2,			//Source Select ToDo
-	input						I_Sel_ALU_Src3,			//Source Select ToDO
+	input						I_Sel_ALU_Src1,			//Source Select
+	input						I_Sel_ALU_Src2,			//Source Select
+	input						I_Sel_ALU_Src3,			//Source Select
 	input	index_t				I_Slice_Len,			//Slice Length
 	input	data_t				I_Src_Data1,			//Data from RegFile
 	input	data_t				I_Src_Data2,			//Data From RegFile
@@ -65,10 +65,10 @@ module Network_S
 	assign Src_Data2			= I_Src_Data2;
 	assign Src_Data3			= I_Src_Data3;
 
-	assign O_PAC_Src_Data		=(    Sel_Path == 2'h1 ) ?		I_Src_Data1 :
-									( Sel_Path == 2'h2 ) ?		I_Src_Data2 :
-									( Sel_Path == 2'h3 ) ?		I_Src_Data3 :
-																'0;
+	assign O_PAC_Src_Data		= (   ( Sel_Path == 2'h1 ) & I_Sel_ALU_Src1 ) ?	I_Src_Data1 :
+									( ( Sel_Path == 2'h2 ) & I_Sel_ALU_Src2 ) ?	I_Src_Data2 :
+									( ( Sel_Path == 2'h3 ) & I_Sel_ALU_Src3 ) ?	I_Src_Data3 :
+																				'0;
 
 	assign O_WB_Data			= (   Sel_Path_WB == 2'h3 ) ?	I_Src_Data3 :
 									( Sel_Path_WB == 2'h2 ) ?	I_Src_Data2 :

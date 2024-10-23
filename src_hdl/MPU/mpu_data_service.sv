@@ -23,8 +23,8 @@ module DataService_MPU
 	input	data_t				I_Data,					//Data from Extern
 	output						O_Req,					//Request to Extern
 	output	data_t				O_Data,					//Data to Extern
-	input						I_Ld_Req,				//Request from Data Memory ToDo
-	input						I_Ld_Grant,				//Grant for Request
+	input						I_Ld_Req,				//Request Loading from Data Memory
+	output						O_Ld_Grant,				//Grant for Request
 	input	data_t				I_Ld_Data,				//Data from Data Memory
 	input						I_Ld_Rls,				//End of Loading
 	output						O_St_Req,				//Request Storing to Data Memory
@@ -91,7 +91,8 @@ module DataService_MPU
 	data_t						Buff_Data	[BUFF_SIZE-1:0];
 
 
-	//
+	// States
+	assign is_FSM_Extern_Recv_Stride= FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_STRIDE;
 	assign is_FSM_Extern_Not_Init	= FSM_Extern_Serv != FSM_EXTERN_MPU_RECV_INIT;
 	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_RUN;
 
@@ -100,13 +101,16 @@ module DataService_MPU
 	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_MPU_ST_RUN;
 	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_MPU_LD_RUN;
 
+	// Buffer sttus
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
+	// Memory Access Type Detection
+	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Ld_Req;
+	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Ld_Req;
 
-	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1];
-	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1];
 
+	//// Buffer
 	// Storing to Buffer
 	assign Store_Buff_St		= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
 	assign Store_Buff_Ld		= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
@@ -130,6 +134,9 @@ module DataService_MPU
 	// IF
 	assign O_Req				= Load_Buff_St & ~Empty;
 	assign O_Data				= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : 0;
+
+	//Ack for Load Request
+	assign O_Ld_Grant			= FSM_Extern_Ld != FSM_EXTERN_MPU_LD_INIT;
 
 	// TPU (Router)
 	assign O_St_Req				= Load_Buff_Ld | is_FSM_Extern_St_Notify;
@@ -309,7 +316,7 @@ module DataService_MPU
 				end
 			end
 			FSM_EXTERN_MPU_LD_WAIT: begin
-				if ( I_Ld_Grant ) begin
+				if ( O_Ld_Grant ) begin
 					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_RUN;
 				end
 				else begin

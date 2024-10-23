@@ -16,7 +16,7 @@ module HazardCheck_TPU
 )(
 	input						clock,
 	input						reset,
-	input						I_Req,							//Request to Work ToDo
+	input						I_Req,							//Request to Work
 	input						I_Slice,						//Slicing is used
 	input						I_Req_Issue,					//Request from Previous Stage
 	input						I_is_Vec,						//Request is for Vector Unit
@@ -101,11 +101,6 @@ module HazardCheck_TPU
 
 	//// Storing to Table
 	logic						Set_Index;
-
-	logic						R_Valid_Dst;
-	logic						R_Valid_Src1;
-	logic						R_Valid_Src2;
-	logic						R_Valid_Src3;
 
 	index_s_t					R_Index_Dst;
 	index_s_t					R_Index_Src1;
@@ -204,7 +199,7 @@ module HazardCheck_TPU
 			We_Valid_Dst	<= 1'b0;
 		end
 		else begin
-			We_Valid_Dst	<= I_Instr.dst.v;
+			We_Valid_Dst	<= I_Req & I_Instr.dst.v;
 		end
 	end
 
@@ -213,7 +208,7 @@ module HazardCheck_TPU
 			We_Valid_Src1	<= 1'b0;
 		end
 		else begin
-			We_Valid_Src1	<= I_Instr.src1.v;
+			We_Valid_Src1	<= I_Req & I_Instr.src1.v;
 		end
 	end
 
@@ -222,7 +217,7 @@ module HazardCheck_TPU
 			We_Valid_Src2	<= 1'b0;
 		end
 		else begin
-			We_Valid_Src2	<= I_Instr.src2.v;
+			We_Valid_Src2	<= I_Req & I_Instr.src2.v;
 		end
 	end
 
@@ -231,7 +226,7 @@ module HazardCheck_TPU
 			We_Valid_Src3	<= 1'b0;
 		end
 		else begin
-			We_Valid_Src3	<= I_Instr.src3.v;
+			We_Valid_Src3	<= I_Req & I_Instr.src3.v;
 		end
 	end
 
@@ -276,33 +271,33 @@ module HazardCheck_TPU
 			R_Indeces		<= '0;
 		end
 		else if ( Set_Index ) begin
-			if ( R_Valid_Dst ) begin
-				R_Indeces.instr.dst.v		<= 1'b1;
+			if ( We_Valid_Dst ) begin
+				R_Indeces.instr.dst.v	<= 1'b1;
 				R_Indeces.instr.dst.idx	<= R_Index_Dst;
 			end
 			else begin
 				R_Indeces.instr.dst.v	<= 1'b0;
 			end
 
-			if ( R_Valid_Src1 ) begin
+			if ( We_Valid_Src1 ) begin
 				R_Indeces.instr.src1.v	<= 1'b1;
-				R_Indeces.instr.src1.idx	<= R_Index_Src1;
+				R_Indeces.instr.src1.idx<= R_Index_Src1;
 			end
 			else begin
 				R_Indeces.instr.src1.v	<= 1'b0;
 			end
 
-			if ( R_Valid_Src2 ) begin
+			if ( We_Valid_Src2 ) begin
 				R_Indeces.instr.src2.v	<= 1'b1;
-				R_Indeces.instr.src2.idx	<= R_Index_Src2;
+				R_Indeces.instr.src2.idx<= R_Index_Src2;
 			end
 			else begin
 				R_Indeces.instr.src2.v	<= 1'b0;
 			end
 
-			if ( R_Valid_Src3 ) begin
+			if ( We_Valid_Src3 ) begin
 				R_Indeces.instr.src3.v	<= 1'b1;
-				R_Indeces.instr.src3.idx	<= R_Index_Src3;
+				R_Indeces.instr.src3.idx<= R_Index_Src3;
 			end
 			else begin
 				R_Indeces.instr.src3.v	<= 1'b0;

@@ -29,10 +29,10 @@ module MA_Unit
 	input	TYPE				I_Token,				//Command
 	output  data_t				O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
-	input						I_Re_p0,
-	input						I_Re_p1,
-	output	data_t				O_Data0,
-	output	data_t				O_Data1,
+	input						I_Re_p0,				//Read-Enable for Pipeline Register
+	input						I_Re_p1,				//Read-Enable for Pipeline Register
+	output	data_t				O_Data0,				//Data from Pipeline Register
+	output	data_t				O_Data1,				//Data from Pipeline Register
 	output	TYPE				O_Token,				//Command
 	output						O_Stall					//Stall Request
 );

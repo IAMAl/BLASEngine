@@ -42,6 +42,7 @@ module BareRegFile
 	assign O_Data_Src2			= src_data2;
 
 
+	//// Capturing Read Data
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			src_data1		<= 0;
@@ -60,6 +61,7 @@ module BareRegFile
 		end
 	end
 
+	//// Register File Body
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
 			for ( int i=0; i<NUM_RF_ENTRY; ++i ) begin

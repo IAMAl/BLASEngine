@@ -18,14 +18,14 @@ module ALU
 	input						clock,
 	input						reset,
 	input	issue_no_t			I_Issue_No,				//Current Issue No
-	input						I_Stall,				//Stall Request ToDO
+	input						I_Stall,				//Stall Request
 	input						I_Req,					//Request from Network Stage
 	input	TYPE				I_Command,				//Command
 	input	data_t				I_Src_Data1,			//Source Data
 	input	data_t				I_Src_Data2,			//Source Data
 	input	data_t				I_Src_Data3,			//Source Data
-	input						I_Re_p0,
-	input						I_Re_p1,
+	input						I_Re_p0,				//Read-Enable for Pipeline Register
+	input						I_Re_p1,				//Read-Enable for Pipeline Register
 	output	TYPE				O_WB_Token,				//Write-Back Information
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output						O_ALU_Done				//Executed
@@ -107,22 +107,22 @@ module ALU
 
 	assign En_SRL				= is_SRL;
 
-	assign MA_Token				= ( En_MA ) ?	I_Command : '0;
-	assign iDiv_Token			= ( En_iDiv ) ?	I_Command : '0;
-	assign Cnvt_Token			= ( En_Cnvt ) ?	I_Command : '0;
-	assign SRL_Token			= ( En_SRL ) ?	I_Command : '0;
+	assign MA_Token				= ( En_MA & ~I_Stall ) ?	I_Command : '0;
+	assign iDiv_Token			= ( En_iDiv & ~I_Stall ) ?	I_Command : '0;
+	assign Cnvt_Token			= ( En_Cnvt & ~I_Stall ) ?	I_Command : '0;
+	assign SRL_Token			= ( En_SRL & ~I_Stall ) ?	I_Command : '0;
 
-	assign MA_Data1				= ( En_MA ) ?	I_Src_Data1 : 0;
-	assign MA_Data2				= ( En_MA ) ?	I_Src_Data2 : 0;
-	assign MA_Data3				= ( En_MA ) ?	I_Src_Data3 : 0;
+	assign MA_Data1				= ( En_MA & ~I_Stall ) ?	I_Src_Data1 : 0;
+	assign MA_Data2				= ( En_MA & ~I_Stall ) ?	I_Src_Data2 : 0;
+	assign MA_Data3				= ( En_MA & ~I_Stall ) ?	I_Src_Data3 : 0;
 
-	assign iDIV_Data1			= ( En_iDiv ) ? I_Src_Data1 : 0;
-	assign iDIV_Data2			= ( En_iDiv ) ? I_Src_Data2 : 0;
+	assign iDIV_Data1			= ( En_iDiv & ~I_Stall ) ?	I_Src_Data1 : 0;
+	assign iDIV_Data2			= ( En_iDiv & ~I_Stall ) ?	I_Src_Data2 : 0;
 
-	assign Cnvt_Data1			= ( En_Cnvt ) ? I_Src_Data1 : 0;
+	assign Cnvt_Data1			= ( En_Cnvt & ~I_Stall ) ?	I_Src_Data1 : 0;
 
-	assign SRL_Data1			= ( En_SRL ) ?	I_Src_Data1 : 0;
-	assign SRL_Data2			= ( En_SRL ) ?	I_Src_Data2 : 0;
+	assign SRL_Data1			= ( En_SRL & ~I_Stall ) ?	I_Src_Data1 : 0;
+	assign SRL_Data2			= ( En_SRL ) & ~I_Stall ?	I_Src_Data2 : 0;
 
 
 	assign Life_MA				= I_Issue_No - Token_MA.issue_no;
