@@ -15,6 +15,7 @@ module Vector_Unit
 (
 	input						clock,
 	input						reset,
+	input	v_ready_t			I_Commit_Grant,			//Grant for Commit
 	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	command_t			I_Command,				//Comamnd to Execute
@@ -57,6 +58,7 @@ module Vector_Unit
 		(
 			.clock(				clock					),
 			.reset(				reset					),
+			.I_Commit_Grant(	I_Commit_Grant[ i ]		),
 			.I_En_Lane(			I_En_Lane[ i ]			),
 			.I_ThreadID(		I_ThreadID				),
 			.I_Command(			I_Command				),

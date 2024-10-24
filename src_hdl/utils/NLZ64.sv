@@ -21,6 +21,10 @@ module NLZ64
 	logic						Valid1;
 	logic						Valid2;
 	logic						Valid3;
+	logic						Valid4;
+	logic						Valid5;
+	logic						Valid6;
+	logic						Valid7;
 
 	logic	[2:0]				Num0;
 	logic	[2:0]				Num1;

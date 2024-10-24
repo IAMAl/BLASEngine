@@ -48,10 +48,10 @@ module RegFile
 		.I_We(				I_We					),
 		.I_Re1(				Re1						),
 		.I_Re2(				Re2						),
-		.I_Index_Dst(		I_Index_Dst				),
+		.I_Index_Dst(		I_Index_Dst.idx			),
 		.I_Data(			I_Data					),
-		.I_Index_Src1(		I_Index_Src1			),
-		.I_Index_Src2(		I_Index_Src2			),
+		.I_Index_Src1(		I_Index_Src1.idx		),
+		.I_Index_Src2(		I_Index_Src2.idx		),
 		.O_Data_Src1(		Data_Src1				),
 		.O_Data_Src2(		Data_Src2				)
 	);

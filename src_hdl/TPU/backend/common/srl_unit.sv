@@ -21,7 +21,7 @@ module SRL_Unit
 	input	TYPE				I_Token,				//Command
 	input   data_t				I_Data1,				//Source Operand
 	input   data_t				I_Data2,				//Source Operand
-	output  data_t				O_Valid,				//Output Valid
+	output  					O_Valid,				//Output Valid
 	output	TYPE				O_Token,				//Command
 	output  data_t				O_Data					//Output Data
 );
@@ -35,8 +35,16 @@ module SRL_Unit
 	logic						Valid_Rotate;
 	logic						Valid_Logic;
 
+	data_t						Data_Shift1;
+	data_t						Data_Shift2;
 	data_t						Data_Shift;
+
+	data_t						Data_Rotate1;
+	data_t						Data_Rotate2;
 	data_t						Data_Rotate;
+
+	data_t						Data_Logic1;
+	data_t						Data_Logic2;
 	data_t						Data_Logic;
 
 	TYPE						Token_Shift;

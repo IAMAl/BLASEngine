@@ -51,11 +51,14 @@ module ldst_unit
 	logic	[WIDTH_BUFF-1:0]	RPtr;
 	logic						Empty;
 	logic						Full;
-	logic	[WIDTH_BUFF:0]		Num;
-
 
 	logic						Run;
+
 	logic						Ready;
+
+	logic						Empty_Buff;
+	logic						Full_Buff;
+	logic	[WIDTH_BUFF:0]		Num;
 
 
 	assign We					= ~I_Stall & I_Valid;

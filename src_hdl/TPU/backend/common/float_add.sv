@@ -15,12 +15,14 @@ module fAdd_Unit
 	parameter int DEPTH_PIPE	= 5,
 	parameter type TYPE			= pipe_exe_tmp_t
 )(
+	input						clock,
+	input						reset,
 	input						I_En,					//Enable to Execute
 	input						I_Stall,				//Stall Request
 	input   data_t				I_Data1,				//Source Operand
 	input   data_t				I_Data2,				//Source Operand
 	input	TYPE				I_Token,				//Command
-	output  data_t				O_Valid,				//Output Valid
+	output  					O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
 	output	TYPE				O_Token					//Command
 );

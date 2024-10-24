@@ -37,6 +37,7 @@ module Scalar_Unit
 	output	instr_t				O_V_Command,			//Command to Vector Unit
 	input	lane_t				I_V_State,				//Status from Vector Unit
 	output	v_ready_t			O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
+	output						O_Commit_Grant,			//Grant for Commit on Vector Unit
 	output	state_t				O_Status,				//Scalar Unit Status
 	output						O_Term					//Flag: Termination
 );
@@ -119,7 +120,7 @@ module Scalar_Unit
 	index_t						Dst_Index_Length;
 	logic						Dst_RegFile_Req;
 	logic						Dst_RegFile_Slice;
-	index_t						Dst_RegFile_Index;
+	idx_t						Dst_RegFile_Index;
 	logic						Dst_Busy;
 	logic						Dst_Done;
 
@@ -144,6 +145,7 @@ module Scalar_Unit
 	logic						WB_En;
 	pipe_exe_tmp_t				WB_Token;
 	data_t						WB_Data;
+	data_t						WB_Data_;
 	logic						WB_Req_Even;
 	logic						WB_Req_Odd;
 	logic						WB_We_Even;
@@ -164,6 +166,7 @@ module Scalar_Unit
 	logic	[1:0]				Config_Path_WB;
 	logic						Math_Done;
 	logic						Condition;
+	logic	[1:0]				Cond_Data;
 	issue_no_t					Bypass_IssueNo;
 
 
@@ -180,12 +183,14 @@ module Scalar_Unit
 	logic						Stall_Network;
 	logic						Stall_ExecUnit;
 	logic						Stall_RegFile_Dst;
+	logic						Stall_WB;
+
 
 	state_t						State;
 	state_t						Status;
 
 
-	logic	[NUM_LANES-1:0]		We_V_State;
+	logic						We_V_State;
 	reg_idx_t					V_State_Data;
 	data_t						V_State;
 
@@ -226,9 +231,16 @@ module Scalar_Unit
 
 
 	logic						Lane_Enable;
+	logic	[NUM_LANES-1:0]		Enable_Lanes;
 	logic						Lane_We;
 	logic						Lane_Re;
 	data_t						Lane_Data;
+
+	logic						Req_Even;
+	logic						Req_Odd;
+
+	logic						We_c;
+	logic						Re_c;
 
 
 	pipe_index_t				PipeReg_Idx;
@@ -323,20 +335,12 @@ module Scalar_Unit
 	//// Register Read/Write Stage
 
 	//	Capture Read Data
-	//	Command
+//	Command
 	assign PipeReg_Set_Net.v		= PipeReg_RR.v;
 	assign PipeReg_Set_Net.op		= PipeReg_RR.op;
 
 	//	Write-Back
 	assign PipeReg_Set_Net.dst		= PipeReg_RR.dst;
-
-	//	Read-Enable
-	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
-										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
-	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
-										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
 
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
@@ -366,6 +370,13 @@ module Scalar_Unit
 	assign PipeReg_Set_Net.src3.src_sel	= ( PipeReg_RR.src3.v ) ?	PipeReg_RR.src3.src_sel :
 																	'0;
 
+	//	Read-Enable
+	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
+										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
+										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
+	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
+										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
+										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
 
 	//	Slice Length
 	assign PipeReg_Set_Net.slice_len= PipeReg_RR.slice_len;
@@ -379,7 +390,7 @@ module Scalar_Unit
 
 	///// Write-Back to PAC
 	assign PAC_We				= WB_Token.v & is_WB_BR;
-	assign PAC_Data				= ( is_WB_BR ) ? WB_Data : '0;
+	assign PAC_Data				= ( is_WB_BR ) ? WB_Data_ : '0;
 	assign PAC_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
 									( PipeReg_RR.src3.src_sel.no == 2'h2 );
@@ -387,7 +398,7 @@ module Scalar_Unit
 
 	//// Lane-Enable
 	assign Lane_We				= is_WB_VU;
-	assign Lane_Data			= ( is_WB_VU ) ? WB_Data : '0;
+	assign Lane_Data			= ( is_WB_VU ) ? WB_Data_ : '0;
 	assign Lane_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
 									( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
 									( PipeReg_RR.src3.src_sel.no == 2'h3 );
@@ -431,10 +442,12 @@ module Scalar_Unit
 
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
-	assign WB_Index_Even		= ( ~Dst_Sel ) ? Dst_RegFile_Index :	'0;
-	assign WB_Index_Odd			= (  Dst_Sel ) ? Dst_RegFile_Index :	'0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data : 				'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data : 				'0;
+	assign WB_Index_Even		= ( ~Dst_Sel ) ? Dst_RegFile_Index.idx :'0;
+	assign WB_Index_Odd			= (  Dst_Sel ) ? Dst_RegFile_Index.idx :'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data_ : 				'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data_ : 				'0;
+
+	assign Cond_Data			= WB_Token.op.OpCode;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
 
@@ -474,7 +487,8 @@ module Scalar_Unit
 
 
 	//// Lane-Enable
-	assign O_Lane_En			= V_State[NUM_LANES*2-1:NUM_LANES];
+	assign Enable_Lanes			= V_State[NUM_LANES*2-1:NUM_LANES];
+	assign O_Lane_En			= Enable_Lanes;
 
 	assign Lane_Enable			= I_En;
 
@@ -492,12 +506,16 @@ module Scalar_Unit
 
 	//// Stall Control
 	assign Slice				= Index_Src1_Busy | Index_Src2_Busy | Index_Src3_Busy;
-	assign Stall_Index_Calc		= ~Lane_Enable | Stall_Index;
+	assign Stall_Index_Calc		= ~Lane_Enable | Stall_Index_Calc;
 	assign Stall_RegFile_Dst	= ~Lane_Enable | Stall_WB;
-	assign Stall_RegFile_Odd	= ~Lane_Enable | Stall_Index;
-	assign Stall_RegFile_Even	= ~Lane_Enable | Stall_Index;
+	assign Stall_RegFile_Odd	= ~Lane_Enable | Stall_Index_Calc;
+	assign Stall_RegFile_Even	= ~Lane_Enable | Stall_Index_Calc;
 	assign Stall_Network		= ~Lane_Enable;
 	assign Stall_ExecUnit		= ~Lane_Enable;
+
+
+	//// Grant for Commit on Vector Unit
+	assign O_Commit_Grant		= Commit_Grant_V;
 
 
 	//// Program Address Control
@@ -583,7 +601,7 @@ module Scalar_Unit
 		.O_Stall_IW_St(		Stall_IW_St				),
 		.O_Stall_IW_Ld(		Stall_IW_Ld				),
 		.O_Stall_IW(		Stall_IW				),
-		.O_Stall_Index(		Stall_Index				),
+		.O_Stall_Index(		Stall_Index_Calc		),
 		.O_Stall_WB(		Stall_WB				)
 	);
 
@@ -623,8 +641,8 @@ module Scalar_Unit
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
 		.I_Index(			PipeReg_Idx.src1		),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Window(			PipeReg_Idx.src1.window	),
+		.I_Length(			PipeReg_Idx.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -643,11 +661,11 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src2.v		),
-		.I_En_II(			0						),
+		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
 		.I_Index(			PipeReg_Idx.src2		),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Window(			PipeReg_Idx.src2.window	),
+		.I_Length(			PipeReg_Idx.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -666,11 +684,11 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.src3.v		),
-		.I_En_II(			0						),
+		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
 		.I_Index(			PipeReg_Idx.src3		),
-		.I_Window(			IDec_Index_Window		),
-		.I_Length(			IDec_Index_Length		),
+		.I_Window(			PipeReg_Idx.src3.window	),
+		.I_Length(			PipeReg_Idx.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -719,7 +737,7 @@ module Scalar_Unit
 		.O_Re_c(			Re_c					),
 		.I_Data(			W_WB_Data				),
 		.O_Data(			R_Scalar_Data			),
-		.I_SWe(				0						),//ToDo
+		.I_SWe(				'0						),//ToDo
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.O_Scalar_Data(		O_Scalar_Data			)
 	);
@@ -832,7 +850,7 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Network			),
 		.I_Req(				PipeReg_RR_Net.v		),
-		.I_Sel_Path(		Config_Path				),
+		.I_Sel_Path(		Config_Path[1:0]		),
 		.I_Sel_Path_WB(		Config_Path_WB			),
 		.I_Sel_ALU_Src1(	PipeReg_RR_Net.src1.v	),
 		.I_Sel_ALU_Src2(	PipeReg_RR_Net.src2.v	),
@@ -845,6 +863,7 @@ module Scalar_Unit
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
 		.I_WB_Data(			WB_Data					),
+		.O_WB_Data(			WB_Data_				),
 		.O_Src_Data1(		PipeReg_Net.data1		),
 		.O_Src_Data2(		PipeReg_Net.data2		),
 		.O_Src_Data3(		PipeReg_Net.data3		),
@@ -870,6 +889,7 @@ module Scalar_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_ExecUnit			),
 		.I_Req(				PipeReg_Exe.v			),
+		.I_Commit_Grant(	Commit_Grant_S			),
 		.I_Issue_No(		IW_IssueNo				),
 		.I_Command(			PipeReg_Exe.instr		),
 		.I_Src_Data1(		PipeReg_Exe.data1		),
@@ -934,7 +954,7 @@ module Scalar_Unit
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_En_Lane(			Lane_Enable				),
+		.I_En_Lane(			Enable_Lanes			),
 		.I_Store(			Store_V					),
 		.I_Issue_No(		IW_IssueNo				),
 		.I_Commit_Req(		I_Commit_Req_V			),

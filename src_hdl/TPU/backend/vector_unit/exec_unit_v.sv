@@ -19,6 +19,7 @@ module ExecUnit_V
 	input						I_En,
 	input						I_Stall,				//Stall
 	input						I_Req,					//Request from Network Stage
+	input						I_Commit_Grant,			//Grant for Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input	command_t			I_Command,				//Command
 	input	data_t				I_Src_Data1,			//Source Data
@@ -43,8 +44,8 @@ module ExecUnit_V
 	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
-	output						O_Ld_Stall,
-	output						O_St_Stall,
+	output						O_Ld_Stall,				//Stall Request for Loading
+	output						O_St_Stall,				//Stall Request for Storing
 	output						O_Lane_En
 );
 
@@ -78,6 +79,10 @@ module ExecUnit_V
 	logic						St_Stall_Evn;
 
 
+	logic						is_Adder;
+	logic						is_Mlter;
+
+
 	logic						We;
 	logic						Re;
 	TYPE						Mv_Token;
@@ -94,6 +99,9 @@ module ExecUnit_V
 	data_t						PData;
 	data_t						Data0;
 	data_t						Data1;
+
+	logic						RegMove;
+
 
 	assign RegMoveOp			= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) & ( I_Command.instr.op.OpClass == 2'b11 );
 	assign CommonMov			= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b01 );
@@ -187,7 +195,7 @@ module ExecUnit_V
 		.I_Re_p1(			I_Re_p1					),
 		.I_Token(			MAU_Token				),
 		.O_Valid(			Valid_MAU				),
-		.O_Data(			Data_MAU				),
+		.O_Data(			MAU_Data				),
 		.O_Data0(			Data0					),
 		.O_Data1(			Data1					),
 		.O_Token(			Token_MAU				)
@@ -198,7 +206,7 @@ module ExecUnit_V
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
-		.I_Commit_Grant(	I_Issue_No				),
+		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Req(				LdSt_Req[1]				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		I_Src_Data1				),
@@ -224,7 +232,7 @@ module ExecUnit_V
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
-		.I_Commit_Grant(	I_Issue_No				),
+		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Req(				LdSt_Req[0]				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		I_Src_Data1				),

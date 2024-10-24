@@ -18,13 +18,14 @@ module ExecUnit_S
 	input						reset,
 	input						I_Stall,				//Stall
 	input						I_Req,					//Request from Network Stage
+	input						I_Commit_Grant,			//Grant for Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input	command_t			I_Command,				//Command
-	input						I_Src_Data1,			//Source Data
-	input						I_Src_Data2,			//Source Data
-	input						I_Src_Data3,			//Source Data
-	output						O_LdSt1,				//Load/Store Command
-	output						O_LdSt2,				//Load/Store Command
+	input	data_t				I_Src_Data1,			//Source Data
+	input	data_t				I_Src_Data2,			//Source Data
+	input	data_t				I_Src_Data3,			//Source Data
+	output	ldst_t				O_LdSt1,				//Load/Store Command
+	output	ldst_t				O_LdSt2,				//Load/Store Command
 	input	data_t				I_Ld_Data1,				//Loaded Data
 	input	data_t				I_Ld_Data2,				//Loaded Data
 	output	data_t				O_St_Data1,				//Storing Data
@@ -37,9 +38,9 @@ module ExecUnit_S
 	input						I_End_Access2,			//End of Access
 	input						I_Re_p0,				//Read-Enable for Pipeline Register
 	input						I_Re_p1,				//Read-Enable for Pipeline Register
-	output	index_t				O_WB_Token,				//Write-Back Index
+	output	TYPE				O_WB_Token,				//Write-Back Index
 	output	data_t				O_WB_Data,				//Write-Back Data
-	output	TYPE				O_WB_IssueNo,			//Issue (Commit) No
+	output	issue_no_t			O_WB_IssueNo,			//Issue (Commit) No
 	output						O_Math_Done,			//Execution Done
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
@@ -76,6 +77,10 @@ module ExecUnit_S
 	logic						Re;
 	TYPE						Mv_Token;
 	data_t						Mv_Data;
+
+	logic						Valid_iDIV;
+
+	logic						RegMove;
 
 
 	assign We					= RegMove & ( ( LifeALU != '0 ) | ( LifeLdSt != '0 ) );
@@ -145,7 +150,7 @@ module ExecUnit_S
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
-		.I_Commit_Grant(	I_Issue_No				),
+		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Req(				LdSt_Req[1]				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		I_Src_Data1				),
@@ -171,8 +176,8 @@ module ExecUnit_S
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
-		.I_Commit_Grant(	I_Issue_No				),
-		.I_Req(				LdSt_Req1				),
+		.I_Commit_Grant(	I_Commit_Grant			),
+		.I_Req(				LdSt_Req				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		I_Src_Data1				),
 		.I_Src_Data2(		I_Src_Data2				),

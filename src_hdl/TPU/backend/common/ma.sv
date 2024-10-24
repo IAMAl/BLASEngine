@@ -27,7 +27,7 @@ module MA_Unit
 	input   data_t				I_Data2,				//Source Data
 	input   data_t				I_Data3,				//Source Data
 	input	TYPE				I_Token,				//Command
-	output  data_t				O_Valid,				//Output Valid
+	output  					O_Valid,				//Output Valid
 	output  data_t				O_Data,					//Output Data
 	input						I_Re_p0,				//Read-Enable for Pipeline Register
 	input						I_Re_p1,				//Read-Enable for Pipeline Register
@@ -52,6 +52,8 @@ module MA_Unit
 	TYPE						Token_Add;
 	TYPE						Token_Mlt;
 
+	logic						Add_Valid;
+	logic						Mlt_Valid;
 
 	data_t						Add_Data;
 	data_t						Mlt_Data;
@@ -68,7 +70,6 @@ module MA_Unit
 	issue_no_t					LifeMlt;
 
 
-
 	logic						LiFeAdd;
 	logic						LiFeMlt;
 	issue_no_t					Add_Issue_No;
@@ -81,6 +82,16 @@ module MA_Unit
 	logic	[WIDTH_BUFF-1:0]	RNo;
 	logic						Full;
 	logic						Empty;
+
+
+	logic						is_Adder;
+	logic						is_Mlter;
+	logic						is_MAC;
+	logic						is_MAD;
+
+	issue_no_t					Add_Isssue_No;
+	issue_no_t					Mlt_Isssue_No;
+
 
 	data_t						Buff_Src3	[DEPTH_MLT-1:0];
 
@@ -131,8 +142,8 @@ module MA_Unit
 													0;
 
 	assign Data2_Add			= ( is_Adder ) ?	I_Data2 :
-									( is_MAD ) ?	Data3 :
-									( is_MAC ) ?	Data3 :
+									( is_MAD ) ?	Buff_Src3[ RNo ] :
+									( is_MAC ) ?	Buff_Src3[ RNo ] :
 													0;
 
 	assign Data1_Mlt			= ( is_Mlter ) ?	I_Data1 :
@@ -148,8 +159,6 @@ module MA_Unit
 
 	assign We					= I_Token.v & ( is_MAD | is_MAC );
 	assign Re					= ~Empty & ( Chain_Mlt | Chain_Add );
-
-	assign Data3				= Buff_Src3[ RNo ];
 
 
 	always_ff @( posedge clock ) begin
@@ -186,6 +195,8 @@ module MA_Unit
 			.DEPTH_PIPE(		DEPTH_ADD				)
 		) Add_Unit
 		(
+			.clock(				clock					),
+			.reset(				reset					),
 			.I_En(				En_Add					),
 			.I_Data1(			Data1_Add				),
 			.I_Data2(			Data2_Add				),
@@ -200,6 +211,8 @@ module MA_Unit
 			.DEPTH_PIPE(		DEPTH_MLT				)
 		) Mlt_Unit
 		(
+			.clock(				clock					),
+			.reset(				reset					),
 			.I_En(				En_Mlt					),
 			.I_Data1(			Data1_Mlt				),
 			.I_Data2(			Data2_Mlt				),

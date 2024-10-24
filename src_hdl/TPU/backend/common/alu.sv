@@ -156,7 +156,7 @@ module ALU
 
 
 	assign O_ALU_Done			= (   ( Sel == 2'b00 ) & Valid_MA ) |
-									( ( Sel == 2'b01 ) & Valid_iDIV ) |
+									( ( Sel == 2'b01 ) & Valid_iDiv ) |
 									( ( Sel == 2'b10 ) & Valid_Cnvt ) |
 									( ( Sel == 2'b11 ) & Valid_SRL );
 
@@ -199,11 +199,11 @@ module ALU
 	(
 		//.clock(				clock					),
 		//.reset(				reset					),
-		.I_En(				En_iDIV					),
+		.I_En(				En_iDiv					),
 		.I_Data1(			iDIV_Data1				),
 		.I_Data2(			iDIV_Data2				),
 		.I_Token(			iDiv_Token				),
-		.O_Valid(			Valid_iDIV				),
+		.O_Valid(			Valid_iDiv				),
 		.O_Data(			Data_iDiv				),
 		.O_Token(			Token_iDiv				)
 	);

@@ -22,7 +22,7 @@ module Commit_TPU
 	output						O_Commit_Grant_S,		//Commit Grant to Scalar Commit Unit
 	output						O_Commit_Grant_V,		//Commit Grant to Vector Commit Unit
 	output						O_Commit_Req,			//Commit Request to Hazard Unit
-	input	issue_no_t			O_Commit_No				//Commit No to Hazard Unit
+	output	issue_no_t			O_Commit_No				//Commit No to Hazard Unit
 );
 
 

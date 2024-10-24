@@ -131,9 +131,6 @@ module IndexUnit
 																Index_s1 + Index_s2;
 
 	//Output Actual Index
-	assign O_Req				= R_Req | R_Sel | I_Req | SkipReq;
-	assign O_Slice				= ( R_Req ) ? R_Sel :	I_Req & I_Index.slice;
-
 	assign O_Index.v			= ( R_Req ) ? R_Idx_Cfg.v | SkipReq | R_Sel :	I_Index.v & I_Req;
 	assign O_Index.slice		= ( R_Req ) ? R_Idx_Cfg.slice :					I_Index.slice;
 	assign O_Index.sel			= ( R_Req ) ? R_Idx_Cfg.sel :					I_Index.sel;

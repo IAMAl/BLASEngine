@@ -28,7 +28,7 @@ module TPU
 	input	[1:0]				I_S_St_Ready,			//Flag: Ready
 	input	[1:0]				I_S_St_Grant,			//Flag: Grant
 	input	[1:0]				I_S_End_Access,			//Flag: End of Access
-	input	v_ldst_t			O_V_LdSt,				//Load/Store Command
+	output	v_ldst_t			O_V_LdSt,				//Load/Store Command
 	input	v_ldst_data_t		I_V_Ld_Data,			//Loaded Data
 	output	v_ldst_data_t		O_V_St_Data,			//Storing Data
 	input	v_ready_t			I_V_Ld_Ready,			//Flag:	Ready
@@ -67,7 +67,8 @@ module TPU
 	v_ready_t					En_Lane;
 	v_ready_t					V_Status;
 
-	logic						Commmit_Req_V;
+	logic						Commit_Req_V;;
+	logic						Commit_Grant;
 
 	logic						Term;
 
@@ -135,7 +136,7 @@ module TPU
 		.I_Empty(			Buff_Empty				),
 		.I_Req_St(			IDBuff_Re				),
 		.O_Ack_St(			Ack_St					),
-		.I_Commit_Req_V(	Commmit_Req_V			),
+		.I_Commit_Req_V(	Commit_Req_V			),
 		.I_En(				I_En_Exe				),
 		.I_ThreadID(		ThreadID				),
 		.I_Instr(			Instr					),
@@ -153,6 +154,7 @@ module TPU
 		.O_V_Command(		V_Command				),
 		.I_V_State(			V_Status				),
 		.O_Lane_En(			En_Lane					),
+		.O_Commit_Grant(	Commit_Grant			),
 		.O_Status(			S_Status				),
 		.O_Term(			Term					)
 	);
@@ -161,6 +163,7 @@ module TPU
 	Vector_Unit Vector_Unit (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Commit_Grant(	Commit_Grant			),
 		.I_En_Lane(			En_Lane					),
 		.I_ThreadID(		ThreadID				),
 		.I_Command(			V_Command				),
@@ -174,7 +177,7 @@ module TPU
 		.I_Ld_Grant(		I_V_Ld_Grant			),
 		.I_St_Ready(		I_V_St_Ready			),
 		.I_St_Grant(		I_V_St_Grant			),
-		.O_Commmit_Req(		Commmit_Req_V			),
+		.O_Commmit_Req(		Commit_Req_V			),
 		.O_Status(			V_Status				)
 	);
 

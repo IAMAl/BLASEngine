@@ -62,6 +62,10 @@ module pub_domain_man
 	logic						Ready_St;
 	logic						Ready_Ld;
 
+	logic						Set_St;
+	logic						Clr_Ld;
+
+
 	logic						R_St_Grant1;
 	logic						R_St_Grant2;
 	logic						R_St_Grant3;
