@@ -177,7 +177,7 @@ module ExecUnit_S
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
 		.I_Commit_Grant(	I_Commit_Grant			),
-		.I_Req(				LdSt_Req				),
+		.I_Req(				LdSt_Req[0]				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		I_Src_Data1				),
 		.I_Src_Data2(		I_Src_Data2				),

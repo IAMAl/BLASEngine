@@ -31,10 +31,10 @@ module TPU
 	output	v_ldst_t			O_V_LdSt,				//Load/Store Command
 	input	v_ldst_data_t		I_V_Ld_Data,			//Loaded Data
 	output	v_ldst_data_t		O_V_St_Data,			//Storing Data
-	input	v_ready_t			I_V_Ld_Ready,			//Flag:	Ready
-	input	v_grant_t			I_V_Ld_Grant,			//Flag: Grant
-	input	v_ready_t			I_V_St_Ready,			//Flag: Ready
-	input	v_grant_t			I_V_St_Grant,			//Flag: Grant
+	input	v_2b_t				I_V_Ld_Ready,			//Flag:	Ready
+	input	v_2b_t				I_V_Ld_Grant,			//Flag: Grant
+	input	v_2b_t				I_V_St_Ready,			//Flag: Ready
+	input	v_2b_t				I_V_St_Grant,			//Flag: Grant
 	input	v_2b_t				I_V_End_Access,			//Flag: End of Access
 	output	mpu_issue_no_t		O_IssueNo,				//Thread's Issue No
 	output						O_Term,					//Flag: Termination

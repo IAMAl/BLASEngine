@@ -37,7 +37,7 @@ module req_handle
 	output	logic				O_Grant3,				//Grant (to Lane)
 	output	logic				O_Req,					//Access Request to Man
 	output	logic				O_GrantVld,				//Grant Validation
-	output	logic				O_GrantNo				//Grant No
+	output	[1:0]				O_GrantNo				//Grant No
 );
 
 
@@ -47,7 +47,10 @@ module req_handle
 
 
 	assign O_GrantVld 			=  R_Grant1 | R_Grant2;
-	assign O_GrantNo 			= ~R_Grant1 & R_Grant2;
+	assign O_GrantNo 			= ( R_Grant1 ) ?	2'b01 :
+									( R_Grant2 ) ?	2'b10 :
+									( R_Grant3 ) ?	2'b11 :
+													2'b0;
 
 	assign O_Grant1				= R_Grant1;
 	assign O_Grant2				= R_Grant2;

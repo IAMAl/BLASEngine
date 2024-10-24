@@ -24,10 +24,10 @@ module Vector_Unit
 	output	v_ldst_t			O_LdSt,					//Load Request
 	input	v_ldst_data_t		I_Ld_Data,				//Loaded Data
 	output	v_ldst_data_t		O_St_Data,				//Storing Data
-	input	v_ready_t			I_Ld_Ready,				//Flag: Ready
-	input	v_grant_t			I_Ld_Grant,				//Flag: Grant
-	input	v_ready_t			I_St_Ready,				//Flag: Ready
-	input	v_grant_t			I_St_Grant,				//Flag: Grant
+	input	v_2b_t				I_Ld_Ready,				//Flag: Ready
+	input	v_2b_t				I_Ld_Grant,				//Flag: Grant
+	input	v_2b_t				I_St_Ready,				//Flag: Ready
+	input	v_2b_t				I_St_Grant,				//Flag: Grant
 	input	v_2b_t				I_End_Access,			//Flag: End of Access
 	output						O_Commmit_Req,			//Commit Request
 	output	v_ready_t			O_Status				//Status on Lane

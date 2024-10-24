@@ -29,10 +29,10 @@ import pkg_mpu::*;
 	output	s_ldst_t			O_LdSt,					//Load/Store Command
 	input	s_ldst_data_t		I_Ld_Data,				//Loaded Data
 	output	s_ldst_data_t		O_St_Data,				//Storing Data
-	input	[1:0]				I_Ld_Ready,				//Flag: Ready
-	input	[1:0]				I_Ld_Grant,				//Flag: Grant
-	input	[1:0]				I_St_Ready,				//Flag: Ready
-	input	[1:0]				I_St_Grant,				//Flag: Grant
+	input	tb_t				I_Ld_Ready,				//Flag: Ready
+	input	tb_t				I_Ld_Grant,				//Flag: Grant
+	input	tb_t				I_St_Ready,				//Flag: Ready
+	input	tb_t				I_St_Grant,				//Flag: Grant
 	input						I_End_Access1,			//Flag: End of Access
 	input						I_End_Access2,			//Flag: End of Access
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect

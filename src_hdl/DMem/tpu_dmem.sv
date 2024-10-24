@@ -58,8 +58,8 @@ module DMem_Body
 
 	logic						Ld_GrantVld;
 	logic						St_GrantVld;
-	logic						Ld_GrantNo;
-	logic						St_GrantNo;
+	logic	[1:0]				Ld_GrantNo;
+	logic	[1:0]				St_GrantNo;
 
 	logic						St_Grant1;
 	logic						St_Grant2;
@@ -159,8 +159,8 @@ module DMem_Body
 	assign Ld_Grant3			= Ld_GrantVld & ( Ld_GrantNo == 2'h2 );
 
 
-	assign St_Offset			= ~St_Public & St_GrantVld & St_GrantNo;
-	assign Ld_Offset			= ~Ld_Public & Ld_GrantVld & Ld_GrantNo;
+	assign St_Offset			= ~St_Public & St_GrantVld & St_GrantVld;
+	assign Ld_Offset			= ~Ld_Public & Ld_GrantVld & Ld_GrantVld;
 
 	assign St_Valid				= ( I_St_Valid1 & O_St_Grant1 ) | ( I_St_Valid2 & O_St_Grant2 );
 	assign Ld_Valid				= ( I_Ld_Valid1 & O_Ld_Grant1 ) | ( I_Ld_Valid2 & O_Ld_Grant2 );
@@ -354,8 +354,10 @@ module DMem_Body
 		.I_GrantNo_Ld(		Ld_GrantNo				),
 		.O_St_Ready1(		St_Ready1				),
 		.O_St_Ready2(		St_Ready2				),
+		.O_St_Ready3(								),
 		.O_Ld_Ready1(		Ld_Ready1				),
 		.O_Ld_Ready2(		Ld_Ready2				),
+		.O_Ld_Ready3(								),
 		.O_Set_Config_St(	Set_Config_St			),
 		.O_Set_Config_Ld(	Set_Config_Ld			)
 	);

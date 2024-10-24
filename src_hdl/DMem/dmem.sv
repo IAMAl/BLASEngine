@@ -17,7 +17,7 @@ module DMem
 	input						I_Rt_Req,				//Request from Router
 	input	data_t				I_Rt_Data,				//Data from Router
 	input						I_Rt_Rls,				//Releas from Router
-	input						O_Rt_Req,				//Request to Router
+	output						O_Rt_Req,				//Request to Router
 	input	data_t				O_Rt_Data,				//Data to Router
 	output						O_Rt_Rls,				//Release to Router
 	input	s_ldst_t			I_S_LdSt,				//Load/Store Command
@@ -30,10 +30,10 @@ module DMem
 	input	v_ldst_t			I_V_LdSt,				//Load/Store Command
 	output	v_ldst_data_t		O_V_Ld_Data,			//Loaded Data, to TPU Core
 	input	v_ldst_data_t		I_V_St_Data,			//Storing Data, from TPU Core
-	output	v_ready_t			O_V_Ld_Ready,			//Flag: Ready to Service
-	output	v_grant_t			O_V_Ld_Grant,			//Flag: Grant for Request
-	output	v_ready_t			O_V_St_Ready,			//Flag: Ready to Service
-	output	v_grant_t			O_V_St_Grant			//Flag: Grant for Request
+	output	v_2b_t				O_V_Ld_Ready,			//Flag: Ready to Service
+	output	v_2b_t				O_V_Ld_Grant,			//Flag: Grant for Request
+	output	v_2b_t				O_V_St_Ready,			//Flag: Ready to Service
+	output	v_2b_t				O_V_St_Grant			//Flag: Grant for Request
 );
 
 
@@ -85,6 +85,7 @@ module DMem
 		DMem_Body DMem_V (
 			.clock(				clock					),
 			.reset(				reset					),
+			.I_Stall(			'0						),
 			.I_Rt_Req(			I_Rt_Req				),
 			.I_Rt_Data(			I_Rt_Data				),
 			.I_Rt_Rls(			I_Rt_Rls				),

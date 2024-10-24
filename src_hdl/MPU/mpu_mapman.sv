@@ -80,7 +80,7 @@ module MapMan_MPU
 
 
 	always_comb begin
-		for ( int i=0; SIZE_TAB_MAPMAN; ++i ) begin
+		for ( int i=0; i<SIZE_TAB_MAPMAN; ++i ) begin
 			Valid[ i ]		= TabInstr[ i ].Valid;
 			is_Matched[ i ]	= Valid[ i ] & ( TabInstr[ WNo ].ThreadID == I_ThreadID_Ld );
 		end

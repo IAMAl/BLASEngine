@@ -62,7 +62,8 @@ package pkg_mpu;
 	typedef logic [WIDTH_NUM_ISSUE-1:0]	mpu_issue_no_t;
 
 	// Single-bit Flag for All TPUs
-	typedef logic [NUM_TPUS-1:0]		tpu_row_clm_t;
+	typedef logic [NUM_CLMS-1:0]		tpu_clm_t;
+	typedef tpu_clm_t	 [NUM_ROWS-1:0]	tpu_row_clm_t;
 
 	//I/F Data Port
 	typedef struct packed {

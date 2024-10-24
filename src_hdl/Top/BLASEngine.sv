@@ -70,11 +70,11 @@ module BLASEngine
 	logic						Route_Bwd_Rls	[NUM_ROWS+1:0][NUM_CLMS:0];
 
 
-	s_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_LdSt;
-	v_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_LdSt;
+	s_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_LdSt;
+	v_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_LdSt;
 
-	s_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_LdSt;
-	v_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_LdSt;
+	s_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_LdSt;
+	v_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_LdSt;
 
 
 	data_t			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_Ld_Data;
@@ -90,28 +90,28 @@ module BLASEngine
 	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Data;
 
 
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_Ld_Ready;
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_Ld_Grant;
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_St_Ready;
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_St_Grant;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_Ld_Ready;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_Ld_Grant;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_St_Ready;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_St_Grant;
 
-	v_ready_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_Ld_Ready;
-	v_grant_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_Ld_Grant;
-	v_ready_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_St_Ready;
-	v_grant_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_St_Grant;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_Ld_Ready;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_Ld_Grant;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_St_Ready;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_St_Grant;
 
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_Ld_Ready;
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_Ld_Grant;
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_St_Ready;
-	logic			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_St_Grant;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_Ld_Ready;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_Ld_Grant;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_St_Ready;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_St_Grant;
 
-	v_ready_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_Ld_Ready;
-	v_grant_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_Ld_Grant;
-	v_ready_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Ready;
-	v_grant_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Grant;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_Ld_Ready;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_Ld_Grant;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_St_Ready;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_St_Grant;
 
-	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]		TPU_S_End_Access;
-	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]		TPU_V_End_Access;
+	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_End_Access;
+	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_End_Access;
 
 
 	MPU MPU (
