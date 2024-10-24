@@ -109,12 +109,14 @@ module LdStUnit
 
 
 	assign Ld_Token.v			= Ld_Req;
+	assign Ld_Token.op			= I_Command.instr.op;
 	assign Ld_Token.dst			= I_Command.instr.dst;
 	assign Ld_Token.slice_len	= I_Command.instr.slice_len;
 	assign Ld_Token.issue_no	= I_Command.issue_no;
 	assign Ld_Token.path		= I_Command.instr.path;
 
 	assign St_Token.v			= St_Req;
+	assign St_Token.op			= I_Command.instr.op;
 	assign St_Token.dst			= I_Command.instr.dst;
 	assign St_Token.slice_len	= I_Command.instr.slice_len;
 	assign St_Token.issue_no	= I_Command.issue_no;

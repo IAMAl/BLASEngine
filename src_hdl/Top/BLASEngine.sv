@@ -14,8 +14,8 @@ module BLASEngine
 	import	pkg_tpu::*;
 	import	pkg_tpu::instr_t;
 	import	pkg_tpu::BYPASS_BUFF_SIZE;
-	import	pkg_top::NUM_ROWS;
-	import	pkg_top::NUM_CLMS;
+	import	pkg_mpu::NUM_ROWS;
+	import	pkg_mpu::NUM_CLMS;
 	import	pkg_mpu::NUM_TPUS;
 (
 	input						clock,
@@ -73,8 +73,8 @@ module BLASEngine
 	s_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_LdSt;
 	v_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_LdSt;
 
-	s_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_LdSt;
-	v_ldst_t		[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_LdSt;
+	s_ldst_t		[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_S_LdSt;
+	v_ldst_t		[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_V_LdSt;
 
 
 	data_t			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_Ld_Data;
@@ -83,11 +83,11 @@ module BLASEngine
 	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_Ld_Data;
 	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_St_Data;
 
-	data_t			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_Ld_Data;
-	data_t			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_S_St_Data;
+	data_t			[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_S_Ld_Data;
+	data_t			[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_S_St_Data;
 
-	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_Ld_Data;
-	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Data;
+	v_data_t		[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_V_Ld_Data;
+	v_data_t		[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Data;
 
 
 	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_Ld_Ready;
@@ -100,15 +100,15 @@ module BLASEngine
 	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_St_Ready;
 	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_St_Grant;
 
-	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_Ld_Ready;
-	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_Ld_Grant;
-	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_St_Ready;
-	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_S_St_Grant;
+	tb_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_S_Ld_Ready;
+	tb_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_S_Ld_Grant;
+	tb_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_S_St_Ready;
+	tb_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_S_St_Grant;
 
-	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_Ld_Ready;
-	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_Ld_Grant;
-	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_St_Ready;
-	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	RAM_V_St_Grant;
+	v_2b_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_V_Ld_Ready;
+	v_2b_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_V_Ld_Grant;
+	v_2b_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_V_St_Ready;
+	v_2b_t			[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_V_St_Grant;
 
 	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_End_Access;
 	v_2b_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_V_End_Access;

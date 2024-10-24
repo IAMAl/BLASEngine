@@ -261,6 +261,7 @@ package pkg_tpu;
 		idx_t							src3;
 		index_t							slice_len;
 		issue_no_t						issue_no;
+		imm_t							imm;
 		logic	[16:0]					path;
 		logic							mread;
 		logic							en_ii;
@@ -276,7 +277,10 @@ package pkg_tpu;
 		idx_t							src4;
 		index_t							slice_len;
 		issue_no_t						issue_no;
+		imm_t							imm;
 		logic	[16:0]					path;
+		logic							mread;
+		logic							en_ii;
 	} pipe_index_reg_t;
 
 	//	Register-Read Stages
@@ -289,7 +293,10 @@ package pkg_tpu;
 		reg_idx_t						src3;
 		index_t							slice_len;
 		issue_no_t						issue_no;
+		imm_t							imm;
 		logic	[16:0]					path;
+		logic							mread;
+		logic							en_ii;
 	} pipe_reg_t;
 
 	//	Register-Read and Network Stages
@@ -305,7 +312,10 @@ package pkg_tpu;
 		index_t							idx3;
 		index_t							slice_len;
 		issue_no_t						issue_no;
+		imm_t							imm;
 		logic	[16:0]					path;
+		logic							mread;
+		logic							en_ii;
 	} pipe_net_t;
 
 	//	Execuution Stage (First)
@@ -318,7 +328,6 @@ package pkg_tpu;
 		index_t							slice_len;
 		issue_no_t						issue_no;
 		logic	[4:0]					path;
-
 	} pipe_exe_t;
 
 	//	Execution Stage (Intermediate)

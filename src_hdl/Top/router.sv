@@ -13,7 +13,10 @@ module Router
 	import pkg_top::*;
 	import pkg_mpu::*;
 	import pkg_tpu::*;
-(
+#(
+	parameter int	ROW_ID		= 0,
+	parameter int	CLM_ID		= 0
+)(
 	input						clock,
 	input						reset,
 	input						I_Req,					//Request from Forward Path
@@ -37,10 +40,13 @@ module Router
 );
 
 
+	logic	[WIDTH_DATA/4:0]	ID_Row;
+	logic	[WIDTH_DATA/4:0]	ID_Clm;
+
 	logic	[WIDTH_DATA/2:0]	MyID;
 	logic	[WIDTH_DATA/2:0]	ID;
 
-	logic	[WIDTH_DATA-1:0]	BranchID;
+	//logic	[WIDTH_DATA-1:0]	BranchID;
 
 	logic						is_Matched;
 
@@ -61,6 +67,10 @@ module Router
 	logic						Run;
 	logic						R_is_Matched;
 
+	assign ID_Row				= ROW_ID;
+	assign ID_Clm				= CLM_ID;
+	assign ID					= { ID_Row, ID_Clm };
+	assign is_Matched			= I_Req & ( I_Data == ID );
 
 	assign O_Req_A				= Req_A;
 	assign O_Rls_A				= Rls_A;
@@ -82,6 +92,16 @@ module Router
 		end
 		else if ( I_Req & ~Run ) begin
 			MyID			<= I_Data[WIDTH_DATA/2-1:0];
+		end
+	end
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_is_Matched	<= 1'b0;
+		end
+		else begin
+			R_is_Matched	<= is_Matched;
 		end
 	end
 

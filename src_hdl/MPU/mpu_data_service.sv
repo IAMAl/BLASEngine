@@ -350,7 +350,7 @@ module DataService_MPU
 
 
 	//Store Buffer
-	RingBuffCTRL_Re #(
+	RingBuffCTRL #(
 		.NUM_ENTRY(			BUFF_SIZE				)
 	) RingBuffCTRL
 	(

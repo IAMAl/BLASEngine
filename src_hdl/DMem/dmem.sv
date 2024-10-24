@@ -18,7 +18,7 @@ module DMem
 	input	data_t				I_Rt_Data,				//Data from Router
 	input						I_Rt_Rls,				//Releas from Router
 	output						O_Rt_Req,				//Request to Router
-	input	data_t				O_Rt_Data,				//Data to Router
+	output	data_t				O_Rt_Data,				//Data to Router
 	output						O_Rt_Rls,				//Release to Router
 	input	s_ldst_t			I_S_LdSt,				//Load/Store Command
 	output	s_ldst_data_t		O_S_Ld_Data,			//Loaded Data, to TPU Core
@@ -40,6 +40,7 @@ module DMem
 	DMem_Body DMem_S (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Stall(			'0						),
 		.I_Rt_Req(			I_Rt_Req				),
 		.I_Rt_Data(			I_Rt_Data				),
 		.I_Rt_Rls(			I_Rt_Rls				),

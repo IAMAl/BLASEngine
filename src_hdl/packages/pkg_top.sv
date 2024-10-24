@@ -11,10 +11,12 @@
 package pkg_top;
 	import pkg_mpu::mpu_issue_no_t;
 	import pkg_mpu::tpu_row_clm_t;
+	import pkg_mpu::NUM_ROWS;
+	import pkg_mpu::NUM_CLMS;
 
 	//Number of Rows in BLASEngine
-	localparam int NUM_ROWS				= 1;
-	localparam int NUM_CLMS				= 1;
+	//localparam int NUM_ROWS				= 1;
+	//localparam int NUM_CLMS				= 1;
 
 	//Total Number of TPUs
 	localparam int NUM_TPU				= NUM_ROWS*NUM_CLMS;

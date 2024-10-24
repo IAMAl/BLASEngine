@@ -26,7 +26,7 @@ module PACUnit
 	input	issue_no_t			I_Timing_WB,			//Count Value for Write-Back Instr
 	input	state_t				I_State,				//Status Register
 	input						I_Cond,					//Flag: Condition
-	output	address_t			I_Src,					//Source Value
+	input	address_t			I_Src,					//Source Value
 	output						O_IFetch,				//Instruction Fetch
 	output	address_t			O_Address,				//Address (Program COunter)
 	output						O_StallReq				//Stall Request

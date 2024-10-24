@@ -36,7 +36,7 @@ module NLZ64
 	logic	[2:0]				Num7;
 
 
-	assign O_Valid				= Valid0 | Valid1 | Valid2 | Valid3 |Valid4 | Valid5 | Valid6 | Valid7;
+	assign O_Valid				= Valid0 | Valid1 | Valid2 | Valid3 | Valid4 | Valid5 | Valid6 | Valid7;
 	assign O_Num				= ( Valid0 ) ?		Num0 | 6'h00 :
 									( Valid1 ) ?	Num1 | 6'h08 :
 									( Valid2 ) ?	Num2 | 6'h10 :

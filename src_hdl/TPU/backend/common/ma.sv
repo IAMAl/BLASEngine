@@ -69,9 +69,6 @@ module MA_Unit
 	issue_no_t					LifeAdd;
 	issue_no_t					LifeMlt;
 
-
-	logic						LiFeAdd;
-	logic						LiFeMlt;
 	issue_no_t					Add_Issue_No;
 	issue_no_t					Mlt_Issue_No;
 
@@ -89,17 +86,13 @@ module MA_Unit
 	logic						is_MAC;
 	logic						is_MAD;
 
-	issue_no_t					Add_Isssue_No;
-	issue_no_t					Mlt_Isssue_No;
-
-
 	data_t						Buff_Src3	[DEPTH_MLT-1:0];
 
 
-	assign Add_Isssue_No		= Add_Token.issue_no;
-	assign Mlt_Isssue_No		= Mlt_Token.issue_no;
-	assign LiFeAdd				= I_Pres_Issue_No - Add_Issue_No;
-	assign LiFeMlt				= I_Pres_Issue_No - Mlt_Issue_No;
+	assign Add_Issue_No			= Add_Token.issue_no;
+	assign Mlt_Issue_No			= Mlt_Token.issue_no;
+	assign LifeAdd				= I_Pres_Issue_No - Add_Issue_No;
+	assign LifeMlt				= I_Pres_Issue_No - Mlt_Issue_No;
 
 	assign En_Add				= is_Adder | is_MAC | is_MAD;
 	assign En_Mlt				= is_Mlter;

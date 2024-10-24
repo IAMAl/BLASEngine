@@ -98,6 +98,7 @@ module ExecUnit_S
 	assign LifeALU				= I_Issue_No - ALU_Token.issue_no;
 	assign LifeLdSt1			= I_Issue_No - Ld_Token[0].issue_no;
 	assign LifeLdSt2			= I_Issue_No - Ld_Token[0].issue_no;
+	assign LifeMv				= I_Issue_No - Mv_Token.issue_no;
 
 	assign is_LifeLdSt2			= LifeLdSt2 > LifeLdSt1;
 	assign LifeLdSt				= ( is_LifeLdSt2 ) ? LifeLdSt2 : LifeLdSt1;

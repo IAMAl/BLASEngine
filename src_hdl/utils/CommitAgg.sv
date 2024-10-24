@@ -45,6 +45,9 @@ module CommitAgg
 
 	assign Send_Commit			= CommitAgg[ Rd_Ptr ].v & ( &( ~( CommitAgg[ Rd_Ptr ].commit ^ CommitAgg[ Rd_Ptr ].en_tpu ) ) );
 
+	assign O_Commit_Req			= Send_Commit;
+	assign O_Commit_No			= CommitAgg[ Rd_Ptr ].issue_no;
+
 
 	always_comb begin
 		for ( int i=0; i<BUFF_SIZE; ++i ) begin
@@ -67,13 +70,13 @@ module CommitAgg
 				CommitAgg[ i ]	<= '0;
 			end
 		end
-		else if ( Send_Commit | I_Commit_Req ) begin
+		else if ( Send_Commit | I_Req ) begin
 			if ( Send_Commit ) begin
 				CommitAgg[ Wr_Ptr ].v		<= 1'b0;
 				CommitAgg[ Wr_Ptr ].en_tpu	<= '0;
 			end
 
-			if ( I_Commit_Req ) begin
+			if ( I_Req ) begin
 				CommitAgg[ Wr_Ptr ].v		<= 1'b1;
 				CommitAgg[ Wr_Ptr ].en_tpu	<= I_En_TPU;
 				CommitAgg[ Wr_Ptr ].commit	<= '0;

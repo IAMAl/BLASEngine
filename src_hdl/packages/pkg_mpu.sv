@@ -14,8 +14,8 @@ package pkg_mpu;
 	import pkg_tpu::WIDTH_DATA;
 
 	//Number of Rows in BLASEngine
-	localparam int NUM_ROWS				= 2;
-	localparam int NUM_CLMS				= 2;
+	localparam int NUM_ROWS				= 1;
+	localparam int NUM_CLMS				= 1;
 
 	// Number of Scalar-Thread
 	localparam int NUM_ENTRY_STH		= 64;
@@ -102,7 +102,7 @@ package pkg_mpu;
 
 	//MPU Status
 	typedef struct packed {
-		logic							io;
+		logic	[3:0]					io;
 		logic							imem_wait;
 		logic							send_thread;
 		logic							full_mapman;

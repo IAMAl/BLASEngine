@@ -97,7 +97,7 @@ module MapMan_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length_Ld		<= 0;
+			R_Address_Ld	<= 0;
 		end
 		else if ( I_Req_Lookup & ~FSM_Ld ) begin
 			R_Address_Ld	<= TabInstr[ RNo ].Address;

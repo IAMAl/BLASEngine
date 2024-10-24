@@ -39,11 +39,11 @@ module MPU
 
 	logic						Req_st;
 	id_t						ThreadID_S_St;
-	instr_t						Length_St;
+	t_address_t					Length_St;
 	logic						Ack_St;
 	logic						No_ThMem;
 	logic						End_Send_Thread;
-	logic						IF_State;
+	logic	[3:0]				IF_State;
 
 	t_address_t					Used_Size;
 	logic						Req_Ld;
@@ -75,7 +75,7 @@ module MPU
 	logic						IF_Req_St;
 	instr_t						IF_Instr;
 
-	tpu_row_clm_t				En_TPU;
+	logic	[NUM_TPUS-1:0]		En_TPU;
 
 
 	assign O_TPU_Req			= |En_TPU;
@@ -102,7 +102,7 @@ module MPU
 		.I_Data(			Dmem_O_Data				),
 		.O_Req(				Dmem_I_Req				),
 		.O_Data(			Dmem_I_Data				),
-		.O_En_TPU(			O_TPU_En_Exe			),
+		.O_En_TPU(			En_TPU					),
 		.O_State(			IF_State				)
 	);
 

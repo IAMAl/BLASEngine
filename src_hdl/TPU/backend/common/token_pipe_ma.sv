@@ -120,7 +120,7 @@ module token_pipe_ma
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			for ( int i=0; i<DEPTH_MLT; ++i ) begin
+			for ( int i=0; i<DEPTH_ADD; ++i ) begin
 				TBuffAdd[ i ]			<= '0;
 			end
 		end

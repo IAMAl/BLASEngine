@@ -147,8 +147,8 @@ module DMem_Body
 	assign St_Public			= St_Ready1 | St_Ready2;
 	assign Ld_Public			= Ld_Ready1 | Ld_Ready2;
 
-	assign St_Private			= ~Base_Addr_St[POS_MSB_DMEM_ADDR+1] & St_GrantVld;
-	assign Ld_Private			= ~Base_Addr_Ld[POS_MSB_DMEM_ADDR+1] & Ld_GrantVld;
+	assign St_Private			= ~Base_Addr_St[POS_MSB_DMEM_ADDR-1] & St_GrantVld;
+	assign Ld_Private			= ~Base_Addr_Ld[POS_MSB_DMEM_ADDR-1] & Ld_GrantVld;
 
 	assign St_Grant1			= St_GrantVld & ( St_GrantNo == 2'h0 );
 	assign St_Grant2			= St_GrantVld & ( St_GrantNo == 2'h1 );
@@ -164,8 +164,8 @@ module DMem_Body
 
 	assign St_Valid				= ( I_St_Valid1 & O_St_Grant1 ) | ( I_St_Valid2 & O_St_Grant2 );
 	assign Ld_Valid				= ( I_Ld_Valid1 & O_Ld_Grant1 ) | ( I_Ld_Valid2 & O_Ld_Grant2 );
-	assign St_Base				= { St_Public, St_Offset, Base_Addr_St[POS_MSB_DMEM_ADDR-1:0] };
-	assign Ld_Base				= { Ld_Public, Ld_Offset, Base_Addr_Ld[POS_MSB_DMEM_ADDR-1:0] };
+	assign St_Base				= { St_Public, St_Offset, Base_Addr_St[POS_MSB_DMEM_ADDR-2:0] };
+	assign Ld_Base				= { Ld_Public, Ld_Offset, Base_Addr_Ld[POS_MSB_DMEM_ADDR-2:0] };
 
 	assign Set_Cfg_and_Run_St	= Set_Config_St | ( ~R_St_Private & St_Private );
 	assign Set_Cfg_and_Run_Ld	= Set_Config_Ld | ( ~R_Ld_Private & Ld_Private );
