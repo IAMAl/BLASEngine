@@ -31,6 +31,7 @@ module Network_S
 	input	index_t				I_Src_Idx1,				//Index from RegFile
 	input	index_t				I_Src_Idx2,				//Index from RegFile
 	input	index_t				I_Src_Idx3,				//Index from RegFile
+	input	index_t				I_WB_Index,
 	input	data_t				I_WB_Data,				//Data from ALU
 	output	data_t				O_WB_Data,				//WB Data to Register File
 	output	data_t				O_Src_Data1,			//To Exec Unit

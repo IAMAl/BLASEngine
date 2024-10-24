@@ -53,6 +53,8 @@ module PathSel
 	data_t						Src_Data3;
 	data_t						WB_Data;
 
+	data_t						Lane_WB_Data;
+
 
 	assign Sel_Path_Lane		= I_Sel_Path[3:0] + LANE_ID;
 	assign Sel_Path_Src			= I_Sel_Path[1:0];

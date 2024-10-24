@@ -145,6 +145,7 @@ import pkg_mpu::*;
 	logic						Lane_CTRL_Rst;
 	logic						Lane_CTRL_Set;
 
+	logic						Re_c;
 	logic						R_Re_c;
 	logic						We_c;
 	logic	[1:0]				Cond_Data;

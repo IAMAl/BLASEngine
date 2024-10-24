@@ -52,6 +52,7 @@ module HazardCheck_TPU
 
 	logic						v_Issue;
 	logic						RAR_Hazard;
+	logic						WAW_Hazard;
 	logic						RAW_Hazard_Src1;
 	logic						RAW_Hazard_Src2;
 	logic						RAW_Hazard_Src3;

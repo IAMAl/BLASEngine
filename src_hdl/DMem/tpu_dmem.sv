@@ -110,7 +110,7 @@ module DMem_Body
 	logic						Ld_Req;
 	data_t						Ld_Data;
 
-	logic						Stall_Lt;
+	logic						Stall_Ld;
 	logic						Stall_St;
 
 	data_t						Extern_St_Data;

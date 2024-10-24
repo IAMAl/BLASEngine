@@ -735,7 +735,7 @@ module Scalar_Unit
 		.O_Re_p0(			Re_p0					),
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),
-		.I_Data(			W_WB_Data				),
+		.I_Data(			WB_Data_				),
 		.O_Data(			R_Scalar_Data			),
 		.I_SWe(				'0						),//ToDo
 		.I_Scalar_Data(		I_Scalar_Data			),
@@ -862,6 +862,7 @@ module Scalar_Unit
 		.I_Src_Idx1(		PipeReg_RR_Net.idx1		),
 		.I_Src_Idx2(		PipeReg_RR_Net.idx2		),
 		.I_Src_Idx3(		PipeReg_RR_Net.idx3		),
+		.I_WB_Index(		WB_Token.dst.idx		),
 		.I_WB_Data(			WB_Data					),
 		.O_WB_Data(			WB_Data_				),
 		.O_Src_Data1(		PipeReg_Net.data1		),

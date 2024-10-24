@@ -53,6 +53,7 @@ module token_pipe_ma
 	issue_no_t					LifeAdd;
 	logic						is_Mlt_Old;
 
+	logic						Valid;
 
 	logic						SelOut;
 
