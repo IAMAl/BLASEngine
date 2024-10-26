@@ -25,7 +25,7 @@ module PACUnit
 	input	issue_no_t			I_Timing_MY,			//Count Value for This Instruction
 	input	issue_no_t			I_Timing_WB,			//Count Value for Write-Back Instr
 	input	state_t				I_State,				//Status Register
-	input						I_Cond,					//Flag: Condition
+	input	cond_t				I_Cond,					//Flag: Condition
 	input	address_t			I_Src,					//Source Value
 	output						O_IFetch,				//Instruction Fetch
 	output	address_t			O_Address,				//Address (Program COunter)
@@ -72,7 +72,7 @@ module PACUnit
 
 
 	// Branch Evaluation
-	assign Taken				= Ready & I_Cond;//I_State[ I_Cond ];
+	assign Taken				= Ready & I_State[ I_Cond ];
 
 
 	// Updating Address

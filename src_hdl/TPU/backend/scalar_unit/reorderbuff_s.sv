@@ -64,9 +64,9 @@ module ReorderBuff_S
 	assign O_Commit_Req			= Re;
 	assign O_Commit_No			= Commit_S[RNo].issue_no;
 
-	assign O_Commited_LdSt1		= R_Commit_Req_LdSt1 & Re;
-	assign O_Commited_LdSt2		= R_Commit_Req_LdSt2 & Re;
-	assign O_Commited_Math		= R_Commit_Req_Math & Re;
+	assign O_Commited_LdSt1		= R_Commit_Req_LdSt1 & ( R_Commit_No_LdSt1 == Commit_S[RNo].issue_no ) & Re;
+	assign O_Commited_LdSt2		= R_Commit_Req_LdSt2 & ( R_Commit_No_LdSt2 == Commit_S[RNo].issue_no ) & Re;
+	assign O_Commited_Math		= R_Commit_Req_Math  & ( R_Commit_No_Math  == Commit_S[RNo].issue_no ) & Re;
 
 	// State of Buffer
 	assign O_Full				= Full;

@@ -17,18 +17,17 @@ module CondReg
 	input						I_Ready,			//Ready to Set
 	input						I_Term,				//Termination of Compare
 	input						I_We,				//Write-Enable the Mask Register
-	input	cond_t				I_Cond,				//Condition to Gnerate Flag
 	input	state_t				I_Status,			//Status of Comparing
 	input						I_Re,				//Read-Enable
-	output						O_Condition			//Condition Data
+	output	state_t				O_Cond				//Condition Data
 );
 
 
-	logic						Mask;
+	cond_t						Mask;
 	logic						Ready;
 
 
-	assign O_Condition			= ( I_Re ) ? Mask : '0;
+	assign O_Cond			= ( I_Re ) ? Mask : '0;
 
 
 	always_ff @( posedge clock ) begin
@@ -49,7 +48,7 @@ module CondReg
 			Mask			<= '0;
 		end
 		else if ( I_We & Ready ) begin
-			Mask			<= I_Status[ I_Cond ];
+			Mask			<= I_Status;
 		end
 	end
 

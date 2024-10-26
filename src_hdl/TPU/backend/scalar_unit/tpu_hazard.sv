@@ -36,8 +36,6 @@ module HazardCheck_TPU
 	localparam int WIDTH_ENTRY	= $clog2(NUM_ENTRY_HAZARD);
 
 
-	iw_t						Index_Entry;
-
 	index_s_t					Index_Dst;
 	index_s_t					Index_Src1;
 	index_s_t					Index_Src2;
@@ -108,8 +106,6 @@ module HazardCheck_TPU
 	index_s_t					R_Index_Src2;
 	index_s_t					R_Index_Src3;
 
-	iw_t						R_Indeces;
-
 	logic						We_Valid_Dst;
 	logic						We_Valid_Src1;
 	logic						We_Valid_Src2;
@@ -132,15 +128,29 @@ module HazardCheck_TPU
 
 
 	//// Forming Indeces for Mixing Scalar and Vector Units
-	assign Index_Dst			= { I_is_Vec, I_Instr.dst.dst_sel.no,  I_Instr.dst.idx };
-	assign Index_Src1			= { I_is_Vec, I_Instr.src1.src_sel.no, I_Instr.src1.idx };
-	assign Index_Src2			= { I_is_Vec, I_Instr.src1.src_sel.no, I_Instr.src2.idx };
-	assign Index_Src3			= { I_is_Vec, I_Instr.src1.src_sel.no, I_Instr.src3.idx };
+	assign Index_Dst.v				= I_Instr.dst.v;
+	assign Index_Dst.sel.unit_no	= I_is_Vec;
+	assign Index_Dst.sel.no			= I_Instr.dst.dst_sel.no;
+	assign Index_Dst.idx			= I_Instr.dst.idx;
+
+	assign Index_Src1.v				= I_Instr.src1.v;
+	assign Index_Src1.sel.unit_no	= I_is_Vec;
+	assign Index_Src1.sel.no		= I_Instr.src1.src_sel.no;
+	assign Index_Src1.idx			= I_Instr.src1.idx;
+
+	assign Index_Src2.v				= I_Instr.src2.v;
+	assign Index_Src2.sel.unit_no	= I_is_Vec;
+	assign Index_Src2.sel.no		= I_Instr.src2.src_sel.no;
+	assign Index_Src2.idx			= I_Instr.src2.idx;
+
+	assign Index_Src3.v				= I_Instr.src3.v;
+	assign Index_Src3.sel.unit_no	= I_is_Vec;
+	assign Index_Src3.sel.no		= I_Instr.src3.src_sel.no;
+	assign Index_Src3.idx			= I_Instr.src3.idx;
 
 
 	//// Storing to Table
-	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
-	assign Index_Entry			= R_Indeces;
+	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
 
 
 	//// Hazard Detections
@@ -160,25 +170,25 @@ module HazardCheck_TPU
 
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY_HAZARD; ++i ) begin
-			is_Matched_i_dst_i_dst[ i ]		= TabHazard[ i ].instr.dst.v  & I_Instr.dst.v  & ( TabHazard[ i ].instr.dst.idx  == I_Instr.dst.idx );
-			is_Matched_i_dst_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].instr.src1.idx == I_Instr.dst.idx );
-			is_Matched_i_dst_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].instr.src2.idx == I_Instr.dst.idx );
-			is_Matched_i_dst_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].instr.src3.idx == I_Instr.dst.idx );
+			is_Matched_i_dst_i_dst[ i ]		= TabHazard[ i ].v & TabHazard[ i ].dst.v  & Index_Dst.v & ( TabHazard[ i ].dst  == Index_Dst );
+			is_Matched_i_dst_i_src1[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src1.v & Index_Dst.v & ( TabHazard[ i ].src1 == Index_Dst );
+			is_Matched_i_dst_i_src2[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src2.v & Index_Dst.v & ( TabHazard[ i ].src2 == Index_Dst );
+			is_Matched_i_dst_i_src3[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src3.v & Index_Dst.v & ( TabHazard[ i ].src3 == Index_Dst );
 
-			is_Matched_i_src1_i_dst[ i ]	= TabHazard[ i ].instr.dst.v  & I_Instr.src1.v & ( TabHazard[ i ].instr.dst.idx  == I_Instr.src1.idx );
-			is_Matched_i_src1_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src1.v & ( TabHazard[ i ].instr.src1.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
-			is_Matched_i_src1_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src1.v & ( TabHazard[ i ].instr.src2.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
-			is_Matched_i_src1_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src1.v & ( TabHazard[ i ].instr.src3.idx == I_Instr.src1.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src1_i_dst[ i ]	= TabHazard[ i ].v & TabHazard[ i ].dst.v  & Index_Src1.v & ( TabHazard[ i ].dst  == Index_Src1 );
+			is_Matched_i_src1_i_src1[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src1.v & Index_Src1.v & ( TabHazard[ i ].src1 == Index_Src1 ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src1_i_src2[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src2.v & Index_Src1.v & ( TabHazard[ i ].src2 == Index_Src1 ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src1_i_src3[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src3.v & Index_Src1.v & ( TabHazard[ i ].src3 == Index_Src1 ) & ( TabHazard[ i ].instr.slice_len != 0 );
 
-			is_Matched_i_src2_i_dst[ i ]	= TabHazard[ i ].instr.dst.v  & I_Instr.src2.v & ( TabHazard[ i ].instr.dst.idx  == I_Instr.src2.idx );
-			is_Matched_i_src2_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src2.v & ( TabHazard[ i ].instr.src1.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
-			is_Matched_i_src2_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src2.v & ( TabHazard[ i ].instr.src2.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
-			is_Matched_i_src2_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src2.v & ( TabHazard[ i ].instr.src3.idx == I_Instr.src2.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src2_i_dst[ i ]	= TabHazard[ i ].v & TabHazard[ i ].dst.v  & Index_Src2.v & ( TabHazard[ i ].dst  == Index_Src2 );
+			is_Matched_i_src2_i_src1[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src1.v & Index_Src2.v & ( TabHazard[ i ].src1 == Index_Src2 ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src2_i_src2[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src2.v & Index_Src2.v & ( TabHazard[ i ].src2 == Index_Src2 ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src2_i_src3[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src3.v & Index_Src2.v & ( TabHazard[ i ].src3 == Index_Src2 ) & ( TabHazard[ i ].instr.slice_len != 0 );
 
-			is_Matched_i_src3_i_dst[ i ]	= TabHazard[ i ].instr.dst.v  & I_Instr.src3.v & ( TabHazard[ i ].instr.dst.idx  == I_Instr.src3.idx );
-			is_Matched_i_src3_i_src1[ i ]	= TabHazard[ i ].instr.src1.v & I_Instr.src3.v & ( TabHazard[ i ].instr.src1.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
-			is_Matched_i_src3_i_src2[ i ]	= TabHazard[ i ].instr.src2.v & I_Instr.src3.v & ( TabHazard[ i ].instr.src2.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
-			is_Matched_i_src3_i_src3[ i ]	= TabHazard[ i ].instr.src3.v & I_Instr.src3.v & ( TabHazard[ i ].instr.src3.idx == I_Instr.src3.idx ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src3_i_dst[ i ]	= TabHazard[ i ].v & TabHazard[ i ].dst.v  & Index_Src3.v & ( TabHazard[ i ].dst  == Index_Src3 );
+			is_Matched_i_src3_i_src1[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src1.v & Index_Src3.v & ( TabHazard[ i ].src1 == Index_Src3 ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src3_i_src2[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src2.v & Index_Src3.v & ( TabHazard[ i ].src2 == Index_Src3 ) & ( TabHazard[ i ].instr.slice_len != 0 );
+			is_Matched_i_src3_i_src3[ i ]	= TabHazard[ i ].v & TabHazard[ i ].src3.v & Index_Src3.v & ( TabHazard[ i ].src3 == Index_Src3 ) & ( TabHazard[ i ].instr.slice_len != 0 );
 		end
 	end
 
@@ -201,7 +211,7 @@ module HazardCheck_TPU
 			We_Valid_Dst	<= 1'b0;
 		end
 		else begin
-			We_Valid_Dst	<= I_Req & I_Instr.dst.v;
+			We_Valid_Dst	<= I_Req & Index_Dst.v;
 		end
 	end
 
@@ -210,7 +220,7 @@ module HazardCheck_TPU
 			We_Valid_Src1	<= 1'b0;
 		end
 		else begin
-			We_Valid_Src1	<= I_Req & I_Instr.src1.v;
+			We_Valid_Src1	<= I_Req & Index_Src1.v;
 		end
 	end
 
@@ -219,7 +229,7 @@ module HazardCheck_TPU
 			We_Valid_Src2	<= 1'b0;
 		end
 		else begin
-			We_Valid_Src2	<= I_Req & I_Instr.src2.v;
+			We_Valid_Src2	<= I_Req & Index_Src2.v;
 		end
 	end
 
@@ -228,7 +238,7 @@ module HazardCheck_TPU
 			We_Valid_Src3	<= 1'b0;
 		end
 		else begin
-			We_Valid_Src3	<= I_Req & I_Instr.src3.v;
+			We_Valid_Src3	<= I_Req & Index_Src3.v;
 		end
 	end
 
@@ -265,45 +275,6 @@ module HazardCheck_TPU
 		end
 		else begin
 			R_Index_Src3	<= Index_Src3;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Indeces		<= '0;
-		end
-		else if ( Set_Index ) begin
-			if ( We_Valid_Dst ) begin
-				R_Indeces.instr.dst.v	<= 1'b1;
-				R_Indeces.instr.dst.idx	<= R_Index_Dst;
-			end
-			else begin
-				R_Indeces.instr.dst.v	<= 1'b0;
-			end
-
-			if ( We_Valid_Src1 ) begin
-				R_Indeces.instr.src1.v	<= 1'b1;
-				R_Indeces.instr.src1.idx<= R_Index_Src1;
-			end
-			else begin
-				R_Indeces.instr.src1.v	<= 1'b0;
-			end
-
-			if ( We_Valid_Src2 ) begin
-				R_Indeces.instr.src2.v	<= 1'b1;
-				R_Indeces.instr.src2.idx<= R_Index_Src2;
-			end
-			else begin
-				R_Indeces.instr.src2.v	<= 1'b0;
-			end
-
-			if ( We_Valid_Src3 ) begin
-				R_Indeces.instr.src3.v	<= 1'b1;
-				R_Indeces.instr.src3.idx<= R_Index_Src3;
-			end
-			else begin
-				R_Indeces.instr.src3.v	<= 1'b0;
-			end
 		end
 	end
 
@@ -425,14 +396,20 @@ module HazardCheck_TPU
 		end
 		else if ( I_Commit_Req | I_Req_Issue ) begin
 			if ( I_Commit_Req ) begin
-				TabHazard[ I_Commit_No ].instr.dst.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].instr.src1.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].instr.src2.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].instr.src3.v	<= 1'b0;
+				TabHazard[ I_Commit_No ].v		<= 1'b0;
+				TabHazard[ I_Commit_No ].dst.v	<= 1'b0;
+				TabHazard[ I_Commit_No ].src1.v	<= 1'b0;
+				TabHazard[ I_Commit_No ].src2.v	<= 1'b0;
+				TabHazard[ I_Commit_No ].src3.v	<= 1'b0;
 			end
 
 			if ( I_Req_Issue ) begin
+				TabHazard[ WNo ].v		<= 1'b1;
 				TabHazard[ WNo ].instr	<= I_Instr;
+				TabHazard[ WNo ].dst	<= Index_Dst;
+				TabHazard[ WNo ].src1	<= Index_Src1;
+				TabHazard[ WNo ].src2	<= Index_Src2;
+				TabHazard[ WNo ].src3	<= Index_Src3;
 			end
 		end
 	end

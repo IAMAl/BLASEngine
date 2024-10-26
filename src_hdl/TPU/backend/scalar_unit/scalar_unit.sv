@@ -83,7 +83,7 @@ module Scalar_Unit
 	logic						Req_Issue;
 	logic						IW_Req_Issue;
 	issue_no_t					IW_IssueNo;
-	instr_t						IW_Instr;
+	instruction_t				IW_Instr;
 	issue_no_t					Rd_Ptr;
 
 	logic						RAR_Hazard;
@@ -263,10 +263,6 @@ module Scalar_Unit
 	assign O_V_Command.v				= Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? IW_IssueNo : '0;
-
-
-	//// Instruction Fetch Stage
-	assign Req_IFetch			= ~Stall_IF;
 
 
 	//// Hazard Detect Stage
@@ -479,8 +475,8 @@ module Scalar_Unit
 		.I_Branch(			Instr_Branch			),
 		.I_Timing_MY(		Bypass_IssueNo			),
 		.I_Timing_WB(		WB_IssueNo				),
-		.I_State(			Status					),
-		.I_Cond(			Condition				),
+		.I_State(			Condition				),
+		.I_Cond(			Cond_Data				),
 		.I_Src(				PAC_Src_Data[9:0]		),
 		.O_IFetch(			Req_IFetch				),
 		.O_Address(			PC						),
@@ -495,7 +491,7 @@ module Scalar_Unit
 		.I_Req_St(			I_Req_St				),
 		.O_Ack_St(			O_Ack_St				),
 		.I_St_Instr(		I_Instr					),
-		.I_Req_Ld(			Req_IFetch				),
+		.I_Req_Ld(			Req_IFetch & ~Stall_IF	),
 		.I_Ld_Address(		PC						),
 		.I_St_Address(		PC						),
 		.O_Ld_Instr(		Instruction				)
@@ -506,7 +502,7 @@ module Scalar_Unit
 	IFetch IFetch (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				Req_IFetch				),
+		.I_Req(				Req_IFetch & ~Stall_IF	),
 		.I_Empty(			I_Empty					),
 		.I_Term(			O_Term					),
 		.I_Instr(			Instruction				),
@@ -769,10 +765,9 @@ module Scalar_Unit
 		.I_Ready(			MaskReg_Ready			),
 		.I_Term(			MaskReg_Term			),
 		.I_We(				MaskReg_We				),
-		.I_Cond(			Cond_Data				),
 		.I_Status(			Status					),
 		.I_Re(				MaskReg_Re				),
-		.O_Condition(		Condition				)
+		.O_Cond(			Condition				)
 	);
 
 

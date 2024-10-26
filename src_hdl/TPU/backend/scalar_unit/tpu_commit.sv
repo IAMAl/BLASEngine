@@ -39,13 +39,12 @@ module Commit_TPU
 
 	// Select Signal
 	assign Sel_V				= Lifetime_V > Lifetime_S;
-	assign Select				= ( Sel_V & ~I_RB_Empty_S & ~I_RB_Empty_V ) |
-									( I_RB_Empty_S & ~I_RB_Empty_V );
-
+	assign Select				= ( Sel_V & I_Commit_Req_V & ~I_RB_Empty_V ) &
+									~( ~Sel_V & I_Commit_Req_S & ~I_RB_Empty_S );
 
 	// Commit Request
-	assign O_Commit_Req			= I_Commit_Req_V | I_RB_Empty_S;
-	assign O_Commit_No			= ( Select ) ?	I_Commit_Req_V : I_Commit_Req_S;
+	assign O_Commit_Req			= I_Commit_Req_V | I_Commit_Req_S;
+	assign O_Commit_No			= ( Select ) ?	I_Commit_No_V : I_Commit_No_S;
 
 	// Send-Back Grant to Each Unit
 	assign O_Commit_Grant_S		= ~Select;

@@ -76,10 +76,6 @@ package pkg_tpu;
 
 
 	//	General Index Type
-	//		MSb differenciates Two Register Files
-	//		Mid-field used for no_t in hazard unit
-	typedef logic	[WIDTH_INDEX+2:0]		index_s_t;
-
 	//	Index Type for Single Register File
 	typedef logic	[WIDTH_INDEX-1:0]		index_t;
 
@@ -134,6 +130,14 @@ package pkg_tpu;
 		unit_no_t						unit_no;
 		no_t							no;
 	} sel_t;
+
+	//		MSb differenciates Two Register Files
+	//		Mid-field used for no_t in hazard unit
+	typedef struct packed {
+		logic							v;
+		index_t							idx;
+		sel_t							sel;
+	} index_s_t;
 
 	typedef struct packed {
 		logic							v;
@@ -191,8 +195,13 @@ package pkg_tpu;
 	////Execution Steering
 	//	Hazard Table used in Scalar unit
 	typedef struct packed {
+		logic							v;
 		instruction_t					instr;
 		logic							commit;
+		index_s_t						dst;
+		index_s_t						src1;
+		index_s_t						src2;
+		index_s_t						src3;
 	} iw_t;
 
 	typedef struct packed {
@@ -215,7 +224,6 @@ package pkg_tpu;
 		issue_no_t						issue_no;
 		logic							commit;
 		logic	[NUM_LANES-1:0]			en_lane;
-		logic	[NUM_LANES-1:0]			en_commit;
 	} commit_tab_v;
 
 
