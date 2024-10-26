@@ -45,8 +45,7 @@ module ExecUnit_V
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
 	output						O_Ld_Stall,				//Stall Request for Loading
-	output						O_St_Stall,				//Stall Request for Storing
-	output						O_Lane_En
+	output						O_St_Stall				//Stall Request for Storing
 );
 
 
@@ -174,8 +173,6 @@ module ExecUnit_V
 
 	assign O_Ld_Stall			= Ld_Stall_Odd | Ld_Stall_Evn;
 	assign O_St_Stall			= St_Stall_Odd | St_Stall_Evn;
-
-	assign O_Lane_En			= 1'b1;//ToDo
 
 
 	MA_Unit #(

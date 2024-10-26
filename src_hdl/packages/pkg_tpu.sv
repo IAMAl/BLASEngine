@@ -254,79 +254,43 @@ package pkg_tpu;
 	//	Index Stage
 	typedef struct packed {
 		logic							v;
-		op_t							op;
-		dst_t							dst;
-		idx_t							src1;
-		idx_t							src2;
-		idx_t							src3;
-		index_t							slice_len;
-		issue_no_t						issue_no;
-		imm_t							imm;
+		command_t						command;
 		logic	[16:0]					path;
-		logic							mread;
-		logic							en_ii;
 	} pipe_index_t;
 
 	typedef struct packed {
 		logic							v;
-		op_t							op;
-		dst_t							dst;
-		idx_t							src1;
-		idx_t							src2;
-		idx_t							src3;
-		idx_t							src4;
-		index_t							slice_len;
-		issue_no_t						issue_no;
-		imm_t							imm;
+		command_t						command;
 		logic	[16:0]					path;
-		logic							mread;
-		logic							en_ii;
 	} pipe_index_reg_t;
 
 	//	Register-Read Stages
 	typedef struct packed {
 		logic							v;
-		op_t							op;
-		dst_t							dst;
-		reg_idx_t						src1;
-		reg_idx_t						src2;
-		reg_idx_t						src3;
-		index_t							slice_len;
-		issue_no_t						issue_no;
-		imm_t							imm;
+		command_t						command;
+		data_t							data1;
+		data_t							data2;
+		data_t							data3;
 		logic	[16:0]					path;
-		logic							mread;
-		logic							en_ii;
 	} pipe_reg_t;
 
 	//	Register-Read and Network Stages
 	typedef struct packed {
 		logic							v;
-		op_t							op;
-		dst_t							dst;
-		reg_idx_t						src1;
-		reg_idx_t						src2;
-		reg_idx_t						src3;
-		index_t							idx1;
-		index_t							idx2;
-		index_t							idx3;
-		index_t							slice_len;
-		issue_no_t						issue_no;
-		imm_t							imm;
+		command_t						command;
+		data_t							data1;
+		data_t							data2;
+		data_t							data3;
 		logic	[16:0]					path;
-		logic							mread;
-		logic							en_ii;
 	} pipe_net_t;
 
 	//	Execuution Stage (First)
 	typedef struct packed {
 		logic							v;
-		instruction_t					instr;
+		command_t						command;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
-		index_t							slice_len;
-		issue_no_t						issue_no;
 		logic	[4:0]					path;
 	} pipe_exe_t;
 
