@@ -99,7 +99,6 @@ module Scalar_Unit
 	logic						Index_Src2_Busy;
 	logic						Index_Src3_Busy;
 
-
 	data_t						RF_Odd_Data1;
 	data_t						RF_Odd_Data2;
 	data_t						RF_Even_Data1;
@@ -114,8 +113,9 @@ module Scalar_Unit
 
 	logic						Req_Index_Dst;
 	logic						Dst_Slice;
+	logic						Dst_Index_MRead;
 	logic	[6:0]				Dst_Sel;
-	index_t						Dst_Index;
+	idx_t						Dst_Index;
 	index_t						Dst_Index_Window;
 	index_t						Dst_Index_Length;
 	logic						Dst_RegFile_Req;
@@ -132,6 +132,9 @@ module Scalar_Unit
 
 
 	logic						Sign;
+	logic						Sign1;
+	logic						Sign2;
+	logic						Sign3;
 	const_t						Constant;
 	logic						Slice_Dst;
 
@@ -146,8 +149,6 @@ module Scalar_Unit
 	pipe_exe_tmp_t				WB_Token;
 	data_t						WB_Data;
 	data_t						WB_Data_;
-	logic						WB_Req_Even;
-	logic						WB_Req_Odd;
 	logic						WB_We_Even;
 	logic						WB_We_Odd;
 	index_t						WB_Index_Even;
@@ -300,6 +301,11 @@ module Scalar_Unit
 	assign PipeReg_IdxRF.v			= PipeReg_Index.v;
 	assign PipeReg_IdxRF.command	= PipeReg_Index.command;
 
+	assign Sign1					= PipeReg_Idx.command.instr.src1.s;
+	assign Sign2					= PipeReg_Idx.command.instr.src2.s;
+	assign Sign3					= PipeReg_Idx.command.instr.src3.s;
+	assign Constant					= PipeReg_Idx.command.instr.imm;
+
 
 	//// Register Read/Write Stage
 	//	Command
@@ -368,10 +374,19 @@ module Scalar_Unit
 
 	assign Dst_Sel				= WB_Token.dst.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Token.dst.slice;
-	assign Dst_Index			= WB_Token.dst.idx;
+	assign Dst_Index.v			= WB_Token.dst.v;
+	assign Dst_Index.slice		= WB_Token.dst.slice;
+	assign Dst_Index.idx		= WB_Token.dst.idx;
+	assign Dst_Index.sel		= WB_Token.dst.sel;
+	assign Dst_Index.src_sel	= WB_Token.dst.dst_sel;
+	assign Dst_Index.window		= WB_Token.dst.window;
 	assign Dst_Index_Window		= WB_Token.dst.window;
 	assign Dst_Index_Length		= WB_Token.dst.slice_len;
+	assign Dst_Index_MRead		= WB_Token.mread;
 
+	assign Sign					= WB_Token.dst.s;
+
+	//	Write-Back Target Decision
 	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
 	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
 	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
@@ -548,7 +563,7 @@ module Scalar_Unit
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
 		.I_En_II(			'0						),
-		.I_MaskedRead(		MaskedRead				),
+		.I_MaskedRead(		Dst_Index_MRead			),
 		.I_Index(			Dst_Index				),
 		.I_Window(			Dst_Index_Window		),
 		.I_Length(			Dst_Index_Length		),
@@ -577,7 +592,7 @@ module Scalar_Unit
 		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
-		.I_Sign(			Sign					),
+		.I_Sign(			Sign1					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src1				),
 		.O_Busy(			Index_Src1_Busy			),
@@ -600,7 +615,7 @@ module Scalar_Unit
 		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
-		.I_Sign(			Sign					),
+		.I_Sign(			Sign2					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src2				),
 		.O_Busy(			Index_Src2_Busy			),
@@ -623,7 +638,7 @@ module Scalar_Unit
 		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
-		.I_Sign(			Sign					),
+		.I_Sign(			Sign3					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src3				),
 		.O_Busy(			Index_Src3_Busy			),
@@ -658,12 +673,10 @@ module Scalar_Unit
 	AuxRegs AuxRegs (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_ThreadID(		I_ThreadID				),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Re(				RegMov_Rd				),
 		.I_We(				RegMov_Wt				),
 		.I_Src_Command(		PipeReg_IdxRR			),
-		.I_Dst_Command(		WB_Token				),
 		.O_Re_p0(			Re_p0					),
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),

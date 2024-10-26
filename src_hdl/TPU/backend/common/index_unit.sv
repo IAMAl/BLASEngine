@@ -69,7 +69,6 @@ module IndexUnit
 	logic						R_Sel;
 	index_t						R_Index;
 	idx_t						R_Idx_Cfg;
-	index_t						R_Base_Index;
 	index_t						R_Length;
 	index_t						R_Window;
 	logic						R_MaskedRead;
@@ -136,6 +135,7 @@ module IndexUnit
 	assign O_Index.sel			= ( R_Req ) ? R_Idx_Cfg.sel :					I_Index.sel;
 	assign O_Index.src_sel		= ( R_Req ) ? R_Idx_Cfg.src_sel :				I_Index.src_sel;
 	assign O_Index.window		= ( R_Req ) ? R_Idx_Cfg.window :				I_Index.window;
+	assign O_Index.s			= ( R_Req ) ? R_Idx_Cfg.s :						I_Index.s;
 	assign O_Index.idx			= ( R_Req ) ? R_Index :							I_Index.idx;
 
 
@@ -199,15 +199,6 @@ module IndexUnit
 		end
 		else if ( I_Req & ~I_Stall ) begin
 			R_Idx_Cfg			<= I_Index;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Base_Index	<= 0;
-		end
-		else if ( I_Req & ~I_Stall & I_Index.slice ) begin
-			R_Base_Index	<= I_Index;
 		end
 	end
 

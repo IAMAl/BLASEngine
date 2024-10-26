@@ -33,7 +33,7 @@ module LdStUnit
 	input						I_St_Ready,				//Ready to Store
 	input						I_St_Grant,				//Grant for Storing
 	input						I_End_Access,			//End of Access
-	output	TYPE				O_Token,				//Command
+	output	TYPE				O_WB_Token,				//Command
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output						O_Ld_Stall,				//Stall Request from Loading
 	output						O_St_Stall,				//Stall Request from Storing
@@ -115,15 +115,17 @@ module LdStUnit
 	assign Ld_Token.op			= I_Command.instr.op;
 	assign Ld_Token.dst			= I_Command.instr.dst;
 	assign Ld_Token.slice_len	= I_Command.instr.slice_len;
-	assign Ld_Token.issue_no	= I_Command.issue_no;
 	assign Ld_Token.path		= I_Command.instr.path;
+	assign Ld_Token.mread		= I_Command.instr.mread;
+	assign Ld_Token.issue_no	= I_Command.issue_no;
 
 	assign St_Token.v			= St_Req_;
 	assign St_Token.op			= I_Command.instr.op;
 	assign St_Token.dst			= I_Command.instr.dst;
 	assign St_Token.slice_len	= I_Command.instr.slice_len;
-	assign St_Token.issue_no	= I_Command.issue_no;
 	assign St_Token.path		= I_Command.instr.path;
+	assign St_Token.mread		= I_Command.instr.mread;
+	assign St_Token.issue_no	= I_Command.issue_no;
 
 	assign St_Data				= I_Src_Data1;
 
@@ -139,8 +141,8 @@ module LdStUnit
 	assign O_LdSt.st.base		= St_Base;
 
 
-	assign O_Token				= (  LifeLd >  LifeSt ) ?	Ld_Token :
-															St_Token;
+	assign O_WB_Token			= (  LifeLd >  LifeSt ) ?	Ld_Commit_Token :
+															St_Commit_Token;
 
 	assign O_WB_Data			= Ld_Data;
 

@@ -44,13 +44,14 @@ module ExecUnit_V
 );
 
 
+
 	logic						MAU_Req;
 	TYPE						MAU_Token;
 	data_t						MAU_Data;
-	issue_no_t					MAU_IssueNo;
 	logic						Valid_MAU;
 
 	TYPE						Token_MAU;
+	TYPE						Token_Mv;				
 
 	logic						LdSt_Req		[1:0];
 	data_t						Ld_Data			[1:0];
@@ -101,6 +102,15 @@ module ExecUnit_V
 	data_t						Src_Data3;
 
 
+	assign Token_Mv.v			= I_Command.v;
+	assign Token_Mv.op			= I_Command.command.instr.op;
+	assign Token_Mv.dst			= I_Command.command.instr.dst;
+	assign Token_Mv.slice_len	= I_Command.command.instr.slice_len;
+	assign Token_Mv.path		= I_Command.command.instr.path;
+	assign Token_Mv.mread		= I_Command.command.instr.mread;
+	assign Token_Mv.issue_no	= I_Command.command.issue_no;
+
+
 	assign Src_Data1			= I_Command.data1;
 	assign Src_Data2			= I_Command.data2;
 	assign Src_Data3			= I_Command.data3;
@@ -122,9 +132,11 @@ module ExecUnit_V
 	assign MAU_Token.op.OpCode	= ( PMov0 ) ?	2'b00 :
 									( PMov1 ) ?	2'b00 :
 												I_Command.command.instr.op.OpCode;
+	assign MAU_Token.op.Sel_Unit= I_Command.command.instr.op.Sel_Unit;
 	assign MAU_Token.dst		= I_Command.command.instr.dst;
 	assign MAU_Token.slice_len	= I_Command.command.instr.slice_len;
 	assign MAU_Token.path		= I_Command.command.instr.path;
+	assign MAU_Token.mread		= I_Command.command.instr.mread;
 	assign MAU_Token.issue_no	= I_Command.command.issue_no;
 
 	assign Src_Data2_			= ( PMov0 ) ?	32'h78000000 :
@@ -149,7 +161,7 @@ module ExecUnit_V
 	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &   I_Command.command.instr.op.OpClass[0];
 
 
-	assign LifeMAU				= I_Command.command.issue_no - MAU_IssueNo;
+	assign LifeMAU				= I_Command.command.issue_no - MAU_Token.issue_no;
 	assign LifeLdSt1			= I_Command.command.issue_no - Ld_Token[0].issue_no;
 	assign LifeLdSt2			= I_Command.command.issue_no - Ld_Token[0].issue_no;
 	assign LifeMv				= I_Command.command.issue_no - Mv_Token.issue_no;
@@ -162,6 +174,11 @@ module ExecUnit_V
 
 
 	assign O_Math_Done			= Token_MAU.v;
+
+	assign O_WB_Token			= ( Re ) ?				Mv_Token :
+									( is_LifeMAU ) ?	MAU_Token :
+									( is_LifeLdSt2 ) ?	Ld_Token[1] :
+														Ld_Token[0];
 
 	assign O_WB_Data			= ( Re ) ?				Mv_Data :
 									( is_LifeMAU ) ?	MAU_Data :
@@ -215,7 +232,7 @@ module ExecUnit_V
 		.I_St_Ready(		I_St_Ready[1]			),
 		.I_St_Grant(		I_St_Grant[1]			),
 		.I_End_Access(		I_End_Access2			),
-		.O_Token(			Ld_Token[1]				),
+		.O_WB_Token(		Ld_Token[1]				),
 		.O_WB_Data(			Ld_Data[1]				),
 		.O_Ld_Stall(		Ld_Stall_Odd			),
 		.O_St_Stall(		St_Stall_Odd			),
@@ -242,7 +259,7 @@ module ExecUnit_V
 		.I_St_Ready(		I_St_Ready[0]			),
 		.I_St_Grant(		I_St_Grant[0]			),
 		.I_End_Access(		I_End_Access1			),
-		.O_Token(			Ld_Token[0]				),
+		.O_WB_Token(		Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
 		.O_Ld_Stall(		Ld_Stall_Evn			),
 		.O_St_Stall(		St_Stall_Evn			),
@@ -259,7 +276,7 @@ module ExecUnit_V
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Data(			I_Command.command		),//ToDo
+		.I_Data(			Token_Mv				),
 		.O_Data(			Mv_Token				),
 		.O_Full(									),
 		.O_Empty(									),

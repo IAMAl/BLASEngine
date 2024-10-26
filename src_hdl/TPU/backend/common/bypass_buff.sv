@@ -81,7 +81,7 @@ module BypassBuff
 
 
 	logic						valid			[BUFF_SIZE-1:0];
-	idx_t						Buff_Index		[BUFF_SIZE-1:0];
+	index_t						Buff_Index		[BUFF_SIZE-1:0];
 	data_t						Buff_Data		[BUFF_SIZE-1:0];
 
 
@@ -125,9 +125,9 @@ module BypassBuff
 
 	always_comb begin
 		for ( int i=0; i<BUFF_SIZE; ++i ) begin
-			is_Matched_Src1[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Idx1.v & ( Buff_Index[ i ].idx == I_Idx1.idx );
-			is_Matched_Src2[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Idx2.v & ( Buff_Index[ i ].idx == I_Idx2.idx );
-			is_Matched_Src3[ i ]	= Valid[ i ] & Buff_Index[ i ].v & I_Idx3.v & ( Buff_Index[ i ].idx == I_Idx3.idx );
+			is_Matched_Src1[ i ]	= Valid[ i ] & I_Idx1.v & ( Buff_Index[ i ] == I_Idx1.idx );
+			is_Matched_Src2[ i ]	= Valid[ i ] & I_Idx2.v & ( Buff_Index[ i ] == I_Idx2.idx );
+			is_Matched_Src3[ i ]	= Valid[ i ] & I_Idx3.v & ( Buff_Index[ i ] == I_Idx3.idx );
 		end
 	end
 
@@ -233,7 +233,7 @@ module BypassBuff
 
 			if ( Store ) begin
 				Valid[ Wr_Ptr ]			<= 1'b1;
-				Buff_Index[ Wr_Ptr ]	<= I_WB_Index;
+				Buff_Index[ Wr_Ptr ]	<= I_WB_Index.idx;
 				Buff_Data[ Wr_Ptr ]		<= I_WB_Data;
 			end
 		end

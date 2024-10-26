@@ -16,7 +16,7 @@ module RegFile
 	input						reset,
 	input						I_Req,					//Request from Index Stage
 	input						I_We,					//Flag: Write=Enable
-	input	dst_t				I_Index_Dst,			//Write Index for Destination
+	input	index_t				I_Index_Dst,			//Write Index for Destination
 	input	data_t				I_Data,					//Write-Back Data
 	input	idx_t				I_Index_Src1,			//Read Index for Source-1
 	input	idx_t				I_Index_Src2,			//Read Index for Source-2
@@ -48,7 +48,7 @@ module RegFile
 		.I_We(				I_We					),
 		.I_Re1(				Re1						),
 		.I_Re2(				Re2						),
-		.I_Index_Dst(		I_Index_Dst.idx			),
+		.I_Index_Dst(		I_Index_Dst				),
 		.I_Data(			I_Data					),
 		.I_Index_Src1(		I_Index_Src1.idx		),
 		.I_Index_Src2(		I_Index_Src2.idx		),

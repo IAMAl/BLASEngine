@@ -28,7 +28,7 @@ module RF_Data_Sel
 	logic	[2:0]				Sel;
 
 
-	assign Sel				= { I_Odd1, I_Odd2, I_Odd3 };
+	assign Sel				= { I_Odd3, I_Odd2, I_Odd1 };
 
 	always_comb begin
 		case ( Sel )
@@ -43,9 +43,9 @@ module RF_Data_Sel
 				O_Data_Src3	= I_Data_Src3;
 			end
 			3'h2: begin
-				O_Data_Src1	= O_Data_Src1;
-				O_Data_Src2	= O_Data_Src3;
-				O_Data_Src3	= O_Data_Src2;
+				O_Data_Src1	= I_Data_Src1;
+				O_Data_Src2	= I_Data_Src3;
+				O_Data_Src3	= I_Data_Src2;
 			end
 			3'h3: begin
 				O_Data_Src1	= I_Data_Src1;

@@ -144,6 +144,7 @@ package pkg_tpu;
 		sel_t							dst_sel;
 		index_t							window;
 		index_t							slice_len;
+		logic							s;
 	} dst_t;
 
 	typedef struct packed {
@@ -153,6 +154,7 @@ package pkg_tpu;
 		logic		[6:0]				sel;
 		index_t							window;
 		sel_t							src_sel;
+		logic							s;
 	} idx_t;
 
 	typedef struct packed {
@@ -301,6 +303,7 @@ package pkg_tpu;
 		index_t							slice_len;
 		issue_no_t						issue_no;
 		logic	[4:0]					path;
+		logic							mread;
 	} pipe_exe_tmp_t;
 
 	//	Execuution Stage (Last)

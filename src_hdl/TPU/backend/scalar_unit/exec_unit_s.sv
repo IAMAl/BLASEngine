@@ -47,6 +47,7 @@ module ExecUnit_S
 	logic						ALU_Req;
 	data_t						ALU_Data;
 	TYPE						ALU_Token;
+	TYPE						Token_Mv;
 
 	logic						LdSt_Req		[1:0];
 	data_t						Ld_Data			[1:0];
@@ -94,6 +95,15 @@ module ExecUnit_S
 
 
 	logic						Valid_iDIV;
+
+
+	assign Token_Mv.v			= I_Command.v;
+	assign Token_Mv.op			= I_Command.command.instr.op;
+	assign Token_Mv.dst			= I_Command.command.instr.dst;
+	assign Token_Mv.slice_len	= I_Command.command.instr.slice_len;
+	assign Token_Mv.path		= I_Command.command.instr.path;
+	assign Token_Mv.mread		= I_Command.command.instr.mread;
+	assign Token_Mv.issue_no	= I_Command.command.issue_no;
 
 
 	assign Src_Data1			= I_Command.data1;
@@ -194,7 +204,7 @@ module ExecUnit_S
 		.I_St_Ready(		I_St_Ready[1]			),
 		.I_St_Grant(		I_St_Grant[1]			),
 		.I_End_Access(		I_End_Access2			),
-		.O_Token(			Ld_Token[1]				),
+		.O_WB_Token(		Ld_Token[1]				),
 		.O_WB_Data(			Ld_Data[1]				),
 		.O_Ld_Stall(		Ld_Stall_Odd			),
 		.O_St_Stall(		St_Stall_Odd			),
@@ -221,7 +231,7 @@ module ExecUnit_S
 		.I_St_Ready(		I_St_Ready[0]			),
 		.I_St_Grant(		I_St_Grant[0]			),
 		.I_End_Access(		I_End_Access1			),
-		.O_Token(			Ld_Token[0]				),
+		.O_WB_Token(		Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
 		.O_Ld_Stall(		Ld_Stall_Evn			),
 		.O_St_Stall(		St_Stall_Evn			),
@@ -237,7 +247,7 @@ module ExecUnit_S
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Data(			I_Command				),
+		.I_Data(			Token_Mv				),
 		.O_Data(			Mv_Token				),
 		.O_Full(									),
 		.O_Empty(									),

@@ -56,7 +56,6 @@ import pkg_mpu::*;
 	logic						Index_Src2_Busy;
 	logic						Index_Src3_Busy;
 
-
 	data_t						RF_Odd_Data1;
 	data_t						RF_Odd_Data2;
 	data_t						RF_Even_Data1;
@@ -71,8 +70,9 @@ import pkg_mpu::*;
 
 	logic						Req_Index_Dst;
 	logic						Dst_Slice;
+	logic						Dst_Index_MRead;
 	logic	[6:0]				Dst_Sel;
-	index_t						Dst_Index;
+	idx_t						Dst_Index;
 	index_t						Dst_Index_Window;
 	index_t						Dst_Index_Length;
 	logic						Dst_RegFile_Req;
@@ -88,6 +88,9 @@ import pkg_mpu::*;
 
 
 	logic						Sign;
+	logic						Sign1;
+	logic						Sign2;
+	logic						Sign3;
 	const_t						Constant;
 
 
@@ -102,8 +105,6 @@ import pkg_mpu::*;
 	data_t						WB_Data;
 	data_t						WB_Data_;
 	logic						WB_Req_Even;
-	logic						WB_Req_Odd;
-	logic						WB_We_Even;
 	logic						WB_We_Odd;
 	index_t						WB_Index_Even;
 	index_t						WB_Index_Odd;
@@ -170,13 +171,19 @@ import pkg_mpu::*;
 
 
 	//// Lane-Enable
+	assign Lane_CTRL_Rst		= ( PipeReg_Exe.command.instr.op.OpType == 2'b01 ) &
+									( PipeReg_Exe.command.instr.op.OpClass == 2'b10 ) &
+									( PipeReg_Exe.command.instr.op.OpCode == 2'b01 );
+	assign Lane_CTRL_Set		= ( PipeReg_Exe.command.instr.op.OpType == 2'b01 ) &
+									( PipeReg_Exe.command.instr.op.OpClass == 2'b10 ) &
+									( PipeReg_Exe.command.instr.op.OpCode == 2'b00 );
 	Lane_En_V Lane_En_V (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				I_En_Lane				),
 		.I_Rst(				Lane_CTRL_Rst			),
 		.I_Set(				Lane_CTRL_Set			),
-		.I_Index(			Dst_Index				),
+		.I_Index(			Dst_Index.idx			),
 		.I_Status(			Status					),
 		.O_State(			O_Status				),
 		.O_En(				Lane_Enable				)
@@ -205,6 +212,12 @@ import pkg_mpu::*;
 	//// Packing for Register File Access
 	assign PipeReg_IdxRF.v			= PipeReg_Idx.v;
 	assign PipeReg_IdxRF.command	= PipeReg_Idx.command;
+
+
+	assign Sign1					= PipeReg_Idx.command.instr.src1.s;
+	assign Sign2					= PipeReg_Idx.command.instr.src2.s;
+	assign Sign3					= PipeReg_Idx.command.instr.src3.s;
+	assign Constant					= PipeReg_Idx.command.instr.imm;
 
 
 	//// Register Read/Write Stage
@@ -252,15 +265,22 @@ import pkg_mpu::*;
 
 	assign Dst_Sel				= WB_Token.dst.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Token.dst.slice;
-	assign Dst_Index			= WB_Token.dst.idx;
+	assign Dst_Index.v			= WB_Token.dst.v;
+	assign Dst_Index.slice		= WB_Token.dst.slice;
+	assign Dst_Index.idx		= WB_Token.dst.idx;
+	assign Dst_Index.sel		= WB_Token.dst.sel;
+	assign Dst_Index.src_sel	= WB_Token.dst.dst_sel;
+	assign Dst_Index.window		= WB_Token.dst.window;
 	assign Dst_Index_Window		= WB_Token.dst.window;
 	assign Dst_Index_Length		= WB_Token.dst.slice_len;
+	assign Dst_Index_MRead		= WB_Token.mread;
 
+	assign Sign					= WB_Token.dst.s;
 
 	//	Write-Back Target Decision
-	assign is_WB_RF				= WB_Token.dst.dst_sel == 2'h1;
-	assign is_WB_BR				= WB_Token.dst.dst_sel == 2'h2;
-	assign is_WB_VU				= WB_Token.dst.dst_sel == 2'h3;
+	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
+	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
+	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
 
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst & ~We_c;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF & ~Stall_RegFile_Dst & ~We_c;
@@ -327,18 +347,19 @@ import pkg_mpu::*;
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			Stall_RegFile_Dst		),
-		.I_Req(				Req_Index_Dst			),
+		.I_Stall(			0&Stall_RegFile_Dst		),
+		.I_Req(				1|Req_Index_Dst			),
 		.I_En_II(			'0						),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
+		.I_MaskedRead(		Dst_Index_MRead			),
 		.I_Index(			Dst_Index				),
-		.I_Window(			WB_Token.dst.window		),
-		.I_Length(			WB_Token.dst.slice_len	),
+		.I_Window(			Dst_Index_Window		),
+		.I_Length(			Dst_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Dst_RegFile_Index		),
+		.O_Busy(									),
 		.O_Done(			Dst_Done				)
 	);
 
@@ -358,7 +379,7 @@ import pkg_mpu::*;
 		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
-		.I_Sign(			Sign					),
+		.I_Sign(			Sign1					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src1				),
 		.O_Busy(			Index_Src1_Busy			),
@@ -381,7 +402,7 @@ import pkg_mpu::*;
 		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
-		.I_Sign(			Sign					),
+		.I_Sign(			Sign2					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src2				),
 		.O_Busy(			Index_Src2_Busy			),
@@ -404,7 +425,7 @@ import pkg_mpu::*;
 		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
-		.I_Sign(			Sign					),
+		.I_Sign(			Sign3					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Index_Src3				),
 		.O_Busy(			Index_Src3_Busy			),
@@ -465,21 +486,11 @@ import pkg_mpu::*;
 	end
 
 
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Re_c			<= 1'b0;
-		end
-		else begin
-			R_Re_c			<= Re_c;
-		end
-	end
-
-
 	//// Register Read/Write Stage
 	RegFile RegFile_Odd (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_Req_Odd				),
+		.I_Req(				Req_Odd					),
 		.I_We(				WB_We_Odd				),
 		.I_Index_Dst(		WB_Index_Odd			),
 		.I_Data(			WB_Data_Odd				),
@@ -493,7 +504,7 @@ import pkg_mpu::*;
 	RegFile RegFile_Even (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				WB_Req_Even				),
+		.I_Req(				Req_Even				),
 		.I_We(				WB_We_Even				),
 		.I_Index_Dst(		WB_Index_Even			),
 		.I_Data(			WB_Data_Even			),
@@ -564,7 +575,7 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Network			),
-		.I_Command(			PipeReg_RR_Net.v		),
+		.I_Command(			PipeReg_RR_Net			),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),
 		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),

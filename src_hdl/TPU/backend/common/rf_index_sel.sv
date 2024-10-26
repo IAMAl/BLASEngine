@@ -28,7 +28,7 @@ module RF_Index_Sel
 	logic	[2:0]				Sel;
 
 
-	assign Sel				= { I_Odd1, I_Odd2, I_Odd3 };
+	assign Sel				= { I_Odd3, I_Odd2, I_Odd1 };
 
 	always_comb begin
 		case ( Sel )
