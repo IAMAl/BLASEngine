@@ -73,21 +73,30 @@ module ExecUnit_S
 	TYPE						Mv_Token;
 	data_t						Mv_Data;
 
-	logic						Valid_iDIV;
+
+	logic						RegMoveOp;
+	logic						CommonMov;
+	logic						PMov;
+	logic						PMov0;
+	logic						PMov1;
+
+	data_t						Src_Data2_;
+
+	data_t						PData;
+	data_t						Data0;
+	data_t						Data1;
 
 	logic						RegMove;
-
-
-	pipe_exe_tmp_t				MA_Command;
 
 	data_t						Src_Data1;
 	data_t						Src_Data2;
 	data_t						Src_Data3;
 
 
-	assign Src_Data1			= I_Command.data1;
-	assign Src_Data2			= I_Command.data2;
-	assign Src_Data3			= I_Command.data3;
+	logic						Valid_iDIV;
+
+	pipe_exe_tmp_t				MA_Command;
+
 
 	assign MA_Command.v			=;
 	assign MA_Command.op		=;
@@ -97,11 +106,31 @@ module ExecUnit_S
 	assign MA_Command.path		=;
 
 
+	assign Src_Data1			= I_Command.data1;
+	assign Src_Data2			= I_Command.data2;
+	assign Src_Data3			= I_Command.data3;
+
+	assign RegMoveOp			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 ) & ( I_Command.instr.op.OpClass == 2'b11 );
+	assign CommonMov			= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b01 );
+	assign PMov					= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b10 ) & I_Command.instr.src1.v;
+	assign PMov0				= PMov & ( I_Command.instr.src1.idx == '0 );
+	assign PMov1				= PMov & ( I_Command.instr.src1.idx == '1 );
+
+	assign Src_Data2_			= ( PMov0 ) ?	32'h78000000 :
+									( PMov1 ) ? 32'h00000000 :
+												Src_Data2;
+
+
 	assign We					= RegMove & ( ( LifeALU != '0 ) | ( LifeLdSt != '0 ) );
 	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeALU );
 	assign RegMove				= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 ) &
 										( I_Command.instr.op.OpClass == 2'b11 ) &
 										( |I_Command.instr.op.OpCode );
+
+	assign PData				= ( CommonMov) ?	Src_Data1 :
+									( PMov0 ) ?		Data0 :
+									( PMov1 ) ?		Data1 :
+													'0;
 
 	assign ALU_Req				= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 );
 
@@ -146,7 +175,7 @@ module ExecUnit_S
 		.I_Req(				ALU_Req					),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		Src_Data1				),
-		.I_Src_Data2(		Src_Data2				),
+		.I_Src_Data2(		Src_Data2_				),
 		.I_Src_Data3(		Src_Data3				),
 		.I_Re_p0(			I_Re_p0					),
 		.I_Re_p1(			I_Re_p1					),
@@ -232,7 +261,7 @@ module ExecUnit_S
 		.reset(				reset					),
 		.I_We(				We						),
 		.I_Re(				Re						),
-		.I_Data(			Src_Data1				),
+		.I_Data(			PData					),
 		.O_Data(			Mv_Data					),
 		.O_Full(									),
 		.O_Empty(									),

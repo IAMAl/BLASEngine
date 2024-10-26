@@ -18,13 +18,9 @@ module ExecUnit_V
 	input						reset,
 	input						I_En,
 	input						I_Stall,				//Stall
-	input						I_Req,					//Request from Network Stage
+	input	command_t			I_Command,				//Command
 	input						I_Commit_Grant,			//Grant for Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
-	input	command_t			I_Command,				//Command
-	input	data_t				I_Src_Data1,			//Source Data
-	input	data_t				I_Src_Data2,			//Source Data
-	input	data_t				I_Src_Data3,			//Source Data
 	output	ldst_t				O_LdSt1,				//Load/Store Command
 	output	ldst_t				O_LdSt2,				//Load/Store Command
 	input	data_t				I_Ld_Data1,				//Loaded Data
@@ -93,7 +89,7 @@ module ExecUnit_V
 	logic						PMov0;
 	logic						PMov1;
 
-	data_t						Src_Data2;
+	data_t						Src_Data2_;
 
 	data_t						PData;
 	data_t						Data0;
@@ -101,8 +97,16 @@ module ExecUnit_V
 
 	logic						RegMove;
 
+	data_t						Src_Data1;
+	data_t						Src_Data2;
+	data_t						Src_Data3;
 
-	assign RegMoveOp			= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) & ( I_Command.instr.op.OpClass == 2'b11 );
+
+	assign Src_Data1			= I_Command.data1;
+	assign Src_Data2			= I_Command.data2;
+	assign Src_Data3			= I_Command.data3;
+
+	assign RegMoveOp			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 ) & ( I_Command.instr.op.OpClass == 2'b11 );
 	assign CommonMov			= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b01 );
 	assign PMov					= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b10 ) & I_Command.instr.src1.v;
 	assign PMov0				= PMov & ( I_Command.instr.src1.idx == '0 );
@@ -124,26 +128,26 @@ module ExecUnit_V
 	assign MAU_Token.issue_no	= I_Command.issue_no;
 	assign MAU_Token.path		= I_Command.instr.path;
 
-	assign Src_Data2			= ( PMov0 ) ?	32'h78000000 :
+	assign Src_Data2_			= ( PMov0 ) ?	32'h78000000 :
 									( PMov1 ) ? 32'h00000000 :
-												I_Src_Data2;
+												Src_Data2;
 
 
 	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
 	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
-	assign RegMove				= I_Req & ( I_Command.instr.op.OpType == 2'b00 ) &
+	assign RegMove				= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 ) &
 										( I_Command.instr.op.OpClass == 2'b11 ) &
 										( |I_Command.instr.op.OpCode );
 
-	assign PData				= ( CommonMov) ?	I_Src_Data1 :
+	assign PData				= ( CommonMov) ?	Src_Data1 :
 									( PMov0 ) ?		Data0 :
 									( PMov1 ) ?		Data1 :
 													'0;
 
-	assign MAU_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b00 );
+	assign MAU_Req				= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 );
 
-	assign LdSt_Req[0]			= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  ~I_Command.instr.op.OpClass[0];
-	assign LdSt_Req[1]			= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &   I_Command.instr.op.OpClass[0];
+	assign LdSt_Req[0]			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b11 ) &  ~I_Command.instr.op.OpClass[0];
+	assign LdSt_Req[1]			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b11 ) &   I_Command.instr.op.OpClass[0];
 
 
 	assign LifeMAU				= I_Issue_No - MAU_IssueNo;
@@ -159,12 +163,6 @@ module ExecUnit_V
 
 
 	assign O_Math_Done			= Token_MAU.v;
-
-
-	assign O_WB_Token			= ( Re ) ?				Mv_Token :
-									( is_LifeMAU ) ?	Token_MAU :
-									( is_LifeLdSt2 ) ?	Ld_Token[1] :
-														Ld_Token[0];
 
 	assign O_WB_Data			= ( Re ) ?				Mv_Data :
 									( is_LifeMAU ) ?	MAU_Data :
@@ -185,9 +183,9 @@ module ExecUnit_V
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				I_En					),
-		.I_Data1(			I_Src_Data1				),
-		.I_Data2(			Src_Data2				),
-		.I_Data3(			I_Src_Data3				),
+		.I_Data1(			Src_Data1				),
+		.I_Data2(			Src_Data2_				),
+		.I_Data3(			Src_Data3				),
 		.I_Re_p0(			I_Re_p0					),
 		.I_Re_p1(			I_Re_p1					),
 		.I_Token(			MAU_Token				),
@@ -206,9 +204,9 @@ module ExecUnit_V
 		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Req(				LdSt_Req[1]				),
 		.I_Command(			I_Command				),
-		.I_Src_Data1(		I_Src_Data1				),
-		.I_Src_Data2(		I_Src_Data2				),
-		.I_Src_Data3(		I_Src_Data3				),
+		.I_Src_Data1(		Src_Data1				),
+		.I_Src_Data2(		Src_Data2				),
+		.I_Src_Data3(		Src_Data3				),
 		.O_LdSt(			O_LdSt2					),
 		.I_Ld_Data(			I_Ld_Data2				),
 		.O_St_Data(			O_St_Data2				),
@@ -232,9 +230,9 @@ module ExecUnit_V
 		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Req(				LdSt_Req[0]				),
 		.I_Command(			I_Command				),
-		.I_Src_Data1(		I_Src_Data1				),
-		.I_Src_Data2(		I_Src_Data2				),
-		.I_Src_Data3(		I_Src_Data3				),
+		.I_Src_Data1(		Src_Data1				),
+		.I_Src_Data2(		Src_Data2				),
+		.I_Src_Data3(		Src_Data3				),
 		.O_LdSt(			O_LdSt1					),
 		.I_Ld_Data(			I_Ld_Data1				),
 		.O_St_Data(			O_St_Data1				),
