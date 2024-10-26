@@ -18,7 +18,7 @@ module Vector_Unit
 	input	v_ready_t			I_Commit_Grant,			//Grant for Commit
 	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
-	input	command_t			I_Command,				//Comamnd to Execute
+	input	pipe_index_t		I_Command,				//Comamnd to Execute
 	input	data_t				I_Scalar_Data,			//Scalar Data
 	output	data_t				O_Scalar_Data,			//Scalar Data
 	output	v_ldst_t			O_LdSt,					//Load Request

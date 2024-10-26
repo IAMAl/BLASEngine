@@ -69,15 +69,15 @@ module Network_V
 	index_t						Slice_Len;
 
 
-	assign Req					= I_Req;
+	assign Req					= I_Command.v;
 
 	assign Sel_Scalar			= I_Sel_Path[1:0];
 
 	assign Sel_Path				= I_Sel_Path[6:2];
 
-	assign Sel_Scalar_Src1		= Req & I_Sel_ALU_Src1 & ( Sel_Scalar == 2'h1 );
-	assign Sel_Scalar_Src2		= Req & I_Sel_ALU_Src2 & ( Sel_Scalar == 2'h2 );
-	assign Sel_Scalar_Src3		= Req & I_Sel_ALU_Src3 & ( Sel_Scalar == 2'h3 );
+	assign Sel_Scalar_Src1		= Req & I_Command.command.instr.src1.v & ( Sel_Scalar == 2'h1 );
+	assign Sel_Scalar_Src2		= Req & I_Command.command.instr.src2.v & ( Sel_Scalar == 2'h2 );
+	assign Sel_Scalar_Src3		= Req & I_Command.command.instr.src3.v & ( Sel_Scalar == 2'h3 );
 
 
 	assign Src_Index1			= I_Command.command.instr.src1.idx;

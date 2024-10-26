@@ -47,31 +47,31 @@ import pkg_mpu::*;
 	data_t						SData_R;
 
 
-	assign RegMove_Rd			= I_Re & ( I_Src_Command.op.OpType == 2'b00 ) &
-									( I_Src_Command.op.OpClass == 2'b11 ) &
-									( I_Src_Command.op.OpCode == 2'b10 );
+	assign RegMove_Rd			= I_Re & ( I_Src_Command.command.instr.op.OpType == 2'b00 ) &
+									( I_Src_Command.command.instr.op.OpClass == 2'b11 ) &
+									( I_Src_Command.command.instr.op.OpCode == 2'b10 );
 
-	assign RegMove_Wt			= I_We & ( I_Src_Command.op.OpType == 2'b00 ) &
-									( I_Src_Command.op.OpClass == 2'b11 ) &
-									( I_Src_Command.op.OpCode == 2'b11 );
+	assign RegMove_Wt			= I_We & ( I_Src_Command.command.instr.op.OpType == 2'b00 ) &
+									( I_Src_Command.command.instr.op.OpClass == 2'b11 ) &
+									( I_Src_Command.command.instr.op.OpCode == 2'b11 );
 
-	assign O_Re_p0				= RegMove_Rd & I_Src_Command.src1.v & ( I_Src_Command.src1.idx == 0 );
-	assign O_Re_p1				= RegMove_Rd & I_Src_Command.src1.v & ( I_Src_Command.src1.idx == 1 );
+	assign O_Re_p0				= RegMove_Rd & I_Src_Command.command.instr.src1.v & ( I_Src_Command.command.instr.src1.idx == 0 );
+	assign O_Re_p1				= RegMove_Rd & I_Src_Command.command.instr.src1.v & ( I_Src_Command.command.instr.src1.idx == 1 );
 
 	assign We_c					= RegMove_Wt;
 	assign Re_c					= RegMove_Rd & ~( O_Re_p0 | O_Re_p1 );
 	assign O_Re_c				= Re_c;
 
 
-	assign We_s					= I_We & ( I_Src_Command.op.OpType == 2'b00 ) &
-									( I_Src_Command.op.OpClass == 2'b11 ) &
-									( I_Src_Command.op.OpCode == 2'b11 )  &
-									( I_Src_Command.src1.idx == 8 );
+	assign We_s					= I_We & ( I_Src_Command.command.instr.op.OpType == 2'b00 ) &
+									( I_Src_Command.command.instr.op.OpClass == 2'b11 ) &
+									( I_Src_Command.command.instr.op.OpCode == 2'b11 )  &
+									( I_Src_Command.command.instr.src1.idx == 8 );
 
-	assign Re_s					= I_We & ( I_Src_Command.op.OpType == 2'b00 ) &
-									( I_Src_Command.op.OpClass == 2'b11 ) &
-									( I_Src_Command.op.OpCode == 2'b10 )  &
-									( I_Src_Command.src1.idx == 8 );
+	assign Re_s					= I_We & ( I_Src_Command.command.instr.op.OpType == 2'b00 ) &
+									( I_Src_Command.command.instr.op.OpClass == 2'b11 ) &
+									( I_Src_Command.command.instr.op.OpCode == 2'b10 )  &
+									( I_Src_Command.command.instr.src1.idx == 8 );
 
 
 	assign O_Data				= ( Re_s ) ? SData_R : '0;

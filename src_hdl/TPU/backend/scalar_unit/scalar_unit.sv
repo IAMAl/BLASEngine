@@ -34,7 +34,7 @@ module Scalar_Unit
 	input	tb_t				I_St_Grant,				//Flag: Grant
 	input	tb_t				I_End_Access,			//Flag: End of Access
 	output						O_Re_Buff,				//Read-Enable for Buffer
-	output	command				O_V_Command,			//Command to Vector Unit
+	output	pipe_index_t		O_V_Command,			//Command to Vector Unit
 	input	v_ready_t			I_V_State,				//Status from Vector Unit
 	output	v_ready_t			O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
 	output						O_Commit_Grant,			//Grant for Commit on Vector Unit
@@ -244,8 +244,8 @@ module Scalar_Unit
 
 	pipe_index_t				PipeReg_Idx;
 	pipe_index_t				PipeReg_Index;
-	pipe_index_t				PipeReg_IdxRF;
-	pipe_index_t				PipeReg_IdxRR;
+	pipe_index_reg_t			PipeReg_IdxRF;
+	pipe_index_reg_t			PipeReg_IdxRR;
 	pipe_reg_t					PipeReg_RR;
 	pipe_net_t					PipeReg_Set_Net;
 	pipe_net_t					PipeReg_RR_Net;
@@ -258,9 +258,10 @@ module Scalar_Unit
 
 
 	//// Select Scalar unit or Vector unit backend
-	assign S_Command			= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign O_V_Command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign O_V_Command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? IW_IssueNo : '0;
+	assign S_Command					= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign O_V_Command.v				= Instr.instr.op.Sel_Unit & Req_Issue;
+	assign O_V_Command.command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? IW_IssueNo : '0;
 
 
 	//// Instruction Fetch Stage
@@ -308,25 +309,25 @@ module Scalar_Unit
 	//	Capture Read Data
 	//	Command
 	assign PipeReg_Set_Net.v		= PipeReg_RR.v;
-	assign PipeReg_Set_Net.comman	= PipeReg_RR.command;
+	assign PipeReg_Set_Net.command	= PipeReg_RR.command;
 
 	assign PipeReg_Set_Net.data1	= ( RegMov_Rd ) ?							R_Scalar_Data :
-										( PipeReg_RR.command.instr.src1.v ) ?	RF_Odd_Data1 :
+										( PipeReg_RR.command.instr.src1.v ) ?	PipeReg_RR.data1 :
 																				'0;
 
-	assign PipeReg_Set_Net.data2	= ( PipeReg_RR.command.instr.src2.v ) ?		RF_Odd_Data2 :
+	assign PipeReg_Set_Net.data2	= ( PipeReg_RR.command.instr.src2.v ) ?		PipeReg_RR.data2 :
 																				'0;
 
-	assign PipeReg_Set_Net.data3	= ( PipeReg_RR.command.instr.src3.v ) ?		RF_Odd_Data3 :
+	assign PipeReg_Set_Net.data3	= ( PipeReg_RR.command.instr.src3.v ) ?		PipeReg_RR.data3 :
 																				'0;
 
 	//	Read-Enable
-	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
-										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
-	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
-										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
+	assign Req_Even					= ( ( ~PipeReg_RR.command.instr.src1.src_sel.unit_no & PipeReg_RR.command.instr.src1.v ) |
+										( ~PipeReg_RR.command.instr.src2.src_sel.unit_no & PipeReg_RR.command.instr.src2.v ) |
+										( ~PipeReg_RR.command.instr.src3.src_sel.unit_no & PipeReg_RR.command.instr.src3.v ) ) & ~Re_c;
+	assign Req_Odd					= ( (  PipeReg_RR.command.instr.src1.src_sel.unit_no & PipeReg_RR.command.instr.src1.v ) |
+										(  PipeReg_RR.command.instr.src2.src_sel.unit_no & PipeReg_RR.command.instr.src2.v ) |
+										(  PipeReg_RR.command.instr.src3.src_sel.unit_no & PipeReg_RR.command.instr.src3.v ) ) & ~Re_c;
 
 	//	Read Data
 	assign V_State_Data.v			= 1'b1;
@@ -338,21 +339,21 @@ module Scalar_Unit
 	///// Write-Back to PAC
 	assign PAC_We				= WB_Token.v & is_WB_BR;
 	assign PAC_Data				= ( is_WB_BR ) ? WB_Data_ : '0;
-	assign PAC_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src3.src_sel.no == 2'h2 );
+	assign PAC_Re				= ( PipeReg_RR.command.instr.src1.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.command.instr.src2.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.command.instr.src3.src_sel.no == 2'h2 );
 
 
 	//// Lane-Enable
 	assign Lane_We				= is_WB_VU;
 	assign Lane_Data			= ( is_WB_VU ) ? WB_Data_ : '0;
-	assign Lane_Re				= ( PipeReg_RR.src1.src_sel.no == 2'h3 ) |
-									( PipeReg_RR.src2.src_sel.no == 2'h3 ) |
-									( PipeReg_RR.src3.src_sel.no == 2'h3 );
+	assign Lane_Re				= ( PipeReg_RR.command.instr.src1.src_sel.no == 2'h3 ) |
+									( PipeReg_RR.command.instr.src2.src_sel.no == 2'h3 ) |
+									( PipeReg_RR.command.instr.src3.src_sel.no == 2'h3 );
 
 
 	//// Nwtwork Stage
-	assign Config_Path			= PipeReg_RR_Net.path;
+	assign Config_Path			= PipeReg_RR_Net.command.instr.path;
 
 	//	Capture Data
 	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
@@ -394,24 +395,24 @@ module Scalar_Unit
 
 	//	Write-Back to Cond Register
 	assign WB_En				= WB_Token.v & is_WB_BR;
-	assign MaskReg_Ready		= ( PipeReg_Idx.op.OpType == 2'b01 ) &
-									( PipeReg_Idx.op.OpClass == 2'b10 ) &
-									( PipeReg_Idx.op.OpCode[1] == 1'b1 );
+	assign MaskReg_Ready		= ( PipeReg_Idx.command.instr.op.OpType == 2'b01 ) &
+									( PipeReg_Idx.command.instr.op.OpClass == 2'b10 ) &
+									( PipeReg_Idx.command.instr.op.OpCode[1] == 1'b1 );
 	assign MaskReg_Term			= Dst_Done;
 	assign MaskReg_We			= WB_Token.v & is_WB_BR;
-	assign MaskReg_Re			= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src3.src_sel.no == 2'h2 );
+	assign MaskReg_Re			= (   PipeReg_RR.command.instr.src1.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.command.instr.src2.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.command.instr.src3.src_sel.no == 2'h2 );
 
 
 	//// Reg Move
-	assign RegMov_Rd			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
-									( PipeReg_Idx.op.OpClass == 2'b11 ) &
-									( PipeReg_Idx.op.OpCode == 2'b10 );
+	assign RegMov_Rd			= ( PipeReg_Idx.command.instr.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.command.instr.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.command.instr.op.OpCode == 2'b10 );
 
-	assign RegMov_Wt			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
-									( PipeReg_Idx.op.OpClass == 2'b11 ) &
-									( PipeReg_Idx.op.OpCode == 2'b11 );
+	assign RegMov_Wt			= ( PipeReg_Idx.command.instr.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.command.instr.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.command.instr.op.OpCode == 2'b11 );
 
 
 	//// Commit
@@ -568,12 +569,12 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.src1.v		),
+		.I_Req(				PipeReg_Idx.command.instr.src1.v		),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.src1		),
-		.I_Window(			PipeReg_Idx.src1.window	),
-		.I_Length(			PipeReg_Idx.slice_len	),
+		.I_Index(			PipeReg_Idx.command.instr.src1		),
+		.I_Window(			PipeReg_Idx.command.instr.src1.window	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -591,12 +592,12 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.src2.v		),
+		.I_Req(				PipeReg_Idx.command.instr.src2.v		),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.src2		),
-		.I_Window(			PipeReg_Idx.src2.window	),
-		.I_Length(			PipeReg_Idx.slice_len	),
+		.I_Index(			PipeReg_Idx.command.instr.src2		),
+		.I_Window(			PipeReg_Idx.command.instr.src2.window	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -614,12 +615,12 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.src3.v		),
+		.I_Req(				PipeReg_Idx.command.instr.src3.v		),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.src3		),
-		.I_Window(			PipeReg_Idx.src3.window	),
-		.I_Length(			PipeReg_Idx.slice_len	),
+		.I_Index(			PipeReg_Idx.command.instr.src3		),
+		.I_Window(			PipeReg_Idx.command.instr.src3.window	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -631,9 +632,9 @@ module Scalar_Unit
 
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Index.src1.v	),
-		.I_Odd2(			PipeReg_Index.src2.v	),
-		.I_Odd3(			PipeReg_Index.src3.v	),
+		.I_Odd1(			PipeReg_Index.command.instr.src1.v	),
+		.I_Odd2(			PipeReg_Index.command.instr.src2.v	),
+		.I_Odd3(			PipeReg_Index.command.instr.src3.v	),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
@@ -680,7 +681,7 @@ module Scalar_Unit
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
+			Sel				<= { PipeReg_Index.command.instr.src3.v, PipeReg_Index.command.instr.src2.v, PipeReg_Index.command.instr.src1.v };
 		end
 	end
 

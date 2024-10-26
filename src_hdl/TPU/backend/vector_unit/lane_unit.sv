@@ -23,7 +23,7 @@ import pkg_mpu::*;
 	input						I_Commit_Grant,			//Grant for Commit
 	input						I_En_Lane,				//Enable Execution
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
-	input	command_t			I_Command,				//Execution Command
+	input	pipe_index_t		I_Command,				//Execution Command
 	input	data_t				I_Scalar_Data,			//Scalar Data from Scalar Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Scalar Unit
 	output	s_ldst_t			O_LdSt,					//Load/Store Command
@@ -211,29 +211,29 @@ import pkg_mpu::*;
 	//	Capture Read Data
 	//	Command
 	assign PipeReg_Set_Net.v		= PipeReg_RR.v;
-	assign PipeReg_Set_Net.comman	= PipeReg_RR.command;
+	assign PipeReg_Set_Net.command	= PipeReg_RR.command;
 
 	assign PipeReg_Set_Net.data1	= ( RegMov_Rd ) ?							R_Scalar_Data :
-										( PipeReg_RR.command.instr.src1.v ) ?	RF_Odd_Data1 :
+										( PipeReg_RR.command.instr.src1.v ) ?	PipeReg_RR.data1 :
 																				'0;
 
-	assign PipeReg_Set_Net.data2	= ( PipeReg_RR.command.instr.src2.v ) ?		RF_Odd_Data2 :
+	assign PipeReg_Set_Net.data2	= ( PipeReg_RR.command.instr.src2.v ) ?		PipeReg_RR.data2 :
 																				'0;
 
-	assign PipeReg_Set_Net.data3	= ( PipeReg_RR.command.instr.src3.v ) ?		RF_Odd_Data3 :
+	assign PipeReg_Set_Net.data3	= ( PipeReg_RR.command.instr.src3.v ) ?		PipeReg_RR.data3 :
 																				'0;
 
 	//	Read-Enable
-	assign Req_Even					= ( ( ~PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
-										( ~PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										( ~PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
-	assign Req_Odd					= ( (  PipeReg_RR.src1.src_sel.unit_no & PipeReg_RR.src1.v ) |
-										(  PipeReg_RR.src2.src_sel.unit_no & PipeReg_RR.src2.v ) |
-										(  PipeReg_RR.src3.src_sel.unit_no & PipeReg_RR.src3.v ) ) & ~Re_c;
+	assign Req_Even					= ( ( ~PipeReg_RR.command.instr.src1.src_sel.unit_no & PipeReg_RR.command.instr.src1.v ) |
+										( ~PipeReg_RR.command.instr.src2.src_sel.unit_no & PipeReg_RR.command.instr.src2.v ) |
+										( ~PipeReg_RR.command.instr.src3.src_sel.unit_no & PipeReg_RR.command.instr.src3.v ) ) & ~Re_c;
+	assign Req_Odd					= ( (  PipeReg_RR.command.instr.src1.src_sel.unit_no & PipeReg_RR.command.instr.src1.v ) |
+										(  PipeReg_RR.command.instr.src2.src_sel.unit_no & PipeReg_RR.command.instr.src2.v ) |
+										(  PipeReg_RR.command.instr.src3.src_sel.unit_no & PipeReg_RR.command.instr.src3.v ) ) & ~Re_c;
 
 
 	//// Network
-	assign Config_Path			= PipeReg_RR_Net.path[6:0];
+	assign Config_Path			= PipeReg_RR_Net.command.instr.path[6:0];
 
 	//	Capture Data
 	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
@@ -279,24 +279,24 @@ import pkg_mpu::*;
 
 	//	Write-Back to Mask Register
 	assign WB_En				= WB_Token.v & is_WB_BR;
-	assign MaskReg_Ready		= ( PipeReg_Idx.op.OpType == 2'b01 ) &
-									( PipeReg_Idx.op.OpClass == 2'b10 ) &
-									( PipeReg_Idx.op.OpCode[1] == 1'b1 );
+	assign MaskReg_Ready		= ( PipeReg_Idx.command.instr.op.OpType == 2'b01 ) &
+									( PipeReg_Idx.command.instr.op.OpClass == 2'b10 ) &
+									( PipeReg_Idx.command.instr.op.OpCode[1] == 1'b1 );
 	assign MaskReg_Term			= Dst_Done;
 	assign MaskReg_We			= WB_Token.v & is_WB_BR;
-	assign MaskReg_Re			= (   PipeReg_RR.src1.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src2.src_sel.no == 2'h2 ) |
-									( PipeReg_RR.src3.src_sel.no == 2'h2 );
+	assign MaskReg_Re			= (   PipeReg_RR.command.instr.src1.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.command.instr.src2.src_sel.no == 2'h2 ) |
+									( PipeReg_RR.command.instr.src3.src_sel.no == 2'h2 );
 
 
 	//// Reg Move
-	assign RegMov_Rd			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
-									( PipeReg_Idx.op.OpClass == 2'b11 ) &
-									( PipeReg_Idx.op.OpCode == 2'b10 );
+	assign RegMov_Rd			= ( PipeReg_Idx.command.instr.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.command.instr.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.command.instr.op.OpCode == 2'b10 );
 
-	assign RegMov_Wt			= ( PipeReg_Idx.op.OpType == 2'b00 ) &
-									( PipeReg_Idx.op.OpClass == 2'b11 ) &
-									( PipeReg_Idx.op.OpCode == 2'b11 );
+	assign RegMov_Wt			= ( PipeReg_Idx.command.instr.op.OpType == 2'b00 ) &
+									( PipeReg_Idx.command.instr.op.OpClass == 2'b11 ) &
+									( PipeReg_Idx.command.instr.op.OpCode == 2'b11 );
 
 
 	//// Commit Request
@@ -326,7 +326,7 @@ import pkg_mpu::*;
 		.I_Stall(			Stall_RegFile_Dst		),
 		.I_Req(				Req_Index_Dst			),
 		.I_En_II(			'0						),
-		.I_MaskedRead(		PipeReg_Idx.mread		),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
 		.I_Index(			Dst_Index				),
 		.I_Window(			WB_Token.dst.window		),
 		.I_Length(			WB_Token.dst.slice_len	),
@@ -346,12 +346,12 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.src1.v		),
-		.I_En_II(			PipeReg_Idx.en_ii		),
-		.I_MaskedRead(		PipeReg_Idx.mread		),
-		.I_Index(			PipeReg_Idx.src1		),
-		.I_Window(			PipeReg_Idx.src1.window	),
-		.I_Length(			PipeReg_Idx.slice_len	),
+		.I_Req(				PipeReg_Idx.command.instr.src1.v		),
+		.I_En_II(			PipeReg_Idx.command.instr.en_ii		),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
+		.I_Index(			PipeReg_Idx.command.instr.src1		),
+		.I_Window(			PipeReg_Idx.command.instr.src1.window	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -369,12 +369,12 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.src2.v		),
-		.I_En_II(			PipeReg_Idx.en_ii		),
-		.I_MaskedRead(		PipeReg_Idx.mread		),
-		.I_Index(			PipeReg_Idx.src2		),
-		.I_Window(			PipeReg_Idx.src2.window	),
-		.I_Length(			PipeReg_Idx.slice_len	),
+		.I_Req(				PipeReg_Idx.command.instr.src2.v		),
+		.I_En_II(			PipeReg_Idx.command.instr.en_ii		),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
+		.I_Index(			PipeReg_Idx.command.instr.src2		),
+		.I_Window(			PipeReg_Idx.command.instr.src2.window	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -392,12 +392,12 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.src3.v		),
-		.I_En_II(			PipeReg_Idx.en_ii		),
-		.I_MaskedRead(		PipeReg_Idx.mread		),
-		.I_Index(			PipeReg_Idx.src3		),
-		.I_Window(			PipeReg_Idx.src3.window	),
-		.I_Length(			PipeReg_Idx.slice_len	),
+		.I_Req(				PipeReg_Idx.command.instr.src3.v		),
+		.I_En_II(			PipeReg_Idx.command.instr.en_ii		),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
+		.I_Index(			PipeReg_Idx.command.instr.src3		),
+		.I_Window(			PipeReg_Idx.command.instr.src3.window	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -409,9 +409,9 @@ import pkg_mpu::*;
 
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Index.src1.v	),
-		.I_Odd2(			PipeReg_Index.src2.v	),
-		.I_Odd3(			PipeReg_Index.src3.v	),
+		.I_Odd1(			PipeReg_Index.command.instr.src1.v	),
+		.I_Odd2(			PipeReg_Index.command.instr.src2.v	),
+		.I_Odd3(			PipeReg_Index.command.instr.src3.v	),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
@@ -458,7 +458,7 @@ import pkg_mpu::*;
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Index.src3.v, PipeReg_Index.src2.v, PipeReg_Index.src1.v };
+			Sel				<= { PipeReg_Index.command.instr.src3.v, PipeReg_Index.command.instr.src2.v, PipeReg_Index.command.instr.src1.v };
 		end
 	end
 
@@ -510,9 +510,9 @@ import pkg_mpu::*;
 		.I_Data_Src2(		RF_Odd_Data2			),
 		.I_Data_Src3(		RF_Even_Data1			),
 		.I_Data_Src4(		RF_Even_Data2			),
-		.O_Data_Src1(		PipeReg_RR.src1.data	),
-		.O_Data_Src2(		PipeReg_RR.src2.data	),
-		.O_Data_Src3(		PipeReg_RR.src3.data	)
+		.O_Data_Src1(		PipeReg_RR.data1		),
+		.O_Data_Src2(		PipeReg_RR.data2		),
+		.O_Data_Src3(		PipeReg_RR.data3		)
 	);
 
 	//	Pipeline Register
@@ -600,12 +600,8 @@ import pkg_mpu::*;
 		.reset(				reset					),
 		.I_En(				Lane_Enable				),
 		.I_Stall(			Stall_ExecUnit			),
+		.I_Command(			PipeReg_Exe				),
 		.I_Commit_Grant(	I_Commit_Grant			),
-		.I_Req(				PipeReg_Exe.v			),
-		.I_Command(			PipeReg_Exe.instr		),
-		.I_Src_Data1(		PipeReg_Exe.data1		),
-		.I_Src_Data2(		PipeReg_Exe.data2		),
-		.I_Src_Data3(		PipeReg_Exe.data3		),
 		.O_LdSt1(			O_LdSt[0]				),
 		.O_LdSt2(			O_LdSt[1]				),
 		.I_Ld_Data1(		I_Ld_Data[0]			),

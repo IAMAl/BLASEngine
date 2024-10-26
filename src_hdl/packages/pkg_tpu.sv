@@ -255,13 +255,15 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		command_t						command;
-		logic	[16:0]					path;
 	} pipe_index_t;
 
 	typedef struct packed {
 		logic							v;
 		command_t						command;
-		logic	[16:0]					path;
+		idx_t							src1;
+		idx_t							src2;
+		idx_t							src3;
+		idx_t							src4;
 	} pipe_index_reg_t;
 
 	//	Register-Read Stages
@@ -271,7 +273,6 @@ package pkg_tpu;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
-		logic	[16:0]					path;
 	} pipe_reg_t;
 
 	//	Register-Read and Network Stages
@@ -281,7 +282,6 @@ package pkg_tpu;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
-		logic	[16:0]					path;
 	} pipe_net_t;
 
 	//	Execuution Stage (First)
@@ -291,7 +291,6 @@ package pkg_tpu;
 		data_t							data1;
 		data_t							data2;
 		data_t							data3;
-		logic	[4:0]					path;
 	} pipe_exe_t;
 
 	//	Execution Stage (Intermediate)

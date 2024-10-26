@@ -18,9 +18,8 @@ module ExecUnit_V
 	input						reset,
 	input						I_En,
 	input						I_Stall,				//Stall
-	input	command_t			I_Command,				//Command
+	input	pipe_exe_t			I_Command,				//Command
 	input						I_Commit_Grant,			//Grant for Commit
-	input	issue_no_t			I_Issue_No,				//Current Issue No
 	output	ldst_t				O_LdSt1,				//Load/Store Command
 	output	ldst_t				O_LdSt2,				//Load/Store Command
 	input	data_t				I_Ld_Data1,				//Loaded Data
@@ -106,27 +105,27 @@ module ExecUnit_V
 	assign Src_Data2			= I_Command.data2;
 	assign Src_Data3			= I_Command.data3;
 
-	assign RegMoveOp			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 ) & ( I_Command.instr.op.OpClass == 2'b11 );
-	assign CommonMov			= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b01 );
-	assign PMov					= RegMoveOp & ( I_Command.instr.op.OpCode == 2'b10 ) & I_Command.instr.src1.v;
-	assign PMov0				= PMov & ( I_Command.instr.src1.idx == '0 );
-	assign PMov1				= PMov & ( I_Command.instr.src1.idx == '1 );
+	assign RegMoveOp			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 ) & ( I_Command.command.instr.op.OpClass == 2'b11 );
+	assign CommonMov			= RegMoveOp & ( I_Command.command.instr.op.OpCode == 2'b01 );
+	assign PMov					= RegMoveOp & ( I_Command.command.instr.op.OpCode == 2'b10 ) & I_Command.command.instr.src1.v;
+	assign PMov0				= PMov & ( I_Command.command.instr.src1.idx == '0 );
+	assign PMov1				= PMov & ( I_Command.command.instr.src1.idx == '1 );
 
-	assign is_Adder				= I_En & ( I_Command.instr.op.OpClass == 2'b00 );
-	assign is_Mlter				= I_En & ( I_Command.instr.op.OpClass == 2'b01 );
+	assign is_Adder				= I_En & ( I_Command.command.instr.op.OpClass == 2'b00 );
+	assign is_Mlter				= I_En & ( I_Command.command.instr.op.OpClass == 2'b01 );
 
 	assign MAU_Token.v			= is_Adder | is_Mlter;
-	assign MAU_Token.op.OpType	= I_Command.instr.op.OpType;
+	assign MAU_Token.op.OpType	= I_Command.command.instr.op.OpType;
 	assign MAU_Token.op.OpClass	= ( PMov0 ) ?	2'b01 :
 									( PMov1 ) ?	2'b00 :
-												I_Command.instr.op.OpClass;
+												I_Command.command.instr.op.OpClass;
 	assign MAU_Token.op.OpCode	= ( PMov0 ) ?	2'b00 :
 									( PMov1 ) ?	2'b00 :
-												I_Command.instr.op.OpCode;
-	assign MAU_Token.dst		= I_Command.instr.dst;
-	assign MAU_Token.slice_len	= I_Command.instr.slice_len;
-	assign MAU_Token.issue_no	= I_Command.issue_no;
-	assign MAU_Token.path		= I_Command.instr.path;
+												I_Command.command.instr.op.OpCode;
+	assign MAU_Token.dst		= I_Command.command.instr.dst;
+	assign MAU_Token.slice_len	= I_Command.command.instr.slice_len;
+	assign MAU_Token.path		= I_Command.command.instr.path;
+	assign MAU_Token.issue_no	= I_Command.command.issue_no;
 
 	assign Src_Data2_			= ( PMov0 ) ?	32'h78000000 :
 									( PMov1 ) ? 32'h00000000 :
@@ -135,25 +134,25 @@ module ExecUnit_V
 
 	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
 	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
-	assign RegMove				= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 ) &
-										( I_Command.instr.op.OpClass == 2'b11 ) &
-										( |I_Command.instr.op.OpCode );
+	assign RegMove				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 ) &
+										( I_Command.command.instr.op.OpClass == 2'b11 ) &
+										( |I_Command.command.instr.op.OpCode );
 
 	assign PData				= ( CommonMov) ?	Src_Data1 :
 									( PMov0 ) ?		Data0 :
 									( PMov1 ) ?		Data1 :
 													'0;
 
-	assign MAU_Req				= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b00 );
+	assign MAU_Req				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 );
 
-	assign LdSt_Req[0]			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b11 ) &  ~I_Command.instr.op.OpClass[0];
-	assign LdSt_Req[1]			= I_Command.command.v & ( I_Command.instr.op.OpType == 2'b11 ) &   I_Command.instr.op.OpClass[0];
+	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  ~I_Command.command.instr.op.OpClass[0];
+	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &   I_Command.command.instr.op.OpClass[0];
 
 
-	assign LifeMAU				= I_Issue_No - MAU_IssueNo;
-	assign LifeLdSt1			= I_Issue_No - Ld_Token[0].issue_no;
-	assign LifeLdSt2			= I_Issue_No - Ld_Token[0].issue_no;
-	assign LifeMv				= I_Issue_No - Mv_Token.issue_no;
+	assign LifeMAU				= I_Command.command.issue_no - MAU_IssueNo;
+	assign LifeLdSt1			= I_Command.command.issue_no - Ld_Token[0].issue_no;
+	assign LifeLdSt2			= I_Command.command.issue_no - Ld_Token[0].issue_no;
+	assign LifeMv				= I_Command.command.issue_no - Mv_Token.issue_no;
 
 
 	assign is_LifeLdSt2			= LifeLdSt2 > LifeLdSt1;
@@ -202,6 +201,7 @@ module ExecUnit_V
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
 		.I_Commit_Grant(	I_Commit_Grant			),
+		.I_Issue_No(		I_Command.command.issue_no				),
 		.I_Req(				LdSt_Req[1]				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		Src_Data1				),
@@ -214,7 +214,7 @@ module ExecUnit_V
 		.I_Ld_Grant(		I_Ld_Grant[1]			),
 		.I_St_Ready(		I_St_Ready[1]			),
 		.I_St_Grant(		I_St_Grant[1]			),
-		.I_End_Access(		I_End_Access1			),
+		.I_End_Access(		I_End_Access2			),
 		.O_Token(			Ld_Token[1]				),
 		.O_WB_Data(			Ld_Data[1]				),
 		.O_Ld_Stall(		Ld_Stall_Odd			),
@@ -228,6 +228,7 @@ module ExecUnit_V
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
 		.I_Commit_Grant(	I_Commit_Grant			),
+		.I_Issue_No(		I_Command.command.issue_no				),
 		.I_Req(				LdSt_Req[0]				),
 		.I_Command(			I_Command				),
 		.I_Src_Data1(		Src_Data1				),
@@ -240,7 +241,7 @@ module ExecUnit_V
 		.I_Ld_Grant(		I_Ld_Grant[0]			),
 		.I_St_Ready(		I_St_Ready[0]			),
 		.I_St_Grant(		I_St_Grant[0]			),
-		.I_End_Access(		I_End_Access2			),
+		.I_End_Access(		I_End_Access1			),
 		.O_Token(			Ld_Token[0]				),
 		.O_WB_Data(			Ld_Data[0]				),
 		.O_Ld_Stall(		Ld_Stall_Evn			),

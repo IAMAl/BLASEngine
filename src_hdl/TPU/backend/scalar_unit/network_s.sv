@@ -48,7 +48,7 @@ module Network_S
 	index_t						Slice_Len;
 
 
-	assign Req					= I_Req;
+	assign Req					= I_Command.v;
 	assign Sel_Path				= I_Sel_Path;
 	assign Sel_Path_WB			= I_Sel_Path_WB;
 

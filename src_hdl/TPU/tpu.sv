@@ -63,7 +63,7 @@ module TPU
 
 	state_t						S_Status;
 
-	command_t					V_Command;
+	pipe_index_t				V_Command;
 	v_ready_t					En_Lane;
 	v_ready_t					V_Status;
 
