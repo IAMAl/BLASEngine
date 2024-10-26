@@ -44,6 +44,9 @@ module LdStUnit
 	logic						Ld_Req;
 	logic						St_Req;
 
+	logic						Ld_Req_;
+	logic						St_Req_;
+
 	data_t						Ld_Data;
 	data_t						St_Data;
 
@@ -108,14 +111,14 @@ module LdStUnit
 	assign O_St_Stall			= St_Stall;
 
 
-	assign Ld_Token.v			= Ld_Req;
+	assign Ld_Token.v			= Ld_Req_;
 	assign Ld_Token.op			= I_Command.instr.op;
 	assign Ld_Token.dst			= I_Command.instr.dst;
 	assign Ld_Token.slice_len	= I_Command.instr.slice_len;
 	assign Ld_Token.issue_no	= I_Command.issue_no;
 	assign Ld_Token.path		= I_Command.instr.path;
 
-	assign St_Token.v			= St_Req;
+	assign St_Token.v			= St_Req_;
 	assign St_Token.op			= I_Command.instr.op;
 	assign St_Token.dst			= I_Command.instr.dst;
 	assign St_Token.slice_len	= I_Command.instr.slice_len;
@@ -125,12 +128,12 @@ module LdStUnit
 	assign St_Data				= I_Src_Data1;
 
 
-	assign O_LdSt.ld.req		= Ld_Req;
+	assign O_LdSt.ld.req		= Ld_Req_;
 	assign O_LdSt.ld.len		= Ld_Length;
 	assign O_LdSt.ld.stride		= Ld_Stride;
 	assign O_LdSt.ld.base		= Ld_Base;
 
-	assign O_LdSt.st.req		= St_Req;
+	assign O_LdSt.st.req		= St_Req_;
 	assign O_LdSt.st.len		= St_Length;
 	assign O_LdSt.st.stride		= St_Stride;
 	assign O_LdSt.st.base		= St_Base;
@@ -163,7 +166,7 @@ module LdStUnit
 		.I_Length(			I_Src_Data1[9:0]			),
 		.I_Stride(			I_Src_Data2[9:0]			),
 		.I_Base(			I_Src_Data3[9:0]			),
-		.O_Req(				Ld_Req						),
+		.O_Req(				Ld_Req_						),
 		.O_Length(			Ld_Length					),
 		.O_Stride(			Ld_Stride					),
 		.O_Base(			Ld_Base						),
@@ -193,7 +196,7 @@ module LdStUnit
 		.I_Length(			I_Src_Data1[9:0]			),
 		.I_Stride(			I_Src_Data2[9:0]			),
 		.I_Base(			I_Src_Data3[9:0]			),
-		.O_Req(				St_Req						),
+		.O_Req(				St_Req_						),
 		.O_Length(			St_Length					),
 		.O_Stride(			St_Stride					),
 		.O_Base(			St_Base						),

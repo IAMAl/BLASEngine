@@ -146,9 +146,13 @@ import pkg_mpu::*;
 	logic						Lane_CTRL_Rst;
 	logic						Lane_CTRL_Set;
 
-	logic						Re_c;
-	logic						R_Re_c;
+	logic						Req_Even;
+	logic						Req_Odd;
+	
 	logic						We_c;
+	logic						Re_c;
+
+	logic						R_Re_c;
 	logic	[1:0]				Cond_Data;
 
 	logic						Set_One;
@@ -435,12 +439,10 @@ import pkg_mpu::*;
 	AuxRegs AuxRegs (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_ThreadID(		I_ThreadID				),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Re(				RegMov_Rd				),
 		.I_We(				RegMov_Wt				),
 		.I_Src_Command(		PipeReg_IdxRR			),
-		.I_Dst_Command(		WB_Token				),
 		.O_Re_p0(			Re_p0					),
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),
@@ -561,7 +563,7 @@ import pkg_mpu::*;
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			PipeReg_RR_Net			),
+		.I_Stall(			Stall_Network			),
 		.I_Command(			PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),

@@ -20,32 +20,35 @@ module NLZ8
 	always_comb begin
 		case ( I_Data )
 			8'b???????1: begin
-				O_Num = 0;
+				O_Num = 3'h0;
 			end
 			8'b??????10: begin
-				O_Num = 1;
+				O_Num = 3'h1;
 			end
 			8'b?????100: begin
-				O_Num = 2;
+				O_Num = 3'h2;
 			end
 			8'b????1000: begin
-				O_Num = 3;
+				O_Num = 3'h3;
 			end
 			8'b???10000: begin
-				O_Num = 4;
+				O_Num = 3'h4;
 			end
 			8'b??100000: begin
-				O_Num = 5;
+				O_Num = 3'h5;
 			end
 			8'b?1000000: begin
-				O_Num = 6;
+				O_Num = 3'h6;
 			end
 			8'b10000000: begin
-				O_Num = 7;
+				O_Num = 3'h7;
+			end
+			default: begin
+				O_Num = 3'h0;
 			end
 		endcase
 	end
 
-	assign O_Valid	= O_Num != 3'h0;
+	assign O_Valid	= I_Data != 8'h0;
 
 endmodule

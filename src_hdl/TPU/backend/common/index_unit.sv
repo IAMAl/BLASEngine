@@ -135,8 +135,7 @@ module IndexUnit
 	assign O_Index.slice		= ( R_Req ) ? R_Idx_Cfg.slice :					I_Index.slice;
 	assign O_Index.sel			= ( R_Req ) ? R_Idx_Cfg.sel :					I_Index.sel;
 	assign O_Index.src_sel		= ( R_Req ) ? R_Idx_Cfg.src_sel :				I_Index.src_sel;
-	assign O_Index.window		= ( R_Req ) ? R_Idx_Cfg.v :						I_Index.window;
-	assign O_Index.src_sel		= ( R_Req ) ? R_Idx_Cfg.v :						I_Index.src_sel;
+	assign O_Index.window		= ( R_Req ) ? R_Idx_Cfg.window :				I_Index.window;
 	assign O_Index.idx			= ( R_Req ) ? R_Index :							I_Index.idx;
 
 
