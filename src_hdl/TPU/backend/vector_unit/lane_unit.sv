@@ -271,6 +271,7 @@ import pkg_mpu::*;
 	assign Dst_Index.sel		= WB_Token.dst.sel;
 	assign Dst_Index.src_sel	= WB_Token.dst.dst_sel;
 	assign Dst_Index.window		= WB_Token.dst.window;
+	assign Dst_Index.s			= WB_Token.dst.s;
 	assign Dst_Index_Window		= WB_Token.dst.window;
 	assign Dst_Index_Length		= WB_Token.dst.slice_len;
 	assign Dst_Index_MRead		= WB_Token.mread;

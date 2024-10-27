@@ -74,7 +74,13 @@ module fMlt_Unit
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( We ) begin
+		if ( reset) begin
+			for ( int i=0; i<DEPTH_PIPE; ++i ) begin
+				PipeToken[ i ]	<= '0;
+				PipeData[ i ]	<= '0;
+			end
+		end
+		else if ( We ) begin
 			PipeToken[ WPtr ]	<= Token;
 			PipeData[ WPtr ]	<= Data;
 		end

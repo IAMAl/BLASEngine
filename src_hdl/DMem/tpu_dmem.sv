@@ -214,7 +214,10 @@ module DMem_Body
 	end
 
 	always_ff @( posedge clock ) begin
-		if ( Req_Ld ) begin
+		if ( reset ) begin
+			Ld_Data			<= '0;
+		end
+		else if ( Req_Ld ) begin
 			Ld_Data			<= DataMem[ Address_Ld ];
 		end
 	end

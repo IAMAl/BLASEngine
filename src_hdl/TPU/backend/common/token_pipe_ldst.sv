@@ -68,7 +68,15 @@ module token_pipe_ldst
 
 
 	always_ff @( posedge clock ) begin
-		if ( We ) begin
+		if ( reset ) begin
+			for ( int i=0; i<DEPTH_BUFF; ++i ) begin
+				BuffToken[ i ]	<= '0;
+				BuffLength[ i ]	<= '0;
+				BuffStride[ i ]	<= '0;
+				BuffBase[ i ]	<= '0;
+			end
+		end
+		else if ( We ) begin
 			BuffToken[ WPtr ]	<= I_Token;
 			BuffLength[ WPtr ]	<= I_Length;
 			BuffStride[ WPtr ]	<= I_Stride;

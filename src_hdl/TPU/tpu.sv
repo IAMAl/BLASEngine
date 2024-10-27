@@ -113,6 +113,8 @@ module TPU
 
 
 	//	 Buffer for SIMT Thread-ID
+	assign IDBuff_We	= We_Buff;
+	assign IDBuff_Re	= Re_Buff;
 	RingBuff #(
 		.NUM_ENTRY(			SIZE_THREAD_MEM			),
 		.TYPE(				id_t					)
@@ -134,7 +136,7 @@ module TPU
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Empty(			Buff_Empty				),
-		.I_Req_St(			IDBuff_Re				),
+		.I_Req_St(			IDBuff_We				),
 		.O_Ack_St(			Ack_St					),
 		.I_Commit_Req_V(	Commit_Req_V			),
 		.I_En(				I_En_Exe				),

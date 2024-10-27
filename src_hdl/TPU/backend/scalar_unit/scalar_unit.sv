@@ -84,11 +84,11 @@ module Scalar_Unit
 	logic						IW_Req_Issue;
 	issue_no_t					IW_IssueNo;
 	instruction_t				IW_Instr;
-	issue_no_t					Rd_Ptr;
 
 	logic						RAR_Hazard;
 
 	instr_t						S_Command;
+	logic						is_Vec;
 
 
 	idx_t						Index_Src1;
@@ -118,8 +118,6 @@ module Scalar_Unit
 	idx_t						Dst_Index;
 	index_t						Dst_Index_Window;
 	index_t						Dst_Index_Length;
-	logic						Dst_RegFile_Req;
-	logic						Dst_RegFile_Slice;
 	idx_t						Dst_RegFile_Index;
 	logic						Dst_Busy;
 	logic						Dst_Done;
@@ -136,7 +134,6 @@ module Scalar_Unit
 	logic						Sign2;
 	logic						Sign3;
 	const_t						Constant;
-	logic						Slice_Dst;
 
 
 	logic						Bypass_Buff_Full;
@@ -208,7 +205,6 @@ module Scalar_Unit
 	issue_no_t					Commit_No_LdSt1;
 	issue_no_t					Commit_No_LdSt2;
 	issue_no_t					Commit_No_Math;
-	issue_no_t					Hazard;
 	logic						Commit_Req_S;
 	issue_no_t					Commit_No_S;
 	logic						Commited_LdSt1;
@@ -259,7 +255,9 @@ module Scalar_Unit
 
 
 	//// Select Scalar unit or Vector unit backend
-	assign S_Command					= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign S_Command.v					= ~Instr.instr.op.Sel_Unit & Req_Issue;
+	assign S_Command.instr				= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
+	assign is_Vec						= ~Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.v				= Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? IW_IssueNo : '0;
@@ -376,6 +374,7 @@ module Scalar_Unit
 	assign Dst_Index.sel		= WB_Token.dst.sel;
 	assign Dst_Index.src_sel	= WB_Token.dst.dst_sel;
 	assign Dst_Index.window		= WB_Token.dst.window;
+	assign Dst_Index.s			= WB_Token.dst.s;
 	assign Dst_Index_Window		= WB_Token.dst.window;
 	assign Dst_Index_Length		= WB_Token.dst.slice_len;
 	assign Dst_Index_MRead		= WB_Token.mread;
@@ -399,6 +398,11 @@ module Scalar_Unit
 	assign Cond_Data			= WB_Token.op.OpCode;
 
 	assign Bypass_IssueNo		= WB_IssueNo;
+
+
+	//// Reorder Buffer
+	assign Store_S				= WB_Token.v;
+	assign Store_V				= I_Commit_Req_V;
 
 	assign We_c					= WB_Token.v & ( WB_Token.op.OpType == 2'b00 ) &
 									( WB_Token.op.OpClass == 2'b11 ) &
@@ -428,6 +432,11 @@ module Scalar_Unit
 
 	//// Commit
 	assign Commit_No_Math		= WB_IssueNo;
+	assign Commit_No_LdSt1		= WB_IssueNo;
+	assign Commit_No_LdSt2		= WB_IssueNo;
+	assign Commmit_Req_Math		= Math_Done;
+	assign Commmit_Req_LdSt1	= LdSt_Done1;
+	assign Commmit_Req_LdSt2	= LdSt_Done2;
 
 
 	//// Write Vector Unit Status Register
@@ -449,6 +458,7 @@ module Scalar_Unit
 
 	//// Stall Control
 	assign Slice				= Index_Src1_Busy | Index_Src2_Busy | Index_Src3_Busy;
+	assign Stall_PCU			= ~Lane_Enable;
 	assign Stall_Index_Calc		= ~Lane_Enable | Stall_Index_Calc;
 	assign Stall_RegFile_Dst	= ~Lane_Enable | Stall_WB;
 	assign Stall_RegFile_Odd	= ~Lane_Enable | Stall_Index_Calc;
@@ -519,6 +529,7 @@ module Scalar_Unit
 		.I_Req(				Req_IW					),
 		.I_Slice(			Dst_Slice				),
 		.I_Req_Issue(		IW_Req_Issue			),
+		.I_is_Vec(			is_Vec					),
 		.I_Instr(			IW_Instr				),
 		.I_Commit_Req(		Commit_Req				),
 		.I_Commit_No(		Commit_No				),
@@ -894,7 +905,7 @@ module Scalar_Unit
 
 	// Commit Request Selecter
 	Commit_TPU Commit_TPU (
-		.I_Rd_Ptr(			Rd_Ptr					),
+		.I_Rd_Ptr(			IW_IssueNo				),
 		.I_RB_Empty_S(		Empty_RB_S				),
 		.I_RB_Empty_V(		Empty_RB_V				),
 		.I_Commit_Req_S(	Commit_Req_S			),

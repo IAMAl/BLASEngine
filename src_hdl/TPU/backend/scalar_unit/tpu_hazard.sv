@@ -82,6 +82,7 @@ module HazardCheck_TPU
 	logic [NUM_ENTRY_HAZARD-1:0]	is_Matched_i_src3_i_src2;
 	logic [NUM_ENTRY_HAZARD-1:0]	is_Matched_i_src3_i_src3;
 
+
 	logic						R_Req;
 	logic						R_RAR_Hazard;
 	logic						R_WAW_Hazard;
@@ -150,7 +151,7 @@ module HazardCheck_TPU
 
 
 	//// Storing to Table
-	assign Set_Index			= We_Valid_Dst | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3;
+	assign Set_Index			= R_Req & ( We_Valid_Dst | We_Valid_Src1 | We_Valid_Src2 | We_Valid_Src3 );
 
 
 	//// Hazard Detections
@@ -200,7 +201,7 @@ module HazardCheck_TPU
 
 
 	//// Buffer Control
-	assign We					= I_Req_Issue & ~Full;
+	assign We					= Set_Index & ~Full;
 	assign Re					= v_Issue & ~Empty;
 
 
@@ -394,7 +395,7 @@ module HazardCheck_TPU
 				TabHazard[ i ]			<= '0;
 			end
 		end
-		else if ( I_Commit_Req | I_Req_Issue ) begin
+		else if ( I_Commit_Req | Set_Index ) begin
 			if ( I_Commit_Req ) begin
 				TabHazard[ I_Commit_No ].v		<= 1'b0;
 				TabHazard[ I_Commit_No ].dst.v	<= 1'b0;
@@ -403,7 +404,7 @@ module HazardCheck_TPU
 				TabHazard[ I_Commit_No ].src3.v	<= 1'b0;
 			end
 
-			if ( I_Req_Issue ) begin
+			if ( Set_Index ) begin
 				TabHazard[ WNo ].v		<= 1'b1;
 				TabHazard[ WNo ].instr	<= I_Instr;
 				TabHazard[ WNo ].dst	<= Index_Dst;

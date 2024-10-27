@@ -36,7 +36,7 @@ module IFetch
 
 
 	// Capture Instruction
-	assign We_Instr				= Req;
+	assign We_Instr				= Req & I_Instr.v;
 
 	// Send Instruction to Next Stage
 	assign O_Req				= R_Req_D1;

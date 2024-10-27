@@ -163,44 +163,53 @@ module BLASEngine
 				TPU_Commit_No[ NUM_CLMS*row + clm ]		= TPU_IssueNo[0][ clm ];
 
 				RAM_S_LdSt[ row ][ clm ][0]		= TPU_S_LdSt[ row ][ clm ][0];
-				RAM_S_Ld_Data[ row ][ clm ][0]	= TPU_S_Ld_Data[ row ][ clm ][0];
+				TPU_S_Ld_Data[ row ][ clm ][0]	= RAM_S_Ld_Data[ row ][ clm ][0];
 				RAM_S_St_Data[ row ][ clm ][0]	= TPU_S_St_Data[ row ][ clm ][0];
 
 				RAM_V_LdSt[ row ][ clm ][0]		= TPU_V_LdSt[ row ][ clm ][0];
-				RAM_V_Ld_Data[ row ][ clm ][0]	= TPU_V_Ld_Data[ row ][ clm ][0];
+				TPU_V_Ld_Data[ row ][ clm ][0]	= RAM_V_Ld_Data[ row ][ clm ][0];
 				RAM_V_St_Data[ row ][ clm ][0]	= TPU_V_St_Data[ row ][ clm ][0];
 
 				RAM_S_LdSt[ row+1 ][ clm ][1]	= TPU_S_LdSt[ row ][ clm ][1];
-				RAM_S_Ld_Data[ row+1 ][ clm ][1]= TPU_S_Ld_Data[ row ][ clm ][1];
+				TPU_S_Ld_Data[ row ][ clm ][1]	= RAM_S_Ld_Data[ row+1 ][ clm ][1];
 				RAM_S_St_Data[ row+1 ][ clm ][1]= TPU_S_St_Data[ row ][ clm ][1];
 
 				RAM_V_LdSt[ row+1 ][ clm ][1]	= TPU_V_LdSt[ row ][ clm ][1];
-				RAM_V_Ld_Data[ row+1 ][ clm ][1]= TPU_V_Ld_Data[ row ][ clm ][1];
+				TPU_V_Ld_Data[ row ][ clm ][1]	= RAM_V_Ld_Data[ row+1 ][ clm ][1];
 				RAM_V_St_Data[ row+1 ][ clm ][1]= TPU_V_St_Data[ row ][ clm ][1];
-
-				TPU_S_Ld_Ready[ row ][ clm ][0]	= RAM_S_Ld_Ready[ row ][ clm ][0];
-				TPU_S_Ld_Grant[ row ][ clm ][0]	= RAM_S_Ld_Grant[ row ][ clm ][0];
-				TPU_S_St_Ready[ row ][ clm ][0]	= RAM_S_St_Ready[ row ][ clm ][0];
-				TPU_S_St_Grant[ row ][ clm ][0]	= RAM_S_St_Grant[ row ][ clm ][0];
-
-				TPU_S_Ld_Ready[ row ][ clm ][1]	= RAM_S_Ld_Ready[ row+1 ][ clm ][1];
-				TPU_S_Ld_Grant[ row ][ clm ][1]	= RAM_S_Ld_Grant[ row+1 ][ clm ][1];
-				TPU_S_St_Ready[ row ][ clm ][1]	= RAM_S_St_Ready[ row+1 ][ clm ][1];
-				TPU_S_St_Grant[ row ][ clm ][1]	= RAM_S_St_Grant[ row+1 ][ clm ][1];
-
-				TPU_V_Ld_Ready[ row ][ clm ][0]	= RAM_V_Ld_Ready[ row ][ clm ][0];
-				TPU_V_Ld_Grant[ row ][ clm ][0]	= RAM_V_Ld_Grant[ row ][ clm ][0];
-				TPU_V_St_Ready[ row ][ clm ][0]	= RAM_V_St_Ready[ row ][ clm ][0];
-				TPU_V_St_Grant[ row ][ clm ][0]	= RAM_V_St_Grant[ row ][ clm ][0];
-
-				TPU_V_Ld_Ready[ row ][ clm ][1]	= RAM_V_Ld_Ready[ row+1 ][ clm ][1];
-				TPU_V_Ld_Grant[ row ][ clm ][1]	= RAM_V_Ld_Grant[ row+1 ][ clm ][1];
-				TPU_V_St_Ready[ row ][ clm ][1]	= RAM_V_St_Ready[ row+1 ][ clm ][1];
-				TPU_V_St_Grant[ row ][ clm ][1]	= RAM_V_St_Grant[ row+1 ][ clm ][1];
 			end
 		end
 	end
+	always_comb begin
+		for ( int clm=0; clm<NUM_CLMS; ++clm ) begin
+			for ( int row=0; row<NUM_ROWS; ++row ) begin
+				for ( int lane=0; lane<NUM_LANES; ++lane ) begin
+					TPU_S_Ld_Ready[ row ][ clm ][ lane ][0]	= RAM_S_Ld_Ready[ row ][ clm ][ lane ][0];
+					TPU_S_Ld_Grant[ row ][ clm ][ lane ][0]	= RAM_S_Ld_Grant[ row ][ clm ][ lane ][0];
+					TPU_S_St_Ready[ row ][ clm ][ lane ][0]	= RAM_S_St_Ready[ row ][ clm ][ lane ][0];
+					TPU_S_St_Grant[ row ][ clm ][ lane ][0]	= RAM_S_St_Grant[ row ][ clm ][ lane ][0];
 
+					TPU_S_Ld_Ready[ row ][ clm ][ lane ][1]	= RAM_S_Ld_Ready[ row+1 ][ clm ][ lane ][1];
+					TPU_S_Ld_Grant[ row ][ clm ][ lane ][1]	= RAM_S_Ld_Grant[ row+1 ][ clm ][ lane ][1];
+					TPU_S_St_Ready[ row ][ clm ][ lane ][1]	= RAM_S_St_Ready[ row+1 ][ clm ][ lane ][1];
+					TPU_S_St_Grant[ row ][ clm ][ lane ][1]	= RAM_S_St_Grant[ row+1 ][ clm ][ lane ][1];
+
+					TPU_V_Ld_Ready[ row ][ clm ][ lane ][0]	= RAM_V_Ld_Ready[ row ][ clm ][ lane ][0];
+					TPU_V_Ld_Grant[ row ][ clm ][ lane ][0]	= RAM_V_Ld_Grant[ row ][ clm ][ lane ][0];
+					TPU_V_St_Ready[ row ][ clm ][ lane ][0]	= RAM_V_St_Ready[ row ][ clm ][ lane ][0];
+					TPU_V_St_Grant[ row ][ clm ][ lane ][0]	= RAM_V_St_Grant[ row ][ clm ][ lane ][0];
+					
+					TPU_V_Ld_Ready[ row ][ clm ][ lane ][1]	= RAM_V_Ld_Ready[ row+1 ][ clm ][ lane ][1];
+					TPU_V_Ld_Grant[ row ][ clm ][ lane ][1]	= RAM_V_Ld_Grant[ row+1 ][ clm ][ lane ][1];
+					TPU_V_St_Ready[ row ][ clm ][ lane ][1]	= RAM_V_St_Ready[ row+1 ][ clm ][ lane ][1];
+					TPU_V_St_Grant[ row ][ clm ][ lane ][1]	= RAM_V_St_Grant[ row+1 ][ clm ][ lane ][1];
+	
+					TPU_S_End_Access[ row ][ clm ][ lane ]	= '0;//ToDo
+					TPU_V_End_Access[ row ][ clm ][ lane ]	= '0;//ToDo
+				end
+			end
+		end
+	end
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
 		for ( genvar row=0; row<NUM_ROWS; ++row ) begin

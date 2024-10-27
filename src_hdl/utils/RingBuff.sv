@@ -35,7 +35,12 @@ module RingBuff
 	assign O_Data				= ( I_Re ) ? Data[ RPtr ] : '0;
 
 	always_ff @( posedge clock ) begin
-		if ( I_We ) begin
+		if ( reset ) begin
+			for ( int i=0; i<NUM_ENTRY; ++i ) begin
+				Data[ i ]	<= '0;
+			end
+		end
+		else if ( I_We ) begin
 			Data[ WPtr ]	<= I_Data;
 		end
 	end
