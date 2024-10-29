@@ -202,6 +202,7 @@ package pkg_tpu;
 		index_s_t						src1;
 		index_s_t						src2;
 		index_s_t						src3;
+		logic							br;
 	} iw_t;
 
 	typedef struct packed {
