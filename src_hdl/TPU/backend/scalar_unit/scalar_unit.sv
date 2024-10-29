@@ -57,8 +57,8 @@ module Scalar_Unit
 	logic 						PAC_Re;
 	data_t						PAC_Data;
 
-	logic						CondValid1;
-	logic						CondValid2;
+
+	logic						CondValid;
 
 
 	logic						Instr_Jump;
@@ -165,7 +165,6 @@ module Scalar_Unit
 	logic						Math_Done;
 	logic						Condition;
 	logic	[1:0]				Cond_Data;
-	issue_no_t					Bypass_IssueNo;
 
 
 	logic						LdSt_Done1;
@@ -397,8 +396,6 @@ module Scalar_Unit
 
 	assign Cond_Data			= WB_Token.op.OpCode;
 
-	assign Bypass_IssueNo		= WB_IssueNo;
-
 
 	//// Reorder Buffer
 	assign Store_S				= WB_Token.v;
@@ -476,15 +473,14 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req_St(			I_Req_St				),
-		.I_Req(				PAC_Req					),
+		.I_End_St(	),//ToDo
+		.I_Req_Ld(			PAC_Req					),
+		.I_End_Ld(	),//ToDo
 		.I_Stall(			Stall_PCU				),
-		.I_Sel_CondValid(	WB_Sel_CondValid		),
-		.I_CondValid1(		CondValid1				),
-		.I_CondValid2(		CondValid2				),
+		.I_Valid(		CondValid				),
+		.I_CondValid2(
 		.I_Jump(			Instr_Jump				),
 		.I_Branch(			Instr_Branch			),
-		.I_Timing_MY(		Bypass_IssueNo			),
-		.I_Timing_WB(		WB_IssueNo				),
 		.I_State(			Condition				),
 		.I_Cond(			Cond_Data				),
 		.I_Src(				PAC_Src_Data[9:0]		),
@@ -539,7 +535,8 @@ module Scalar_Unit
 		.O_RAW_Hazard(								),
 		.O_WAR_Hazard(								),
 		.O_WAW_Hazard(								),
-		.O_Rd_Ptr(			IW_IssueNo				)
+		.O_Rd_Ptr(			IW_IssueNo				),
+		.O_Stall(	)//ToDo
 	);
 
 
