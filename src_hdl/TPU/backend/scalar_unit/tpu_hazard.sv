@@ -29,12 +29,17 @@ module HazardCheck_TPU
 	output						O_RAW_Hazard,					//RAW-Hazard
 	output						O_WAR_Hazard,					//WAR-Hazard
 	output						O_WAW_Hazard,					//WAW-Hazard
-	output	issue_no_t			O_Rd_Ptr						//Read Pointer to Commit Unit
+	output	issue_no_t			O_Rd_Ptr，						//Read Pointer to Commit Unit
+	output					O_Stall
 );
 
 
 	localparam int WIDTH_ENTRY	= $clog2(NUM_ENTRY_HAZARD);
 
+
+	logic						Br;
+	logic						Issue_Br;
+	logic						Commit_Br;
 
 	index_s_t					Index_Dst;
 	index_s_t					Index_Src1;
@@ -112,6 +117,8 @@ module HazardCheck_TPU
 	logic						We_Valid_Src2;
 	logic						We_Valid_Src3;
 
+	logic						Stall_Br;
+
 
 	assign O_Req_Issue			= R_Req;
 
@@ -122,6 +129,8 @@ module HazardCheck_TPU
 	assign O_RAW_Hazard			= R_RAW_Hazard_Src1 | R_RAW_Hazard_Src2 | R_RAW_Hazard_Src3;
 	assign O_WAR_Hazard			= R_WAR_Hazard_Src1 | R_WAR_Hazard_Src2 | R_WAR_Hazard_Src3;
 	assign O_WAW_Hazard			= R_WAW_Hazard;
+
+	assign O_Stall				= Stall_Br;
 
 
 	//// Referenced at Commit Select Unit
@@ -200,11 +209,39 @@ module HazardCheck_TPU
 	assign v_Issue				= I_Req_Issue & ~( RAW_Hazard_Src1 | RAW_Hazard_Src2 | RAW_Hazard_Src3 | WAR_Hazard_Src1 | WAR_Hazard_Src2 | WAR_Hazard_Src3 | WAW_Hazard );
 
 
+	//// Branch Instruction Detection
+	assign Br				= ( I_Instr.op.OpType == 2'b10 ) &
+							( I_Instr.op.OpClass == 2'b01 ) &
+							( I_Instr.op.OpCode == 2'b01 );
+
+
+	//// Issueing Detection of Branch Instruction
+	assign Issue_Br				= I_Req & TabHazard[ RNo ].v & TabHazard[ RNo ].br;
+
+
+	//// Committing Detection of Branch Instruction
+	assign Commit_Br			= I_Commit_Req & TabHazard[ I_Commit_No ].v & TabHazard[ I_Commit_No ].br;
+
+
 	//// Buffer Control
 	assign We					= Set_Index & ~Full;
 	assign Re					= v_Issue & ~Empty;
 
 
+	//// Stall Generation for Issueing Branch Instruction
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Stall_Br	<= 1'b0;
+		end
+		else if ( Commit_Br ) begin
+			Stall_Br	<= 1'b0;
+		end
+		else if ( Issue_Br ) begin
+			Stall_Br	<= 1'b1;
+		end
+	end
+
+	
 	//// Storing to Table
 	//	 Taking Care of Stall
 	always_ff @( posedge clock ) begin
@@ -402,6 +439,7 @@ module HazardCheck_TPU
 				TabHazard[ I_Commit_No ].src1.v	<= 1'b0;
 				TabHazard[ I_Commit_No ].src2.v	<= 1'b0;
 				TabHazard[ I_Commit_No ].src3.v	<= 1'b0;
+				TabHazard[ I_Commit_No ].br	<= 1'b0;
 			end
 
 			if ( Set_Index ) begin
@@ -411,6 +449,7 @@ module HazardCheck_TPU
 				TabHazard[ WNo ].src1	<= Index_Src1;
 				TabHazard[ WNo ].src2	<= Index_Src2;
 				TabHazard[ WNo ].src3	<= Index_Src3;
+				TabHazard[ WNo ].br	<= Br;
 			end
 		end
 	end
