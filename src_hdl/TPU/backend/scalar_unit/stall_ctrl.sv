@@ -10,7 +10,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Stall_Ctrl (
-	input						I_PAC_Wait,				//Wait-State in PAC Unit
 	input						I_Hazard,				//Hazard Detected
 	input						I_Branch,				//Branch Instruction Detected
 	input						I_Slice,				//Slicing is Used
@@ -26,11 +25,11 @@ module Stall_Ctrl (
 );
 
 
-	assign O_Stall_IF			= I_PAC_Wait | 	I_Slice |						I_Hazard	|	I_Branch;
-	assign O_Stall_IW_St		= I_PAC_Wait | 	I_Slice;
-	assign O_Stall_IW_Ld		= I_PAC_Wait | 	I_Slice | 	I_Bypass_Buff_Full;
-	assign O_Stall_IW			= I_PAC_Wait |	I_Slice |	I_Bypass_Buff_Full;
-	assign O_Stall_Index		= 							I_Bypass_Buff_Full	|				I_St_Stall;
-	assign O_Stall_WB			= 																I_Ld_Stall;
+	assign O_Stall_IF			= I_Slice |						I_Hazard	|	I_Branch;
+	assign O_Stall_IW_St		= I_Slice;
+	assign O_Stall_IW_Ld		= I_Slice | I_Bypass_Buff_Full;
+	assign O_Stall_IW			= I_Slice |	I_Bypass_Buff_Full;
+	assign O_Stall_Index		= 								I_St_Stall	|	I_Bypass_Buff_Full;
+	assign O_Stall_WB			= 								I_Ld_Stall;
 
 endmodule

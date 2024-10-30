@@ -198,12 +198,12 @@ module BLASEngine
 					TPU_V_Ld_Grant[ row ][ clm ][ lane ][0]	= RAM_V_Ld_Grant[ row ][ clm ][ lane ][0];
 					TPU_V_St_Ready[ row ][ clm ][ lane ][0]	= RAM_V_St_Ready[ row ][ clm ][ lane ][0];
 					TPU_V_St_Grant[ row ][ clm ][ lane ][0]	= RAM_V_St_Grant[ row ][ clm ][ lane ][0];
-					
+
 					TPU_V_Ld_Ready[ row ][ clm ][ lane ][1]	= RAM_V_Ld_Ready[ row+1 ][ clm ][ lane ][1];
 					TPU_V_Ld_Grant[ row ][ clm ][ lane ][1]	= RAM_V_Ld_Grant[ row+1 ][ clm ][ lane ][1];
 					TPU_V_St_Ready[ row ][ clm ][ lane ][1]	= RAM_V_St_Ready[ row+1 ][ clm ][ lane ][1];
 					TPU_V_St_Grant[ row ][ clm ][ lane ][1]	= RAM_V_St_Grant[ row+1 ][ clm ][ lane ][1];
-	
+
 					TPU_S_End_Access[ row ][ clm ][ lane ]	= '0;//ToDo
 					TPU_V_End_Access[ row ][ clm ][ lane ]	= '0;//ToDo
 				end
@@ -272,6 +272,7 @@ module BLASEngine
 				.reset(			reset							),
 				.I_En_Exe(		TPU_En_Exe[ row ][ clm ]		),
 				.I_Req(			TPU_Req[ row ][ clm ]			),
+				.I_IssueNo(		Issue_No						),
 				.I_Instr(		Issue_Instr						),
 				.O_S_LdSt(		TPU_S_LdSt[ row ][ clm ]		),
 				.I_S_Ld_Data(	TPU_S_Ld_Data[ row ][ clm ]		),

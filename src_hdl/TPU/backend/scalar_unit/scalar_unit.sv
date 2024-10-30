@@ -52,7 +52,6 @@ module Scalar_Unit
 
 
 	logic						PAC_Req;
-	logic						PAC_Wait;
 	data_t						PAC_Src_Data;
 	logic 						PAC_We;
 	logic 						PAC_Re;
@@ -75,10 +74,6 @@ module Scalar_Unit
 
 	logic						Req_IFetch;
 
-	index_t						IDec_Index_Window;
-	index_t						IDec_Index_Length;
-
-	logic						WB_Sel_CondValid;
 
 	logic						Req_IW;
 	logic						Req_Issue;
@@ -251,6 +246,10 @@ module Scalar_Unit
 	pipe_exe_t					PipeReg_Exe;
 
 
+	////
+	assign PAC_Req				= I_En;
+
+
 	//// Output Status
 	assign O_Status				= Status;
 
@@ -398,6 +397,16 @@ module Scalar_Unit
 
 	assign Cond_Data			= WB_Token.op.OpCode;
 
+	assign Instr_Branch			= WB_Token.v &
+									( WB_Token.op.OpType == 2'b11 ) &
+									( WB_Token.op.OpClass == 2'b10 ) &
+									( WB_Token.op.OpCode == 2'b01 );
+
+	assign Instr_Jump			= WB_Token.v &
+									( WB_Token.op.OpType == 2'b11 ) &
+									( WB_Token.op.OpClass == 2'b01 ) &
+									( WB_Token.op.OpCode == 2'b01 );
+
 
 	//// Reorder Buffer
 	assign Store_S				= WB_Token.v;
@@ -488,8 +497,7 @@ module Scalar_Unit
 		.I_Cond(			Cond_Data				),
 		.I_Src(				PAC_Src_Data[9:0]		),
 		.O_IFetch(			Req_IFetch				),
-		.O_Address(			PC						),
-		.O_StallReq(		PAC_Wait				)
+		.O_Address(			PC						)
 	);
 
 
@@ -545,7 +553,6 @@ module Scalar_Unit
 
 	//// Stall Control
 	Stall_Ctrl Stall_Ctrl (
-		.I_PAC_Wait(		PAC_Wait				),
 		.I_Hazard(			RAR_Hazard				),
 		.I_Branch(			Branch_Instr			),
 		.I_Slice(			Slice					),

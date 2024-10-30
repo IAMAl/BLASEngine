@@ -26,21 +26,20 @@ module PACUnit
 	input	cond_t				I_Cond,					//Flag: Condition
 	input	address_t			I_Src,					//Source Value
 	output						O_IFetch,				//Instruction Fetch
-	output	address_t			O_Address,				//Address (Program COunter)
-	output						O_StallReq				//Stall Request
+	output	address_t			O_Address				//Address (Program COunter)
 );
 
 	logic						Jump;
 	logic						Taken;
 	logic						Update;
-	address_t					Address
+	address_t					Address;
 	logic						Req;
 
 	logic						R_St;
 	address_t					R_Address;
 
 
-	assign Req				= ~I_Stall & I_Req;
+	assign Req				= ~I_Stall & I_Req_Ld;
 
 
 	// Branch Evaluation
