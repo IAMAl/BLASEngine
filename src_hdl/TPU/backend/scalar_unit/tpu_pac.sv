@@ -58,10 +58,10 @@ module PACUnit
 
 
 	// Send Instruction Fetch Request
-	assign O_IFetch				= Req;
+	assign O_IFetch			= Req;
 
 	// Program Address
-	assign O_Address			= R_Address;
+	assign O_Address		= R_Address;
 
 
 	// Capture Store Request

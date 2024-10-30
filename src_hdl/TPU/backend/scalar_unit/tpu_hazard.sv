@@ -216,7 +216,7 @@ module HazardCheck_TPU
 
 
 	//// Issueing Detection of Branch Instruction
-	assign Issue_Br				= I_Req & TabHazard[ RNo ].v & TabHazard[ RNo ].br;
+	assign Issue_Br				= v_Issue & TabHazard[ RNo ].v & TabHazard[ RNo ].br;
 
 
 	//// Committing Detection of Branch Instruction

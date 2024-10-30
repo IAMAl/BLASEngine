@@ -137,6 +137,7 @@ module TPU
 		.reset(				reset					),
 		.I_Empty(			Buff_Empty				),
 		.I_Req_St(			IDBuff_We				),
+		.I_End_St(			Buff_Empty & ~We_Buff	),
 		.O_Ack_St(			Ack_St					),
 		.I_Commit_Req_V(	Commit_Req_V			),
 		.I_En(				I_En_Exe				),

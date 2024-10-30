@@ -18,6 +18,7 @@ module Scalar_Unit
 	input						reset,
 	input						I_Empty,				//Empty on Buffer
 	input						I_Req_St,				//Store Request for Instructions
+	input						I_End_St,				//End of Storing
 	output						O_Ack_St,				//Acknowledge for Storing
 	input						I_Commit_Req_V,			//Commit Request from Vector Unit
 	input						I_En,					//Enable Execution
@@ -476,9 +477,9 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req_St(			I_Req_St				),
-		.I_End_St(	),//ToDo
+		.I_End_St(			I_End_St				),
 		.I_Req_Ld(			PAC_Req					),
-		.I_End_Ld(	),//ToDo
+		.I_End_Ld(			O_Term					),
 		.I_Stall(			Stall_PCU				),
 		.I_Valid(			CondValid				),
 		.I_Jump(			Instr_Jump				),
