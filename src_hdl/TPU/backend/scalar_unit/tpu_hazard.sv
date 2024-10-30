@@ -52,6 +52,7 @@ module HazardCheck_TPU
 	logic						Empty;
 	logic	[WIDTH_BUFF-1:0]	WNo;
 	logic	[WIDTH_BUFF-1:0]	RNo;
+	logic	[WIDTH_BUFF-1:0]	CNo;
 
 	logic						v_Issue;
 	logic						RAR_Hazard;
@@ -137,6 +138,10 @@ module HazardCheck_TPU
 	assign O_Rd_Ptr				= RNo;
 
 
+	//// Clear Entry
+	assign CNo					= I_Commit_No;
+
+
 	//// Forming Indeces for Mixing Scalar and Vector Units
 	assign Index_Dst.v				= I_Instr.dst.v;
 	assign Index_Dst.sel.unit_no	= I_is_Vec;
@@ -177,6 +182,7 @@ module HazardCheck_TPU
 	assign RAR_Hazard_Src1		= ( |is_Matched_i_src1_i_src1 ) | ( |is_Matched_i_src1_i_src2 ) | ( |is_Matched_i_src1_i_src3 );
 	assign RAR_Hazard_Src2		= ( |is_Matched_i_src2_i_src1 ) | ( |is_Matched_i_src2_i_src2 ) | ( |is_Matched_i_src2_i_src3 );
 	assign RAR_Hazard_Src3		= ( |is_Matched_i_src3_i_src1 ) | ( |is_Matched_i_src3_i_src2 ) | ( |is_Matched_i_src3_i_src3 );
+	assign RAR_Hazard			= I_Slice & ( RAR_Hazard_Src1 | RAR_Hazard_Src2 | RAR_Hazard_Src3 );
 
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY_HAZARD; ++i ) begin
@@ -202,8 +208,6 @@ module HazardCheck_TPU
 		end
 	end
 
-	assign RAR_Hazard			= I_Slice & ( RAR_Hazard_Src1 | RAR_Hazard_Src2 | RAR_Hazard_Src3 );
-
 
 	//// Issueable Detection
 	assign v_Issue				= I_Req_Issue & ~( RAW_Hazard_Src1 | RAW_Hazard_Src2 | RAW_Hazard_Src3 | WAR_Hazard_Src1 | WAR_Hazard_Src2 | WAR_Hazard_Src3 | WAW_Hazard );
@@ -220,7 +224,7 @@ module HazardCheck_TPU
 
 
 	//// Committing Detection of Branch Instruction
-	assign Commit_Br			= I_Commit_Req & TabHazard[ I_Commit_No ].v & TabHazard[ I_Commit_No ].br;
+	assign Commit_Br			= I_Commit_Req & TabHazard[ CNo ].v & TabHazard[ CNo ].br;
 
 
 	//// Buffer Control
@@ -434,12 +438,12 @@ module HazardCheck_TPU
 		end
 		else if ( I_Commit_Req | Set_Index ) begin
 			if ( I_Commit_Req ) begin
-				TabHazard[ I_Commit_No ].v		<= 1'b0;
-				TabHazard[ I_Commit_No ].dst.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].src1.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].src2.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].src3.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].br		<= 1'b0;
+				TabHazard[ CNo ].v		<= 1'b0;
+				TabHazard[ CNo ].dst.v	<= 1'b0;
+				TabHazard[ CNo ].src1.v	<= 1'b0;
+				TabHazard[ CNo ].src2.v	<= 1'b0;
+				TabHazard[ CNo ].src3.v	<= 1'b0;
+				TabHazard[ CNo ].br		<= 1'b0;
 			end
 
 			if ( Set_Index ) begin

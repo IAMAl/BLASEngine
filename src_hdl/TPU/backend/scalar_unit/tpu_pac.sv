@@ -41,7 +41,6 @@ module PACUnit
 
 	assign Req				= ~I_Stall & I_Req_Ld;
 
-
 	// Branch Evaluation
 	assign Taken			= I_Valid & I_Branch & I_State[ I_Cond ] & ~I_Stall;
 
@@ -55,13 +54,11 @@ module PACUnit
 								( ~I_Stall ) ?	R_Address + 1'b1 :
 												R_Address;
 
-
 	// Send Instruction Fetch Request
 	assign O_IFetch			= Req;
 
 	// Program Address
 	assign O_Address		= R_Address;
-
 
 	// Capture Store Request
 	always_ff @( posedge clock ) begin

@@ -62,7 +62,7 @@ module ldst_unit
 
 
 	assign We					= ~I_Stall & I_Valid;
-	assign Re					= ~I_Stall & I_Commit_Grant;
+	assign Re					= ~I_Stall & I_Access_Grant;//I_Commit_Grant;
 	assign Term					= ~I_Stall & Run & I_Term;
 
 	assign O_Token				= ( Term ) ? Token : '0;

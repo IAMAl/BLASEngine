@@ -40,7 +40,7 @@ module PathSel
 	logic	[3:0]				Sel_Path_Lane;
 	logic	[3:0]				Sel_Path_WB_Lane;
 	logic	[1:0]				Sel_Path_Src;
-	logic	[2:0]				Sel_Path_WB;
+	logic	[1:0]				Sel_Path_WB;
 	logic						Sel_Path;
 	logic						Sel_WB_Path;
 

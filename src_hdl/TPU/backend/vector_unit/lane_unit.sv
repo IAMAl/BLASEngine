@@ -250,7 +250,7 @@ import pkg_mpu::*;
 
 
 	//// Network
-	assign Config_Path			= PipeReg_RR_Net.command.instr.path[6:0];
+	assign Config_Path			= PipeReg_RR_Net.command.instr.path;
 
 	//	Capture Data
 	assign PipeReg_Net.v		= PipeReg_RR_Net.v;
@@ -348,11 +348,11 @@ import pkg_mpu::*;
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			0&Stall_RegFile_Dst		),
-		.I_Req(				1|Req_Index_Dst			),
+		.I_Stall(			1'b0&Stall_RegFile_Dst		),
+		.I_Req(				1'b1|Req_Index_Dst			),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		Dst_Index_MRead			),
-		.I_Index(			Dst_Index				),
+		.I_Index(			Dst_Index.idx			),
 		.I_Window(			Dst_Index_Window		),
 		.I_Length(			Dst_Index_Length		),
 		.I_ThreadID(		I_ThreadID				),
@@ -559,7 +559,7 @@ import pkg_mpu::*;
 		.I_Term(			MaskReg_Term			),
 		.I_We(				MaskReg_We				),
 		.I_Set_One(			Set_One					),
-		.I_Index(			Dst_Index				),
+		.I_Index(			Dst_Index.idx			),
 		.I_Cond(			Cond_Data				),
 		.I_Status(			Status					),
 		.I_Re(				MaskReg_Re				),

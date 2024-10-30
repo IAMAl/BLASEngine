@@ -40,10 +40,10 @@ module InstrMem
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			is_Storing	<= 1'b0;
+			is_Storing		<= 1'b0;
 		end
 		else begin
-			is_Storing	<= I_Req_St;
+			is_Storing		<= I_Req_St;
 		end
 	end
 
@@ -59,7 +59,7 @@ module InstrMem
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Instr			<= 0;
+			R_Instr			<= '0;
 		end
 		else if ( I_Req_Ld ) begin
 			R_Instr			<= InstrMem[ I_Ld_Address ];

@@ -120,7 +120,7 @@ module BypassBuff
 	assign Last_Src2			= Run_Slice_Src2 ^ ( I_Idx2.idx == Len_Src2 );
 	assign Last_Src3			= Run_Slice_Src3 ^ ( I_Idx3.idx == Len_Src3 );
 
-	assign Clr					= Last_Src1 & Last_Src2 & Last_Src3;
+	assign Clr					= ~( Run_Slice_Src1 | Run_Slice_Src2 | Run_Slice_Src3 );
 
 
 	always_comb begin

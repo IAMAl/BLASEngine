@@ -157,13 +157,14 @@ module ExecUnit_V
 
 	assign MAU_Req				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 );
 
-	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  ~I_Command.command.instr.op.OpClass[0];
-	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &   I_Command.command.instr.op.OpClass[0];
+	// ToDo
+	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) & /*~I_Command.command.instr.op.OpClass[0] &*/ ( I_Command.command.instr.op.OpCode == 2'b10 );
+	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) & /* I_Command.command.instr.op.OpClass[0] &*/ ( I_Command.command.instr.op.OpCode == 2'b10 );
 
 
 	assign LifeMAU				= I_Command.command.issue_no - MAU_Token.issue_no;
 	assign LifeLdSt1			= I_Command.command.issue_no - Ld_Token[0].issue_no;
-	assign LifeLdSt2			= I_Command.command.issue_no - Ld_Token[0].issue_no;
+	assign LifeLdSt2			= I_Command.command.issue_no - Ld_Token[1].issue_no;
 	assign LifeMv				= I_Command.command.issue_no - Mv_Token.issue_no;
 
 
