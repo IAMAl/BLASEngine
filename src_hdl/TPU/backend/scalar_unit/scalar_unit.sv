@@ -86,6 +86,7 @@ module Scalar_Unit
 	instruction_t				IW_Instr;
 
 	logic						RAR_Hazard;
+	logic						Branch_Instr;
 
 	instr_t						S_Command;
 	logic						is_Vec;
@@ -254,10 +255,10 @@ module Scalar_Unit
 
 
 	//// Select Scalar unit or Vector unit backend
-	assign S_Command.v					= ~Instr.instr.op.Sel_Unit & Req_Issue;
+	assign S_Command.v					=   ~Instr.instr.op.Sel_Unit & Req_Issue;
 	assign S_Command.instr				= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 	assign is_Vec						= ~Instr.instr.op.Sel_Unit & Req_Issue;
-	assign O_V_Command.v				= Instr.instr.op.Sel_Unit & Req_Issue;
+	assign O_V_Command.v				=  Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? IW_IssueNo : '0;
 
@@ -389,8 +390,8 @@ module Scalar_Unit
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_Index_Even		= ( ~Dst_Sel ) ? Dst_RegFile_Index.idx :'0;
 	assign WB_Index_Odd			= (  Dst_Sel ) ? Dst_RegFile_Index.idx :'0;
-	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data_ : 				'0;
-	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data_ : 				'0;
+	assign WB_Data_Even			= ( ~Dst_Sel ) ? WB_Data_ : 			'0;
+	assign WB_Data_Odd			= (  Dst_Sel ) ? WB_Data_ : 			'0;
 
 	assign WB_IssueNo			= WB_Token.issue_no;
 
@@ -401,7 +402,8 @@ module Scalar_Unit
 	assign Store_S				= WB_Token.v;
 	assign Store_V				= I_Commit_Req_V;
 
-	assign We_c					= WB_Token.v & ( WB_Token.op.OpType == 2'b00 ) &
+	assign We_c					= WB_Token.v &
+									( WB_Token.op.OpType == 2'b00 ) &
 									( WB_Token.op.OpClass == 2'b11 ) &
 									( WB_Token.op.OpCode == 2'b11 );
 
@@ -448,7 +450,8 @@ module Scalar_Unit
 
 
 	//// End of Execution
-	assign O_Term				= WB_Token.v & ( WB_Token.op.OpType == 2'b01 ) &
+	assign O_Term				= WB_Token.v &
+									( WB_Token.op.OpType == 2'b01 ) &
 									( WB_Token.op.OpClass == 2'b01 ) &
 									( WB_Token.op.OpCode == 2'b11 );
 
@@ -477,8 +480,7 @@ module Scalar_Unit
 		.I_Req_Ld(			PAC_Req					),
 		.I_End_Ld(	),//ToDo
 		.I_Stall(			Stall_PCU				),
-		.I_Valid(		CondValid				),
-		.I_CondValid2(
+		.I_Valid(			CondValid				),
 		.I_Jump(			Instr_Jump				),
 		.I_Branch(			Instr_Branch			),
 		.I_State(			Condition				),
@@ -536,7 +538,7 @@ module Scalar_Unit
 		.O_WAR_Hazard(								),
 		.O_WAW_Hazard(								),
 		.O_Rd_Ptr(			IW_IssueNo				),
-		.O_Stall(	)//ToDo
+		.O_Branch(			Branch_Instr			)
 	);
 
 
@@ -544,6 +546,7 @@ module Scalar_Unit
 	Stall_Ctrl Stall_Ctrl (
 		.I_PAC_Wait(		PAC_Wait				),
 		.I_Hazard(			RAR_Hazard				),
+		.I_Branch(			Branch_Instr			),
 		.I_Slice(			Slice					),
 		.I_Bypass_Buff_Full(Bypass_Buff_Full		),
 		.I_Ld_Stall(		Ld_Stall				),
@@ -591,9 +594,9 @@ module Scalar_Unit
 		.I_Req(				PipeReg_Idx.command.instr.src1.v		),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.command.instr.src1		),
+		.I_Index(			PipeReg_Idx.command.instr.src1			),
 		.I_Window(			PipeReg_Idx.command.instr.src1.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign1					),
@@ -614,9 +617,9 @@ module Scalar_Unit
 		.I_Req(				PipeReg_Idx.command.instr.src2.v		),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.command.instr.src2		),
+		.I_Index(			PipeReg_Idx.command.instr.src2			),
 		.I_Window(			PipeReg_Idx.command.instr.src2.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign2					),
@@ -637,9 +640,9 @@ module Scalar_Unit
 		.I_Req(				PipeReg_Idx.command.instr.src3.v		),
 		.I_En_II(			'0						),
 		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.command.instr.src3		),
+		.I_Index(			PipeReg_Idx.command.instr.src3			),
 		.I_Window(			PipeReg_Idx.command.instr.src3.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign3					),

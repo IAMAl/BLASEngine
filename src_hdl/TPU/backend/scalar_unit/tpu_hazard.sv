@@ -29,8 +29,8 @@ module HazardCheck_TPU
 	output						O_RAW_Hazard,					//RAW-Hazard
 	output						O_WAR_Hazard,					//WAR-Hazard
 	output						O_WAW_Hazard,					//WAW-Hazard
-	output	issue_no_t			O_Rd_Ptr，						//Read Pointer to Commit Unit
-	output					O_Stall
+	output	issue_no_t			O_Rd_Ptr,						//Read Pointer to Commit Unit
+	output						O_Branch						//Stall Request
 );
 
 
@@ -130,7 +130,7 @@ module HazardCheck_TPU
 	assign O_WAR_Hazard			= R_WAR_Hazard_Src1 | R_WAR_Hazard_Src2 | R_WAR_Hazard_Src3;
 	assign O_WAW_Hazard			= R_WAW_Hazard;
 
-	assign O_Stall				= Stall_Br;
+	assign O_Branch				= Stall_Br;
 
 
 	//// Referenced at Commit Select Unit
@@ -210,9 +210,9 @@ module HazardCheck_TPU
 
 
 	//// Branch Instruction Detection
-	assign Br				= ( I_Instr.op.OpType == 2'b10 ) &
-							( I_Instr.op.OpClass == 2'b01 ) &
-							( I_Instr.op.OpCode == 2'b01 );
+	assign Br					= ( I_Instr.op.OpType == 2'b10 ) &
+									( I_Instr.op.OpClass == 2'b01 ) &
+									( I_Instr.op.OpCode == 2'b01 );
 
 
 	//// Issueing Detection of Branch Instruction
@@ -241,7 +241,7 @@ module HazardCheck_TPU
 		end
 	end
 
-	
+
 	//// Storing to Table
 	//	 Taking Care of Stall
 	always_ff @( posedge clock ) begin
@@ -422,7 +422,7 @@ module HazardCheck_TPU
 			R_Req				<= 1'b0;
 		end
 		else begin
-			R_Req				<= v_Issue;
+			R_Req				<= v_Issue & ~Stall_Br;
 		end
 	end
 
@@ -439,7 +439,7 @@ module HazardCheck_TPU
 				TabHazard[ I_Commit_No ].src1.v	<= 1'b0;
 				TabHazard[ I_Commit_No ].src2.v	<= 1'b0;
 				TabHazard[ I_Commit_No ].src3.v	<= 1'b0;
-				TabHazard[ I_Commit_No ].br	<= 1'b0;
+				TabHazard[ I_Commit_No ].br		<= 1'b0;
 			end
 
 			if ( Set_Index ) begin
@@ -449,7 +449,7 @@ module HazardCheck_TPU
 				TabHazard[ WNo ].src1	<= Index_Src1;
 				TabHazard[ WNo ].src2	<= Index_Src2;
 				TabHazard[ WNo ].src3	<= Index_Src3;
-				TabHazard[ WNo ].br	<= Br;
+				TabHazard[ WNo ].br		<= Br;
 			end
 		end
 	end

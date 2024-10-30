@@ -15,11 +15,11 @@ module PACUnit
 	input						clock,
 	input						reset,
 	input						I_Req_St,				//Store Request
-	inout						I_End_St,
-	input						I_Req_Ld,					//Request from Network Stage
-	input						I_End_Ld,
+	inout						I_End_St,				//End of Storing
+	input						I_Req_Ld,				//Request of Fetching
+	input						I_End_Ld,				//End of Fetching
 	input						I_Stall,				//Force Stalling
-	input						I_Valid,			//Condition Valid
+	input						I_Valid,				//Condition Valid
 	input						I_Jump,					//Jump Instruction
 	input						I_Branch,				//Branch Instruction
 	input	state_t				I_State,				//Status Register
@@ -37,26 +37,24 @@ module PACUnit
 	logic						Req;
 
 	logic						R_St;
-
-
 	address_t					R_Address;
 
 
-	assign Req					= ~I_Stall & I_Req;
+	assign Req				= ~I_Stall & I_Req;
 
 
 	// Branch Evaluation
-	assign Taken				= I_Valid & I_Branch & I_State[ I_Cond ] & ~I_Stall;
+	assign Taken			= I_Valid & I_Branch & I_State[ I_Cond ] & ~I_Stall;
 
 	// Jump
 	assign Jump				= I_Valid & I_Jump & ~I_Stall;
 
 	// Updating Address
-	assign Update				= Req | R_St;
-	assign Address				= ( Jump ) ?		R_Address + I_Src :
-							( Taken ) ?	R_Address + I_Src :
-							( ~I_Stall ) ?	R_Address + 1'b1 :
-									R_Address;
+	assign Update			= Req | R_St;
+	assign Address			= ( Jump ) ?		R_Address + I_Src :
+								( Taken ) ?		R_Address + I_Src :
+								( ~I_Stall ) ?	R_Address + 1'b1 :
+												R_Address;
 
 
 	// Send Instruction Fetch Request
