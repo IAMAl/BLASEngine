@@ -68,13 +68,11 @@ import pkg_mpu::*;
 	logic						Re_p1;
 
 
-	logic						Req_Index_Dst;
 	logic						Dst_Slice;
-	logic						Dst_Index_MRead;
+	index_t						Dst_Slice_Len;
 	logic	[6:0]				Dst_Sel;
 	idx_t						Dst_Index;
-	index_t						Dst_Index_Window;
-	index_t						Dst_Index_Length;
+	logic						Dst_Mask_Read;
 	logic						Dst_RegFile_Req;
 	logic						Dst_RegFile_Slice;
 	idx_t						Dst_RegFile_Index;
@@ -82,7 +80,8 @@ import pkg_mpu::*;
 	logic						Dst_Done;
 
 
-	data_t						R_Scalar_Data;
+	logic						Aux_SWe;
+	data_t						Scalar_Data;
 
 	mask_t						Mask_Data;
 
@@ -105,6 +104,7 @@ import pkg_mpu::*;
 	data_t						WB_Data;
 	data_t						WB_Data_;
 	logic						WB_Req_Even;
+	logic						WB_We_Even;
 	logic						WB_We_Odd;
 	index_t						WB_Index_Even;
 	index_t						WB_Index_Odd;
@@ -149,7 +149,7 @@ import pkg_mpu::*;
 
 	logic						Req_Even;
 	logic						Req_Odd;
-	
+
 	logic						We_c;
 	logic						Re_c;
 
@@ -230,7 +230,7 @@ import pkg_mpu::*;
 	assign PipeReg_Set_Net.v		= PipeReg_RR.v;
 	assign PipeReg_Set_Net.command	= PipeReg_RR.command;
 
-	assign PipeReg_Set_Net.data1	= ( RegMov_Rd ) ?							R_Scalar_Data :
+	assign PipeReg_Set_Net.data1	= ( RegMov_Rd ) ?							Scalar_Data :
 										( PipeReg_RR.command.instr.src1.v ) ?	PipeReg_RR.data1 :
 																				'0;
 
@@ -261,20 +261,17 @@ import pkg_mpu::*;
 	//  Network Path
 	assign Config_Path_WB		= WB_Token.path;
 
-	assign Req_Index_Dst		= is_WB_RF & WB_Token.v;
-
 	assign Dst_Sel				= WB_Token.dst.dst_sel.unit_no;
 	assign Dst_Slice			= WB_Token.dst.slice;
-	assign Dst_Index.v			= WB_Token.dst.v;
+	assign Dst_Index.v			= WB_Token.dst.v & is_WB_RF;
 	assign Dst_Index.slice		= WB_Token.dst.slice;
 	assign Dst_Index.idx		= WB_Token.dst.idx;
 	assign Dst_Index.sel		= WB_Token.dst.sel;
 	assign Dst_Index.src_sel	= WB_Token.dst.dst_sel;
 	assign Dst_Index.window		= WB_Token.dst.window;
 	assign Dst_Index.s			= WB_Token.dst.s;
-	assign Dst_Index_Window		= WB_Token.dst.window;
-	assign Dst_Index_Length		= WB_Token.dst.slice_len;
-	assign Dst_Index_MRead		= WB_Token.mread;
+	assign Dst_Mask_Read		= WB_Token.mread;
+	assign Dst_Slice_Len		= WB_Token.dst.slice_len;
 
 	assign Sign					= WB_Token.dst.s;
 
@@ -296,6 +293,13 @@ import pkg_mpu::*;
 
 	assign Cond_Data			= ( is_WB_BR ) ? WB_Token.op.OpCode : '0;
 
+	// Aux Data (Scalar Data)
+	assign Aux_SWe				= WB_Token.v & is_WB_RF &
+									( WB_Token.op.OpType == 2'b00 ) &
+									( WB_Token.op.OpClass == 2'b11 ) &
+									( WB_Token.op.OpCode == 2'b11 ) &
+									WB_Token.dst.v &
+									( WB_Token.dst.idx == 6'h00 );
 
 	assign Set_One				= is_WB_BR &
 									( WB_Token.op.OpType == 2'b01 ) &
@@ -348,13 +352,13 @@ import pkg_mpu::*;
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Stall(			1'b0&Stall_RegFile_Dst		),
-		.I_Req(				1'b1|Req_Index_Dst			),
+		.I_Stall(			Stall_RegFile_Dst		),
+		.I_Req(				Dst_Index.v				),
 		.I_En_II(			'0						),
-		.I_MaskedRead(		Dst_Index_MRead			),
-		.I_Index(			Dst_Index.idx			),
-		.I_Window(			Dst_Index_Window		),
-		.I_Length(			Dst_Index_Length		),
+		.I_MaskedRead(		Dst_Mask_Read			),
+		.I_Index(			Dst_Index				),
+		.I_Window(			Dst_Index.window		),
+		.I_Length(			Dst_Slice_Len			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign					),
@@ -373,11 +377,11 @@ import pkg_mpu::*;
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.command.instr.src1.v		),
-		.I_En_II(			PipeReg_Idx.command.instr.en_ii		),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
-		.I_Index(			PipeReg_Idx.command.instr.src1		),
+		.I_En_II(			PipeReg_Idx.command.instr.en_ii			),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread			),
+		.I_Index(			PipeReg_Idx.command.instr.src1			),
 		.I_Window(			PipeReg_Idx.command.instr.src1.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign1					),
@@ -396,11 +400,11 @@ import pkg_mpu::*;
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.command.instr.src2.v		),
-		.I_En_II(			PipeReg_Idx.command.instr.en_ii		),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
-		.I_Index(			PipeReg_Idx.command.instr.src2		),
+		.I_En_II(			PipeReg_Idx.command.instr.en_ii			),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread			),
+		.I_Index(			PipeReg_Idx.command.instr.src2			),
 		.I_Window(			PipeReg_Idx.command.instr.src2.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign2					),
@@ -419,11 +423,11 @@ import pkg_mpu::*;
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
 		.I_Req(				PipeReg_Idx.command.instr.src3.v		),
-		.I_En_II(			PipeReg_Idx.command.instr.en_ii		),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread		),
-		.I_Index(			PipeReg_Idx.command.instr.src3		),
+		.I_En_II(			PipeReg_Idx.command.instr.en_ii			),
+		.I_MaskedRead(		PipeReg_Idx.command.instr.mread			),
+		.I_Index(			PipeReg_Idx.command.instr.src3			),
 		.I_Window(			PipeReg_Idx.command.instr.src3.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len	),
+		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign3					),
@@ -469,8 +473,8 @@ import pkg_mpu::*;
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),
 		.I_Data(			WB_Data_				),
-		.O_Data(			R_Scalar_Data			),
-		.I_SWe(				'0						),//ToDo
+		.O_Data(			Scalar_Data			),
+		.I_SWe(				Aux_SWe					),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.O_Scalar_Data(		O_Scalar_Data			)
 	);

@@ -214,7 +214,8 @@ Section 2nd to 5th shows encode for every execution cluster. BLASEngine's unique
 ## 7. Reg Move
 
 Dst/Src Index Map
-- 6h00	p0	Pipeline Register-0
-- 6h01	p1	Pipeline Register-1
-- 6h08	c0	Constant Register-0
-- 6h09	c1	Constant Register-1
+- 6h00	p0	Scalar Register
+- 6h08	p0	Pipeline Register-0
+- 6h09	p1	Pipeline Register-1
+- 6h10	c0	Constant Register-0
+- 6h11	c1	Constant Register-1
