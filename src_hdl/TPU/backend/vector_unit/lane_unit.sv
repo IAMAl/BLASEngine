@@ -73,8 +73,6 @@ import pkg_mpu::*;
 	logic	[6:0]				Dst_Sel;
 	idx_t						Dst_Index;
 	logic						Dst_Mask_Read;
-	logic						Dst_RegFile_Req;
-	logic						Dst_RegFile_Slice;
 	idx_t						Dst_RegFile_Index;
 	logic						Dst_Busy;
 	logic						Dst_Done;
@@ -103,14 +101,12 @@ import pkg_mpu::*;
 	pipe_exe_tmp_t				WB_Token;
 	data_t						WB_Data;
 	data_t						WB_Data_;
-	logic						WB_Req_Even;
 	logic						WB_We_Even;
 	logic						WB_We_Odd;
 	index_t						WB_Index_Even;
 	index_t						WB_Index_Odd;
 	data_t						WB_Data_Even;
 	data_t						WB_Data_Odd;
-	issue_no_t					WB_IssueNo;
 
 	logic						MaskReg_Ready;
 	logic						MaskReg_Term;
@@ -153,7 +149,6 @@ import pkg_mpu::*;
 	logic						We_c;
 	logic						Re_c;
 
-	logic						R_Re_c;
 	logic	[1:0]				Cond_Data;
 
 	logic						Set_One;
@@ -364,7 +359,7 @@ import pkg_mpu::*;
 		.I_Sign(			Sign					),
 		.I_Mask_Data(		Mask_Data				),
 		.O_Index(			Dst_RegFile_Index		),
-		.O_Busy(									),
+		.O_Busy(			Dst_Busy				),
 		.O_Done(			Dst_Done				)
 	);
 
@@ -581,13 +576,15 @@ import pkg_mpu::*;
 		.reset(				reset					),
 		.I_Stall(			Stall_Network			),
 		.I_Command(			PipeReg_RR_Net			),
+		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),
+		.I_Scalar_Data(		Scalar_Data				),
 		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),
 		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
 		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),
 		.I_Lane_Data_WB(	I_Lane_Data_WB			),
-		.I_WB_Index(		WB_Token.dst.idx		),
+		.I_WB_Index(		WB_Token.dst			),
 		.I_WB_Data(			WB_Data					),
 		.O_WB_Data(			WB_Data_				),
 		.O_Src_Data1(		PipeReg_Net.data1		),

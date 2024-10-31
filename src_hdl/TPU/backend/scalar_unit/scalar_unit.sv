@@ -264,7 +264,7 @@ module Scalar_Unit
 
 
 	//// Hazard Detect Stage
-	assign Req_IW				= ~Stall_IW_St;
+	//assign Req_IW				= ~Stall_IW_St;
 	assign IW_Req_Issue			= ~Stall_IW_Ld & ~Stall_IW;
 
 
@@ -533,7 +533,7 @@ module Scalar_Unit
 	HazardCheck_TPU HazardCheck_TPU (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req(				Req_IW					),
+		.I_Req(				Req_IW & ~Stall_IW_St	),
 		.I_Slice(			Dst_Slice				),
 		.I_Req_Issue(		IW_Req_Issue			),
 		.I_is_Vec(			is_Vec					),

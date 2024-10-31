@@ -48,8 +48,6 @@ module BypassBuff
 	logic	[WIDTH_NUM-1:0]		NoSrc3;
 	logic	[WIDTH_NUM-1:0]		Sel_NoSrc;
 
-	logic	[WIDTH_NUM-1:0]		Len;
-
 	logic						Hit;
 	logic						Hit_Src1;
 	logic						Hit_Src2;
@@ -80,7 +78,6 @@ module BypassBuff
 	index_t						Len_Src3;
 
 
-	logic						valid			[BUFF_SIZE-1:0];
 	index_t						Buff_Index		[BUFF_SIZE-1:0];
 	data_t						Buff_Data		[BUFF_SIZE-1:0];
 
@@ -215,7 +212,7 @@ module BypassBuff
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			for ( int i=0; i>BUFF_SIZE; ++i ) begin
+			for ( int i=0; i<BUFF_SIZE; ++i ) begin
 				Valid[ i ]		<= 1'b0;
 				Buff_Index[ i ]	<= '0;
 				Buff_Data[ i ]	<= '0;
@@ -231,7 +228,7 @@ module BypassBuff
 				end
 			end
 
-			if ( Store ) begin
+			if ( Store & ~( Clr & ( Rd_Ptr == Wr_Ptr ) ) ) begin
 				Valid[ Wr_Ptr ]			<= 1'b1;
 				Buff_Index[ Wr_Ptr ]	<= I_WB_Index.idx;
 				Buff_Data[ Wr_Ptr ]		<= I_WB_Data;

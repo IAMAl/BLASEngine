@@ -97,6 +97,6 @@ module PathSel
 	assign O_Lane_Data_Src1		= ( I_Req )	?		I_Src_Data1 : '0;
 	assign O_Lane_Data_Src2		= ( I_Req )	?		I_Src_Data2 : '0;
 	assign O_Lane_Data_Src3		= ( I_Req )	?		I_Src_Data3 : '0;
-	assign O_Lane_Data_WB		= I_Lane_Data_WB;
+	assign O_Lane_Data_WB		= I_WB_Data;
 
 endmodule

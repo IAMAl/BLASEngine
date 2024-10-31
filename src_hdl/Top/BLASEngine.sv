@@ -77,17 +77,17 @@ module BLASEngine
 	v_ldst_t		[NUM_ROWS:0][NUM_CLMS-1:0]		RAM_V_LdSt;
 
 
-	data_t			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_Ld_Data;
-	data_t			[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_St_Data;
+	s_ldst_data_t	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_Ld_Data;
+	s_ldst_data_t	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_S_St_Data;
 
-	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_Ld_Data;
-	v_data_t		[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_St_Data;
+	v_ldst_data_t	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_Ld_Data;
+	v_ldst_data_t	[NUM_ROWS-1:0][NUM_CLMS-1:0][1:0]	TPU_V_St_Data;
 
-	data_t			[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_S_Ld_Data;
-	data_t			[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_S_St_Data;
+	s_ldst_data_t	[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_S_Ld_Data;
+	s_ldst_data_t	[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_S_St_Data;
 
-	v_data_t		[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_V_Ld_Data;
-	v_data_t		[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Data;
+	v_ldst_data_t	[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_V_Ld_Data;
+	v_ldst_data_t	[NUM_ROWS:0][NUM_CLMS-1:0][1:0]	RAM_V_St_Data;
 
 
 	tb_t			[NUM_ROWS-1:0][NUM_CLMS-1:0]	TPU_S_Ld_Ready;
