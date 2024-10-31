@@ -71,7 +71,9 @@ module ExecUnit_S
 
 	logic						We;
 	logic						Re;
+	TYPE						Mv_Token_;
 	TYPE						Mv_Token;
+	data_t						Mv_Data_;
 	data_t						Mv_Data;
 
 
@@ -164,6 +166,18 @@ module ExecUnit_S
 	assign O_St_Stall			= St_Stall_Odd | St_Stall_Evn;
 
 
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Mv_Token		<= '0;
+			Mv_Data			<= '0;
+		end
+		else begin
+			Mv_Token		<= Mv_Token_;
+			Mv_Data			<= Mv_Data_;
+		end
+	end
+
+
 	ALU #(
 		.TYPE(				TYPE					)
 	) IALU
@@ -248,7 +262,7 @@ module ExecUnit_S
 		.I_We(				We						),
 		.I_Re(				Re						),
 		.I_Data(			Token_Mv				),
-		.O_Data(			Mv_Token				),
+		.O_Data(			Mv_Token_				),
 		.O_Full(									),
 		.O_Empty(									),
 		.O_Num(										)
@@ -264,7 +278,7 @@ module ExecUnit_S
 		.I_We(				We						),
 		.I_Re(				Re						),
 		.I_Data(			PData					),
-		.O_Data(			Mv_Data					),
+		.O_Data(			Mv_Data_				),
 		.O_Full(									),
 		.O_Empty(									),
 		.O_Num(										)

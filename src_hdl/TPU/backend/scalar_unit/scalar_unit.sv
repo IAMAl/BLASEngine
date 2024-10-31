@@ -119,8 +119,8 @@ module Scalar_Unit
 	logic						Dst_Busy;
 	logic						Dst_Done;
 
-
-	data_t						R_Scalar_Data;
+	logic						Aux_SWe;
+	data_t						Scalar_Data;
 
 	logic						MaskedRead;
 	mask_t						Mask_Data;
@@ -311,7 +311,7 @@ module Scalar_Unit
 	assign PipeReg_Set_Net.v		= PipeReg_RR.v;
 	assign PipeReg_Set_Net.command	= PipeReg_RR.command;
 
-	assign PipeReg_Set_Net.data1	= ( RegMov_Rd ) ?							R_Scalar_Data :
+	assign PipeReg_Set_Net.data1	= ( RegMov_Rd ) ?							Scalar_Data :
 										( PipeReg_RR.command.instr.src1.v ) ?	PipeReg_RR.data1 :
 																				'0;
 
@@ -397,6 +397,14 @@ module Scalar_Unit
 
 	assign Cond_Data			= WB_Token.op.OpCode;
 
+	// Aux Data (Scalar Data)
+	assign Aux_SWe				= WB_Token.v & is_WB_RF &
+									( WB_Token.op.OpType == 2'b00 ) &
+									( WB_Token.op.OpClass == 2'b11 ) &
+									( WB_Token.op.OpCode == 2'b11 ) &
+									WB_Token.dst.v &
+									( WB_Token.dst.idx == 6'h00 );
+
 	assign Instr_Branch			= WB_Token.v &
 									( WB_Token.op.OpType == 2'b11 ) &
 									( WB_Token.op.OpClass == 2'b10 ) &
@@ -469,7 +477,6 @@ module Scalar_Unit
 	//// Stall Control
 	assign Slice				= Index_Src1_Busy | Index_Src2_Busy | Index_Src3_Busy;
 	assign Stall_PCU			= ~Lane_Enable;
-	assign Stall_Index_Calc		= ~Lane_Enable | Stall_Index_Calc;
 	assign Stall_RegFile_Dst	= ~Lane_Enable | Stall_WB;
 	assign Stall_RegFile_Odd	= ~Lane_Enable | Stall_Index_Calc;
 	assign Stall_RegFile_Even	= ~Lane_Enable | Stall_Index_Calc;
@@ -696,8 +703,8 @@ module Scalar_Unit
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),
 		.I_Data(			WB_Data_				),
-		.O_Data(			R_Scalar_Data			),
-		.I_SWe(				'0						),//ToDo
+		.O_Data(			Scalar_Data			),
+		.I_SWe(				Aux_SWe					),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.O_Scalar_Data(		O_Scalar_Data			)
 	);

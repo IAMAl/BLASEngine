@@ -81,7 +81,9 @@ module ExecUnit_V
 	logic						We;
 	logic						Re;
 	TYPE						Mv_Token;
+	TYPE						Mv_Token_;
 	data_t						Mv_Data;
+	data_t						Mv_Data_;
 
 	logic						RegMoveOp;
 	logic						CommonMov;
@@ -157,7 +159,6 @@ module ExecUnit_V
 
 	assign MAU_Req				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 );
 
-	// ToDo
 	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) & ~I_Command.command.instr.op.OpClass[0] & ( I_Command.command.instr.op.OpCode == 2'b10 );
 	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  I_Command.command.instr.op.OpClass[0] & ( I_Command.command.instr.op.OpCode == 2'b10 );
 
@@ -188,6 +189,18 @@ module ExecUnit_V
 
 	assign O_Ld_Stall			= Ld_Stall_Odd | Ld_Stall_Evn;
 	assign O_St_Stall			= St_Stall_Odd | St_Stall_Evn;
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Mv_Token		<= '0;
+			Mv_Data			<= '0;
+		end
+		else begin
+			Mv_Token		<= Mv_Token_;
+			Mv_Data			<= Mv_Data_;
+		end
+	end
 
 
 	MA_Unit #(
@@ -278,7 +291,7 @@ module ExecUnit_V
 		.I_We(				We						),
 		.I_Re(				Re						),
 		.I_Data(			Token_Mv				),
-		.O_Data(			Mv_Token				),
+		.O_Data(			Mv_Token_				),
 		.O_Full(									),
 		.O_Empty(									),
 		.O_Num(										)
@@ -294,7 +307,7 @@ module ExecUnit_V
 		.I_We(				We						),
 		.I_Re(				Re						),
 		.I_Data(			PData					),
-		.O_Data(			Mv_Data					),
+		.O_Data(			Mv_Data_				),
 		.O_Full(									),
 		.O_Empty(									),
 		.O_Num(										)
