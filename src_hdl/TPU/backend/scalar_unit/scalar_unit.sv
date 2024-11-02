@@ -16,14 +16,14 @@ module Scalar_Unit
 (
 	input						clock,
 	input						reset,
-	input						I_Empty,				//Empty on Buffer
-	input						I_Req_St,				//Store Request for Instructions
-	input						I_End_St,				//End of Storing
-	output						O_Ack_St,				//Acknowledge for Storing
-	input						I_Commit_Req_V,			//Commit Request from Vector Unit
 	input						I_En,					//Enable Execution
 	input	id_t				I_ThreadID,				//Thread-ID
-	input	instr_t				I_Instr,				//Instruction from Buffer
+	output						O_Re_Instr,				//Read-Enable for Instruction Memory
+	output	i_address_t			O_Rd_Address,
+	input	instr_t				I_Instr,				//Instruction from Instruction Memory
+	input						I_Commit_Req_V,			//Commit Request from CommitAgg
+	input	issue_no_t			I_Commit_No_V,			//Commit No from CommitAgg
+	output						O_Commit_Grant_V,		//Commit Grant to CommitAgg
 	input	data_t				I_Scalar_Data,			//Scalar Data from Vector Unit
 	output	data_t				O_Scalar_Data,			//Scalar Data to Vector Unit
 	output	s_ldst_t			O_LdSt,					//Load Request
@@ -34,11 +34,9 @@ module Scalar_Unit
 	input	tb_t				I_St_Ready,				//Flag: Ready
 	input	tb_t				I_St_Grant,				//Flag: Grant
 	input	tb_t				I_End_Access,			//Flag: End of Access
-	output						O_Re_Buff,				//Read-Enable for Buffer
 	output	pipe_index_t		O_V_Command,			//Command to Vector Unit
 	input	v_ready_t			I_V_State,				//Status from Vector Unit
 	output	v_ready_t			O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
-	output						O_Commit_Grant,			//Grant for Commit on Vector Unit
 	output	state_t				O_Status,				//Scalar Unit Status
 	output						O_Term					//Flag: Termination
 );
@@ -46,8 +44,7 @@ module Scalar_Unit
 
 	localparam int	LANE_ID = 0;
 
-	address_t					PC;
-	instr_t						Instruction;
+
 	instr_t						Instr;
 
 
@@ -209,13 +206,6 @@ module Scalar_Unit
 	logic						Commit_Grant_S;
 	logic						Full_RB_S;
 	logic						Empty_RB_S;
-
-
-	logic						Commit_Req_V;
-	issue_no_t					Commit_No_V;
-	logic						Commit_Grant_V;
-	logic						Full_RB_V;
-	logic						Empty_RB_V;
 
 
 	logic						Commit_Req;
@@ -488,40 +478,6 @@ module Scalar_Unit
 	assign O_Commit_Grant		= Commit_Grant_V;
 
 
-	//// Program Address Control
-	PACUnit PACUnit (
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_Req_St(			I_Req_St				),
-		.I_End_St(			I_End_St				),
-		.I_Req_Ld(			PAC_Req					),
-		.I_End_Ld(			O_Term					),
-		.I_Stall(			Stall_PCU				),
-		.I_Valid(			CondValid				),
-		.I_Jump(			Instr_Jump				),
-		.I_Branch(			Instr_Branch			),
-		.I_State(			Condition				),
-		.I_Cond(			Cond_Data				),
-		.I_Src(				PAC_Src_Data[9:0]		),
-		.O_IFetch(			Req_IFetch				),
-		.O_Address(			PC						)
-	);
-
-
-	//// Instruction Memory
-	InstrMem IMem (
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_Req_St(			I_Req_St				),
-		.O_Ack_St(			O_Ack_St				),
-		.I_St_Instr(		I_Instr					),
-		.I_Req_Ld(			Req_IFetch & ~Stall_IF	),
-		.I_Ld_Address(		PC						),
-		.I_St_Address(		PC						),
-		.O_Ld_Instr(		Instruction				)
-	);
-
-
 	//// Instruction Fetch Stage
 	IFetch IFetch (
 		.clock(				clock					),
@@ -529,10 +485,10 @@ module Scalar_Unit
 		.I_Req(				Req_IFetch & ~Stall_IF	),
 		.I_Empty(			I_Empty					),
 		.I_Term(			O_Term					),
-		.I_Instr(			Instruction				),
+		.I_Instr(			I_Instr					),
 		.O_Req(				Req_IW					),
 		.O_Instr(			IW_Instr				),
-		.O_Re_Buff(			O_Re_Buff				)
+		.O_Re_Instr(		O_Re_Instr				)
 	);
 
 
@@ -703,7 +659,7 @@ module Scalar_Unit
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),
 		.I_Data(			WB_Data_				),
-		.O_Data(			Scalar_Data			),
+		.O_Data(			Scalar_Data				),
 		.I_SWe(				Aux_SWe					),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.O_Scalar_Data(		O_Scalar_Data			)
@@ -872,11 +828,30 @@ module Scalar_Unit
 	);
 
 
+	//// Program Address Control
+	PACUnit PACUnit (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req_St(			I_Req_St				),
+		.I_End_St(			I_End_St				),
+		.I_Req_Ld(			PAC_Req					),
+		.I_End_Ld(			O_Term					),
+		.I_Stall(			Stall_PCU				),
+		.I_Valid(			CondValid				),
+		.I_Jump(			Instr_Jump				),
+		.I_Branch(			Instr_Branch			),
+		.I_State(			Condition				),
+		.I_Cond(			Cond_Data				),
+		.I_Src(				PAC_Src_Data[9:0]		),
+		.O_Re(				O_Re_Instr				),
+		.O_Address(			O_Rd_Address			)
+	);
+
+
 	//// Commitment Stage
-	//	 Commit Unit for Scalar Unit
-	ReorderBuff_S #(
-		.NUM_ENTRY(			NUM_ENTRY_RB_S			)
-	) ReorderBuff_S
+	ReorderBuff #(
+		.NUM_ENTRY(			NUM_ENTRY_RB			)
+	) ReorderBuff
 	(
 		.clock(				clock					),
 		.reset(				reset					),
@@ -885,52 +860,17 @@ module Scalar_Unit
 		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
 		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
 		.I_Commit_Req_Math(	Commmit_Req_Math		),
+		.I_Commit_Req_V(	I_Commmit_Req_V			),
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
 		.I_Commit_No_Math(	Commit_No_Math			),
-		.I_Commit_Grant(	Commit_Grant_S			),
+		.I_Commit_No_V(		I_Commit_No_V			),
+		.O_Commit_Grant_S(	Commit_Grant_S			),
+		.O_Commit_Grant_V(	O_Commit_Grant_V		),
 		.O_Commit_Req(		Commit_Req_S			),
 		.O_Commit_No(		Commit_No_S				),
-		.O_Commited_LdSt1(	Commited_LdSt1			),
-		.O_Commited_LdSt2(	Commited_LdSt2			),
-		.O_Commited_Math(	Commited_Math			),
 		.O_Full(			Full_RB_S				),
 		.O_Empty(			Empty_RB_S				)
-	);
-
-
-	//	 Commit Unit for Vector Unit
-	ReorderBuff_V #(
-		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
-	) ReorderBuff_V
-	(
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_En_Lane(			Enable_Lanes			),
-		.I_Store(			Store_V					),
-		.I_Issue_No(		IW_IssueNo				),
-		.I_Commit_Req(		I_Commit_Req_V			),
-		.I_Commit_Grant(	Commit_Grant_V			),
-		.O_Commit_Req(		Commit_Req_V			),
-		.O_Commit_No(		Commit_No_V				),
-		.O_Full(			Full_RB_V				),
-		.O_Empty(			Empty_RB_V				)
-	);
-
-
-	// Commit Request Selecter
-	Commit_TPU Commit_TPU (
-		.I_Rd_Ptr(			IW_IssueNo				),
-		.I_RB_Empty_S(		Empty_RB_S				),
-		.I_RB_Empty_V(		Empty_RB_V				),
-		.I_Commit_Req_S(	Commit_Req_S			),
-		.I_Commit_Req_V(	Commit_Req_V			),
-		.I_Commit_No_S(		Commit_No_S				),
-		.I_Commit_No_V(		Commit_No_V				),
-		.O_Commit_Grant_S(	Commit_Grant_S			),
-		.O_Commit_Grant_V(	Commit_Grant_V			),
-		.O_Commit_Req(		Commit_Req				),
-		.O_Commit_No(		Commit_No				)
 	);
 
 endmodule

@@ -64,13 +64,17 @@ module TPU
 	state_t						S_Status;
 
 	pipe_index_t				V_Command;
-	v_ready_t					En_Lane;
+	v_ready_t					Lane_En;
 	v_ready_t					V_Status;
 
 	logic						Commit_Req_V;;
 	logic						Commit_Grant;
 
 	logic						Term;
+
+	logic						Re_Instr;
+	logic						Rd_Instr;
+	assign Rd_Instr`		= Term;
 
 
 	//// Service Management UNit
@@ -84,65 +88,45 @@ module TPU
 		.I_Req(				I_Req					),
 		.I_Instr(			I_Instr					),
 		.I_IssueNo(			I_IssueNo				),
-		.O_We(				We_Buff					),
+		.O_We(				We_Instr				),
 		.O_ThreadID(		Buff_ThreadID			),
-		.O_Instr(			Buff_Instr				),
+		.O_Instr(			Wr_Instr				),
 		.O_Term(			O_Term					),
 		.O_IssueNo(			O_IssueNo				),
 		.O_Nack(			O_Nack					)
 	);
 
 
-	//// Buffers between FrontENd and Scalar Unit
-	//	 Buffer for Instructions
-	RingBuff #(
-		.NUM_ENTRY(			SIZE_THREAD_MEM			),
-		.TYPE(				instr_t					)
-	) Instr_Buff
+	//// Instruction Memory
+	Instr_Mem #(
+		.MEM_SIZE(			INSTR_MEM_SIZE			)
+	) Instr_Mem
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_We(				We_Buff					),
-		.I_Re(				Re_Buff					),
-		.I_Data(			Buff_Instr				),
-		.O_Data(			Instr					),
-		.O_Full(			Buff_Full				),
-		.O_Empty(			Buff_Empty				),
-		.O_Num(										)
+		.I_We(				We_Instr				),
+		.I_Wr_End(			Wr_End					),
+		.I_Instr(			Wr_Instr				),
+		.I_Re(				Re_Instr				),
+		.I_Rd_Adress(		Rd_Adress				),
+		.I_Rd_End(			Rd_End					),
+		.O_Instr(			Rd_Instr				),
+		.O_Full(									)//ToDo
 	);
 
 
-	//	 Buffer for SIMT Thread-ID
-	assign IDBuff_We	= We_Buff;
-	assign IDBuff_Re	= Re_Buff;
-	RingBuff #(
-		.NUM_ENTRY(			SIZE_THREAD_MEM			),
-		.TYPE(				id_t					)
-	) ID_Buff
-	(
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_We(				IDBuff_We				),
-		.I_Re(				IDBuff_Re				),
-		.I_Data(			Buff_ThreadID			),
-		.O_Data(			ThreadID				),
-		.O_Full(			IDBuff_Full				),
-		.O_Empty(			IDBuff_Empty			),
-		.O_Num(										)
-	);
-
-
+	//// Scalar Unit
 	Scalar_Unit Scalar_Unit (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Empty(			Buff_Empty				),
-		.I_Req_St(			IDBuff_We				),
-		.I_End_St(			Buff_Empty & ~We_Buff	),
-		.O_Ack_St(			Ack_St					),
-		.I_Commit_Req_V(	Commit_Req_V			),
 		.I_En(				I_En_Exe				),
 		.I_ThreadID(		ThreadID				),
-		.I_Instr(			Instr					),
+		.O_Re_Instr(		Re_Instr				),
+		.O_Rd_Adress(		Rd_Adress				),
+		.I_Instr(			Rd_Instr				),
+		.I_Commit_Req_V(	Commit_Req				),
+		.I_Commit_No_V(		Commit_No				),
+		.O_Commit_Grant_V(	Commit_Grant			),
 		.I_Scalar_Data(		In_Scalar_Data			),
 		.O_Scalar_Data(		Out_Scalar_Data			),
 		.O_LdSt(			O_S_LdSt				),
@@ -153,21 +137,19 @@ module TPU
 		.I_St_Ready(		I_S_St_Ready			),
 		.I_St_Grant(		I_S_St_Grant			),
 		.I_End_Access(		I_S_End_Access			),
-		.O_Re_Buff(			Re_Buff					),
 		.O_V_Command(		V_Command				),
 		.I_V_State(			V_Status				),
-		.O_Lane_En(			En_Lane					),
-		.O_Commit_Grant(	Commit_Grant			),
+		.O_Lane_En(			Lane_En					),
 		.O_Status(			S_Status				),
 		.O_Term(			Term					)
 	);
 
 
+	//// Vector Unit
 	Vector_Unit Vector_Unit (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Commit_Grant(	Commit_Grant			),
-		.I_En_Lane(			En_Lane					),
+		.I_En_Lane(			Lane_En					),
 		.I_ThreadID(		ThreadID				),
 		.I_Command(			V_Command				),
 		.I_Scalar_Data(		Out_Scalar_Data			),
@@ -181,6 +163,8 @@ module TPU
 		.I_St_Ready(		I_V_St_Ready			),
 		.I_St_Grant(		I_V_St_Grant			),
 		.O_Commmit_Req(		Commit_Req_V			),
+		.O_Commit_No(		Commit_No_V				),
+		.I_Commit_Grant(	Commit_Grant			),
 		.O_Status(			V_Status				)
 	);
 

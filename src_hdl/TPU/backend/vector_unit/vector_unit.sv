@@ -15,7 +15,6 @@ module Vector_Unit
 (
 	input						clock,
 	input						reset,
-	input	logic				I_Commit_Grant,			//Grant for Commit
 	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	pipe_index_t		I_Command,				//Comamnd to Execute
@@ -30,6 +29,8 @@ module Vector_Unit
 	input	v_2b_t				I_St_Grant,				//Flag: Grant
 	input	v_2b_t				I_End_Access,			//Flag: End of Access
 	output						O_Commmit_Req,			//Commit Request
+	output	issue_no_t			O_Commit_No,			//Commit No
+	input	logic				I_Commit_Grant,			//Grant for Commit
 	output	v_ready_t			O_Status				//Status on Lane
 );
 
@@ -39,14 +40,32 @@ module Vector_Unit
 	lane_t						Lane_Data_Src3;
 	lane_t						Lane_Data_WB;
 
-	v_ready_t				Commit;
+	v_ready_t					Commit_Req;
+	v_issue_no_t				Commit_No;
 
-	data_t	[NUM_LANES-1:0]		Scalar_Data;
+	lane_t						Scalar_Data;
 
-
-	assign O_Commmit_Req		= &( ~( I_En_Lane ^ Commit ) );
 
 	assign O_Scalar_Data		= Scalar_Data[ I_Scalar_Data[$clog2(NUM_LANES)-1:0] ];
+
+
+	CommitAgg_Unit #(
+		.NUM_LANES(			NUM_LANES				),
+		.BUFF_SIZE(			4						)
+	) CommitAgg_Unit
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_En_Lane(			I_En_Lane				),
+		.I_Req(				I_Command.v				),
+		.I_Issue_No(		I_Command.issue_no		),
+		.I_Commit_Req(		Commit_Req				),
+		.I_Commit_No(		Commit_No				),
+		.O_Commit_Req(		O_Commit_Req			),
+		.O_Commit_No(		O_Commit_No				),
+		.I_Commit_Grant(	I_Commit_Grant			),
+		.O_Full(			Commit_Full				)
+	);
 
 
 	//Vector-Lane Generation
@@ -58,7 +77,6 @@ module Vector_Unit
 		(
 			.clock(				clock					),
 			.reset(				reset					),
-			.I_Commit_Grant(	I_Commit_Grant			),
 			.I_En_Lane(			I_En_Lane[ i ]			),
 			.I_ThreadID(		I_ThreadID				),
 			.I_Command(			I_Command				),
@@ -71,9 +89,9 @@ module Vector_Unit
 			.I_Ld_Grant(		I_Ld_Grant[ i ]			),
 			.I_St_Ready(		I_St_Ready[ i ]			),
 			.I_St_Grant(		I_St_Grant[ i ]			),
-			.I_End_Access1(		I_End_Access[ i ][0]	),
-			.I_End_Access2(		I_End_Access[ i ][1]	),
-			.O_Commit(			Commit[ i ]				),
+			.I_End_Access(		I_End_Access[ i ]		),
+			.O_Commit_Req(		Commit_Req[ i ]			),
+			.O_Commit_No(		Commit_No[ i ]			),
 			.I_Lane_Data_Src1(	Lane_Data_Src1			),
 			.I_Lane_Data_Src2(	Lane_Data_Src2			),
 			.I_Lane_Data_Src3(	Lane_Data_Src3			),
