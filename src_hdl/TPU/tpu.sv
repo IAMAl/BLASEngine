@@ -77,7 +77,7 @@ module TPU
 	assign Rd_Instr`		= Term;
 
 
-	//// Service Management UNit
+	//// Service Management Unit
 	FrontEnd FrontEnd (
 		.clock(				clock					),
 		.reset(				reset					),
@@ -89,7 +89,7 @@ module TPU
 		.I_Instr(			I_Instr					),
 		.I_IssueNo(			I_IssueNo				),
 		.O_We(				We_Instr				),
-		.O_ThreadID(		Buff_ThreadID			),
+		.O_ThreadID(		Wr_ThreadID				),
 		.O_Instr(			Wr_Instr				),
 		.O_Term(			O_Term					),
 		.O_IssueNo(			O_IssueNo				),
@@ -106,9 +106,11 @@ module TPU
 		.reset(				reset					),
 		.I_We(				We_Instr				),
 		.I_Wr_End(			Wr_End					),
+		.I_ThreadID(		Wr_ThreadID				),
 		.I_Instr(			Wr_Instr				),
 		.I_Re(				Re_Instr				),
 		.I_Rd_Adress(		Rd_Adress				),
+		.O_ThreadID(		Rd_ThreadID				),
 		.I_Rd_End(			Rd_End					),
 		.O_Instr(			Rd_Instr				),
 		.O_Full(									)//ToDo
@@ -120,9 +122,9 @@ module TPU
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En(				I_En_Exe				),
-		.I_ThreadID(		ThreadID				),
 		.O_Re_Instr(		Re_Instr				),
 		.O_Rd_Adress(		Rd_Adress				),
+		.I_ThreadID(		Rd_ThreadID				),
 		.I_Instr(			Rd_Instr				),
 		.I_Commit_Req_V(	Commit_Req				),
 		.I_Commit_No_V(		Commit_No				),
