@@ -34,11 +34,18 @@ module ExecUnit_V
 	input						I_End_Access2,			//End of Access
 	input						I_Re_p0,				//REad-Enable for Pipeline Register
 	input						I_Re_p1,				//REad-Enable for Pipeline Register
-	output	TYPE				O_WB_Token,				//Write-Back Info
-	output	data_t				O_WB_Data,				//Write-Back Data
-	output						O_Math_Done,			//Execution Done
+	output	TYPE				O_WB_Token_LdSt1,		//Write-Back Info
+	output	TYPE				O_WB_Token_LdSt2,		//Write-Back Info
+	output	TYPE				O_WB_Token_Math,		//Write-Back Info
+	output	TYPE				O_WB_Token_Mv,			//Write-Back Info
+	output	data_t				O_WB_Data_LdSt1,		//Write-Back Data
+	output	data_t				O_WB_Data_LdSt2,		//Write-Back Data
+	output	data_t				O_WB_Data_Math,			//Write-Back Data
+	output	data_t				O_WB_Data_Mv,			//Write-Back Data
 	output						O_LdSt_Done1,			//Load/Store Done
 	output						O_LdSt_Done2,			//Load/Store Done
+	output						O_Math_Done,			//Execution Done
+	output						O_Mv_Done,				//Reg Move Done
 	output						O_Ld_Stall,				//Stall Request for Loading
 	output						O_St_Stall				//Stall Request for Storing
 );
@@ -51,20 +58,11 @@ module ExecUnit_V
 	logic						Valid_MAU;
 
 	TYPE						Token_MAU;
-	TYPE						Token_Mv;				
+	TYPE						Token_Mv;
 
 	logic						LdSt_Req		[1:0];
 	data_t						Ld_Data			[1:0];
 	TYPE						Ld_Token		[1:0];
-
-	issue_no_t					LifeMAU;
-	issue_no_t					LifeLdSt1;
-	issue_no_t					LifeLdSt2;
-	issue_no_t					LifeLdSt;
-	issue_no_t					LifeMv;
-
-	logic						is_LifeMAU;
-	logic						is_LifeLdSt2;
 
 
 	logic						Ld_Stall_Odd;
@@ -80,10 +78,10 @@ module ExecUnit_V
 
 	logic						We;
 	logic						Re;
-	TYPE						Mv_Token;
 	TYPE						Mv_Token_;
-	data_t						Mv_Data;
+	TYPE						Mv_Token;
 	data_t						Mv_Data_;
+	data_t						Mv_Data;
 
 	logic						RegMoveOp;
 	logic						CommonMov;
@@ -163,29 +161,16 @@ module ExecUnit_V
 	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  I_Command.command.instr.op.OpClass[0] & ( I_Command.command.instr.op.OpCode == 2'b10 );
 
 
-	assign LifeMAU				= I_Command.command.issue_no - MAU_Token.issue_no;
-	assign LifeLdSt1			= I_Command.command.issue_no - Ld_Token[0].issue_no;
-	assign LifeLdSt2			= I_Command.command.issue_no - Ld_Token[1].issue_no;
-	assign LifeMv				= I_Command.command.issue_no - Mv_Token.issue_no;
+	assign O_WB_Token_LdSt1		= Ld_Token[0];
+	assign O_WB_Token_LdSt2		= Ld_Token[1];
+	assign O_WB_Token_Math		= ALU_Token;
+	assign O_WB_Token_Mv		= Mv_Token;
 
+	assign O_WB_Data_LdSt1		= Ld_Data[0];
+	assign O_WB_Data_LdSt2		= Ld_Data[1];
+	assign O_WB_Data_Math		= ALU_Data;
+	assign O_WB_Data_Mv			= Mv_Data;
 
-	assign is_LifeLdSt2			= LifeLdSt2 > LifeLdSt1;
-	assign LifeLdSt				= ( is_LifeLdSt2 ) ? LifeLdSt2 : LifeLdSt1;
-
-	assign is_LifeMAU			= LifeMAU > LifeLdSt;
-
-
-	assign O_Math_Done			= Token_MAU.v;
-
-	assign O_WB_Token			= ( Re ) ?				Mv_Token :
-									( is_LifeMAU ) ?	MAU_Token :
-									( is_LifeLdSt2 ) ?	Ld_Token[1] :
-														Ld_Token[0];
-
-	assign O_WB_Data			= ( Re ) ?				Mv_Data :
-									( is_LifeMAU ) ?	MAU_Data :
-									( is_LifeLdSt2 ) ?	Ld_Data[1] :
-														Ld_Data[0];
 
 	assign O_Ld_Stall			= Ld_Stall_Odd | Ld_Stall_Evn;
 	assign O_St_Stall			= St_Stall_Odd | St_Stall_Evn;
