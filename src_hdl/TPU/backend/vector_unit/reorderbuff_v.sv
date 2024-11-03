@@ -6,10 +6,10 @@
 //  GNU AFFERO GENERAL PUBLIC LICENSE
 //	version 3.0
 //
-//	Module Name:	ReorderBuff
+//	Module Name:	ReorderBuff_V
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-module ReorderBuff
+module ReorderBuff_V
 	import pkg_tpu::*;
 #(
 	parameter NUM_ENTRY 		= 16

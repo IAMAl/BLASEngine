@@ -44,7 +44,8 @@ import pkg_mpu::*;
 	output	data_t				O_Lane_Data_Src3,		//Inter-Lane Connect
 	output	data_t				O_Lane_Data_WB,			//Inter-Lane Connect
 	output						O_Status,				//Lane Status
-	output						O_Commit				//Commit Request
+	output						O_Commit_Req,			//Commit Request
+	output	issue_no_t			O_Commit_No				//Commit Request
 );
 
 
@@ -98,8 +99,14 @@ import pkg_mpu::*;
 	logic						is_WB_BR;
 	logic						is_WB_VU;
 	logic						WB_En;
-	pipe_exe_tmp_t				WB_Token;
-	data_t						WB_Data;
+	pipe_exe_tmp_t				WB_Token_LdSt1;
+	pipe_exe_tmp_t				WB_Token_LdSt2;
+	pipe_exe_tmp_t				WB_Token_Math;
+	pipe_exe_tmp_t				WB_Token_Mv;
+	data_t						WB_Data_LdSt1;
+	data_t						WB_Data_LdSt2;
+	data_t						WB_Data_Math;
+	data_t						WB_Data_Mv;
 	data_t						WB_Data_;
 	logic						WB_We_Even;
 	logic						WB_We_Odd;
@@ -107,6 +114,11 @@ import pkg_mpu::*;
 	index_t						WB_Index_Odd;
 	data_t						WB_Data_Even;
 	data_t						WB_Data_Odd;
+
+	logic						LdSt_Done1;
+	logic						LdSt_Done2;
+	logic						Math_Done;
+	logic						Mv_Done;
 
 	logic						MaskReg_Ready;
 	logic						MaskReg_Term;
@@ -116,11 +128,7 @@ import pkg_mpu::*;
 
 	logic	[6:0]				Config_Path;
 	logic	[4:0]				Config_Path_WB;
-	logic						Math_Done;
 
-
-	logic						LdSt_Done1;
-	logic						LdSt_Done2;
 
 	logic						Ld_Stall;
 	logic						St_Stall;
@@ -323,8 +331,20 @@ import pkg_mpu::*;
 									( PipeReg_Idx.command.instr.op.OpCode == 2'b11 );
 
 
-	//// Commit Request
-	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done;
+	//// Commit
+	assign Commmit_Req_LdSt1	= WB_Token_LdSt1.v;
+	assign Commmit_No_LdSt1		= WB_Token_LdSt1.issue_no;
+	
+	assign Commmit_Req_LdSt2	= WB_Token_LdSt2.v;
+	assign Commmit_No_LdSt2		= WB_Token_LdSt2.issue_no;
+
+	assign Commmit_Req_Math		= WB_Token_Math.v;
+	assign Commmit_No_Math		= WB_Token_Math.issue_no;
+
+	assign Commmit_Req_Mv		= WB_Token_Mv.v;
+	assign Commmit_No_Mv		= WB_Token_Mv.issue_no;
+
+	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done | Mv_Done;
 
 
 	//// Stall Control
@@ -631,13 +651,45 @@ import pkg_mpu::*;
 		.I_End_Access2(		I_End_Access2			),
 		.I_Re_p0(			Re_p0					),
 		.I_Re_p1(			Re_p1					),
-		.O_WB_Token(		WB_Token				),
-		.O_WB_Data(			WB_Data					),
-		.O_Math_Done(		Math_Done				),
+		.O_WB_Token_LdSt1(	WB_Token_LdSt1			),
+		.O_WB_Token_LdSt2(	WB_Token_LdSt2			),
+		.O_WB_Token_Math(	WB_Token_Math			),
+		.O_WB_Token_Mv(		WB_Token_Mv				),
+		.O_WB_Data_LdSt1(	WB_Data_LdSt1			),
+		.O_WB_Data_LdSt2(	WB_Data_LdSt2			),
+		.O_WB_Data_Math(	WB_Data_Math			),
+		.O_WB_Data_Mv(		WB_Data_Mv				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
+		.O_Math_Done(		Math_Done				),
+		.O_Mv_Done(			Mv_Done					),
 		.O_Ld_Stall(		Ld_Stall				),
 		.O_St_Stall(		St_Stall				)
+	);
+
+
+	//// Commitment Stage
+	ReorderBuff_V #(
+		.NUM_ENTRY(			NUM_ENTRY_RB			)
+	) ReorderBuff
+	(
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Store(			I_Command.v				),
+		.I_Issue_No(		I_Command.issue_no		),
+		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
+		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
+		.I_Commit_Req_Math(	Commmit_Req_Math		),
+		.I_Commit_Req_Mv(	Commmit_Req_Mv			),
+		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
+		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
+		.I_Commit_No_Math(	Commit_No_Math			),
+		.I_Commit_No_Mv(	Commit_No_Mv			),
+		.O_Commit_Grant(	Commit_Grant			),
+		.O_Commit_Req(		O_Commit_Req			),
+		.O_Commit_No(		O_Commit_No				),
+		.O_Full(			Full_RB_V				),
+		.O_Empty(			Empty_RB_V				)
 	);
 
 endmodule

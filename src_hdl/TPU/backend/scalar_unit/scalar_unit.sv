@@ -19,7 +19,7 @@ module Scalar_Unit
 	input						I_En,					//Enable Execution
 	input	id_t				I_ThreadID,				//Thread-ID
 	output						O_Re_Instr,				//Read-Enable for Instruction Memory
-	output	i_address_t			O_Rd_Address,
+	output	i_address_t			O_Rd_Address,			//Read Address for Instruction Memory
 	input	instr_t				I_Instr,				//Instruction from Instruction Memory
 	input						I_Commit_Req_V,			//Commit Request from CommitAgg
 	input	issue_no_t			I_Commit_No_V,			//Commit No from CommitAgg
@@ -75,7 +75,7 @@ module Scalar_Unit
 	logic						Req_IW;
 	logic						Req_Issue;
 	logic						IW_Req_Issue;
-	issue_no_t					IW_IssueNo;
+	issue_no_t					Issue_No;
 	instruction_t				IW_Instr;
 
 	logic						RAR_Hazard;
@@ -137,8 +137,14 @@ module Scalar_Unit
 	logic						is_WB_BR;
 	logic						is_WB_VU;
 	logic						WB_En;
-	pipe_exe_tmp_t				WB_Token;
-	data_t						WB_Data;
+	pipe_exe_tmp_t				WB_Token_LdSt1;
+	pipe_exe_tmp_t				WB_Token_LdSt2;
+	pipe_exe_tmp_t				WB_Token_Math;
+	pipe_exe_tmp_t				WB_Token_Mv;
+	data_t						WB_Data_LdSt1;
+	data_t						WB_Data_LdSt2;
+	data_t						WB_Data_Math;
+	data_t						WB_Data_Mv;
 	data_t						WB_Data_;
 	logic						WB_We_Even;
 	logic						WB_We_Odd;
@@ -148,6 +154,11 @@ module Scalar_Unit
 	data_t						WB_Data_Odd;
 	issue_no_t					WB_IssueNo;
 
+	logic						LdSt_Done1;
+	logic						LdSt_Done2;
+	logic						Math_Done;
+	logic						Mv_Done;
+
 	logic						MaskReg_Ready;
 	logic						MaskReg_Term;
 	logic						MaskReg_We;
@@ -156,13 +167,9 @@ module Scalar_Unit
 
 	logic	[12:0]				Config_Path;
 	logic	[1:0]				Config_Path_WB;
-	logic						Math_Done;
 	logic						Condition;
 	logic	[1:0]				Cond_Data;
 
-
-	logic						LdSt_Done1;
-	logic						LdSt_Done2;
 
 	logic						Ld_Stall;
 	logic						St_Stall;
@@ -198,18 +205,14 @@ module Scalar_Unit
 	issue_no_t					Commit_No_LdSt1;
 	issue_no_t					Commit_No_LdSt2;
 	issue_no_t					Commit_No_Math;
-	logic						Commit_Req_S;
-	issue_no_t					Commit_No_S;
+	logic						Commit_Req;
+	issue_no_t					Commit_No;
 	logic						Commited_LdSt1;
 	logic						Commited_LdSt2;
 	logic						Commited_Math;
 	logic						Commit_Grant_S;
 	logic						Full_RB_S;
 	logic						Empty_RB_S;
-
-
-	logic						Commit_Req;
-	issue_no_t					Commit_No;
 
 
 	logic						Lane_Enable;
@@ -250,7 +253,7 @@ module Scalar_Unit
 	assign is_Vec						= ~Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.v				=  Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? IW_IssueNo : '0;
+	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Issue_No : '0;
 
 
 	//// Hazard Detect Stage
@@ -265,7 +268,7 @@ module Scalar_Unit
 	assign PipeReg_Idx.command.instr	= S_Command.instr;
 
 	// Issue-No
-	assign PipeReg_Idx.command.issue_no	= IW_IssueNo;
+	assign PipeReg_Idx.command.issue_no	= Issue_No;
 
 	// Mask Read
 	assign MaskedRead					= S_Command.instr.mread;
@@ -438,12 +441,17 @@ module Scalar_Unit
 
 
 	//// Commit
-	assign Commit_No_Math		= WB_IssueNo;
-	assign Commit_No_LdSt1		= WB_IssueNo;
-	assign Commit_No_LdSt2		= WB_IssueNo;
-	assign Commmit_Req_Math		= Math_Done;
-	assign Commmit_Req_LdSt1	= LdSt_Done1;
-	assign Commmit_Req_LdSt2	= LdSt_Done2;
+	assign Commmit_Req_LdSt1	= WB_Token_LdSt1.v;
+	assign Commmit_No_LdSt1		= WB_Token_LdSt1.issue_no;
+
+	assign Commmit_Req_LdSt2	= WB_Token_LdSt2.v;
+	assign Commmit_No_LdSt2		= WB_Token_LdSt2.issue_no;
+
+	assign Commmit_Req_Math		= WB_Token_Math.v;
+	assign Commmit_No_Math		= WB_Token_Math.issue_no;
+
+	assign Commmit_Req_Mv		= WB_Token_Mv.v;
+	assign Commmit_No_Mv		= WB_Token_Mv.issue_no;
 
 
 	//// Write Vector Unit Status Register
@@ -509,7 +517,7 @@ module Scalar_Unit
 		.O_RAW_Hazard(								),
 		.O_WAR_Hazard(								),
 		.O_WAW_Hazard(								),
-		.O_Rd_Ptr(			IW_IssueNo				),
+		.O_Rd_Ptr(			Issue_No				),
 		.O_Branch(			Branch_Instr			)
 	);
 
@@ -803,7 +811,7 @@ module Scalar_Unit
 		.I_Stall(			Stall_ExecUnit			),
 		.I_Command(			PipeReg_Exe				),
 		.I_Commit_Grant(	Commit_Grant_S			),
-		.I_Issue_No(		IW_IssueNo				),
+		.I_Issue_No(		Issue_No				),
 		.O_LdSt1(			O_LdSt[0]				),
 		.O_LdSt2(			O_LdSt[1]				),
 		.I_Ld_Data1(		I_Ld_Data[0]			),
@@ -818,11 +826,18 @@ module Scalar_Unit
 		.I_End_Access2(		I_End_Access[1]			),
 		.I_Re_p0(			Re_p0					),
 		.I_Re_p1(			Re_p1					),
-		.O_WB_Token(		WB_Token				),
-		.O_WB_Data(			WB_Data					),
-		.O_Math_Done(		Math_Done				),
+		.O_WB_Token_LdSt1(	WB_Token_LdSt1			),
+		.O_WB_Token_LdSt2(	WB_Token_LdSt2			),
+		.O_WB_Token_Math(	WB_Token_Math			),
+		.O_WB_Token_Mv(		WB_Token_Mv				),
+		.O_WB_Data_LdSt1(	WB_Data_LdSt1			),
+		.O_WB_Data_LdSt2(	WB_Data_LdSt2			),
+		.O_WB_Data_Math(	WB_Data_Math			),
+		.O_WB_Data_Mv(		WB_Data_Mv				),
 		.O_LdSt_Done1(		LdSt_Done1				),
 		.O_LdSt_Done2(		LdSt_Done2				),
+		.O_Math_Done(		Math_Done				),
+		.O_Mv_Done(			Mv_Done					),
 		.O_Ld_Stall(		Ld_Stall				),
 		.O_St_Stall(		St_Stall				)
 	);
@@ -849,26 +864,28 @@ module Scalar_Unit
 
 
 	//// Commitment Stage
-	ReorderBuff #(
+	ReorderBuff_S #(
 		.NUM_ENTRY(			NUM_ENTRY_RB			)
 	) ReorderBuff
 	(
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Store(			Store_S					),
-		.I_Issue_No(		IW_IssueNo				),
+		.I_Issue_No(		Issue_No				),
 		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
 		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
 		.I_Commit_Req_Math(	Commmit_Req_Math		),
-		.I_Commit_Req_V(	I_Commmit_Req_V			),
+		.I_Commit_Req_Mv(	Commmit_Req_Mv			),
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
 		.I_Commit_No_Math(	Commit_No_Math			),
+		.I_Commit_No_Mv(	Commit_No_Mv			),
+		.O_Commit_Grant(	Commit_Grant_S			),
+		.I_Commit_Req_V(	I_Commmit_Req_V			),
 		.I_Commit_No_V(		I_Commit_No_V			),
-		.O_Commit_Grant_S(	Commit_Grant_S			),
 		.O_Commit_Grant_V(	O_Commit_Grant_V		),
-		.O_Commit_Req(		Commit_Req_S			),
-		.O_Commit_No(		Commit_No_S				),
+		.O_Commit_Req(		Commit_Req				),
+		.O_Commit_No(		Commit_No				),
 		.O_Full(			Full_RB_S				),
 		.O_Empty(			Empty_RB_S				)
 	);
