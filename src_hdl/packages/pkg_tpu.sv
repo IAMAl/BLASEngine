@@ -38,6 +38,7 @@ package pkg_tpu;
 	localparam int SIZE_DATA_MEM		= 1024;
 	localparam int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEM);
 	localparam int POS_MSB_DMEM_ADDR	= WIDTH_SIZE_DMEM;
+	localparam int WIDTH_STRIDE			= (SIZE_DATA_MEM+1)/2;
 
 	//Constant in Instruction
 	localparam int WIDTH_CONSTANT		= 64-7-7*4-6-1;
@@ -81,6 +82,9 @@ package pkg_tpu;
 
 	//	Address Type for Data Memory
 	typedef logic	[WIDTH_SIZE_DMEM-1:0]	address_t;
+
+	//	Stride Type for Data Memory
+	typedef logic	[WIDTH_STRIDE-1:0]		stride_t;
 
 	//	Status Data (cmp instr. result) Types
 	typedef logic	[WIDTH_STATE-1:0]		state_t;
@@ -217,7 +221,7 @@ package pkg_tpu;
 		issue_no_t						issue_no;
 		logic							commit;
 		logic							o;
-	} commit_tab;
+	} commit_tab_t;
 
 	//	Commit Table for Vector Unit
 	//		NOTE: Placed in Scalar Unit
@@ -240,7 +244,7 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							req;
 		address_t						len;
-		address_t						stride;
+		stride_t						stride;
 		address_t						base;
 	} dmem_t;
 

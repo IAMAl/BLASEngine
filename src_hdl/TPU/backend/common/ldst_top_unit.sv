@@ -52,8 +52,8 @@ module LdStUnit
 
 	address_t					Ld_Length;
 	address_t					St_Length;
-	address_t					Ld_Stride;
-	address_t					St_Stride;
+	stride_t					Ld_Stride;
+	stride_t					St_Stride;
 	address_t					Ld_Base;
 	address_t					St_Base;
 
@@ -127,7 +127,7 @@ module LdStUnit
 	assign St_Token.mread		= I_Command.instr.mread;
 	assign St_Token.issue_no	= I_Command.issue_no;
 
-	assign St_Data				= I_Src_Data1;
+	assign St_Data				= I_Src_Data3;
 
 
 	assign O_LdSt.ld.req		= Ld_Req_;
@@ -165,9 +165,9 @@ module LdStUnit
 		.O_Data(			Ld_Data						),
 		.I_Term(			Ld_Term						),
 		.I_Req(				Ld_Req						),
-		.I_Length(			I_Src_Data2[25:16]			),
-		.I_Stride(			I_Src_Data2[9:0]			),
-		.I_Base(			I_Src_Data3[9:0]			),
+		.I_Length(			I_Src_Data1[29:20]			),
+		.I_Stride(			I_Src_Data1[19:0]			),
+		.I_Base(			I_Src_Data2[19:0]			),
 		.O_Req(				Ld_Req_						),
 		.O_Length(			Ld_Length					),
 		.O_Stride(			Ld_Stride					),
@@ -195,9 +195,9 @@ module LdStUnit
 		.O_Data(			O_St_Data					),
 		.I_Term(			St_Term						),
 		.I_Req(				St_Req						),
-		.I_Length(			I_Src_Data2[25:16]			),
-		.I_Stride(			I_Src_Data2[9:0]			),
-		.I_Base(			I_Src_Data3[9:0]			),
+		.I_Length(			I_Src_Data1[29:20]			),
+		.I_Stride(			I_Src_Data1[19:0]			),
+		.I_Base(			I_Src_Data2[19:0]			),
 		.O_Req(				St_Req_						),
 		.O_Length(			St_Length					),
 		.O_Stride(			St_Stride					),
