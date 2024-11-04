@@ -78,9 +78,7 @@ module ExecUnit_V
 
 	logic						We;
 	logic						Re;
-	TYPE						Mv_Token_;
 	TYPE						Mv_Token;
-	data_t						Mv_Data_;
 	data_t						Mv_Data;
 
 	logic						RegMoveOp;
@@ -182,8 +180,8 @@ module ExecUnit_V
 			Mv_Data			<= '0;
 		end
 		else begin
-			Mv_Token		<= Mv_Token_;
-			Mv_Data			<= Mv_Data_;
+			Mv_Token		<= Token_Mv;
+			Mv_Data			<= PData;
 		end
 	end
 
@@ -263,39 +261,6 @@ module ExecUnit_V
 		.O_Ld_Stall(		Ld_Stall_Evn			),
 		.O_St_Stall(		St_Stall_Evn			),
 		.O_LdSt_Done(		O_LdSt_Done1			)
-	);
-
-
-	RingBuff #(
-		.NUM_ENTRY(			8						),
-		.TYPE(				TYPE					)
-	) RegMoveTokenBuff
-	(
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_We(				We						),
-		.I_Re(				Re						),
-		.I_Data(			Token_Mv				),
-		.O_Data(			Mv_Token_				),
-		.O_Full(									),
-		.O_Empty(									),
-		.O_Num(										)
-	);
-
-	RingBuff #(
-		.NUM_ENTRY(			8						),
-		.TYPE(				data_t					)
-	) RegMoveDataBuff
-	(
-		.clock(				clock					),
-		.reset(				reset					),
-		.I_We(				We						),
-		.I_Re(				Re						),
-		.I_Data(			PData					),
-		.O_Data(			Mv_Data_				),
-		.O_Full(									),
-		.O_Empty(									),
-		.O_Num(										)
 	);
 
 endmodule

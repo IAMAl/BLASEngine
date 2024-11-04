@@ -10,9 +10,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Lane_Unit
-import pkg_tpu::*;
-import pkg_tpu::instr_t;
-import pkg_mpu::*;
+	import pkg_tpu::*;
+	import pkg_tpu::instr_t;
+	import pkg_mpu::*;
 #(
 	parameter int NUM_LANES		= 16,
 	parameter int WIDTH_LANES	= $clog2(NUM_LANES),
