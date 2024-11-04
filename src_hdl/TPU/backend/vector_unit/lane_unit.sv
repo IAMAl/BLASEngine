@@ -49,6 +49,17 @@ import pkg_mpu::*;
 );
 
 
+	localparam int BUFF_SIZE_INSTR	= 4;
+	localparam int BUFF_WIDTH		= $clog2(BUFF_SIZE_INSTR);
+
+
+	logic						We_InstrBuff;
+	logic						Re_InstrBuff;
+	pipe_index_t				Command,
+	logic	[WIDTH_BUFF-1:0]	Num_Instrs;
+	logic						Empty;
+
+
 	index_t						Index_Length;
 	logic						Index_En_II;
 	logic						Index_MaskedRead;
@@ -193,6 +204,27 @@ import pkg_mpu::*;
 	pipe_exe_t					PipeReg_Exe;
 
 
+	////
+	assign Num_Istrs		= Num_Instr >= (BUFF_SIZE_INSTR-1);
+	assign We_InstrBuff		=  Stall_Index_Calc;
+	assign Re_InstrBuff		= ~Stall_Index_Calc & ~Empty;
+	RingBuff #(
+		.NUM_ENTRY(			BUFF_SIZE_INSTR			),
+		.TYPE(				pipe_index_t			)
+	) InstrBuff
+	(
+		.clock	(			clock					),
+		.reset(				reset					),
+		.I_We(				We_InstrBuff			),
+		.I_Re(				Re_InstrBuff			),
+		.I_Data(			I_Command				),
+		.O_Data(			Command					),
+		.O_Full(									),
+		.O_Empty(			Empty					),
+		.O_Num(				Num_Istrs				)
+	);
+
+
 	//// Lane-Enable
 	assign Lane_CTRL_Rst		= ( PipeReg_Exe.command.instr.op.OpType == 2'b01 ) &
 									( PipeReg_Exe.command.instr.op.OpClass == 2'b10 ) &
@@ -220,8 +252,8 @@ import pkg_mpu::*;
 		end
 		else begin
 			//	Command
-			PipeReg_Idx.v			<= I_Command.v;
-			PipeReg_Idx.command		<= I_Command.command;
+			PipeReg_Idx.v			<= Command.v;
+			PipeReg_Idx.command		<= Command.command;
 		end
 	end
 
@@ -377,7 +409,7 @@ import pkg_mpu::*;
 	//// Commit
 	assign Commmit_Req_LdSt1	= WB_Token_LdSt1.v;
 	assign Commmit_No_LdSt1		= WB_Token_LdSt1.issue_no;
-	
+
 	assign Commmit_Req_LdSt2	= WB_Token_LdSt2.v;
 	assign Commmit_No_LdSt2		= WB_Token_LdSt2.issue_no;
 
@@ -392,14 +424,24 @@ import pkg_mpu::*;
 
 	//// Stall Control
 	assign Slice				= Index_Src1_Busy | Index_Src2_Busy | Index_Src3_Busy;
-	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall | Bypass_Buff_Full;
-	assign Stall_RegFile_Dst	= ~Lane_Enable | Ld_Stall;
-	assign Stall_RegFile_Odd	= ~Lane_Enable | St_Stall;
-	assign Stall_RegFile_Even	= ~Lane_Enable | St_Stall;
-	assign Stall_Network		= ~Lane_Enable;
+	// Index Stage
+	assign Stall_Index_Calc		= ~Lane_Enable | St_Stall | Bypass_Buff_Full | Stall;
+
+	// Write-Back Stage
+	assign Stall_RegFile_Dst	= ~Lane_Enable | Ld_Stall | Stall;
+
+	// Registerv Read Stage
+	assign Stall_RegFile_Odd	= ~Lane_Enable | St_Stall | Stall;
+	assign Stall_RegFile_Even	= ~Lane_Enable | St_Stall | Stall;
+
+	// Network Stage
+	assign Stall_Network		= ~Lane_Enable | Stall;
+
+	// Execution Stage
 	assign Stall_ExecUnit		= ~Lane_Enable;
 
 
+	//// Enable Processing on This Lane
 	assign En					= ~( Stall_RegFile_Dst | Stall_RegFile_Odd | Stall_RegFile_Even | Stall_Network );
 
 
@@ -732,7 +774,8 @@ import pkg_mpu::*;
 		.O_Commit_Req(		O_Commit_Req			),
 		.O_Commit_No(		O_Commit_No				),
 		.O_Full(			Full_RB_V				),
-		.O_Empty(			Empty_RB_V				)
+		.O_Empty(			Empty_RB_V				),
+		.O_Stall(			Stall					)
 	);
 
 endmodule
