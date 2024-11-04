@@ -85,6 +85,26 @@ module Scalar_Unit
 	logic						is_Vec;
 
 
+	index_t						Index_Length;
+	logic						Index_En_II;
+	logic						Index_MaskedRead;
+
+	logic						Index_Req_Src1;
+	idx_t						Index_Src1_;
+	index_t						Index_Window_Src1;
+
+	logic						Index_Req_Src2;
+	idx_t						Index_Src2_;
+	index_t						Index_Window_Src2;
+
+	logic						Index_Req_Src3;
+	idx_t						Index_Src3_;
+	index_t						Index_Window_Src3;
+
+	logic						RF_Index_Sel_Odd1;
+	logic						RF_Index_Sel_Odd2;
+	logic						RF_Index_Sel_Odd3;
+
 	idx_t						Index_Src1;
 	idx_t						Index_Src2;
 	idx_t						Index_Src3;
@@ -250,8 +270,8 @@ module Scalar_Unit
 	//// Select Scalar unit or Vector unit backend
 	assign S_Command.v					=   ~Instr.instr.op.Sel_Unit & Req_Issue;
 	assign S_Command.instr				= ( ~Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
-	assign is_Vec						= ~Instr.instr.op.Sel_Unit & Req_Issue;
-	assign O_V_Command.v				=  Instr.instr.op.Sel_Unit & Req_Issue;
+	assign is_Vec						=   ~Instr.instr.op.Sel_Unit & Req_Issue;
+	assign O_V_Command.v				=    Instr.instr.op.Sel_Unit & Req_Issue;
 	assign O_V_Command.command.instr	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Instr : '0;
 	assign O_V_Command.command.issue_no	= (  Instr.instr.op.Sel_Unit & Req_Issue ) ? Issue_No : '0;
 
@@ -281,6 +301,27 @@ module Scalar_Unit
 
 	// Masking
 	assign Mask_Data				= '0;
+
+	assign Index_Length				= PipeReg_Idx.command.instr.slice_len;
+	assign Index_En_II				= PipeReg_Idx.command.instr.en_ii;
+	assign Index_MaskedRead			= PipeReg_Idx.command.instr.mread;
+
+	assign Index_Req_Src1			= PipeReg_Idx.command.instr.src1.v;
+	assign Index_Src1_				= PipeReg_Idx.command.instr.src1;
+	assign Index_Window_Src1		= PipeReg_Idx.command.instr.src1.window;
+
+	assign Index_Req_Src2			= PipeReg_Idx.command.instr.src2.v;
+	assign Index_Src2				= PipeReg_Idx.command.instr.src2;
+	assign Index_Window_Src2		= PipeReg_Idx.command.instr.src2.window;
+
+	assign Index_Req_Src3			= PipeReg_Idx.command.instr.src3.v;
+	assign Index_Src3_				= PipeReg_Idx.command.instr.src3;
+	assign Index_Window_Src3		= PipeReg_Idx.command.instr.src3.window;
+
+
+	assign RF_Index_Sel_Odd1		= PipeReg_Index.command.instr.src1.v;
+	assign RF_Index_Sel_Odd2		= PipeReg_Index.command.instr.src2.v;
+	assign RF_Index_Sel_Odd3		= PipeReg_Index.command.instr.src3.v;
 
 
 	//// Packing for Register File Access
@@ -570,12 +611,12 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.command.instr.src1.v		),
-		.I_En_II(			'0						),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.command.instr.src1			),
-		.I_Window(			PipeReg_Idx.command.instr.src1.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
+		.I_Req(				Index_Req_Src1			),
+		.I_En_II(			Index_En_II				),
+		.I_MaskedRead(		Index_MaskedRead		),
+		.I_Index(			Index_Src1_				),
+		.I_Window(			Index_Window_Src1		),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign1					),
@@ -593,12 +634,12 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.command.instr.src2.v		),
-		.I_En_II(			'0						),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.command.instr.src2			),
-		.I_Window(			PipeReg_Idx.command.instr.src2.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
+		.I_Req(				Index_Req_Src2			),
+		.I_En_II(			Index_En_II				),
+		.I_MaskedRead(		Index_MaskedRead		),
+		.I_Index(			Index_Src2_				),
+		.I_Window(			Index_Window_Src2		),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign2					),
@@ -616,12 +657,12 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.command.instr.src3.v		),
-		.I_En_II(			'0						),
-		.I_MaskedRead(		MaskedRead				),
-		.I_Index(			PipeReg_Idx.command.instr.src3			),
-		.I_Window(			PipeReg_Idx.command.instr.src3.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
+		.I_Req(				Index_Req_Src3			),
+		.I_En_II(			Index_En_II				),
+		.I_MaskedRead(		Index_MaskedRead		),
+		.I_Index(			Index_Src3_				),
+		.I_Window(			Index_Window_Src3		),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign3					),
@@ -633,9 +674,9 @@ module Scalar_Unit
 
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Index.command.instr.src1.v	),
-		.I_Odd2(			PipeReg_Index.command.instr.src2.v	),
-		.I_Odd3(			PipeReg_Index.command.instr.src3.v	),
+		.I_Odd1(			RF_Index_Sel_Odd1		),
+		.I_Odd2(			RF_Index_Sel_Odd2		),
+		.I_Odd3(			RF_Index_Sel_Odd3		),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
@@ -680,7 +721,7 @@ module Scalar_Unit
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Index.command.instr.src3.v, PipeReg_Index.command.instr.src2.v, PipeReg_Index.command.instr.src1.v };
+			Sel				<= { RF_Index_Sel_Odd3, RF_Index_Sel_Odd2, RF_Index_Sel_Odd1 };
 		end
 	end
 
@@ -871,6 +912,7 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Store(			Store_S					),
+		.I_is_Vec(			Instr.instr.op.Sel_Unit	),
 		.I_Issue_No(		Issue_No				),
 		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
 		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),

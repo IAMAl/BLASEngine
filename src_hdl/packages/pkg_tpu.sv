@@ -216,7 +216,8 @@ package pkg_tpu;
 		logic							v;
 		issue_no_t						issue_no;
 		logic							commit;
-	} commit_tab_s;
+		logic							o;
+	} commit_tab;
 
 	//	Commit Table for Vector Unit
 	//		NOTE: Placed in Scalar Unit

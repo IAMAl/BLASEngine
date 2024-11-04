@@ -18,31 +18,32 @@ module ReorderBuff_V
 	input						reset,
 	input						I_Store,				//Store Issue No
 	input	issue_no_t			I_Issue_No,				//Storing Issue Number
+	input						I_Slice,				//Flag Use of Slicing
 	input						I_Commit_Req_LdSt1,		//Commit Request from LdSt Unit-1
 	input						I_Commit_Req_LdSt2,		//Commit Request from LdSt Unit-2
 	input						I_Commit_Req_Math,		//Commit Request from Math Unit
-	input						I_Commit_Req_V,
+	input						I_Commit_Req_Mv,		//Commit Request from Reg Move
     input   issue_no_t          I_Commit_No_LdSt1,		//Commit No from LdSt Unit-1
     input   issue_no_t          I_Commit_No_LdSt2,		//Commit No from LdSt Unit-2
     input   issue_no_t          I_Commit_No_Math,		//Commit No from Math Unit
-	input	issue_no_t			I_Commit_No_V,
-	output						O_Commit_Grant_S,		//Commit Grant
-	output						O_Commit_Grant_V,		//Commit Grant
+    input   issue_no_t          I_Commit_No_Mv,			//Commit No from Reg Move
+	output						O_Commit_Grant,			//Commit Grant
 	output						O_Commit_Req,			//Commit Request to Hazard Unit
 	output	issue_no_t			O_Commit_No,			//Commit Number
 	output						O_Full,					//State in Full
-	output						O_Empty					//State in Empty
+	output						O_Empty,				//State in Empty
+	output						O_Stall					//Stall Request
 );
 
 
 	localparam WIDTH_ENTRY		= $clog2(NUM_ENTRY);
 
-	commit_tab_s				Commit	[NUM_ENTRY-1:0];
+	commit_tab_t				Commit	[NUM_ENTRY-1:0];
 
-	logic	[NUM_ENTRY-1:0]		Clr_Valid;
+	logic	[NUM_ENTRY-1:0]		is_Slice;
+
+	logic						Valid_Commit;
 	logic	[NUM_ENTRY-1:0]		Set_Commit;
-
-	logic						En_Commit;
 
 	logic						We;
 	logic						Re;
@@ -61,11 +62,12 @@ module ReorderBuff_V
 	assign O_Empty				= Empty;
 
 	// Commit Grant
-	assign O_Commit_Grant_S		=;//ToDo
-	assign O_Commit_Grant_V		=;//ToDo
+	assign O_Commit_Grant		= Re;
+
+	// Stall Request
+	assign O_Stall				= |is_Slice;
 
 	// Buffer Handling
-	assign En_Commit			= Commit[RNo].v & Commit[RNo].commit;
 	assign Re					= En_Commit & I_Commit_Grant;
 	assign We					= I_Store & ~Full;
 
@@ -81,11 +83,21 @@ module ReorderBuff_V
 		end
 	end
 
-    always_comb begin
-        for ( int i=0; i<NUM_ENTRY; ++i ) begin
-            Clr_Valid[ i ]     = Commit[ i ].v & Commit[ i ].commit;
-        end
-    end
+	always_comb begin
+		for ( int i=0; i<NUM_ENTRY; ++i ) begin
+			is_Slice[ i ]	= Commit[ i ].v & Commit[ i ].opt & ( i != RNo )  & ( i != WNo );
+		end
+	end
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Valid_Commit		<= 1'b0;
+		end
+		else begin
+			Valid_Commit		< = Commit[ RNo ].v & Commit[ RNo ].commit;
+		end
+	end
 
 
 	always_ff @( posedge clock ) begin
@@ -94,20 +106,22 @@ module ReorderBuff_V
 				Commit[i]		<= '0;
 			end
 		end
-		else if ( I_Store | ( Set_Commit != 0) | ( Clr_Valid != 0 ) ) begin
+		else if ( I_Store | ( |Set_Commit ) | Valid_Commit ) begin
 			if ( I_Store ) begin
 				Commit[ WNo ].v			<= 1'b1;
 				Commit[ WNo ].issue_no	<= I_Issue_No;
 				Commit[ WNo ].commit	<= 1'b0;
+				Commit[ WNo ].opt		<= I_Slice;
 			end
 
 			for ( int i=0; i<NUM_ENTRY; ++i ) begin
 				Commit[ i ].commit		<= Commit[ i ].commit | Set_Commit[ i ];
 			end
 
-			for ( int i=0; i<NUM_ENTRY; ++i ) begin
-				Commit[ i ].v			<= Commit[ i ].v &  ~Clr_Valid[ i ];
-				Commit[ i ].commit		<= Commit[ i ].commit & ~Clr_Valid[ i ];
+			if ( Valid_Commit ) begin
+				Commit[ RNo ].v			<= 1'b0;
+				Commit[ RNo ].commit	<= 1'b0;
+				Commit[ RNo ].opt		<= 1'b0;
 			end
 		end
 	end

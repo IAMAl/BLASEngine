@@ -49,6 +49,26 @@ import pkg_mpu::*;
 );
 
 
+	index_t						Index_Length;
+	logic						Index_En_II;
+	logic						Index_MaskedRead;
+
+	logic						Index_Req_Src1;
+	idx_t						Index_Src1_;
+	index_t						Index_Window_Src1;
+
+	logic						Index_Req_Src2;
+	idx_t						Index_Src2_;
+	index_t						Index_Window_Src2;
+
+	logic						Index_Req_Src3;
+	idx_t						Index_Src3_;
+	index_t						Index_Window_Src3;
+
+	logic						RF_Index_Sel_Odd1;
+	logic						RF_Index_Sel_Odd2;
+	logic						RF_Index_Sel_Odd3;
+
 	idx_t						Index_Src1;
 	idx_t						Index_Src2;
 	idx_t						Index_Src3;
@@ -210,6 +230,29 @@ import pkg_mpu::*;
 	//	Command
 	assign PipeReg_Index.v			= PipeReg_Idx.v;
 	assign PipeReg_Index.command	= PipeReg_Idx.command;
+
+	assign Index_Length				= PipeReg_Idx.command.instr.slice_len;
+	assign Index_En_II				= PipeReg_Idx.command.instr.en_ii;
+	assign Index_MaskedRead			= PipeReg_Idx.command.instr.mread;
+
+	assign Index_Req_Src1			= PipeReg_Idx.command.instr.src1.v;
+	assign Index_Src1_				= PipeReg_Idx.command.instr.src1;
+	assign Index_Window_Src1		= PipeReg_Idx.command.instr.src1.window;
+
+
+	assign Index_Req_Src2			= PipeReg_Idx.command.instr.src2.v;
+	assign Index_Src2				= PipeReg_Idx.command.instr.src2;
+	assign Index_Window_Src2		= PipeReg_Idx.command.instr.src2.window;
+
+
+	assign Index_Req_Src3			= PipeReg_Idx.command.instr.src3.v;
+	assign Index_Src3_				= PipeReg_Idx.command.instr.src3;
+	assign Index_Window_Src3		= PipeReg_Idx.command.instr.src3.window;
+
+
+	assign RF_Index_Sel_Odd1= PipeReg_Index.command.instr.src1.v;
+	assign RF_Index_Sel_Odd2= PipeReg_Index.command.instr.src2.v;
+	assign RF_Index_Sel_Odd3= PipeReg_Index.command.instr.src3.v;
 
 
 	//// Packing for Register File Access
@@ -391,12 +434,12 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.command.instr.src1.v		),
-		.I_En_II(			PipeReg_Idx.command.instr.en_ii			),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread			),
-		.I_Index(			PipeReg_Idx.command.instr.src1			),
-		.I_Window(			PipeReg_Idx.command.instr.src1.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
+		.I_Req(				Index_Req_Src1			),
+		.I_En_II(			Index_En_II				),
+		.I_MaskedRead(		Index_MaskedRead		),
+		.I_Index(			Index_Src1_				),
+		.I_Window(			Index_Window_Src1		),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign1					),
@@ -414,12 +457,12 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.command.instr.src2.v		),
-		.I_En_II(			PipeReg_Idx.command.instr.en_ii			),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread			),
-		.I_Index(			PipeReg_Idx.command.instr.src2			),
-		.I_Window(			PipeReg_Idx.command.instr.src2.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
+		.I_Req(				Index_Req_Src2			),
+		.I_En_II(			Index_En_II				),
+		.I_MaskedRead(		Index_MaskedRead		),
+		.I_Index(			Index_Src2_				),
+		.I_Window(			Index_Window_Src2		),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign2					),
@@ -437,12 +480,12 @@ import pkg_mpu::*;
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Index_Calc		),
-		.I_Req(				PipeReg_Idx.command.instr.src3.v		),
-		.I_En_II(			PipeReg_Idx.command.instr.en_ii			),
-		.I_MaskedRead(		PipeReg_Idx.command.instr.mread			),
-		.I_Index(			PipeReg_Idx.command.instr.src3			),
-		.I_Window(			PipeReg_Idx.command.instr.src3.window	),
-		.I_Length(			PipeReg_Idx.command.instr.slice_len		),
+		.I_Req(				Index_Req_Src3			),
+		.I_En_II(			Index_En_II				),
+		.I_MaskedRead(		Index_MaskedRead		),
+		.I_Index(			Index_Src3_				),
+		.I_Window(			Index_Window_Src3		),
+		.I_Length(			Index_Lengtn			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign3					),
@@ -454,9 +497,9 @@ import pkg_mpu::*;
 
 
 	RF_Index_Sel RF_Index_Sel (
-		.I_Odd1(			PipeReg_Index.command.instr.src1.v	),
-		.I_Odd2(			PipeReg_Index.command.instr.src2.v	),
-		.I_Odd3(			PipeReg_Index.command.instr.src3.v	),
+		.I_Odd1(			RF_Index_Sel_Odd1		),
+		.I_Odd2(			RF_Index_Sel_Odd2		),
+		.I_Odd3(			RF_Index_Sel_Odd3		),
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
@@ -488,7 +531,7 @@ import pkg_mpu::*;
 		.O_Re_p1(			Re_p1					),
 		.O_Re_c(			Re_c					),
 		.I_Data(			WB_Data_				),
-		.O_Data(			Scalar_Data			),
+		.O_Data(			Scalar_Data				),
 		.I_SWe(				Aux_SWe					),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.O_Scalar_Data(		O_Scalar_Data			)
@@ -501,7 +544,7 @@ import pkg_mpu::*;
 			Sel				<= '0;
 		end
 		else begin
-			Sel				<= { PipeReg_Index.command.instr.src3.v, PipeReg_Index.command.instr.src2.v, PipeReg_Index.command.instr.src1.v };
+			Sel				<= { RF_Index_Sel_Odd3, RF_Index_Sel_Odd2, RF_Index_Sel_Odd1 };
 		end
 	end
 
