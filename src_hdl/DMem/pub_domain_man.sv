@@ -253,4 +253,20 @@ module pub_domain_man
 		end
 	end
 
+	Encoder #(
+		.NUM_ENTRY(		NUM_ENTRY			)
+	) SetNo_Gen
+	(
+		.I_Data(		is_Hit_St			),
+		.O_Enc(			SetNo				)
+	);
+
+	Encoder #(
+		.NUM_ENTRY(		NUM_ENTRY			)
+	) ClrNo_Gen
+	(
+		.I_Data(		is_Hit_Ld			),
+		.O_Enc(			ClrNo				)
+	);
+
 endmodule

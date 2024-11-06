@@ -52,6 +52,8 @@ module ExecUnit_V
 
 
 
+	issue_no_t					Issue_No;
+
 	logic						MAU_Req;
 	TYPE						MAU_Token;
 	data_t						MAU_Data;
@@ -100,6 +102,9 @@ module ExecUnit_V
 	data_t						Src_Data3;
 
 
+	assign Issue_No				= I_Command.command.issue_no;
+
+
 	assign Token_Mv.v			= I_Command.v;
 	assign Token_Mv.op			= I_Command.command.instr.op;
 	assign Token_Mv.dst			= I_Command.command.instr.dst;
@@ -119,6 +124,7 @@ module ExecUnit_V
 	assign PMov0				= PMov & ( I_Command.command.instr.src1.idx == '0 );
 	assign PMov1				= PMov & ( I_Command.command.instr.src1.idx == '1 );
 
+	// Composing Inpu-Token for Floating-Point Unit
 	assign is_Adder				= I_En & ( I_Command.command.instr.op.OpClass == 2'b00 );
 	assign is_Mlter				= I_En & ( I_Command.command.instr.op.OpClass == 2'b01 );
 
@@ -141,24 +147,19 @@ module ExecUnit_V
 									( PMov1 ) ? 32'h00000000 :
 												Src_Data2;
 
-
-	assign We					= RegMove & ( ( LifeMAU != '0 ) | ( LifeLdSt != '0 ) );
-	assign Re					= ( LifeMv > LifeLdSt ) & ( LifeMv > LifeMAU );
-	assign RegMove				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 ) &
-										( I_Command.command.instr.op.OpClass == 2'b11 ) &
-										( |I_Command.command.instr.op.OpCode );
-
+	// Register Move Path
 	assign PData				= ( CommonMov) ?	Src_Data1 :
 									( PMov0 ) ?		Data0 :
 									( PMov1 ) ?		Data1 :
 													'0;
 
+	// Request to ALU
 	assign MAU_Req				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 );
 
 	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) & ~I_Command.command.instr.op.OpClass[0] & ( I_Command.command.instr.op.OpCode == 2'b10 );
 	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  I_Command.command.instr.op.OpClass[0] & ( I_Command.command.instr.op.OpCode == 2'b10 );
 
-
+	// Write-Backs
 	assign O_WB_Token_LdSt1		= Ld_Token[0];
 	assign O_WB_Token_LdSt2		= Ld_Token[1];
 	assign O_WB_Token_Math		= ALU_Token;
@@ -169,7 +170,9 @@ module ExecUnit_V
 	assign O_WB_Data_Math		= ALU_Data;
 	assign O_WB_Data_Mv			= Mv_Data;
 
+	assign O_Mv_Done			= Mv_Token.v;
 
+	// Stall by Load/Store Unit
 	assign O_Ld_Stall			= Ld_Stall_Odd | Ld_Stall_Evn;
 	assign O_St_Stall			= St_Stall_Odd | St_Stall_Evn;
 
@@ -215,7 +218,7 @@ module ExecUnit_V
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
 		.I_Commit_Grant(	I_Commit_Grant			),
-		.I_Issue_No(		I_Command.command.issue_no		),
+		.I_Issue_No(		Issue_No				),
 		.I_Req(				LdSt_Req[1]				),
 		.I_Command(			I_Command.command		),
 		.I_Src_Data1(		Src_Data1				),
@@ -242,7 +245,7 @@ module ExecUnit_V
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
 		.I_Commit_Grant(	I_Commit_Grant			),
-		.I_Issue_No(		I_Command.command.issue_no		),
+		.I_Issue_No(		Issue_No				),
 		.I_Req(				LdSt_Req[0]				),
 		.I_Command(			I_Command.command		),
 		.I_Src_Data1(		Src_Data1				),

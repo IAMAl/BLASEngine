@@ -852,7 +852,6 @@ module Scalar_Unit
 		.I_Stall(			Stall_ExecUnit			),
 		.I_Command(			PipeReg_Exe				),
 		.I_Commit_Grant(	Commit_Grant_S			),
-		.I_Issue_No(		Issue_No				),
 		.O_LdSt1(			O_LdSt[0]				),
 		.O_LdSt2(			O_LdSt[1]				),
 		.I_Ld_Data1(		I_Ld_Data[0]			),
