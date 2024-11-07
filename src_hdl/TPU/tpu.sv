@@ -44,18 +44,6 @@ module TPU
 
 	logic						Ack_St;
 
-	instr_t						Buff_Instr;
-	logic						We_Buff;
-	logic						Re_Buff;
-	logic 						Buff_Full;
-	logic						Buff_Empty;
-	instr_t						Instr;
-
-	id_t						Buff_ThreadID;
-	logic						IDBuff_We;
-	logic						IDBuff_Re;
-	logic						IDBuff_Full;
-	logic						IDBuff_Empty;
 	id_t						ThreadID;
 
 	data_t						In_Scalar_Data;
@@ -63,18 +51,28 @@ module TPU
 
 	state_t						S_Status;
 
-	pipe_index_t				V_Command;
 	v_ready_t					Lane_En;
+	pipe_index_t				V_Command;
 	v_ready_t					V_Status;
 
-	logic						Commit_Req_V;;
+	logic						Commit_Req;
+	issue_t						Commit_No;
 	logic						Commit_Grant;
 
 	logic						Term;
 
+
+	logic						Empty;
+	logic						Full;
+
+	logic						Wr_End;
+	logic						We_Instr;
+	instr_t						Wr_Instr;
+
+	logic						Rd_End;
 	logic						Re_Instr;
-	logic						Rd_Instr;
-	assign Rd_Instr`		= Term;
+	instr_t						Rd_Instr;
+	i_address_t					Rd_Address;
 
 
 	//// Service Management Unit
@@ -82,14 +80,14 @@ module TPU
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_En_Exe(			I_En_Exe				),
-		.I_Full(			Buff_Full				),
+		.I_Full(			Full					),
 		.I_Term(			Term					),
 		.I_Nack(			~Ack_St					),
 		.I_Req(				I_Req					),
 		.I_Instr(			I_Instr					),
 		.I_IssueNo(			I_IssueNo				),
 		.O_We(				We_Instr				),
-		.O_ThreadID(		Wr_ThreadID				),
+		.O_ThreadID(		ThreadID				),
 		.O_Instr(			Wr_Instr				),
 		.O_Term(			O_Term					),
 		.O_IssueNo(			O_IssueNo				),
@@ -98,22 +96,21 @@ module TPU
 
 
 	//// Instruction Memory
-	Instr_Mem #(
+	IMem #(
 		.MEM_SIZE(			INSTR_MEM_SIZE			)
 	) Instr_Mem
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_We(				We_Instr				),
-		.I_Wr_End(			Wr_End					),
-		.I_ThreadID(		Wr_ThreadID				),
+		.I_Req_St(			We_Instr				),
+		.I_End_St(			Wr_End					),
 		.I_Instr(			Wr_Instr				),
-		.I_Re(				Re_Instr				),
-		.I_Rd_Adress(		Rd_Adress				),
-		.O_ThreadID(		Rd_ThreadID				),
-		.I_Rd_End(			Rd_End					),
+		.I_Req_Ld(			Re_Instr				),
+		.I_End_Ld(			Rd_End					),
 		.O_Instr(			Rd_Instr				),
-		.O_Full(									)//ToDo
+		.I_Ld_Address(		Rd_Address				),
+		.O_Empty(			Empty					),
+		.O_Full(			Full					)
 	);
 
 
@@ -124,7 +121,7 @@ module TPU
 		.I_En(				I_En_Exe				),
 		.O_Re_Instr(		Re_Instr				),
 		.O_Rd_Adress(		Rd_Adress				),
-		.I_ThreadID(		Rd_ThreadID				),
+		.I_ThreadID(		ThreadID				),
 		.I_Instr(			Rd_Instr				),
 		.I_Commit_Req_V(	Commit_Req				),
 		.I_Commit_No_V(		Commit_No				),
@@ -164,8 +161,8 @@ module TPU
 		.I_Ld_Grant(		I_V_Ld_Grant			),
 		.I_St_Ready(		I_V_St_Ready			),
 		.I_St_Grant(		I_V_St_Grant			),
-		.O_Commmit_Req(		Commit_Req_V			),
-		.O_Commit_No(		Commit_No_V				),
+		.O_Commmit_Req(		Commit_Req				),
+		.O_Commit_No(		Commit_No				),
 		.I_Commit_Grant(	Commit_Grant			),
 		.O_Status(			V_Status				)
 	);
