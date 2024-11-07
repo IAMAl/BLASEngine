@@ -370,7 +370,7 @@ module DMem_Body
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Set_and_Run(		Set_Cfg_and_Run_St		),
-		.I_Stall(			Stall_St		),
+		.I_Stall(			Stall_St				),
 		.I_Length(			Length_St				),
 		.I_Stride(			Stride_St				),
 		.I_Base_Addr(		St_Base					),
