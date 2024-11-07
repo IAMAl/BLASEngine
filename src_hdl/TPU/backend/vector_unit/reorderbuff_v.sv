@@ -75,10 +75,10 @@ module ReorderBuff_V
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
 			Set_Commit[ i ]	= Commit[ i ].v & (
-										(   Commit[ i ].issue_no == I_Commit_No_LdSt1 ) |
-										(   Commit[ i ].issue_no == I_Commit_No_LdSt2 ) |
-										(   Commit[ i ].issue_no == I_Commit_No_Math ) |
-										( ( Commit[ i ].issue_no == I_Commit_No_V ) & I_Commit_Req_V )
+										( ( Commit[ i ].issue_no == I_Commit_No_LdSt1 ) & I_Commit_Req_LdSt1 ) |
+										( ( Commit[ i ].issue_no == I_Commit_No_LdSt2 ) & I_Commit_Req_LdSt2 ) |
+										( ( Commit[ i ].issue_no == I_Commit_No_Math )  & I_Commit_Req_Math ) |
+										( ( Commit[ i ].issue_no == I_Commit_No_Mv )	& I_Commit_Req_Mv ) |
 									);
 		end
 	end
