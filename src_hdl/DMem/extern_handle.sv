@@ -119,6 +119,7 @@ module extern_handle
 	assign is_FSM_Extern_St_Buff	= FSM_Extern_St == FSM_EXTERN_ST_BUFF;
 	assign is_FSM_Extern_St_Notify	= FSM_Extern_St == FSM_EXTERN_ST_NOTIFY;
 	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_ST_RUN;
+
 	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_LD_RUN;
 
 	assign Run_St_Service		= St_Req & is_FSM_Extern_Run;
@@ -132,16 +133,14 @@ module extern_handle
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
-
+	// Load/Store Request Detection
 	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Data[WIDTH_DATA-1];
 	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Data[WIDTH_DATA-1];
-
 
 	// Set Access-Config
 	assign Store_Stride			= is_FSM_Extern_Recv_Stride;
 	assign Store_Length			= is_FSM_Extern_Recv_Length;
 	assign Store_Base			= is_FSM_Extern_Recv_Base;
-
 
 	// Storing to Buffer
 	assign Store_Buff_St		= I_Req & is_FSM_Extern_Run & ( is_FSM_Extern_St_Buff | is_FSM_Extern_St_Notify | is_FSM_Extern_St_Run );
@@ -151,13 +150,14 @@ module extern_handle
 	assign Load_Buff_St			= is_FSM_Extern_Run & is_FSM_Extern_St_Run;
 	assign Load_Buff_Ld			= is_FSM_Extern_Run & is_FSM_Extern_Ld_Run;
 
+	// Write-/Read-Enable
 	assign We					= Store_Buff_St | Store_Buff_Ld;
 	assign Re					= Load_Buff_St | Load_Buff_Ld;
 
+	// Buffer Input
 	assign Buff_In_Data			= ( Store_Buff_St ) ?	I_Data :
 									( Store_Buff_Ld ) ?	I_Ld_Data :
 														0;
-
 
 	// Store Configuration
 	assign O_St_Req				= Output_St_Config | ( Load_Buff_St & ~Empty );

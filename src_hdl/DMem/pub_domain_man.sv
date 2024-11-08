@@ -131,20 +131,20 @@ module pub_domain_man
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_St_End	<= 1'b0;
+			R_St_End		<= 1'b0;
 		end
 		else begin
-			R_St_End	<= I_St_End;
+			R_St_End		<= I_St_End;
 		end
 	end
 
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Ld_End	<= 1'b0;
+			R_Ld_End		<= 1'b0;
 		end
 		else begin
-			R_Ld_End	<= I_Ld_End;
+			R_Ld_End		<= I_Ld_End;
 		end
 	end
 
@@ -231,7 +231,6 @@ module pub_domain_man
 		end
 	end
 
-
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
 			R_Stored		<= 0;
@@ -276,6 +275,7 @@ module pub_domain_man
 			R_WPtr			<= R_WPtr + 1'b1;
 		end
 	end
+
 
 	Encoder #(
 		.NUM_ENTRY(		NUM_ENTRY			)

@@ -54,7 +54,7 @@ module MapMan_MPU
 	mpu_mapman_t				TabInstr	[SIZE_TAB_MAPMAN-1:0];
 
 
-	assign O_Full    	       = R_Used_Size >= (SIZE_THREAD_MEM-1);
+	assign O_Full				= R_Used_Size >= (SIZE_THREAD_MEM-1);
 
 	assign Found				= |(~Valid);
 
