@@ -24,14 +24,14 @@ module extern_handle
 	output						O_Rls,					//Release TOken to Extern
 	output						O_Ld_Req,				//Request Loading
 	output	address_t			O_Ld_Length,			//Access-Length for Loading
-	output	address_t			O_Ld_Stride,			//Access-Stride for Loading
+	output	stride_t			O_Ld_Stride,			//Access-Stride for Loading
 	output	address_t			O_Ld_Base,				//Access-Base Address for Loading
 	input						I_Ld_Grant,				//Grant fro Load-Request
 	input	data_t				I_Ld_Data,				//Loaded Data
 	input						I_Ld_Term,				//End of Loading
 	output						O_St_Req,				//Request Storing
 	output	address_t			O_St_Length,			//Access-Length for Storing
-	output	address_t			O_St_Stride,			//Access-Stride for Storing
+	output	stride_t			O_St_Stride,			//Access-Stride for Storing
 	output	address_t			O_St_Base,				//Access-Base Address for Storing
 	input						I_St_Grant,				//Grant fro Store-Request
 	output	data_t				O_St_Data,				//Storing Data
@@ -91,7 +91,7 @@ module extern_handle
 
 
 	address_t					R_Length;
-	address_t					R_Stride;
+	stride_t					R_Stride;
 	address_t					R_Base;
 
 	address_t					Counter_St;

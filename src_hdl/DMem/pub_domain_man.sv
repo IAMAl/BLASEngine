@@ -66,6 +66,9 @@ module pub_domain_man
 	logic						Clr_Ld;
 
 
+	logic						R_St_End;
+	logic						R_Ld_End;
+
 	logic						R_St_Grant1;
 	logic						R_St_Grant2;
 	logic						R_St_Grant3;
@@ -108,6 +111,7 @@ module pub_domain_man
 	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrantVld_Ld & Ready_Ld;
 	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrantVld_Ld & Ready_Ld;
 
+
 	assign O_Set_Config_St		= Hit_St;
 	assign O_Set_Config_Ld		= Hit_Ld;
 
@@ -121,6 +125,26 @@ module pub_domain_man
 	always_comb begin
 		for ( int i=0; i<NUM_ENTRY; ++i ) begin
 			is_Hit_Ld[ i ]	= ( TabBAddr[ i ] == I_Ld_Base ) & R_Valid[ i ];
+		end
+	end
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_St_End	<= 1'b0;
+		end
+		else begin
+			R_St_End	<= I_St_End;
+		end
+	end
+
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			R_Ld_End	<= 1'b0;
+		end
+		else begin
+			R_Ld_End	<= I_Ld_End;
 		end
 	end
 
@@ -212,12 +236,12 @@ module pub_domain_man
 		if ( reset ) begin
 			R_Stored		<= 0;
 		end
-		else if (( Hit_St & I_St_End ) | ( Hit_Ld & I_Ld_End )) begin
-			if ( Hit_St & I_St_End ) begin
+		else if ( R_St_End | R_Ld_End ) begin
+			if ( R_St_End ) begin
 				R_Stored[ R_SetNo ]	<= 1'b1;
 			end
 
-			if ( Hit_Ld & I_Ld_End ) begin
+			if ( R_Ld_End ) begin
 				R_Stored[ R_ClrNo ]	<= 1'b0;
 			end
 		end

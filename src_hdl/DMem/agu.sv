@@ -17,7 +17,7 @@ module agu
 	input						I_Set_and_Run,			//Flag: Activate Load/Store Unit
 	input						I_Stall,				//Force Stalling by Local Memory
 	input	address_t			I_Length,				//Vector-Length for Load/Store
-	input	address_t			I_Stride,				//Stride-Factor for Load/Store
+	input	stride_t			I_Stride,				//Stride-Factor for Load/Store
 	input	address_t			I_Base_Addr,			//Load/Store Base Address
 	output	logic				O_Req,					//Access-Request
 	output	address_t			O_Address,				//Access-Address
@@ -32,7 +32,7 @@ module agu
 	logic						R_We;
 	logic						R_Req;
 	address_t					R_Length;
-	address_t					R_Stride;
+	stride_t					R_Stride;
 	address_t					R_Address;
 
 

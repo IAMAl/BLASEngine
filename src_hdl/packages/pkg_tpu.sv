@@ -40,6 +40,9 @@ package pkg_tpu;
 	localparam int POS_MSB_DMEM_ADDR	= WIDTH_SIZE_DMEM;
 	localparam int WIDTH_STRIDE			= (SIZE_DATA_MEM+1)/2;
 
+	//Number of Tble Entries for Public Domain Handling (Data Mem)
+	localparam int NUM_ENTRY_PUB_DOMAIN	= 32;
+
 	//Constant in Instruction
 	localparam int WIDTH_CONSTANT		= 64-7-7*4-6-1;
 

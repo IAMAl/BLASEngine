@@ -21,16 +21,16 @@ module req_handle
 	input						I_Term2,				//End of Access
 	input						I_Term3,				//End of Access
 	input	address_t			I_Length1,				//Access Length
-	input	address_t			I_Stride1,				//Stride Factor
+	input	stride_t			I_Stride1,				//Stride Factor
 	input	address_t			I_Base_Addr1,			//Base Address
 	input	address_t			I_Length2,				//Access Length
-	input	address_t			I_Stride2,				//Stride Factor
+	input	stride_t			I_Stride2,				//Stride Factor
 	input	address_t			I_Base_Addr2,			//Base Address
 	input	address_t			I_Length3,				//Access Length
-	input	address_t			I_Stride3,				//Stride Factor
+	input	stride_t			I_Stride3,				//Stride Factor
 	input	address_t			I_Base_Addr3,			//Base Address
 	output	address_t			O_Length,				//Access Length
-	output	address_t			O_Stride,				//Stride Factor
+	output	stride_t			O_Stride,				//Stride Factor
 	output	address_t			O_Base_Addr,			//Base Address
 	output	logic				O_Grant1,				///Grant (to Lane)
 	output	logic				O_Grant2,				//Grant (to Lane)

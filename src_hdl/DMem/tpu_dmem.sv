@@ -26,16 +26,16 @@ module DMem_Body
 	input						I_Ld_Req1,				//Flag Load Request
 	input						I_Ld_Req2,				//Flag Load Reques
 	input	address_t			I_St_Length1,			//Access Length
-	input	address_t			I_St_Stride1,			//Stride Factor
+	input	stride_t			I_St_Stride1,			//Stride Factor
 	input	address_t			I_St_Base_Addr1,		//Base Address
 	input	address_t			I_St_Length2,			//Access Length
-	input	address_t			I_St_Stride2,			//Stride Factor
+	input	stride_t			I_St_Stride2,			//Stride Factor
 	input	address_t			I_St_Base_Addr2,		//Base Address
 	input	address_t			I_Ld_Length1,			//Access Length
-	input	address_t			I_Ld_Stride1,			//Stride Factor
+	input	stride_t			I_Ld_Stride1,			//Stride Factor
 	input	address_t			I_Ld_Base_Addr1,		//Base Address
 	input	address_t			I_Ld_Length2,			//Access Length
-	input	address_t			I_Ld_Stride2,			//Stride Factor
+	input	stride_t			I_Ld_Stride2,			//Stride Factor
 	input	address_t			I_Ld_Base_Addr2,		//Base Address
 	input						I_St_Valid1,			//Flag: Storing Data Validation
 	input						I_St_Valid2,			//Flag: Storing Data Validation
@@ -85,8 +85,8 @@ module DMem_Body
 
 	address_t					Length_St;
 	address_t					Length_Ld;
-	address_t					Stride_St;
-	address_t					Stride_Ld;
+	stride_t					Stride_St;
+	stride_t					Stride_Ld;
 	address_t					Base_Addr_St;
 	address_t					Base_Addr_Ld;
 	address_t					Address_St;
@@ -119,14 +119,14 @@ module DMem_Body
 
 	logic						Extern_St_Req;
 	address_t					Extern_St_Length;
-	address_t					Extern_St_Stride;
+	stride_t					Extern_St_Stride;
 	address_t					Extern_St_Base;
 	logic						Extern_St_Grant;
 	logic						Extern_St_Term;
 
 	logic						Extern_Ld_Req;
 	address_t					Extern_Ld_Length;
-	address_t					Extern_Ld_Stride;
+	stride_t					Extern_Ld_Stride;
 	address_t					Extern_Ld_Base;
 	logic						Extern_Ld_Grant;
 	logic						Extern_Ld_Term;
@@ -144,11 +144,11 @@ module DMem_Body
 	data_t						DataMem	[SIZE_DATA_MEM-1:0];
 
 
-	assign St_Public			= St_Ready1 | St_Ready2;
-	assign Ld_Public			= Ld_Ready1 | Ld_Ready2;
+	assign St_Public			= ~Base_Addr_St[POS_MSB_DMEM_ADDR-1] & St_GrantVld;
+	assign Ld_Public			= ~Base_Addr_Ld[POS_MSB_DMEM_ADDR-1] & Ld_GrantVld;
 
-	assign St_Private			= ~Base_Addr_St[POS_MSB_DMEM_ADDR-1] & St_GrantVld;
-	assign Ld_Private			= ~Base_Addr_Ld[POS_MSB_DMEM_ADDR-1] & Ld_GrantVld;
+	assign St_Private			= Base_Addr_St[POS_MSB_DMEM_ADDR-1] & St_GrantVld;
+	assign Ld_Private			= Base_Addr_Ld[POS_MSB_DMEM_ADDR-1] & Ld_GrantVld;
 
 	assign St_Grant1			= St_GrantVld & ( St_GrantNo == 2'h0 );
 	assign St_Grant2			= St_GrantVld & ( St_GrantNo == 2'h1 );
@@ -159,13 +159,13 @@ module DMem_Body
 	assign Ld_Grant3			= Ld_GrantVld & ( Ld_GrantNo == 2'h2 );
 
 
-	assign St_Offset			= ~St_Public & St_GrantVld & St_GrantVld;
-	assign Ld_Offset			= ~Ld_Public & Ld_GrantVld & Ld_GrantVld;
+	assign St_Offset			= St_Private & ~I_St_Req1 & I_St_Req2;
+	assign Ld_Offset			= Ld_Private & ~I_Ld_Req1 & I_Ld_Req2;
 
 	assign St_Valid				= ( I_St_Valid1 & O_St_Grant1 ) | ( I_St_Valid2 & O_St_Grant2 );
 	assign Ld_Valid				= ( I_Ld_Valid1 & O_Ld_Grant1 ) | ( I_Ld_Valid2 & O_Ld_Grant2 );
-	assign St_Base				= { St_Public, St_Offset, Base_Addr_St[POS_MSB_DMEM_ADDR-2:0] };
-	assign Ld_Base				= { Ld_Public, Ld_Offset, Base_Addr_Ld[POS_MSB_DMEM_ADDR-2:0] };
+	assign St_Base				= { St_Private, St_Offset, Base_Addr_St[POS_MSB_DMEM_ADDR-2:0] };
+	assign Ld_Base				= { Ld_Private, Ld_Offset, Base_Addr_Ld[POS_MSB_DMEM_ADDR-2:0] };
 
 	assign Set_Cfg_and_Run_St	= Set_Config_St | ( ~R_St_Private & St_Private );
 	assign Set_Cfg_and_Run_Ld	= Set_Config_Ld | ( ~R_Ld_Private & Ld_Private );
@@ -285,10 +285,10 @@ module DMem_Body
 		.I_Term3(			End_St					),
 		.I_Length1(			I_St_Length1			),
 		.I_Stride1(			I_St_Stride1			),
-		.I_Base_Addr1(		I_St_Base_Addr1			),
+		.I_Base_Addr1(		St_Base					),
 		.I_Length2(			I_St_Length2			),
 		.I_Stride2(			I_St_Stride2			),
-		.I_Base_Addr2(		I_St_Base_Addr2			),
+		.I_Base_Addr2(		St_Base					),
 		.I_Length3(			Extern_St_Length		),
 		.I_Stride3(			Extern_St_Stride		),
 		.I_Base_Addr3(		Extern_St_Base			),
@@ -315,10 +315,10 @@ module DMem_Body
 		.I_Term3(			End_Ld					),
 		.I_Length1(			I_Ld_Length1			),
 		.I_Stride1(			I_Ld_Stride1			),
-		.I_Base_Addr1(		I_Ld_Base_Addr1			),
+		.I_Base_Addr1(		Ld_Base					),
 		.I_Length2(			I_Ld_Length2			),
 		.I_Stride2(			I_Ld_Stride2			),
-		.I_Base_Addr2(		I_Ld_Base_Addr2			),
+		.I_Base_Addr2(		Ld_Base					),
 		.I_Length3(			Extern_Ld_Length		),
 		.I_Stride3(			Extern_Ld_Stride		),
 		.I_Base_Addr3(		Extern_Ld_Base			),
@@ -335,7 +335,7 @@ module DMem_Body
 
 
 	pub_domain_man #(
-		.NUM_ENTRY(			32						)
+		.NUM_ENTRY(			NUM_ENTRY_PUB_DOMAIN	)
 	) pub_domain_man
 	(
 		.clock(				clock					),
