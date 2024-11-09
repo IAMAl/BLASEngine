@@ -68,6 +68,8 @@ module ldst_unit
 
 	assign Term					= ~I_Stall & Run & I_Term;
 
+	assign O_Req				= Run;
+
 	assign O_Stall				= ( Full | Full_Buff ) & ( Run & ~Ready );
 
 

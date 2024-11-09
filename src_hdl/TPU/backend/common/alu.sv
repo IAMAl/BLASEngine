@@ -26,6 +26,8 @@ module ALU
 	input	data_t				I_Src_Data3,			//Source Data
 	input						I_Re_p0,				//Read-Enable for Pipeline Register
 	input						I_Re_p1,				//Read-Enable for Pipeline Register
+	output	data_t				O_PData0,
+	output	data_t				O_PData1,
 	output	TYPE				O_WB_Token,				//Write-Back Information
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output						O_ALU_Done				//Executed
@@ -197,7 +199,6 @@ module ALU
 									( Sel == 2'b11 ) ?	Data_SRL :
 														0;
 
-
 	MA_Unit #(
 		.DEPTH_MLT(			3						),
 		.DEPTH_ADD(			1						),
@@ -216,6 +217,8 @@ module ALU
 		.I_Token(			MA_Token				),
 		.O_Valid(			Valid_MA				),
 		.O_Data(			Data_MA					),
+		.O_Data0(			O_PData0				),
+		.O_Data1(			O_PData1				),
 		.O_Token(			Token_MA				)
 	);
 

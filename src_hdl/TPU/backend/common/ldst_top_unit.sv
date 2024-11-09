@@ -11,6 +11,7 @@
 
 module LdStUnit
 	import	pkg_tpu::*;
+	import	pkg_tpu::command_t;
 #(
 	parameter int DEPTH_BUFF_LDST	= 8,
 	parameter type TYPE				= pipe_exe_tmp_t
@@ -57,9 +58,6 @@ module LdStUnit
 	address_t					Ld_Base;
 	address_t					St_Base;
 
-	issue_no_t					Ld_Commit_No;
-	issue_no_t					St_Commit_No;
-
 	logic						Ld_Stall;
 	logic						St_Stall;
 
@@ -70,6 +68,9 @@ module LdStUnit
 	TYPE						Ld_Commit_Token;
 	TYPE						St_Commit_Token;
 
+
+	logic	[WIDTH_ENTRY_HAZARD-1:0]	DiffLd;
+	logic	[WIDTH_ENTRY_HAZARD-1:0]	DiffSt;
 
 	issue_no_t					LifeLd;
 	issue_no_t					LifeSt;
@@ -95,12 +96,13 @@ module LdStUnit
 	assign Base_Address			= I_Src_Data2[WIDTH_SIZE_DMEM-1:0];
 
 
-	assign Ld_Commit_No			= Ld_Commit_Token.issue_no;
-	assign St_Commit_No			= St_Commit_Token.issue_no;
+	assign DiffLd				= I_Issue_No - Ld_Commit_Token.issue_no;
+	assign DiffSt				= I_Issue_No - St_Commit_Token.issue_no;
 
-	assign LifeLd				= I_Issue_No - Ld_Commit_No;
-	assign LifeSt				= I_Issue_No - St_Commit_No;
-
+	assign LifeLd				= ( DiffLd[WIDTH_ENTRY_HAZARD] ) ?	 ~DiffLd[WIDTH_ENTRY_HAZARD-1:0] + 1'b1 :
+																	  DiffLd[WIDTH_ENTRY_HAZARD-1:0] ;
+	assign LifeSt				= ( DiffSt[WIDTH_ENTRY_HAZARD] ) ?	 ~DiffSt[WIDTH_ENTRY_HAZARD-1:0] + 1'b1 :
+																	  DiffSt[WIDTH_ENTRY_HAZARD-1:0] ;
 
 	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass;
 	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass;
@@ -162,7 +164,7 @@ module LdStUnit
 	ldst_unit #(
 		.DEPTH_BUFF(		16							),
 		.DEPTH_BUFF_LDST(	DEPTH_BUFF_LDST				),
-		.TYPE(				pipe_exe_tmp_t				)
+		.TYPE(				TYPE						)
 	) ld_unit
 	(
 		.clock(				clock						),
@@ -192,7 +194,7 @@ module LdStUnit
 	ldst_unit #(
 		.DEPTH_BUFF(		16							),
 		.DEPTH_BUFF_LDST(	DEPTH_BUFF_LDST				),
-		.TYPE(				pipe_exe_tmp_t				)
+		.TYPE(				TYPE						)
 	) st_unit
 	(
 		.clock(				clock						),

@@ -181,6 +181,8 @@ module ExecUnit_S
 		.I_Re_p1(			I_Re_p1					),
 		.O_WB_Token(		ALU_Token				),
 		.O_WB_Data(			ALU_Data				),
+		.O_PData0(			Data0					),
+		.O_PDat10(			Data1					),
 		.O_ALU_Done(		O_Math_Done				)
 	);
 
