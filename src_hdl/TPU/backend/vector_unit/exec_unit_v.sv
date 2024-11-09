@@ -162,12 +162,12 @@ module ExecUnit_V
 	// Write-Backs
 	assign O_WB_Token_LdSt1		= Ld_Token[0];
 	assign O_WB_Token_LdSt2		= Ld_Token[1];
-	assign O_WB_Token_Math		= ALU_Token;
+	assign O_WB_Token_Math		= MAU_Token;
 	assign O_WB_Token_Mv		= Mv_Token;
 
 	assign O_WB_Data_LdSt1		= Ld_Data[0];
 	assign O_WB_Data_LdSt2		= Ld_Data[1];
-	assign O_WB_Data_Math		= ALU_Data;
+	assign O_WB_Data_Math		= MAU_Data;
 	assign O_WB_Data_Mv			= Mv_Data;
 
 	assign O_Mv_Done			= Mv_Token.v;

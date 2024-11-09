@@ -85,6 +85,16 @@ module LdStUnit
 	logic						St_Commit_Grant;
 
 
+	logic [WIDTH_SIZE_DMEM-1:0]	Length;
+	stride_t					Stride;
+	logic [WIDTH_SIZE_DMEM-1:0]	Base_Address;
+
+
+	assign Length				= I_Src_Data1[WIDTH_SIZE_DMEM-1:0];
+	assign Stride				= I_Src_Data1[WIDTH_DATA-1:WIDTH_DATA-WIDTH_STRIDE];
+	assign Base_Address			= I_Src_Data2[WIDTH_SIZE_DMEM-1:0];
+
+
 	assign Ld_Commit_No			= Ld_Commit_Token.issue_no;
 	assign St_Commit_No			= St_Commit_Token.issue_no;
 
@@ -165,9 +175,9 @@ module LdStUnit
 		.O_Data(			Ld_Data						),
 		.I_Term(			Ld_Term						),
 		.I_Req(				Ld_Req						),
-		.I_Length(			I_Src_Data1[29:20]			),
-		.I_Stride(			I_Src_Data1[19:0]			),
-		.I_Base(			I_Src_Data2[19:0]			),
+		.I_Length(			Length						),
+		.I_Stride(			Stride						),
+		.I_Base(			Base_Address				),
 		.O_Req(				Ld_Req_						),
 		.O_Length(			Ld_Length					),
 		.O_Stride(			Ld_Stride					),
@@ -195,9 +205,9 @@ module LdStUnit
 		.O_Data(			O_St_Data					),
 		.I_Term(			St_Term						),
 		.I_Req(				St_Req						),
-		.I_Length(			I_Src_Data1[29:20]			),
-		.I_Stride(			I_Src_Data1[19:0]			),
-		.I_Base(			I_Src_Data2[19:0]			),
+		.I_Length(			Length						),
+		.I_Stride(			Stride						),
+		.I_Base(			Base_Address				),
 		.O_Req(				St_Req_						),
 		.O_Length(			St_Length					),
 		.O_Stride(			St_Stride					),

@@ -88,7 +88,7 @@ module ReorderBuff_S
 			Valid_Commit		<= 1'b0;
 		end
 		else begin
-			Valid_Commit		< = Commit[ RNo ].v & Commit[ RNo ].commit;
+			Valid_Commit		<= Commit[ RNo ].v & Commit[ RNo ].commit;
 		end
 	end
 

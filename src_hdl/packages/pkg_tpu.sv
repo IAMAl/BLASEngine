@@ -28,17 +28,25 @@ package pkg_tpu;
 	localparam int WIDTH_ENTRY_HAZARD	= $clog2(NUM_ENTRY_HAZARD);
 
 	//NUmber of Active Instructions
-	localparam int NUM_ACTIVE_INSTRS		= 16;
+	localparam int NUM_ACTIVE_INSTRS	= 16;
 	localparam int WIDTH_ACTIVE_INSTRS	= $clog2(NUM_ACTIVE_INSTRS);
 
 	//Bit-Width for Status Register
 	localparam int WIDTH_STATE			= 4;
 
+	//Instruction Memory
+	localparam int INSTR_MEM_SIZE		= 1024;
+	localparam int WIDTH_IMEM			= $clog2(INSTR_MEM_SIZE);
+
+	// Instruction Buffer in Lane
+	localparam int IBUFF_SIZE			= 16;
+	localparam int WIDTH_IBUFF			= $clog2(IBUFF_SIZE);
+
 	//Data Memory
 	localparam int SIZE_DATA_MEM		= 1024;
 	localparam int WIDTH_SIZE_DMEM		= $clog2(SIZE_DATA_MEM);
 	localparam int POS_MSB_DMEM_ADDR	= WIDTH_SIZE_DMEM;
-	localparam int WIDTH_STRIDE			= (SIZE_DATA_MEM+1)/2;
+	localparam int WIDTH_STRIDE			= $clog2((SIZE_DATA_MEM+1)/2);
 
 	//Number of Tble Entries for Public Domain Handling (Data Mem)
 	localparam int NUM_ENTRY_PUB_DOMAIN	= 32;
@@ -64,10 +72,6 @@ package pkg_tpu;
 	// Reorder Buffer Size for Scalar Unit
 	localparam int NUM_ENTRY_RB_V		= 8;
 
-	// Instruction Memory
-	localparam int IMEM_SIZE			= 1024;
-	localparam int WIDTH_IMEM			= $clog2(IMEM_SIZE);
-
 
 	////Logic Types
 	//	General Data Type
@@ -82,6 +86,9 @@ package pkg_tpu;
 	//	General Index Type
 	//	Index Type for Single Register File
 	typedef logic	[WIDTH_INDEX-1:0]		index_t;
+
+	//	Addreas Type for Instruction Memory
+	typedef logic	[WIDTH_IMEM-1:0]		i_address_t;
 
 	//	Address Type for Data Memory
 	typedef logic	[WIDTH_SIZE_DMEM-1:0]	address_t;
@@ -98,6 +105,8 @@ package pkg_tpu;
 	//	Instruction Issue No
 	//		Used for Commit as clearing address the Hazard Check Table
 	typedef logic	[WIDTH_ENTRY_HAZARD-1:0]issue_no_t;
+
+	typedef issue_no_t [NUM_LANES-1:0]		v_issue_no_t;
 
 	//	Mask Type
 	//		Used in Vector Lane
@@ -204,7 +213,6 @@ package pkg_tpu;
 	typedef struct packed {
 		logic							v;
 		instruction_t					instr;
-		logic							commit;
 		index_s_t						dst;
 		index_s_t						src1;
 		index_s_t						src2;
@@ -223,7 +231,7 @@ package pkg_tpu;
 		logic							v;
 		issue_no_t						issue_no;
 		logic							commit;
-		logic							o;
+		logic							opt;
 	} commit_tab_t;
 
 	//	Commit Table for Vector Unit

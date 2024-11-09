@@ -15,12 +15,12 @@ module IFetch
 	input						clock,
 	input						reset,
 	input						I_Req,					//Enable to Work
-	input						I_Empty,				//Flag: State in Empty for Buffer
+	input						I_Empty,				//Flag: State in Empty for Instr Memory
 	input						I_Term,					//Flag: Termination
 	input	instr_t				I_Instr,				//Instruction
 	output						O_Req,					//Request to Next Stage
 	output	instruction_t		O_Instr,				//Instruction
-	output						O_Re_Buff				//Read-Enabloe for Buffer
+	output						O_Re_Instr				//Read-Enabloe for Instr Memory
 );
 
 
@@ -43,7 +43,7 @@ module IFetch
 	assign O_Instr				= R_Instr;
 
 	// Reqd-Enable to Instruction Buffer
-	assign O_Re_Buff			= ~R_Empty;
+	assign O_Re_Instr			= ~R_Empty;
 
 	// Delayed to Retime
 	always_ff @( posedge clock ) begin

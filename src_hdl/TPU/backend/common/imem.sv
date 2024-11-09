@@ -64,6 +64,7 @@ module IMem
 	assign O_Instr			= ( Re ) ?
 								( RPtr == 0 ) ?	IMem0[ Ld_Address0 ] :
 								( RPtr == 1 ) ?	IMem0[ Ld_Address1 ] :
+												'0 :
 												'0;
 
 	assign O_Empty			= Empty;
@@ -72,13 +73,13 @@ module IMem
 
 	always_ff @( posedge clock ) begin
 		if ( We0 ) begin
-			IMem[ St_Address ]	<= I_Instr;
+			IMem0[ St_Address ]	<= I_Instr;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( We1 ) begin
-			IMem[ St_Address ]	<= I_Instr;
+			IMem1[ St_Address ]	<= I_Instr;
 		end
 	end
 
@@ -182,13 +183,13 @@ module IMem
 			end
 		end
 		default: begin
-			FSM_ST		<= '0;
+			FSM_St		<= '0;
 		end
 		endcase
 	end
 
 	RingBuffCTRL #(
-		.NUM_ENTRY(		2				),
+		.NUM_ENTRY(		2				)
 	) SelPtr
 	(
 		.clock(			clock			),

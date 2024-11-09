@@ -16,6 +16,8 @@ module ReorderBuff_V
 )(
 	input						clock,
 	input						reset,
+	input                       I_En_Lane,
+	input						I_Commit_Grant,
 	input						I_Store,				//Store Issue No
 	input	issue_no_t			I_Issue_No,				//Storing Issue Number
 	input						I_Slice,				//Flag Use of Slicing
@@ -68,7 +70,7 @@ module ReorderBuff_V
 	assign O_Stall				= |is_Slice;
 
 	// Buffer Handling
-	assign Re					= En_Commit & I_Commit_Grant;
+	assign Re					= I_En_Lane & I_Commit_Grant;
 	assign We					= I_Store & ~Full;
 
 
@@ -78,7 +80,7 @@ module ReorderBuff_V
 										( ( Commit[ i ].issue_no == I_Commit_No_LdSt1 ) & I_Commit_Req_LdSt1 ) |
 										( ( Commit[ i ].issue_no == I_Commit_No_LdSt2 ) & I_Commit_Req_LdSt2 ) |
 										( ( Commit[ i ].issue_no == I_Commit_No_Math )  & I_Commit_Req_Math ) |
-										( ( Commit[ i ].issue_no == I_Commit_No_Mv )	& I_Commit_Req_Mv ) |
+										( ( Commit[ i ].issue_no == I_Commit_No_Mv )	& I_Commit_Req_Mv )
 									);
 		end
 	end
@@ -95,7 +97,7 @@ module ReorderBuff_V
 			Valid_Commit		<= 1'b0;
 		end
 		else begin
-			Valid_Commit		< = Commit[ RNo ].v & Commit[ RNo ].commit;
+			Valid_Commit		<= Commit[ RNo ].v & Commit[ RNo ].commit;
 		end
 	end
 

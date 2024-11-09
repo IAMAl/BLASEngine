@@ -157,6 +157,7 @@ module Scalar_Unit
 	logic						is_WB_BR;
 	logic						is_WB_VU;
 	logic						WB_En;
+	pipe_exe_tmp_t				WB_Token;
 	pipe_exe_tmp_t				WB_Token_LdSt1;
 	pipe_exe_tmp_t				WB_Token_LdSt2;
 	pipe_exe_tmp_t				WB_Token_Math;
@@ -187,7 +188,7 @@ module Scalar_Unit
 
 	logic	[12:0]				Config_Path;
 	logic	[1:0]				Config_Path_WB;
-	logic						Condition;
+	logic	[3:0]				Condition;
 	logic	[1:0]				Cond_Data;
 
 
@@ -260,7 +261,7 @@ module Scalar_Unit
 
 
 	////
-	assign PAC_Req				= I_En;
+	assign PAC_Req				= 1;//I_En;
 
 
 	//// Output Status
@@ -311,7 +312,7 @@ module Scalar_Unit
 	assign Index_Window_Src1		= PipeReg_Idx.command.instr.src1.window;
 
 	assign Index_Req_Src2			= PipeReg_Idx.command.instr.src2.v;
-	assign Index_Src2				= PipeReg_Idx.command.instr.src2;
+	assign Index_Src2_				= PipeReg_Idx.command.instr.src2;
 	assign Index_Window_Src2		= PipeReg_Idx.command.instr.src2.window;
 
 	assign Index_Req_Src3			= PipeReg_Idx.command.instr.src3.v;
@@ -395,6 +396,17 @@ module Scalar_Unit
 
 
 	//// Write-Back
+	assign WB_Token				= ( WB_Token_LdSt1.issue_no == Commit_No ) ?	WB_Token_LdSt1 :
+									( WB_Token_LdSt2.issue_no == Commit_No ) ?	WB_Token_LdSt2 :
+									( WB_Token_Math.issue_no == Commit_No ) ?	WB_Token_Math :
+									( WB_Token_Mv.issue_no == Commit_No ) ?		WB_Token_Mv :
+																				'0;
+
+	//	Write-Back Target Decision
+	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
+	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
+	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
+
 	//  Network Path
 	assign Config_Path_WB		= WB_Token.path;
 
@@ -415,10 +427,6 @@ module Scalar_Unit
 
 	assign Sign					= WB_Token.dst.s;
 
-	//	Write-Back Target Decision
-	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
-	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
-	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
 
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
@@ -521,10 +529,6 @@ module Scalar_Unit
 	assign Stall_RegFile_Even	= ~Lane_Enable | Stall_Index_Calc;
 	assign Stall_Network		= ~Lane_Enable;
 	assign Stall_ExecUnit		= ~Lane_Enable;
-
-
-	//// Grant for Commit on Vector Unit
-	assign O_Commit_Grant		= Commit_Grant_V;
 
 
 	//// Instruction Fetch Stage
@@ -810,7 +814,7 @@ module Scalar_Unit
 		.I_Data(			Lane_Data				),
 		.I_Re(				Lane_Re					),
 		.I_We_V_State(		We_V_State				),
-		.I_V_State(			V_State_Data			),
+		.I_V_State(			V_State_Data.data[15:0]	),
 		.O_Data(			V_State					)
 	);
 
@@ -905,7 +909,7 @@ module Scalar_Unit
 
 	//// Commitment Stage
 	ReorderBuff_S #(
-		.NUM_ENTRY(			NUM_ENTRY_RB			)
+		.NUM_ENTRY(			NUM_ENTRY_RB_S			)
 	) ReorderBuff
 	(
 		.clock(				clock					),

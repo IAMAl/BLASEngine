@@ -35,8 +35,8 @@ module ExecUnit_S
 	input						I_Re_p1,				//Read-Enable for Pipeline Register
 	output	TYPE				O_WB_Token_LdSt1,		//Write-Back Index
 	output	TYPE				O_WB_Token_LdSt2,		//Write-Back Index
-	output	TYPE				O_WB_Token_Math			//Write-Back Index
-	output	TYPE				O_WB_Token_Mv			//Write-Back Index
+	output	TYPE				O_WB_Token_Math,			//Write-Back Index
+	output	TYPE				O_WB_Token_Mv,			//Write-Back Index
 	output	data_t				O_WB_Data_LdSt1,		//Write-Back Data
 	output	data_t				O_WB_Data_LdSt2,		//Write-Back Data
 	output	data_t				O_WB_Data_Math,			//Write-Back Data

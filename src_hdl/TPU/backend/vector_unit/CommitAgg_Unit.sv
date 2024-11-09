@@ -10,8 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module CommitAgg_Unit
-	import pkg_top::*;
-	import pkg_mpu::*;
+	import pkg_tpu::*;
 #(
 	parameter int	NUM_LANES	= 1,
 	parameter int	BUFF_SIZE	= 4

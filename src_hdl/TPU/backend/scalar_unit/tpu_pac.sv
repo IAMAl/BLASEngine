@@ -24,22 +24,22 @@ module PACUnit
 	input						I_Branch,				//Branch Instruction
 	input	state_t				I_State,				//Status Register
 	input	cond_t				I_Cond,					//Flag: Condition
-	input	address_t			I_Src,					//Source Value
-	output						O_IFetch,				//Instruction Fetch
-	output	address_t			O_Address				//Address (Program COunter)
+	input	i_address_t			I_Src,					//Source Value
+	output						O_Re,					//Instruction Fetch
+	output	i_address_t			O_Address				//Address (Program COunter)
 );
 
 	logic						Jump;
 	logic						Taken;
 	logic						Update;
-	address_t					Address;
+	i_address_t					Address;
 	logic						Req;
 
 	logic						R_St;
-	address_t					R_Address;
+	i_address_t					R_Address;
 
 
-	assign Req				= ~I_Stall & I_Req_Ld;
+	assign Req				= I_Req_Ld;
 
 	// Branch Evaluation
 	assign Taken			= I_Valid & I_Branch & I_State[ I_Cond ] & ~I_Stall;
@@ -55,7 +55,7 @@ module PACUnit
 												R_Address;
 
 	// Send Instruction Fetch Request
-	assign O_IFetch			= Req;
+	assign O_Re				= Req;
 
 	// Program Address
 	assign O_Address		= R_Address;

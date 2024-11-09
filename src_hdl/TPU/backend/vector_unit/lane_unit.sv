@@ -49,14 +49,11 @@ module Lane_Unit
 );
 
 
-	localparam int BUFF_SIZE_INSTR	= 4;
-	localparam int BUFF_WIDTH		= $clog2(BUFF_SIZE_INSTR);
-
-
 	logic						We_InstrBuff;
 	logic						Re_InstrBuff;
-	pipe_index_t				Command,
-	logic	[WIDTH_BUFF-1:0]	Num_Instrs;
+	pipe_index_t				Command;
+	logic	[WIDTH_IBUFF:0]		Num_Instrs;
+	logic						Full;
 	logic						Empty;
 
 
@@ -130,6 +127,7 @@ module Lane_Unit
 	logic						is_WB_BR;
 	logic						is_WB_VU;
 	logic						WB_En;
+	pipe_exe_tmp_t				WB_Token;
 	pipe_exe_tmp_t				WB_Token_LdSt1;
 	pipe_exe_tmp_t				WB_Token_LdSt2;
 	pipe_exe_tmp_t				WB_Token_Math;
@@ -205,11 +203,10 @@ module Lane_Unit
 
 
 	////
-	assign Num_Istrs		= Num_Instr >= (BUFF_SIZE_INSTR-1);
 	assign We_InstrBuff		=  Stall_Index_Calc;
 	assign Re_InstrBuff		= ~Stall_Index_Calc & ~Empty;
 	RingBuff #(
-		.NUM_ENTRY(			BUFF_SIZE_INSTR			),
+		.NUM_ENTRY(			IBUFF_SIZE				),
 		.TYPE(				pipe_index_t			)
 	) InstrBuff
 	(
@@ -219,9 +216,9 @@ module Lane_Unit
 		.I_Re(				Re_InstrBuff			),
 		.I_Data(			I_Command				),
 		.O_Data(			Command					),
-		.O_Full(									),
+		.O_Full(			Full					),
 		.O_Empty(			Empty					),
-		.O_Num(				Num_Istrs				)
+		.O_Num(				Num_Instrs				)
 	);
 
 
@@ -273,7 +270,7 @@ module Lane_Unit
 
 
 	assign Index_Req_Src2			= PipeReg_Idx.command.instr.src2.v;
-	assign Index_Src2				= PipeReg_Idx.command.instr.src2;
+	assign Index_Src2_				= PipeReg_Idx.command.instr.src2;
 	assign Index_Window_Src2		= PipeReg_Idx.command.instr.src2.window;
 
 
@@ -354,6 +351,12 @@ module Lane_Unit
 	assign Sign					= WB_Token.dst.s;
 
 	//	Write-Back Target Decision
+	assign WB_Token				= ( WB_Token_LdSt1.issue_no == O_Commit_No ) ?		WB_Token_LdSt1 :
+									( WB_Token_LdSt2.issue_no == O_Commit_No ) ?	WB_Token_LdSt2 :
+									( WB_Token_Math.issue_no == O_Commit_No ) ?		WB_Token_Math :
+									( WB_Token_Mv.issue_no == O_Commit_No ) ?		WB_Token_Mv :
+																					'0;
+
 	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
 	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
 	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
@@ -755,13 +758,16 @@ module Lane_Unit
 
 	//// Commitment Stage
 	ReorderBuff_V #(
-		.NUM_ENTRY(			NUM_ENTRY_RB			)
+		.NUM_ENTRY(			NUM_ENTRY_RB_V			)
 	) ReorderBuff
 	(
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_En_Lane(			Lane_Enable				),
+		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Store(			I_Command.v				),
-		.I_Issue_No(		I_Command.issue_no		),
+		.I_Issue_No(	I_Command.command.issue_no	),
+		.I_Slice(I_Command.command.instr.dst.slice	),
 		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
 		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
 		.I_Commit_Req_Math(	Commmit_Req_Math		),
