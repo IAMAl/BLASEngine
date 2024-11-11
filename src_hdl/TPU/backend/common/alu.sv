@@ -115,6 +115,7 @@ module ALU
 	assign MA_Token.dst			= ( En_MA & ~I_Stall ) ?	I_Command.instr.dst :	 	'0;
 	assign MA_Token.slice_len	= ( En_MA & ~I_Stall ) ?	I_Command.instr.slice_len : '0;
 	assign MA_Token.path		= ( En_MA & ~I_Stall ) ?	I_Command.instr.path :		'0;
+	assign MA_Token.mread		= ( En_MA & ~I_Stall ) ?	I_Command.instr.mread :		'0;
 	assign MA_Token.issue_no	= ( En_MA & ~I_Stall ) ?	I_Command.issue_no : 		'0;
 
 	assign iDiv_Token.v			= ( En_iDiv & ~I_Stall ) ?	I_Req : 					'0;
@@ -122,6 +123,7 @@ module ALU
 	assign iDiv_Token.dst		= ( En_iDiv & ~I_Stall ) ?	I_Command.instr.dst :	 	'0;
 	assign iDiv_Token.slice_len	= ( En_iDiv & ~I_Stall ) ?	I_Command.instr.slice_len : '0;
 	assign iDiv_Token.path		= ( En_iDiv & ~I_Stall ) ?	I_Command.instr.path :		'0;
+	assign iDiv_Token.mread		= ( En_iDiv & ~I_Stall ) ?	I_Command.instr.mread :		'0;
 	assign iDiv_Token.issue_no	= ( En_iDiv & ~I_Stall ) ?	I_Command.issue_no : 		'0;
 
 	assign Cnvt_Token.v			= ( En_Cnvt & ~I_Stall ) ?	I_Req : 					'0;
@@ -129,6 +131,7 @@ module ALU
 	assign Cnvt_Token.dst		= ( En_Cnvt & ~I_Stall ) ?	I_Command.instr.dst :	 	'0;
 	assign Cnvt_Token.slice_len	= ( En_Cnvt & ~I_Stall ) ?	I_Command.instr.slice_len : '0;
 	assign Cnvt_Token.path		= ( En_Cnvt & ~I_Stall ) ?	I_Command.instr.path :		'0;
+	assign Cnvt_Token.mread		= ( En_Cnvt & ~I_Stall ) ?	I_Command.instr.mread :		'0;
 	assign Cnvt_Token.issue_no	= ( En_Cnvt & ~I_Stall ) ?	I_Command.issue_no : 		'0;
 
 	assign SRL_Token.v			= ( En_SRL & ~I_Stall ) ?	I_Req : 					'0;
@@ -136,6 +139,7 @@ module ALU
 	assign SRL_Token.dst		= ( En_SRL & ~I_Stall ) ?	I_Command.instr.dst :	 	'0;
 	assign SRL_Token.slice_len	= ( En_SRL & ~I_Stall ) ?	I_Command.instr.slice_len : '0;
 	assign SRL_Token.path		= ( En_SRL & ~I_Stall ) ?	I_Command.instr.path :		'0;
+	assign SRL_Token.mread		= ( En_SRL & ~I_Stall ) ?	I_Command.instr.mread :		'0;
 	assign SRL_Token.issue_no	= ( En_MA & ~I_Stall ) ?	I_Command.issue_no : 		'0;
 
 

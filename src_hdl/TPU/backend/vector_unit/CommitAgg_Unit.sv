@@ -10,16 +10,18 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module CommitAgg_Unit
+	import pkg_tpu::NUM_LANES;
 	import pkg_tpu::*;
+	import pkg_top::*;
 #(
-	parameter int	NUM_LANES	= 1,
 	parameter int	BUFF_SIZE	= 4
 )(
 	input						clock,
 	input						reset,
+	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
 	input						I_Req,					//Issue Request
 	input	issue_no_t  		I_Issue_No,				//Issue Number
-	input	v_ready_t   		I_Commit_Req,			//Commit Request from Scalar Unit
+	input	v_ready_t			I_Commit_Req,			//Commit Request from Scalar Unit
 	input	v_issue_no_t		I_Commit_No,			//Commit Number	from Scalar Unit
 	output						O_Commit_Req,			//Commit Request to Scalar Unit
 	output	issue_no_t  		O_Commit_No,			//Commit Number to Scalar Unit
@@ -41,7 +43,7 @@ module CommitAgg_Unit
 	logic	[WIDTH_SIZE-1:0]	Rd_Ptr;
 
 
-	commit_agg_t				CommitAgg		[BUFF_SIZE-1:0];
+	v_commit_agg_t				CommitAgg		[BUFF_SIZE-1:0];
 
 
 	assign We					= I_Commit_Req;
@@ -62,7 +64,7 @@ module CommitAgg_Unit
 	always_comb begin
 		for ( int j=0; j<NUM_LANES; ++j ) begin
 			for ( int i=0; i<BUFF_SIZE; ++i ) begin
-				is_Matched[ i ][ j ]	= CommitAgg[ i ].v & CommitAgg[ i ].en_tpu[ j ] & I_Commit_Req[ j ] & ( I_Commit_No[ j ] == CommitAgg[ i ].issue_no );
+				is_Matched[ i ][ j ]	= CommitAgg[ i ].v & CommitAgg[ i ].en_tpu[ j ] & ~( I_Commit_Req[ j ] ^ I_En_Lane[ j ] ) & ( I_Commit_No[ j ] == CommitAgg[ i ].issue_no );
 			end
 		end
 	end

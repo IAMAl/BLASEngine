@@ -33,8 +33,7 @@ module Lane_Unit
 	input	tb_t				I_Ld_Grant,				//Flag: Grant
 	input	tb_t				I_St_Ready,				//Flag: Ready
 	input	tb_t				I_St_Grant,				//Flag: Grant
-	input						I_End_Access1,			//Flag: End of Access
-	input						I_End_Access2,			//Flag: End of Access
+	input	[1:0]				I_End_Access,			//Flag: End of Access
 	input	lane_t				I_Lane_Data_Src1,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src2,		//Inter-Lane Connect
 	input	lane_t				I_Lane_Data_Src3,		//Inter-Lane Connect
@@ -136,6 +135,7 @@ module Lane_Unit
 	data_t						WB_Data_LdSt2;
 	data_t						WB_Data_Math;
 	data_t						WB_Data_Mv;
+	data_t						WB_Data;
 	data_t						WB_Data_;
 	logic						WB_We_Even;
 	logic						WB_We_Odd;
@@ -168,11 +168,30 @@ module Lane_Unit
 	logic						Stall_Network;
 	logic						Stall_ExecUnit;
 	logic						Stall_RegFile_Dst;
+	logic						Stall;
 
 	state_t						Status;
 
 
 	logic						Slice;
+
+
+	logic						Commit_Req_LdSt1;
+	logic						Commit_Req_LdSt2;
+	logic						Commit_Req_Math;
+	logic						Commit_Req_Mv;
+	issue_no_t					Commit_No_LdSt1;
+	issue_no_t					Commit_No_LdSt2;
+	issue_no_t					Commit_No_Math;
+	issue_no_t					Commit_No_Mv;
+	logic						Commit_Req;
+	logic						Commited_LdSt1;
+	logic						Commited_LdSt2;
+	logic						Commited_Math;
+	logic						Commit_Grant_S;
+	logic						Full_RB_V;
+	logic						Empty_RB_V;
+
 
 
 	logic						En;
@@ -223,9 +242,7 @@ module Lane_Unit
 
 
 	//// Lane-Enable
-	assign Lane_CTRL_Rst		= ( PipeReg_Exe.command.instr.op.OpType == 2'b01 ) &
-									( PipeReg_Exe.command.instr.op.OpClass == 2'b10 ) &
-									( PipeReg_Exe.command.instr.op.OpCode == 2'b01 );
+	assign Lane_CTRL_Rst		= ( PipeReg_Exe.command.instr.op.OpType == 2'b01 ) & ( PipeReg_Exe.command.instr.op.OpClass == 2'b10 ) & ( PipeReg_Exe.command.instr.op.OpCode == 2'b01 );
 	assign Lane_CTRL_Set		= ( PipeReg_Exe.command.instr.op.OpType == 2'b01 ) &
 									( PipeReg_Exe.command.instr.op.OpClass == 2'b10 ) &
 									( PipeReg_Exe.command.instr.op.OpCode == 2'b00 );
@@ -357,6 +374,12 @@ module Lane_Unit
 									( WB_Token_Mv.issue_no == O_Commit_No ) ?		WB_Token_Mv :
 																					'0;
 
+	assign WB_Data			= ( O_Commit_No == WB_Token_LdSt1.issue_no ) ?	WB_Data_LdSt1 :
+								( O_Commit_No == WB_Token_LdSt2.issue_no ) ?	WB_Data_LdSt2 :
+								( O_Commit_No == WB_Token_Math.issue_no ) ?	WB_Data_Math :
+								( O_Commit_No == WB_Token_Mv.issue_no ) ?		WB_Data_Mv :
+																			'0;
+
 	assign is_WB_RF				= WB_Token.dst.dst_sel.no == 2'h1;
 	assign is_WB_BR				= WB_Token.dst.dst_sel.no == 2'h2;
 	assign is_WB_VU				= WB_Token.dst.dst_sel.no == 2'h3;
@@ -410,19 +433,17 @@ module Lane_Unit
 
 
 	//// Commit
-	assign Commmit_Req_LdSt1	= WB_Token_LdSt1.v;
-	assign Commmit_No_LdSt1		= WB_Token_LdSt1.issue_no;
+	assign Commit_Req_LdSt1		= WB_Token_LdSt1.v;
+	assign Commit_No_LdSt1		= WB_Token_LdSt1.issue_no;
 
-	assign Commmit_Req_LdSt2	= WB_Token_LdSt2.v;
-	assign Commmit_No_LdSt2		= WB_Token_LdSt2.issue_no;
+	assign Commit_Req_LdSt2		= WB_Token_LdSt2.v;
+	assign Commit_No_LdSt2		= WB_Token_LdSt2.issue_no;
 
-	assign Commmit_Req_Math		= WB_Token_Math.v;
-	assign Commmit_No_Math		= WB_Token_Math.issue_no;
+	assign Commit_Req_Math		= WB_Token_Math.v;
+	assign Commit_No_Math		= WB_Token_Math.issue_no;
 
-	assign Commmit_Req_Mv		= WB_Token_Mv.v;
-	assign Commmit_No_Mv		= WB_Token_Mv.issue_no;
-
-	assign O_Commit				= LdSt_Done1 | LdSt_Done2 | Math_Done | Mv_Done;
+	assign Commit_Req_Mv		= WB_Token_Mv.v;
+	assign Commit_No_Mv			= WB_Token_Mv.issue_no;
 
 
 	//// Stall Control
@@ -530,7 +551,7 @@ module Lane_Unit
 		.I_MaskedRead(		Index_MaskedRead		),
 		.I_Index(			Index_Src3_				),
 		.I_Window(			Index_Window_Src3		),
-		.I_Length(			Index_Lengtn			),
+		.I_Length(			Index_Length			),
 		.I_ThreadID(		I_ThreadID				),
 		.I_Constant(		Constant[5:0]			),
 		.I_Sign(			Sign3					),
@@ -735,8 +756,8 @@ module Lane_Unit
 		.I_Ld_Grant(		I_Ld_Grant				),
 		.I_St_Ready(		I_St_Ready				),
 		.I_St_Grant(		I_St_Grant				),
-		.I_End_Access1(		I_End_Access1			),
-		.I_End_Access2(		I_End_Access2			),
+		.I_End_Access1(		I_End_Access[0]			),
+		.I_End_Access2(		I_End_Access[1]			),
 		.I_Re_p0(			Re_p0					),
 		.I_Re_p1(			Re_p1					),
 		.O_WB_Token_LdSt1(	WB_Token_LdSt1			),
@@ -768,10 +789,10 @@ module Lane_Unit
 		.I_Store(			I_Command.v				),
 		.I_Issue_No(	I_Command.command.issue_no	),
 		.I_Slice(I_Command.command.instr.dst.slice	),
-		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
-		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
-		.I_Commit_Req_Math(	Commmit_Req_Math		),
-		.I_Commit_Req_Mv(	Commmit_Req_Mv			),
+		.I_Commit_Req_LdSt1(Commit_Req_LdSt1		),
+		.I_Commit_Req_LdSt2(Commit_Req_LdSt2		),
+		.I_Commit_Req_Math(	Commit_Req_Math			),
+		.I_Commit_Req_Mv(	Commit_Req_Mv			),
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
 		.I_Commit_No_Math(	Commit_No_Math			),

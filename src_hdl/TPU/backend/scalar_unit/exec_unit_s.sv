@@ -170,7 +170,7 @@ module ExecUnit_S
 	(
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Issue_No(		I_Issue_No				),
+		.I_Issue_No(		Issue_No				),
 		.I_Stall(			I_Stall					),
 		.I_Req(				ALU_Req					),
 		.I_Command(			I_Command.command		),
@@ -182,7 +182,7 @@ module ExecUnit_S
 		.O_WB_Token(		ALU_Token				),
 		.O_WB_Data(			ALU_Data				),
 		.O_PData0(			Data0					),
-		.O_PDat10(			Data1					),
+		.O_PData1(			Data1					),
 		.O_ALU_Done(		O_Math_Done				)
 	);
 

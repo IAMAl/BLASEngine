@@ -69,8 +69,8 @@ module LdStUnit
 	TYPE						St_Commit_Token;
 
 
-	logic	[WIDTH_ENTRY_HAZARD-1:0]	DiffLd;
-	logic	[WIDTH_ENTRY_HAZARD-1:0]	DiffSt;
+	logic	[WIDTH_ENTRY_HAZARD:0]	DiffLd;
+	logic	[WIDTH_ENTRY_HAZARD:0]	DiffSt;
 
 	issue_no_t					LifeLd;
 	issue_no_t					LifeSt;

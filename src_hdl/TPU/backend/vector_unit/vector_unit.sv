@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 module Vector_Unit
+	import pkg_tpu::NUM_LANES;
 	import pkg_tpu::*;
 	import pkg_mpu::*;
 (
@@ -28,7 +29,7 @@ module Vector_Unit
 	input	v_2b_t				I_St_Ready,				//Flag: Ready
 	input	v_2b_t				I_St_Grant,				//Flag: Grant
 	input	v_2b_t				I_End_Access,			//Flag: End of Access
-	output						O_Commmit_Req,			//Commit Request
+	output						O_Commit_Req,			//Commit Request
 	output	issue_no_t			O_Commit_No,			//Commit No
 	input	logic				I_Commit_Grant,			//Grant for Commit
 	output	v_ready_t			O_Status				//Status on Lane
@@ -50,7 +51,7 @@ module Vector_Unit
 
 
 	CommitAgg_Unit #(
-		.NUM_LANES(			NUM_LANES				),
+		//.NUM_LANES(			NUM_LANES				),
 		.BUFF_SIZE(			4						)
 	) CommitAgg_Unit
 	(
@@ -58,7 +59,7 @@ module Vector_Unit
 		.reset(				reset					),
 		.I_En_Lane(			I_En_Lane				),
 		.I_Req(				I_Command.v				),
-		.I_Issue_No(		I_Command.issue_no		),
+		.I_Issue_No(	I_Command.command.issue_no	),
 		.I_Commit_Req(		Commit_Req				),
 		.I_Commit_No(		Commit_No				),
 		.O_Commit_Req(		O_Commit_Req			),

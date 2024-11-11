@@ -14,8 +14,6 @@ module PACUnit
 (
 	input						clock,
 	input						reset,
-	input						I_Req_St,				//Store Request
-	inout						I_End_St,				//End of Storing
 	input						I_Req_Ld,				//Request of Fetching
 	input						I_End_Ld,				//End of Fetching
 	input						I_Stall,				//Force Stalling
@@ -35,7 +33,6 @@ module PACUnit
 	i_address_t					Address;
 	logic						Req;
 
-	logic						R_St;
 	i_address_t					R_Address;
 
 
@@ -48,7 +45,7 @@ module PACUnit
 	assign Jump				= I_Valid & I_Jump & ~I_Stall;
 
 	// Updating Address
-	assign Update			= Req | R_St;
+	assign Update			= Req;
 	assign Address			= ( Jump ) ?		R_Address + I_Src :
 								( Taken ) ?		R_Address + I_Src :
 								( ~I_Stall ) ?	R_Address + 1'b1 :
@@ -60,25 +57,12 @@ module PACUnit
 	// Program Address
 	assign O_Address		= R_Address;
 
-	// Capture Store Request
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_St			<= 1'b0;
-		end
-		else if ( I_End_St ) begin
-			R_St			<= 1'b0;
-		end
-		else if ( I_Req_St ) begin
-			R_St			<= 1'b1;
-		end
-	end
 
-	// Program Address
 	always_ff @( posedge clock ) begin
 		if ( reset) begin
 			R_Address		<= '0;
 		end
-		else if ( I_End_Ld | I_End_St ) begin
+		else if ( I_End_Ld ) begin
 			R_Address		<= '0;
 		end
 		else if ( Update ) begin

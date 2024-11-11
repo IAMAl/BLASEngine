@@ -24,6 +24,7 @@ module FrontEnd
 	input	mpu_issue_no_t		I_IssueNo,				//Issue No at MPU, used for Exec
 	input	instr_t				I_Instr,				//Instruction
 	output						O_We,					//Write-Enable for Buffer
+	output						O_Wr_End,
 	output	id_t				O_ThreadID,				//ThreadID to Buffer
 	output	instr_t				O_Instr,				//Instruction to Buffer
 	output						O_Term,					//Flag: Termination
@@ -71,6 +72,7 @@ module FrontEnd
 	assign O_ThreadID			= R_ThreadID;
 	assign O_Nack				= R_Full | R_Nack;
 	assign O_Term				= is_FSM_TPU_RUN & R_Term;
+	assign O_Wr_End				= R_We & ~R_Req;
 
 
 	always_ff @ ( posedge clock ) begin

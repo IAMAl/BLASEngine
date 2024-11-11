@@ -16,6 +16,7 @@ module Scalar_Unit
 (
 	input						clock,
 	input						reset,
+	input						I_Empty,
 	input						I_En,					//Enable Execution
 	input	id_t				I_ThreadID,				//Thread-ID
 	output						O_Re_Instr,				//Read-Enable for Instruction Memory
@@ -166,6 +167,7 @@ module Scalar_Unit
 	data_t						WB_Data_LdSt2;
 	data_t						WB_Data_Math;
 	data_t						WB_Data_Mv;
+	data_t						WB_Data;
 	data_t						WB_Data_;
 	logic						WB_We_Even;
 	logic						WB_We_Odd;
@@ -220,12 +222,14 @@ module Scalar_Unit
 	logic						Slice;
 
 
-	logic						Commmit_Req_LdSt1;
-	logic						Commmit_Req_LdSt2;
-	logic						Commmit_Req_Math;
+	logic						Commit_Req_LdSt1;
+	logic						Commit_Req_LdSt2;
+	logic						Commit_Req_Math;
+	logic						Commit_Req_Mv;
 	issue_no_t					Commit_No_LdSt1;
 	issue_no_t					Commit_No_LdSt2;
 	issue_no_t					Commit_No_Math;
+	issue_no_t					Commit_No_Mv;
 	logic						Commit_Req;
 	issue_no_t					Commit_No;
 	logic						Commited_LdSt1;
@@ -261,7 +265,9 @@ module Scalar_Unit
 
 
 	////
-	assign PAC_Req				= 1;//I_En;
+	assign PAC_Req				= I_En;
+
+	assign Req_IFetch			= I_En;
 
 
 	//// Output Status
@@ -428,6 +434,13 @@ module Scalar_Unit
 	assign Sign					= WB_Token.dst.s;
 
 
+	assign WB_Data			= ( Commit_No == WB_Token_LdSt1.issue_no ) ?	WB_Data_LdSt1 :
+								( Commit_No == WB_Token_LdSt2.issue_no ) ?	WB_Data_LdSt2 :
+								( Commit_No == WB_Token_Math.issue_no ) ?	WB_Data_Math :
+								( Commit_No == WB_Token_Mv.issue_no ) ?		WB_Data_Mv :
+																			'0;
+
+
 	assign WB_We_Even			= ~Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_We_Odd			=  Dst_Sel & WB_Token.v & is_WB_RF;
 	assign WB_Index_Even		= ( ~Dst_Sel ) ? Dst_RegFile_Index.idx :'0;
@@ -438,6 +451,9 @@ module Scalar_Unit
 	assign WB_IssueNo			= WB_Token.issue_no;
 
 	assign Cond_Data			= WB_Token.op.OpCode;
+
+	assign CondValid			= WB_Token.v;
+
 
 	// Aux Data (Scalar Data)
 	assign Aux_SWe				= WB_Token.v & is_WB_RF &
@@ -490,17 +506,17 @@ module Scalar_Unit
 
 
 	//// Commit
-	assign Commmit_Req_LdSt1	= WB_Token_LdSt1.v;
-	assign Commmit_No_LdSt1		= WB_Token_LdSt1.issue_no;
+	assign Commit_Req_LdSt1	= WB_Token_LdSt1.v;
+	assign Commit_No_LdSt1		= WB_Token_LdSt1.issue_no;
 
-	assign Commmit_Req_LdSt2	= WB_Token_LdSt2.v;
-	assign Commmit_No_LdSt2		= WB_Token_LdSt2.issue_no;
+	assign Commit_Req_LdSt2	= WB_Token_LdSt2.v;
+	assign Commit_No_LdSt2		= WB_Token_LdSt2.issue_no;
 
-	assign Commmit_Req_Math		= WB_Token_Math.v;
-	assign Commmit_No_Math		= WB_Token_Math.issue_no;
+	assign Commit_Req_Math		= WB_Token_Math.v;
+	assign Commit_No_Math		= WB_Token_Math.issue_no;
 
-	assign Commmit_Req_Mv		= WB_Token_Mv.v;
-	assign Commmit_No_Mv		= WB_Token_Mv.issue_no;
+	assign Commit_Req_Mv		= WB_Token_Mv.v;
+	assign Commit_No_Mv		= WB_Token_Mv.issue_no;
 
 
 	//// Write Vector Unit Status Register
@@ -788,7 +804,7 @@ module Scalar_Unit
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Req(				WB_En					),
-		.I_Diff_Data(		WB_Data					),
+		.I_Diff_Data(		WB_Data_				),
 		.O_Status(			Status					)
 	);
 
@@ -891,8 +907,6 @@ module Scalar_Unit
 	PACUnit PACUnit (
 		.clock(				clock					),
 		.reset(				reset					),
-		.I_Req_St(			I_Req_St				),
-		.I_End_St(			I_End_St				),
 		.I_Req_Ld(			PAC_Req					),
 		.I_End_Ld(			O_Term					),
 		.I_Stall(			Stall_PCU				),
@@ -917,16 +931,16 @@ module Scalar_Unit
 		.I_Store(			Store_S					),
 		.I_is_Vec(			Instr.instr.op.Sel_Unit	),
 		.I_Issue_No(		Issue_No				),
-		.I_Commit_Req_LdSt1(Commmit_Req_LdSt1		),
-		.I_Commit_Req_LdSt2(Commmit_Req_LdSt2		),
-		.I_Commit_Req_Math(	Commmit_Req_Math		),
-		.I_Commit_Req_Mv(	Commmit_Req_Mv			),
+		.I_Commit_Req_LdSt1(Commit_Req_LdSt1		),
+		.I_Commit_Req_LdSt2(Commit_Req_LdSt2		),
+		.I_Commit_Req_Math(	Commit_Req_Math		),
+		.I_Commit_Req_Mv(	Commit_Req_Mv			),
 		.I_Commit_No_LdSt1(	Commit_No_LdSt1			),
 		.I_Commit_No_LdSt2(	Commit_No_LdSt2			),
 		.I_Commit_No_Math(	Commit_No_Math			),
 		.I_Commit_No_Mv(	Commit_No_Mv			),
 		.O_Commit_Grant(	Commit_Grant_S			),
-		.I_Commit_Req_V(	I_Commmit_Req_V			),
+		.I_Commit_Req_V(	I_Commit_Req_V			),
 		.I_Commit_No_V(		I_Commit_No_V			),
 		.O_Commit_Grant_V(	O_Commit_Grant_V		),
 		.O_Commit_Req(		Commit_Req				),

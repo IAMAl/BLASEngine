@@ -342,6 +342,15 @@ package pkg_tpu;
 	} pipe_exe_end_t;
 
 
+	//Commit Aggregater Table
+	typedef struct packed {
+		logic				v;
+		issue_no_t			issue_no;
+		v_ready_t			en_tpu;
+		v_ready_t			commit;
+	} v_commit_agg_t;
+
+
 	/// FSM
 	typedef enum logic [2:0] {
 		FSM_EXTERN_INIT			= 3'h0,

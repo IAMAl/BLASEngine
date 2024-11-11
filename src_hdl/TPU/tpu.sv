@@ -42,8 +42,6 @@ module TPU
 );
 
 
-	logic						Ack_St;
-
 	id_t						ThreadID;
 
 	data_t						In_Scalar_Data;
@@ -56,7 +54,7 @@ module TPU
 	v_ready_t					V_Status;
 
 	logic						Commit_Req;
-	issue_t						Commit_No;
+	issue_no_t					Commit_No;
 	logic						Commit_Grant;
 
 	logic						Term;
@@ -69,7 +67,6 @@ module TPU
 	logic						We_Instr;
 	instr_t						Wr_Instr;
 
-	logic						Rd_End;
 	logic						Re_Instr;
 	instr_t						Rd_Instr;
 	i_address_t					Rd_Address;
@@ -82,11 +79,12 @@ module TPU
 		.I_En_Exe(			I_En_Exe				),
 		.I_Full(			Full					),
 		.I_Term(			Term					),
-		.I_Nack(			~Ack_St					),
+		.I_Nack(			Full					),
 		.I_Req(				I_Req					),
 		.I_Instr(			I_Instr					),
 		.I_IssueNo(			I_IssueNo				),
 		.O_We(				We_Instr				),
+		.O_Wr_End(			Wr_End					),
 		.O_ThreadID(		ThreadID				),
 		.O_Instr(			Wr_Instr				),
 		.O_Term(			O_Term					),
@@ -97,7 +95,7 @@ module TPU
 
 	//// Instruction Memory
 	IMem #(
-		.MEM_SIZE(			INSTR_MEM_SIZE			)
+		.IMEM_SIZE(			INSTR_MEM_SIZE			)
 	) Instr_Mem
 	(
 		.clock(				clock					),
@@ -106,7 +104,7 @@ module TPU
 		.I_End_St(			Wr_End					),
 		.I_Instr(			Wr_Instr				),
 		.I_Req_Ld(			Re_Instr				),
-		.I_End_Ld(			Rd_End					),
+		.I_End_Ld(			Term					),
 		.O_Instr(			Rd_Instr				),
 		.I_Ld_Address(		Rd_Address				),
 		.O_Empty(			Empty					),
@@ -118,9 +116,10 @@ module TPU
 	Scalar_Unit Scalar_Unit (
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Empty(			Empty					),
 		.I_En(				I_En_Exe				),
 		.O_Re_Instr(		Re_Instr				),
-		.O_Rd_Adress(		Rd_Adress				),
+		.O_Rd_Address(		Rd_Address				),
 		.I_ThreadID(		ThreadID				),
 		.I_Instr(			Rd_Instr				),
 		.I_Commit_Req_V(	Commit_Req				),
@@ -161,7 +160,7 @@ module TPU
 		.I_Ld_Grant(		I_V_Ld_Grant			),
 		.I_St_Ready(		I_V_St_Ready			),
 		.I_St_Grant(		I_V_St_Grant			),
-		.O_Commmit_Req(		Commit_Req				),
+		.O_Commit_Req(		Commit_Req				),
 		.O_Commit_No(		Commit_No				),
 		.I_Commit_Grant(	Commit_Grant			),
 		.O_Status(			V_Status				)

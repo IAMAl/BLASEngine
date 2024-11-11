@@ -29,9 +29,13 @@ module IMem
 
 
 	logic						We;
+	logic						We0;
+	logic						We1;
 	logic						Re;
 	logic						WPtr;
 	logic						RPtr;
+	logic						Empty;
+	logic						Full;
 	logic	[1:0]				Num;
 
 	logic						End_St;
