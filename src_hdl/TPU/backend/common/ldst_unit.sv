@@ -68,9 +68,9 @@ module ldst_unit
 
 	assign Term					= ~I_Stall & Run & I_Term;
 
-	assign O_Req				= Run;
+	assign O_Req				= ~Empty & Run;
 
-	assign O_Stall				= ( Full | Full_Buff ) & ( Run & ~Ready );
+	assign O_Stall				= ( Full | Full_Buff ) | ( Run & ~Ready );
 
 
 	always_ff @( posedge clock ) begin
@@ -80,7 +80,7 @@ module ldst_unit
 		else if ( I_Term ) begin
 			Run				<= 1'b0;
 		end
-		else if ( ~Empty & I_Access_Grant ) begin
+		else if ( I_Access_Grant ) begin
 			Run				<= 1'b1;
 		end
 	end
