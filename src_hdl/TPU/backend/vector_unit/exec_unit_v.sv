@@ -62,9 +62,10 @@ module ExecUnit_V
 	TYPE						Token_MAU;
 	TYPE						Token_Mv;
 
-	logic						LdSt_Req		[1:0];
-	data_t						Ld_Data			[1:0];
-	TYPE						Ld_Token		[1:0];
+	logic	[1:0]				LdSt_Req;
+	data_t	[1:0]				Ld_Data;
+	TYPE	[1:0]				Ld_Token;
+	TYPE						LdSt_Token;
 
 
 	logic						Ld_Stall_Odd;
@@ -101,6 +102,15 @@ module ExecUnit_V
 	assign Issue_No				= I_Command.command.issue_no;
 
 
+	assign LdSt_Token.v			= I_Command.v;
+	assign LdSt_Token.op		= I_Command.command.instr.op;
+	assign LdSt_Token.dst		= I_Command.command.instr.dst;
+	assign LdSt_Token.slice_len	= I_Command.command.instr.slice_len;
+	assign LdSt_Token.path		= I_Command.command.instr.path;
+	assign LdSt_Token.mread		= I_Command.command.instr.mread;
+	assign LdSt_Token.issue_no	= I_Command.command.issue_no;
+
+
 	assign Token_Mv.v			= I_Command.v;
 	assign Token_Mv.op			= I_Command.command.instr.op;
 	assign Token_Mv.dst			= I_Command.command.instr.dst;
@@ -117,8 +127,8 @@ module ExecUnit_V
 	assign RegMoveOp			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 ) & ( I_Command.command.instr.op.OpClass == 2'b11 );
 	assign CommonMov			= RegMoveOp & ( I_Command.command.instr.op.OpCode == 2'b01 );
 	assign PMov					= RegMoveOp & ( I_Command.command.instr.op.OpCode == 2'b10 ) & I_Command.command.instr.src1.v;
-	assign PMov0				= PMov & ( I_Command.command.instr.src1.idx == '0 );
-	assign PMov1				= PMov & ( I_Command.command.instr.src1.idx == '1 );
+	assign PMov0				= PMov & ( I_Command.command.instr.src1.idx == 0 );
+	assign PMov1				= PMov & ( I_Command.command.instr.src1.idx == 1 );
 
 	// Composing Inpu-Token for Floating-Point Unit
 	assign is_Adder				= I_En & ( I_Command.command.instr.op.OpClass == 2'b00 );
@@ -220,7 +230,8 @@ module ExecUnit_V
 		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Issue_No(		Issue_No				),
 		.I_Req(				LdSt_Req[1]				),
-		.I_Command(			I_Command.command		),
+		.I_Op(				I_Command.command.instr.op	),
+		.I_Token(			LdSt_Token				),
 		.I_Src_Data1(		Src_Data1				),
 		.I_Src_Data2(		Src_Data2				),
 		.I_Src_Data3(		Src_Data3				),
@@ -247,7 +258,8 @@ module ExecUnit_V
 		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Issue_No(		Issue_No				),
 		.I_Req(				LdSt_Req[0]				),
-		.I_Command(			I_Command.command		),
+		.I_Op(				I_Command.command.instr.op	),
+		.I_Token(			LdSt_Token				),
 		.I_Src_Data1(		Src_Data1				),
 		.I_Src_Data2(		Src_Data2				),
 		.I_Src_Data3(		Src_Data3				),

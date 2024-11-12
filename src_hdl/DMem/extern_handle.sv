@@ -80,7 +80,7 @@ module extern_handle
 
 
 	data_t						Buff_In_Data;
-	data_t						Buff_Data;
+	data_t						Buff_Data					[BUFF_SIZE-1:0];
 
 
 	logic						Run_St_Service;

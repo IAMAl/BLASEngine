@@ -23,7 +23,6 @@ module ldst_unit
 	input						I_Req,					//Access-Request
 	input						I_Commit_Grant,			//Grant to Commit
 	input						I_Access_Grant,			//Access-Grant
-	input						I_Valid,				//Valid for Data
 	input	data_t				I_Data,					//Data
 	output	data_t				O_Data,					//Data
 	input						I_Term,					//End of Access
@@ -63,7 +62,7 @@ module ldst_unit
 	assign We					= ~I_Stall & I_Req & ~Full;
 	assign Re					= ~I_Stall & I_Commit_Grant & ~Empty;
 
-	assign We_Data				= ~I_Stall & Run & I_Valid & ~Full_Buff;
+	assign We_Data				= ~I_Stall & Run & ~Full_Buff;
 	assign Re_Data				= ~I_Stall & Run & ~Empty_Buff;
 
 	assign Term					= ~I_Stall & Run & I_Term;

@@ -196,7 +196,7 @@ package pkg_tpu;
 		idx_t							src3;
 		index_t							slice_len;
 		imm_t							imm;
-		logic	[6:0]					path;
+		logic	[4:0]					path;
 		logic							mread;
 		logic							en_ii;
 	} instruction_t;
@@ -248,6 +248,22 @@ package pkg_tpu;
 		instruction_t					instr;
 		issue_no_t						issue_no;
 	} command_t;
+
+
+	////Network Stages
+	typedef struct packed {
+		logic							v;
+		logic							idx_v1;
+		logic							idx_v2;
+		logic							idx_v3;
+		index_t							idx1;
+		index_t							idx2;
+		index_t							idx3;
+		data_t							data1;
+		data_t							data2;
+		data_t							data3;
+		index_t							slice_len;
+	} net_t;
 
 
 	////Data Memory

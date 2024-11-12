@@ -150,13 +150,14 @@ module DMem_Body
 	assign St_Private			= Base_Addr_St[POS_MSB_DMEM_ADDR-1] & St_GrantVld;
 	assign Ld_Private			= Base_Addr_Ld[POS_MSB_DMEM_ADDR-1] & Ld_GrantVld;
 
-	assign St_Grant1			= St_GrantVld & ( St_GrantNo == 2'h0 );
-	assign St_Grant2			= St_GrantVld & ( St_GrantNo == 2'h1 );
-	assign St_Grant3			= St_GrantVld & ( St_GrantNo == 2'h2 );
 
-	assign Ld_Grant1			= Ld_GrantVld & ( Ld_GrantNo == 2'h0 );
-	assign Ld_Grant2			= Ld_GrantVld & ( Ld_GrantNo == 2'h1 );
-	assign Ld_Grant3			= Ld_GrantVld & ( Ld_GrantNo == 2'h2 );
+	assign St_Grant1			= St_GrantVld & ( St_GrantNo == 2'h1 );
+	assign St_Grant2			= St_GrantVld & ( St_GrantNo == 2'h2 );
+	assign St_Grant3			= St_GrantVld & ( St_GrantNo == 2'h3 );
+
+	assign Ld_Grant1			= Ld_GrantVld & ( Ld_GrantNo == 2'h1 );
+	assign Ld_Grant2			= Ld_GrantVld & ( Ld_GrantNo == 2'h2 );
+	assign Ld_Grant3			= Ld_GrantVld & ( Ld_GrantNo == 2'h3 );
 
 
 	assign St_Offset			= St_Private & ~I_St_Req1 & I_St_Req2;
@@ -285,10 +286,10 @@ module DMem_Body
 		.I_Term3(			End_St					),
 		.I_Length1(			I_St_Length1			),
 		.I_Stride1(			I_St_Stride1			),
-		.I_Base_Addr1(		St_Base					),
+		.I_Base_Addr1(		I_St_Base_Addr1			),
 		.I_Length2(			I_St_Length2			),
 		.I_Stride2(			I_St_Stride2			),
-		.I_Base_Addr2(		St_Base					),
+		.I_Base_Addr2(		I_St_Base_Addr2			),
 		.I_Length3(			Extern_St_Length		),
 		.I_Stride3(			Extern_St_Stride		),
 		.I_Base_Addr3(		Extern_St_Base			),
@@ -315,10 +316,10 @@ module DMem_Body
 		.I_Term3(			End_Ld					),
 		.I_Length1(			I_Ld_Length1			),
 		.I_Stride1(			I_Ld_Stride1			),
-		.I_Base_Addr1(		Ld_Base					),
+		.I_Base_Addr1(		I_Ld_Base_Addr1			),
 		.I_Length2(			I_Ld_Length2			),
 		.I_Stride2(			I_Ld_Stride2			),
-		.I_Base_Addr2(		Ld_Base					),
+		.I_Base_Addr2(		I_Ld_Base_Addr2			),
 		.I_Length3(			Extern_Ld_Length		),
 		.I_Stride3(			Extern_Ld_Stride		),
 		.I_Base_Addr3(		Extern_Ld_Base			),

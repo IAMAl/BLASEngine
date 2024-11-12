@@ -19,16 +19,15 @@ module Network_V
 	input						clock,
 	input						reset,
 	input						I_Stall,
-	input	pipe_net_t			I_Command,				//Command
-	input						I_Req,					//Request from Reg-Read
-	input	[6:0]				I_Sel_Path,				//Path Selects
+	input	net_t				I_Command,				//Command
+	input	[4:0]				I_Sel_Path,				//Path Selects
 	input	[4:0]				I_Sel_Path_WB,			//Path Selects
 	input	data_t				I_Scalar_Data,			//Data from Scalar Unit
 	input	lane_t				I_Lane_Data_Src1,		//Lane Data
 	input	lane_t				I_Lane_Data_Src2,		//Lane Data
 	input	lane_t				I_Lane_Data_Src3,		//Lane Data
 	input	lane_t				I_Lane_Data_WB,			//Lane Data
-	input	dst_t				I_WB_Index,				//Write-Back Index
+	input	index_t				I_WB_Index,				//Write-Back Index
 	input	data_t				I_WB_Data,				//Write-Back Data
 	output	data_t				O_WB_Data,				//To RF Unit
 	output	data_t				O_Src_Data1,			//To Exec Unit
@@ -43,16 +42,10 @@ module Network_V
 
 
 	logic						Req;
-	logic	[4:0]				Sel_Path;
 
-	logic	[1:0]				Sel_Scalar;
-	logic						Sel_Scalar_Src1;
-	logic						Sel_Scalar_Src2;
-	logic						Sel_Scalar_Src3;
-
-	idx_t						Src_Index1;
-	idx_t						Src_Index2;
-	idx_t						Src_Index3;
+	index_t						Src_Index1;
+	index_t						Src_Index2;
+	index_t						Src_Index3;
 
 	data_t						Src_Data1;
 	data_t						Src_Data2;
@@ -67,24 +60,17 @@ module Network_V
 
 	assign Req					= I_Command.v;
 
-	assign Sel_Scalar			= I_Sel_Path[1:0];
+	assign Sel_Path				= I_Sel_Path[4:0];
 
-	assign Sel_Path				= I_Sel_Path[6:2];
-
-	assign Sel_Scalar_Src1		= Req & I_Command.command.instr.src1.v & ( Sel_Scalar == 2'h1 );
-	assign Sel_Scalar_Src2		= Req & I_Command.command.instr.src2.v & ( Sel_Scalar == 2'h2 );
-	assign Sel_Scalar_Src3		= Req & I_Command.command.instr.src3.v & ( Sel_Scalar == 2'h3 );
-
-
-	assign Src_Index1			= I_Command.command.instr.src1;
-	assign Src_Index2			= I_Command.command.instr.src2;
-	assign Src_Index3			= I_Command.command.instr.src3;
+	assign Src_Index1			= I_Command.idx1;
+	assign Src_Index2			= I_Command.idx2;
+	assign Src_Index3			= I_Command.idx3;
 
 	assign Src_Data1			= I_Command.data1;
 	assign Src_Data2			= I_Command.data2;
 	assign Src_Data3			= I_Command.data3;
 
-	assign Slice_Len			= I_Command.command.instr.slice_len;
+	assign Slice_Len			= I_Command.slice_len;
 
 
 	PathSel #(
@@ -92,7 +78,7 @@ module Network_V
 	) PathSel
 	(
 		.I_Req(				Req						),
-		.I_Sel_Path(		Sel_Path				),
+		.I_Sel_Path(		I_Sel_Path				),
 		.I_Sel_Path_WB(		I_Sel_Path_WB			),
 		.I_Scalar_Data(		I_Scalar_Data			),
 		.I_Lane_Data_Src1(	I_Lane_Data_Src1		),
@@ -121,9 +107,13 @@ module Network_V
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
+		.I_Valid(			Req						),
 		.I_WB_Index(		I_WB_Index				),
 		.I_WB_Data(			I_WB_Data				),
 		.I_Slice_Len(		Slice_Len				),
+		.I_Idx_v1(			I_Command.idx_v1		),
+		.I_Idx_v2(			I_Command.idx_v2		),
+		.I_Idx_v3(			I_Command.idx_v3		),
 		.I_Idx1(			Src_Index1				),
 		.I_Idx2(			Src_Index2				),
 		.I_Idx3(			Src_Index3				),

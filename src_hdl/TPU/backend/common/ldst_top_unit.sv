@@ -22,7 +22,8 @@ module LdStUnit
 	input						I_Commit_Grant,			//Grant of Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input						I_Req,					//Request from Network Stage
-	input	command_t			I_Command,				//Command
+	input	op_t				I_Op,
+	input	TYPE				I_Token,
 	input	data_t				I_Src_Data1,			//Source Data
 	input	data_t				I_Src_Data2,			//Source Data
 	input	data_t				I_Src_Data3,			//Source Data
@@ -79,9 +80,6 @@ module LdStUnit
 	logic						St_Term;
 
 
-	logic						Ld_Valid;
-	logic						St_Valid;
-
 	logic						Ld_Commit_Grant;
 	logic						St_Commit_Grant;
 
@@ -104,12 +102,8 @@ module LdStUnit
 	assign LifeSt				= ( DiffSt[WIDTH_ENTRY_HAZARD] ) ?	 ~DiffSt[WIDTH_ENTRY_HAZARD-1:0] + 1'b1 :
 																	  DiffSt[WIDTH_ENTRY_HAZARD-1:0] ;
 
-	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass[1];
-	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass[1];
-
-
-	assign Ld_Valid				= Ld_Req;//ToDo
-	assign St_Valid				= St_Req;//ToDo
+	assign Ld_Req				= I_Req & ( I_Op.OpType == 2'b11 ) & ~I_Op.OpClass[1];
+	assign St_Req				= I_Req & ( I_Op.OpType == 2'b11 ) &  I_Op.OpClass[1];
 
 
 	assign Ld_Term				= I_End_Access;
@@ -123,21 +117,21 @@ module LdStUnit
 	assign O_St_Stall			= St_Stall;
 
 
-	assign Ld_Token.v			= Ld_Req;
-	assign Ld_Token.op			= I_Command.instr.op;
-	assign Ld_Token.dst			= I_Command.instr.dst;
-	assign Ld_Token.slice_len	= I_Command.instr.slice_len;
-	assign Ld_Token.path		= I_Command.instr.path;
-	assign Ld_Token.mread		= I_Command.instr.mread;
-	assign Ld_Token.issue_no	= I_Command.issue_no;
+	assign Ld_Token.v			= I_Token.v & Ld_Req;
+	assign Ld_Token.op			= I_Token.op;
+	assign Ld_Token.dst			= I_Token.dst;
+	assign Ld_Token.slice_len	= I_Token.slice_len;
+	assign Ld_Token.path		= I_Token.path;
+	assign Ld_Token.mread		= I_Token.mread;
+	assign Ld_Token.issue_no	= I_Token.issue_no;
 
-	assign St_Token.v			= St_Req;
-	assign St_Token.op			= I_Command.instr.op;
-	assign St_Token.dst			= I_Command.instr.dst;
-	assign St_Token.slice_len	= I_Command.instr.slice_len;
-	assign St_Token.path		= I_Command.instr.path;
-	assign St_Token.mread		= I_Command.instr.mread;
-	assign St_Token.issue_no	= I_Command.issue_no;
+	assign St_Token.v			= I_Token.v & St_Req;
+	assign St_Token.op			= I_Token.op;
+	assign St_Token.dst			= I_Token.dst;
+	assign St_Token.slice_len	= I_Token.slice_len;
+	assign St_Token.path		= I_Token.path;
+	assign St_Token.mread		= I_Token.mread;
+	assign St_Token.issue_no	= I_Token.issue_no;
 
 	assign St_Data				= I_Src_Data3;
 
@@ -172,7 +166,6 @@ module LdStUnit
 		.I_Stall(			I_Stall						),
 		.I_Commit_Grant(	Ld_Commit_Grant				),
 		.I_Access_Grant(	I_Ld_Grant					),
-		.I_Valid(			Ld_Valid					),
 		.I_Data(			I_Ld_Data					),
 		.O_Data(			Ld_Data						),
 		.I_Term(			Ld_Term						),
@@ -202,7 +195,6 @@ module LdStUnit
 		.I_Stall(			I_Stall						),
 		.I_Commit_Grant(	St_Commit_Grant				),
 		.I_Access_Grant(	I_St_Grant					),
-		.I_Valid(			St_Valid					),
 		.I_Data(			St_Data						),
 		.O_Data(			O_St_Data					),
 		.I_Term(			St_Term						),

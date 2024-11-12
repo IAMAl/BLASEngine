@@ -833,11 +833,24 @@ module Scalar_Unit
 
 
 	//// Network Stage
+	net_t					Net_Command;
+	assign Net_Command.v			= PipeReg_Net.v;
+	assign Net_Command.idx_v1		= PipeReg_Net.command.instr.src1.v;
+	assign Net_Command.idx_v2		= PipeReg_Net.command.instr.src2.v;
+	assign Net_Command.idx_v3		= PipeReg_Net.command.instr.src3.v;
+	assign Net_Command.idx1			= PipeReg_Net.command.instr.src1.idx;
+	assign Net_Command.idx2			= PipeReg_Net.command.instr.src2.idx;
+	assign Net_Command.idx3			= PipeReg_Net.command.instr.src3.idx;
+	assign Net_Command.data1		= PipeReg_Net.data1;
+	assign Net_Command.data2		= PipeReg_Net.data2;
+	assign Net_Command.data3		= PipeReg_Net.data3;
+	assign Net_Command.slice_len	= PipeReg_Net.command.instr.slice_len;
+	
 	Network_S Network_S (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			Stall_Network			),
-		.I_Command(			PipeReg_RR_Net			),
+		.I_Command(			Net_Command				),
 		.I_Sel_Path(		Config_Path[1:0]		),
 		.I_Sel_Path_WB(		Config_Path_WB			),
 		.I_WB_Index(		WB_Token.dst.idx		),

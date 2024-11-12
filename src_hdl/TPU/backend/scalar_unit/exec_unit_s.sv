@@ -60,11 +60,10 @@ module ExecUnit_S
 	logic	[1:0]				LdSt_Req;
 	data_t	[1:0]				Ld_Data;
 	TYPE	[1:0]				Ld_Token;
-
+	TYPE						LdSt_Token;
 
 	logic						Ld_Stall_Odd;
 	logic						Ld_Stall_Evn;
-
 	logic						St_Stall_Odd;
 	logic						St_Stall_Evn;
 
@@ -92,6 +91,15 @@ module ExecUnit_S
 	assign Issue_No				= I_Command.command.issue_no;
 
 
+	assign LdSt_Token.v			= I_Command.v;
+	assign LdSt_Token.op		= I_Command.command.instr.op;
+	assign LdSt_Token.dst		= I_Command.command.instr.dst;
+	assign LdSt_Token.slice_len	= I_Command.command.instr.slice_len;
+	assign LdSt_Token.path		= I_Command.command.instr.path;
+	assign LdSt_Token.mread		= I_Command.command.instr.mread;
+	assign LdSt_Token.issue_no	= I_Command.command.issue_no;
+
+
 	assign Token_Mv.v			= I_Command.v;
 	assign Token_Mv.op			= I_Command.command.instr.op;
 	assign Token_Mv.dst			= I_Command.command.instr.dst;
@@ -108,8 +116,8 @@ module ExecUnit_S
 	assign RegMoveOp			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 ) & ( I_Command.command.instr.op.OpClass == 2'b11 );
 	assign CommonMov			= RegMoveOp & ( I_Command.command.instr.op.OpCode == 2'b01 );
 	assign PMov					= RegMoveOp & ( I_Command.command.instr.op.OpCode == 2'b10 ) & I_Command.command.instr.src1.v;
-	assign PMov0				= PMov & ( I_Command.command.instr.src1.idx == '0 );
-	assign PMov1				= PMov & ( I_Command.command.instr.src1.idx == '1 );
+	assign PMov0				= PMov & ( I_Command.command.instr.src1.idx == 0 );
+	assign PMov1				= PMov & ( I_Command.command.instr.src1.idx == 1 );
 
 	assign Src_Data2_			= ( PMov0 ) ?	32'h78000000 :
 									( PMov1 ) ? 32'h00000000 :
@@ -189,7 +197,8 @@ module ExecUnit_S
 		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Issue_No(		Issue_No				),
 		.I_Req(				LdSt_Req[1]				),
-		.I_Command(			I_Command.command		),
+		.I_Op(				I_Command.command.instr.op	),
+		.I_Token(			LdSt_Token				),
 		.I_Src_Data1(		Src_Data1				),
 		.I_Src_Data2(		Src_Data2				),
 		.I_Src_Data3(		Src_Data3				),
@@ -216,7 +225,8 @@ module ExecUnit_S
 		.I_Commit_Grant(	I_Commit_Grant			),
 		.I_Issue_No(		Issue_No				),
 		.I_Req(				LdSt_Req[0]				),
-		.I_Command(			I_Command.command		),
+		.I_Op(				I_Command.command.instr.op	),
+		.I_Token(			LdSt_Token				),
 		.I_Src_Data1(		Src_Data1				),
 		.I_Src_Data2(		Src_Data2				),
 		.I_Src_Data3(		Src_Data3				),

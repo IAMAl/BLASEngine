@@ -155,7 +155,7 @@ module Lane_Unit
 	logic						MaskReg_Re;
 
 
-	logic	[6:0]				Config_Path;
+	logic	[4:0]				Config_Path;
 	logic	[4:0]				Config_Path_WB;
 
 
@@ -692,6 +692,19 @@ module Lane_Unit
 
 
 	//// Network Stage
+	net_t					Net_Command;
+	assign Net_Command.v			= PipeReg_Net.v;
+	assign Net_Command.idx_v1		= PipeReg_Net.command.instr.src1.v;
+	assign Net_Command.idx_v2		= PipeReg_Net.command.instr.src2.v;
+	assign Net_Command.idx_v3		= PipeReg_Net.command.instr.src3.v;
+	assign Net_Command.idx1			= PipeReg_Net.command.instr.src1.idx;
+	assign Net_Command.idx2			= PipeReg_Net.command.instr.src2.idx;
+	assign Net_Command.idx3			= PipeReg_Net.command.instr.src3.idx;
+	assign Net_Command.data1		= PipeReg_Net.data1;
+	assign Net_Command.data2		= PipeReg_Net.data2;
+	assign Net_Command.data3		= PipeReg_Net.data3;
+	assign Net_Command.slice_len	= PipeReg_Net.command.instr.slice_len;
+
 	Network_V #(
 		.NUM_LANES(			NUM_LANES				),
 		.LANE_ID(			LANE_ID					)
@@ -701,7 +714,6 @@ module Lane_Unit
 		.reset(				reset					),
 		.I_Stall(			Stall_Network			),
 		.I_Command(			PipeReg_RR_Net			),
-		.I_Req(				PipeReg_RR_Net.v		),
 		.I_Sel_Path(		Config_Path				),
 		.I_Sel_Path_WB(		Config_Path_WB			),
 		.I_Scalar_Data(		Scalar_Data				),
@@ -709,7 +721,7 @@ module Lane_Unit
 		.I_Lane_Data_Src2(	I_Lane_Data_Src2		),
 		.I_Lane_Data_Src3(	I_Lane_Data_Src3		),
 		.I_Lane_Data_WB(	I_Lane_Data_WB			),
-		.I_WB_Index(		WB_Token.dst			),
+		.I_WB_Index(		WB_Token.dst.idx		),
 		.I_WB_Data(			WB_Data					),
 		.O_WB_Data(			WB_Data_				),
 		.O_Src_Data1(		PipeReg_Net.data1		),

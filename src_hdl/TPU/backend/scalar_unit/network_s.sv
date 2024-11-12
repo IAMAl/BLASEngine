@@ -18,10 +18,9 @@ module Network_S
 	input						clock,
 	input						reset,
 	input						I_Stall,
-	input	pipe_net_t			I_Command,				//Command
+	input	net_t				I_Command,				//Command
 	input	[1:0]				I_Sel_Path,				//Path Selects
 	input	[1:0]				I_Sel_Path_WB,			//Path Selects
-	input	index_t				I_Slice_Len,			//Slice Length
 	input	index_t				I_WB_Index,				//Index from ALU
 	input	data_t				I_WB_Data,				//Data from ALU
 	output	data_t				O_WB_Data,				//WB Data to Register File
@@ -52,15 +51,15 @@ module Network_S
 	assign Sel_Path				= I_Sel_Path;
 	assign Sel_Path_WB			= I_Sel_Path_WB;
 
-	assign Src_Index1			= I_Command.command.instr.src1.idx;
-	assign Src_Index2			= I_Command.command.instr.src2.idx;
-	assign Src_Index3			= I_Command.command.instr.src3.idx;
+	assign Src_Index1			= I_Command.idx1;
+	assign Src_Index2			= I_Command.idx2;
+	assign Src_Index3			= I_Command.idx3;
 
 	assign Src_Data1			= I_Command.data1;
 	assign Src_Data2			= I_Command.data2;
 	assign Src_Data3			= I_Command.data3;
 
-	assign Slice_Len			=  I_Command.command.instr.slice_len;
+	assign Slice_Len			= I_Command.slice_len;
 
 
 	assign O_PAC_Src_Data		= ( Sel_Path == 2'h1 ) ?		Src_Data1 :
@@ -81,9 +80,13 @@ module Network_S
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			I_Stall					),
+		.I_Valid(			Req						),
 		.I_WB_Index(		I_WB_Index				),
 		.I_WB_Data(			I_WB_Data				),
 		.I_Slice_Len(		Slice_Len				),
+		.I_Idx_v1(			I_Command.idx_v1		),
+		.I_Idx_v2(			I_Command.idx_v2		),
+		.I_Idx_v3(			I_Command.idx_v3		),
 		.I_Idx1(			Src_Index1				),
 		.I_Idx2(			Src_Index2				),
 		.I_Idx3(			Src_Index3				),

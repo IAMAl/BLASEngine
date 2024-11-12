@@ -51,7 +51,7 @@ module fMlt_Unit
 	assign ResultData			= I_Data1 * I_Data2;
 
 	assign Valid				= I_En;
-	assign Data					= ( I_En ) ? ResultData : 0;
+	assign Data					= ( I_En ) ? ResultData : '0;
 	assign Token				= ( I_En ) ? I_Token	: '0;
 
 

@@ -108,11 +108,6 @@ module HazardCheck_TPU
 	//// Storing to Table
 	logic						Set_Index;
 
-	index_s_t					R_Index_Dst;
-	index_s_t					R_Index_Src1;
-	index_s_t					R_Index_Src2;
-	index_s_t					R_Index_Src3;
-
 	logic						We_Valid_Dst;
 	logic						We_Valid_Src1;
 	logic						We_Valid_Src2;
@@ -281,42 +276,6 @@ module HazardCheck_TPU
 		end
 		else begin
 			We_Valid_Src3	<= I_Req & Index_Src3.v;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Index_Dst		<= '0;
-		end
-		else begin
-			R_Index_Dst		<= Index_Dst;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Index_Src1	<= '0;
-		end
-		else begin
-			R_Index_Src1	<= Index_Src1;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Index_Src2	<= '0;
-		end
-		else begin
-			R_Index_Src2	<= Index_Src2;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Index_Src3	<= '0;
-		end
-		else begin
-			R_Index_Src3	<= Index_Src3;
 		end
 	end
 
