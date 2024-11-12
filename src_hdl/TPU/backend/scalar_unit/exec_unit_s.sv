@@ -35,7 +35,7 @@ module ExecUnit_S
 	input						I_Re_p1,				//Read-Enable for Pipeline Register
 	output	TYPE				O_WB_Token_LdSt1,		//Write-Back Index
 	output	TYPE				O_WB_Token_LdSt2,		//Write-Back Index
-	output	TYPE				O_WB_Token_Math,			//Write-Back Index
+	output	TYPE				O_WB_Token_Math,		//Write-Back Index
 	output	TYPE				O_WB_Token_Mv,			//Write-Back Index
 	output	data_t				O_WB_Data_LdSt1,		//Write-Back Data
 	output	data_t				O_WB_Data_LdSt2,		//Write-Back Data
@@ -57,9 +57,9 @@ module ExecUnit_S
 	TYPE						ALU_Token;
 	TYPE						Token_Mv;
 
-	logic						LdSt_Req		[1:0];
-	data_t						Ld_Data			[1:0];
-	TYPE						Ld_Token		[1:0];
+	logic	[1:0]				LdSt_Req;
+	data_t	[1:0]				Ld_Data;
+	TYPE	[1:0]				Ld_Token;
 
 
 	logic						Ld_Stall_Odd;
@@ -68,8 +68,6 @@ module ExecUnit_S
 	logic						St_Stall_Odd;
 	logic						St_Stall_Evn;
 
-	logic						We;
-	logic						Re;
 	TYPE						Mv_Token;
 	data_t						Mv_Data;
 
@@ -89,9 +87,6 @@ module ExecUnit_S
 	data_t						Src_Data1;
 	data_t						Src_Data2;
 	data_t						Src_Data3;
-
-
-	logic						Valid_iDIV;
 
 
 	assign Issue_No				= I_Command.command.issue_no;
@@ -130,8 +125,8 @@ module ExecUnit_S
 	assign ALU_Req				= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b00 );
 
 	// Request to Load/Store Units
-	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  ~I_Command.command.instr.op.OpClass[0];
-	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &   I_Command.command.instr.op.OpClass[0];
+	assign LdSt_Req[0]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) & ~I_Command.command.instr.op.OpClass[0];
+	assign LdSt_Req[1]			= I_Command.v & ( I_Command.command.instr.op.OpType == 2'b11 ) &  I_Command.command.instr.op.OpClass[0];
 
 
 	// Write-Backs

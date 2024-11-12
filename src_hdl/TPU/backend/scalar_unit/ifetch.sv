@@ -19,7 +19,7 @@ module IFetch
 	input						I_Term,					//Flag: Termination
 	input	instr_t				I_Instr,				//Instruction
 	output						O_Req,					//Request to Next Stage
-	output	instruction_t		O_Instr,				//Instruction
+	output	instr_t				O_Instr,				//Instruction
 	output						O_Re_Instr				//Read-Enabloe for Instr Memory
 );
 
@@ -31,7 +31,7 @@ module IFetch
 	logic						R_Empty;
 	logic						R_Term;
 
-	instruction_t				R_Instr;
+	instr_t						R_Instr;
 	logic						Req;
 
 
@@ -102,7 +102,7 @@ module IFetch
 			R_Instr			<= '0;
 		end
 		else if ( We_Instr ) begin
-			R_Instr			<= I_Instr.instr;
+			R_Instr			<= I_Instr;
 		end
 	end
 

@@ -211,8 +211,7 @@ package pkg_tpu;
 	////Execution Steering
 	//	Hazard Table used in Scalar unit
 	typedef struct packed {
-		logic							v;
-		instruction_t					instr;
+		instr_t							instr;
 		index_s_t						dst;
 		index_s_t						src1;
 		index_s_t						src2;

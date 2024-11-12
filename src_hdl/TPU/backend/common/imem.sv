@@ -49,8 +49,8 @@ module IMem
 	logic	[1:0]				FSM_St;
 	logic	[1:0]				FSM_Ld;
 
-	instr_t						IMem0		[IMEM_SIZE-1:0];
-	instr_t						IMem1		[IMEM_SIZE-1:0];
+	instr_t		[INSTR_MEM_SIZE-1:0]				IMem0;
+	instr_t		[INSTR_MEM_SIZE-1:0]				IMem1;
 
 
 	assign End_Ld			= I_End_Ld & ( FSM_Ld == 2'h2 );
@@ -62,8 +62,8 @@ module IMem
 
 	assign Re				= I_Req_Ld & ~Empty;
 
-	assign Ld_Address0		= ( RPtr ) ?	'0 :			I_Ld_Address;
-	assign Ld_Address1		= ( RPtr ) ?	I_Ld_Address :	'0;
+	assign Ld_Address0		= ( RPtr == 0 ) ?	'0 :			I_Ld_Address;
+	assign Ld_Address1		= ( RPtr == 1 ) ?	I_Ld_Address :	'0;
 
 	assign O_Instr			= ( Re ) ?
 								( RPtr == 0 ) ?	IMem0[ Ld_Address0 ] :

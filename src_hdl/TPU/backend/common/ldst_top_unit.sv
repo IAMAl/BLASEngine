@@ -104,12 +104,12 @@ module LdStUnit
 	assign LifeSt				= ( DiffSt[WIDTH_ENTRY_HAZARD] ) ?	 ~DiffSt[WIDTH_ENTRY_HAZARD-1:0] + 1'b1 :
 																	  DiffSt[WIDTH_ENTRY_HAZARD-1:0] ;
 
-	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass;
-	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass;
+	assign Ld_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) & ~I_Command.instr.op.OpClass[1];
+	assign St_Req				= I_Req & ( I_Command.instr.op.OpType == 2'b11 ) &  I_Command.instr.op.OpClass[1];
 
 
-	assign Ld_Valid				= Ld_Req;
-	assign St_Valid				= St_Req;
+	assign Ld_Valid				= Ld_Req;//ToDo
+	assign St_Valid				= St_Req;//ToDo
 
 
 	assign Ld_Term				= I_End_Access;
@@ -123,7 +123,7 @@ module LdStUnit
 	assign O_St_Stall			= St_Stall;
 
 
-	assign Ld_Token.v			= Ld_Req_;
+	assign Ld_Token.v			= Ld_Req;
 	assign Ld_Token.op			= I_Command.instr.op;
 	assign Ld_Token.dst			= I_Command.instr.dst;
 	assign Ld_Token.slice_len	= I_Command.instr.slice_len;
@@ -131,7 +131,7 @@ module LdStUnit
 	assign Ld_Token.mread		= I_Command.instr.mread;
 	assign Ld_Token.issue_no	= I_Command.issue_no;
 
-	assign St_Token.v			= St_Req_;
+	assign St_Token.v			= St_Req;
 	assign St_Token.op			= I_Command.instr.op;
 	assign St_Token.dst			= I_Command.instr.dst;
 	assign St_Token.slice_len	= I_Command.instr.slice_len;

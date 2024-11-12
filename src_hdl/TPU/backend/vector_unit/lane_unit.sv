@@ -184,11 +184,7 @@ module Lane_Unit
 	issue_no_t					Commit_No_LdSt2;
 	issue_no_t					Commit_No_Math;
 	issue_no_t					Commit_No_Mv;
-	logic						Commit_Req;
-	logic						Commited_LdSt1;
-	logic						Commited_LdSt2;
-	logic						Commited_Math;
-	logic						Commit_Grant_S;
+	logic 						Commit_Grant;
 	logic						Full_RB_V;
 	logic						Empty_RB_V;
 

@@ -44,6 +44,8 @@ module Vector_Unit
 	v_ready_t					Commit_Req;
 	v_issue_no_t				Commit_No;
 
+	logic						Commit_Full;
+
 	lane_t						Scalar_Data;
 
 
@@ -78,6 +80,7 @@ module Vector_Unit
 		(
 			.clock(				clock					),
 			.reset(				reset					),
+			.I_Commit_Grant(	I_Commit_Grant			),//ToDo Must come from CommitAgg_Unit as "Commit_Grant[ i ]"
 			.I_En_Lane(			I_En_Lane[ i ]			),
 			.I_ThreadID(		I_ThreadID				),
 			.I_Command(			I_Command				),

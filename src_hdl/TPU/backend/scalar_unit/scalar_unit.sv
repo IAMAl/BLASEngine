@@ -77,7 +77,7 @@ module Scalar_Unit
 	logic						Req_Issue;
 	logic						IW_Req_Issue;
 	issue_no_t					Issue_No;
-	instruction_t				IW_Instr;
+	instr_t						IW_Instr;
 
 	logic						RAR_Hazard;
 	logic						Branch_Instr;
@@ -211,7 +211,6 @@ module Scalar_Unit
 
 
 	logic						We_V_State;
-	reg_idx_t					V_State_Data;
 	data_t						V_State;
 
 
@@ -232,9 +231,6 @@ module Scalar_Unit
 	issue_no_t					Commit_No_Mv;
 	logic						Commit_Req;
 	issue_no_t					Commit_No;
-	logic						Commited_LdSt1;
-	logic						Commited_LdSt2;
-	logic						Commited_Math;
 	logic						Commit_Grant_S;
 	logic						Full_RB_S;
 	logic						Empty_RB_S;
@@ -369,12 +365,6 @@ module Scalar_Unit
 	assign Req_Odd					= ( (  PipeReg_RR.command.instr.src1.src_sel.unit_no & PipeReg_RR.command.instr.src1.v ) |
 										(  PipeReg_RR.command.instr.src2.src_sel.unit_no & PipeReg_RR.command.instr.src2.v ) |
 										(  PipeReg_RR.command.instr.src3.src_sel.unit_no & PipeReg_RR.command.instr.src3.v ) ) & ~Re_c;
-
-	//	Read Data
-	assign V_State_Data.v			= 1'b1;
-	assign V_State_Data.idx			= '0;
-	assign V_State_Data.data		= '0 | I_V_State;
-	assign V_State_Data.src_sel		= '0;
 
 
 	///// Write-Back to PAC
@@ -524,7 +514,7 @@ module Scalar_Unit
 
 
 	//// Lane-Enable
-	assign Enable_Lanes			= V_State[NUM_LANES*2-1:NUM_LANES];
+	assign Enable_Lanes			= V_State[NUM_LANES-1:0];//[NUM_LANES*2-1:NUM_LANES];
 	assign O_Lane_En			= Enable_Lanes;
 
 	assign Lane_Enable			= I_En;
@@ -557,7 +547,7 @@ module Scalar_Unit
 		.I_Instr(			I_Instr					),
 		.O_Req(				Req_IW					),
 		.O_Instr(			IW_Instr				),
-		.O_Re_Instr(		O_Re_Instr				)
+		.O_Re_Instr(		)//O_Re_Instr				)
 	);
 
 
@@ -692,7 +682,14 @@ module Scalar_Unit
 		.O_Done(									)
 	);
 
-
+	idx_t src1;
+	idx_t src2;
+	idx_t src3;
+	idx_t src4;
+	assign PipeReg_IdxRF.src1		= src1;
+	assign PipeReg_IdxRF.src2		= src2;
+	assign PipeReg_IdxRF.src3		= src3;
+	assign PipeReg_IdxRF.src4		= src4;
 	RF_Index_Sel RF_Index_Sel (
 		.I_Odd1(			RF_Index_Sel_Odd1		),
 		.I_Odd2(			RF_Index_Sel_Odd2		),
@@ -700,10 +697,10 @@ module Scalar_Unit
 		.I_Index_Src1(		Index_Src1				),
 		.I_Index_Src2(		Index_Src2				),
 		.I_Index_Src3(		Index_Src3				),
-		.O_Index_Src1(		PipeReg_IdxRF.src1		),
-		.O_Index_Src2(		PipeReg_IdxRF.src2		),
-		.O_Index_Src3(		PipeReg_IdxRF.src3		),
-		.O_Index_Src4(		PipeReg_IdxRF.src4		)
+		.O_Index_Src1(		src1		),
+		.O_Index_Src2(		src2		),
+		.O_Index_Src3(		src3		),
+		.O_Index_Src4(		src4		)
 	);
 
 	//	Pipeline Register
@@ -830,7 +827,7 @@ module Scalar_Unit
 		.I_Data(			Lane_Data				),
 		.I_Re(				Lane_Re					),
 		.I_We_V_State(		We_V_State				),
-		.I_V_State(			V_State_Data.data[15:0]	),
+		.I_V_State(			I_V_State				),
 		.O_Data(			V_State					)
 	);
 

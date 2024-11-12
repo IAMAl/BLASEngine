@@ -78,8 +78,6 @@ module ExecUnit_V
 	logic						is_Mlter;
 
 
-	logic						We;
-	logic						Re;
 	TYPE						Mv_Token;
 	data_t						Mv_Data;
 
@@ -94,8 +92,6 @@ module ExecUnit_V
 	data_t						PData;
 	data_t						Data0;
 	data_t						Data1;
-
-	logic						RegMove;
 
 	data_t						Src_Data1;
 	data_t						Src_Data2;
@@ -170,6 +166,7 @@ module ExecUnit_V
 	assign O_WB_Data_Math		= MAU_Data;
 	assign O_WB_Data_Mv			= Mv_Data;
 
+	assign O_Math_Done			= MAU_Token.v;//ToDo Slice is not supported
 	assign O_Mv_Done			= Mv_Token.v;
 
 	// Stall by Load/Store Unit
@@ -198,6 +195,9 @@ module ExecUnit_V
 	(
 		.clock(				clock					),
 		.reset(				reset					),
+		.I_Stall(			I_Stall					),
+		.I_Grant(			I_Commit_Grant			),
+		.I_Pres_Issue_No(	Issue_No				),
 		.I_En(				I_En					),
 		.I_Data1(			Src_Data1				),
 		.I_Data2(			Src_Data2_				),
