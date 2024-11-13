@@ -43,7 +43,6 @@ module Router
 	logic	[WIDTH_DATA/4:0]	ID_Row;
 	logic	[WIDTH_DATA/4:0]	ID_Clm;
 
-	logic	[WIDTH_DATA/2:0]	MyID;
 	logic	[WIDTH_DATA/2:0]	ID;
 
 	//logic	[WIDTH_DATA-1:0]	BranchID;
@@ -88,20 +87,13 @@ module Router
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			MyID			<= 0;
-		end
-		else if ( I_Req & ~Run ) begin
-			MyID			<= I_Data[WIDTH_DATA/2-1:0];
-		end
-	end
-
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
 			R_is_Matched	<= 1'b0;
 		end
-		else begin
-			R_is_Matched	<= is_Matched;
+		else if ( I_Rls ) begin
+			R_is_Matched	<= 1'b0;
+		end
+		else if ( is_Matched ) begin
+			R_is_Matched	<= 1'b1;
 		end
 	end
 

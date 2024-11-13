@@ -21,8 +21,8 @@ module BLASEngine
 	input						clock,
 	input						reset,
 	input						I_Req_IF,				//Request from External
-	input	mpu_if_t			I_Data_IF,				//Data from External
-	output	mpu_if_t			O_Data_IF,				//Data to External
+	input	mpu_in_t			I_Data_IF,				//Data from External
+	output	mpu_out_t			O_Data_IF,				//Data to External
 	output	mpu_stat_t			O_Status,				//System Status
 	output						O_Wait					//Flag: Wait for Thread Program
 );
