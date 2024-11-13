@@ -17,7 +17,7 @@ module Network_S
 )(
 	input						clock,
 	input						reset,
-	input						I_Stall,
+	input						I_Stall,				//Stall Request
 	input	net_t				I_Command,				//Command
 	input	[1:0]				I_Sel_Path,				//Path Selects
 	input	[1:0]				I_Sel_Path_WB,			//Path Selects

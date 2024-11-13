@@ -16,7 +16,7 @@ module Scalar_Unit
 (
 	input						clock,
 	input						reset,
-	input						I_Empty,
+	input						I_Empty,				//Flag: Empty on Instruction Memory
 	input						I_En,					//Enable Execution
 	input	id_t				I_ThreadID,				//Thread-ID
 	output						O_Re_Instr,				//Read-Enable for Instruction Memory
