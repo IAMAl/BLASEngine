@@ -14,7 +14,7 @@ module PathSel
 #(
 	parameter int LANE_ID		= 0
 )(
-	input						I_Req,
+	input						I_Req,							//Request to Work
 	input	[4:0]				I_Sel_Path,						//Path Selects
 	input	[4:0]				I_Sel_Path_WB,					//Path Selects
 	input	data_t				I_Scalar_Data,					//Scalar Data

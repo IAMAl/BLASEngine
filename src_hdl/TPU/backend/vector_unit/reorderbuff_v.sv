@@ -16,8 +16,8 @@ module ReorderBuff_V
 )(
 	input						clock,
 	input						reset,
-	input                       I_En_Lane,
-	input						I_Commit_Grant,
+	input                       I_En_Lane,				//Enable for working on this Lane
+	input						I_Commit_Grant,			//Commit Grant from Commit Aggregater
 	input						I_Store,				//Store Issue No
 	input	issue_no_t			I_Issue_No,				//Storing Issue Number
 	input						I_Slice,				//Flag Use of Slicing

@@ -16,10 +16,10 @@ module IICtrl
 )(
 	input						clock,
 	input						reset,
-	input						I_Stall,
-	input						I_En_II,
-	input						I_Clr_II,
-	output						O_Stall
+	input						I_Stall,				//Stall Request
+	input						I_En_II,				//Enable Initial-Interval
+	input						I_Clr_II,				//Clear Initial-Interval
+	output						O_Stall					//Stall Request
 );
 
 

@@ -16,7 +16,7 @@ module ExecUnit_V
 )(
 	input						clock,
 	input						reset,
-	input						I_En,
+	input						I_En,					//Enable to Execute
 	input						I_Stall,				//Stall
 	input	pipe_exe_t			I_Command,				//Command
 	input						I_Commit_Grant,			//Grant for Commit
