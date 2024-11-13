@@ -17,13 +17,13 @@ module BypassBuff
 	input						clock,
 	input						reset,
 	input						I_Stall,				//Force Stalling
-	input						I_Valid,
+	input						I_Valid,				//Flag: Valid Input
 	input	index_t				I_WB_Index,				//Write-back Index
 	input	data_t				I_WB_Data,				//Write-back Data
 	input	index_t				I_Slice_Len,			//SLice Length
-	input						I_Idx_v1,
-	input						I_Idx_v2,
-	input						I_Idx_v3,
+	input						I_Idx_v1,				//Valid for Index
+	input						I_Idx_v2,				//Valid for Index
+	input						I_Idx_v3,				//Valid for Index
 	input	index_t				I_Idx1,					//Index
 	input	index_t				I_Idx2,					//Index
 	input	index_t				I_Idx3,					//Index

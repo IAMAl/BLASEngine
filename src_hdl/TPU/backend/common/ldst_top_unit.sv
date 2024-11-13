@@ -22,8 +22,8 @@ module LdStUnit
 	input						I_Commit_Grant,			//Grant of Commit
 	input	issue_no_t			I_Issue_No,				//Current Issue No
 	input						I_Req,					//Request from Network Stage
-	input	op_t				I_Op,
-	input	TYPE				I_Token,
+	input	op_t				I_Op,					//Operation Part in Instruction
+	input	TYPE				I_Token,				//Command
 	input	data_t				I_Src_Data1,			//Source Data
 	input	data_t				I_Src_Data2,			//Source Data
 	input	data_t				I_Src_Data3,			//Source Data

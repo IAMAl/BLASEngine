@@ -26,8 +26,8 @@ module ALU
 	input	data_t				I_Src_Data3,			//Source Data
 	input						I_Re_p0,				//Read-Enable for Pipeline Register
 	input						I_Re_p1,				//Read-Enable for Pipeline Register
-	output	data_t				O_PData0,
-	output	data_t				O_PData1,
+	output	data_t				O_PData0,				//Read Pipeline Register
+	output	data_t				O_PData1,				//Read Pipeline Register
 	output	TYPE				O_WB_Token,				//Write-Back Information
 	output	data_t				O_WB_Data,				//Write-Back Data
 	output						O_ALU_Done				//Executed
@@ -143,17 +143,17 @@ module ALU
 	assign SRL_Token.issue_no	= ( En_MA & ~I_Stall ) ?	I_Command.issue_no : 		'0;
 
 
-	assign MA_Data1				= ( En_MA & ~I_Stall ) ?	I_Src_Data1 : 0;
-	assign MA_Data2				= ( En_MA & ~I_Stall ) ?	I_Src_Data2 : 0;
-	assign MA_Data3				= ( En_MA & ~I_Stall ) ?	I_Src_Data3 : 0;
+	assign MA_Data1				= ( En_MA & ~I_Stall ) ?	I_Src_Data1 : '0;
+	assign MA_Data2				= ( En_MA & ~I_Stall ) ?	I_Src_Data2 : '0;
+	assign MA_Data3				= ( En_MA & ~I_Stall ) ?	I_Src_Data3 : '0;
 
-	assign iDIV_Data1			= ( En_iDiv & ~I_Stall ) ?	I_Src_Data1 : 0;
-	assign iDIV_Data2			= ( En_iDiv & ~I_Stall ) ?	I_Src_Data2 : 0;
+	assign iDIV_Data1			= ( En_iDiv & ~I_Stall ) ?	I_Src_Data1 : '0;
+	assign iDIV_Data2			= ( En_iDiv & ~I_Stall ) ?	I_Src_Data2 : '0;
 
-	assign Cnvt_Data1			= ( En_Cnvt & ~I_Stall ) ?	I_Src_Data1 : 0;
+	assign Cnvt_Data1			= ( En_Cnvt & ~I_Stall ) ?	I_Src_Data1 : '0;
 
-	assign SRL_Data1			= ( En_SRL & ~I_Stall ) ?	I_Src_Data1 : 0;
-	assign SRL_Data2			= ( En_SRL ) & ~I_Stall ?	I_Src_Data2 : 0;
+	assign SRL_Data1			= ( En_SRL & ~I_Stall ) ?	I_Src_Data1 : '0;
+	assign SRL_Data2			= ( En_SRL ) & ~I_Stall ?	I_Src_Data2 : '0;
 
 
 	assign Life_MA				= I_Issue_No - Token_MA.issue_no;
