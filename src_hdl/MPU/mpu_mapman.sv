@@ -88,7 +88,7 @@ module MapMan_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length_Ld		<= 0;
+			R_Length_Ld		<= '0;
 		end
 		else if ( I_Req_Lookup & ~FSM_Ld ) begin
 			R_Length_Ld		<= TabInstr[ RNo ].Length;
@@ -97,7 +97,7 @@ module MapMan_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Address_Ld	<= 0;
+			R_Address_Ld	<= '0;
 		end
 		else if ( I_Req_Lookup & ~FSM_Ld ) begin
 			R_Address_Ld	<= TabInstr[ RNo ].Address;
@@ -106,7 +106,7 @@ module MapMan_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Used_Size		<= 0;
+			R_Used_Size		<= '0;
 		end
 		else if ( Update ) begin
 			R_Used_Size		<= R_Used_Size + UpdateAmount;

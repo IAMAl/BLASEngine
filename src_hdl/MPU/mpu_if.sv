@@ -17,8 +17,8 @@ module IF_MPU
 (
 	input						clock,
 	input						reset,
-	input						I_End_Ld,
-	input						I_End_St,
+	input						I_End_Ld,				//Flag: End of Loading
+	input						I_End_St,				//Flag: End of Storing
 	input						I_Req_IF,				//Request from External
 	input	mpu_in_t			I_Data_IF,				//Data from External
 	output	mpu_out_t			O_Data_IF,				//Data to External
@@ -150,7 +150,7 @@ module IF_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			En_TPU			<= 0;
+			En_TPU			<= '0;
 		end
 		else if ( I_Req_IF & ( R_FSM_IF_MPU	<= FSM_SET_EN_TPU_MPU ) ) begin
 			En_TPU			<= I_Data_IF;

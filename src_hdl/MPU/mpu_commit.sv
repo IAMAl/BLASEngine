@@ -39,6 +39,9 @@ module Commit_MPU
 	mpu_issue_no_t				R_Issue_No;
 	logic						R_Commit;
 
+	// Ring-BUffer Control
+	assign We					= I_Req_Issue & ~Full;
+	assign Re					= Commit & ~Empty;
 
 	// Check First Entry can be committed or not
 	assign Commit				= IssueInfo[ RNo ].Valid & IssueInfo[ RNo ].Commit;
@@ -95,8 +98,6 @@ module Commit_MPU
 
 
 	//// Module: Ring-Buffer Controller
-	assign We					= I_Req_Issue & ~Full;
-	assign Re					= Commit & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			NUM_ENTRY_HAZARD		)
 	) HazardTab_Ptr

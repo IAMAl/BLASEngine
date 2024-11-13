@@ -100,7 +100,7 @@ module DataService_MPU
 	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_MPU_LD_RUN;
 
 	// Buffer sttus
-	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
+	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1'b1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
 
 
@@ -125,9 +125,10 @@ module DataService_MPU
 	assign Run_Ld_Service		= Ld_Req & is_FSM_Extern_Run;
 	assign is_Ld_Notified		= ( I_Ld_Data == NOTIFY_DATA ) & is_FSM_Extern_Ld_Run;
 
-	// IF
+	// Interface
 	assign O_Req				= Load_Buff_St & ~Empty;
-	assign O_Data				= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : '0;
+	assign O_Data				= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :
+																'0;
 
 	//Ack for Load Request
 	assign O_Ld_Grant			= FSM_Extern_Ld != FSM_EXTERN_MPU_LD_INIT;
@@ -136,7 +137,7 @@ module DataService_MPU
 	assign O_St_Req				= Load_Buff_Ld | is_FSM_Extern_St_Notify;
 	assign O_St_Data			= ( Load_Buff_Ld ) ?				I_Data :
 									( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
-																	0;
+																	'0;
 	assign O_St_Rls				= Counter_St == R_Length;
 
 	// Memory Access Type Detection
@@ -167,7 +168,7 @@ module DataService_MPU
 	// Capture Access-Length
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length		<= 0;
+			R_Length		<= '0;
 		end
 		else if ( Store_Length ) begin
 			R_Length		<= I_Data;
@@ -178,10 +179,10 @@ module DataService_MPU
 	//Counter
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Counter_St		<= 0;
+			Counter_St		<= '0;
 		end
 		else if ( O_St_Rls ) begin
-			Counter_St		<= 0;
+			Counter_St		<= '0;
 		end
 		else if ( I_Req & is_FSM_Extern_St_Run ) begin
 			Counter_St		<= Counter_St + 1'b1;

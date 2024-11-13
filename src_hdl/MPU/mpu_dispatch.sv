@@ -76,7 +76,7 @@ module Dispatch_MPU
 	assign Loading				= FSM_Dispatch == FSM_DPC_SEND_INSTRS;
 
 	// Check Loading is ended
-	assign End_Load				= R_Length == 0;
+	assign End_Load				= R_Length == '0;
 
 	// Requset to MapMan with Thread-ID
 	assign O_Req_Lookup			= FSM_Dispatch == FSM_DPC_GETINFO;
@@ -105,7 +105,7 @@ module Dispatch_MPU
 		if ( reset ) begin
 			R_Ld			<= 1'b0;
 			R_LdD1			<= 1'b0;
-			R_Instr			<= 0;
+			R_Instr			<= '0;
 		end
 		else begin
 			R_Ld			<= Loading;
@@ -123,8 +123,8 @@ module Dispatch_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_ThreadID		<= 0;
-			R_IssueNo		<= 0;
+			R_ThreadID		<= '0;
+			R_IssueNo		<= '0;
 		end
 		else if ( I_Req_Issue ) begin
 			R_ThreadID		<= I_ThreadID;
@@ -134,7 +134,7 @@ module Dispatch_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length		<= 0;
+			R_Length		<= '0;
 		end
 		else if ( Loading ) begin
 			R_Length		<= R_Length - 1'b1;
@@ -146,7 +146,7 @@ module Dispatch_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_TLength		<= 0;
+			R_TLength		<= '0;
 		end
 		else if ( Set_Address ) begin
 			R_TLength		<= Length;
@@ -155,7 +155,7 @@ module Dispatch_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Address		<= 0;
+			R_Address		<= '0;
 		end
 		else if ( Loading ) begin
 			R_Address		<= R_Address + 1'b1;

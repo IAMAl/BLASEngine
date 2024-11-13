@@ -55,7 +55,7 @@ module ThrreadMem_MPU
 
 	// Storing Thread in Instruction Memory
 	mpu_address_t				R_Length_St;
-	mpu_address_t				R_Adddress_St;
+	mpu_address_t				R_Address_St;
 
 	logic	[WIDTH_THREAD_MEM-1:0]	R_Count;
 
@@ -68,6 +68,11 @@ module ThrreadMem_MPU
 
 
 	fsm_threadmem_t				FSM_Instr_St;
+
+
+	//// Theread Memory Window
+	assign We					= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_LOOKUP );
+	assign Re					= R_Req;
 
 
 	//// Send Wait Signal to Host in order to Stall Its Sending
@@ -129,7 +134,7 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Instr_Ld		<= 0;
+			R_Instr_Ld		<= '0;
 		end
 		else if ( I_Req_Ld ) begin
 			R_Instr_Ld		<= InstrMem[ I_Adddress_Ld ];
@@ -138,22 +143,22 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( Store ) begin
-			InstrMem[ R_Adddress_St ]	<= I_Instr_St;
+			InstrMem[ R_Address_St ]	<= I_Instr_St;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Adddress_St	<= 0;
+			R_Address_St	<= '0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_STORE ) begin
-			R_Adddress_St	<= R_Adddress_St + 1'b1;
+			R_Address_St	<= R_Address_St + 1'b1;
 		end
 	end
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_ThreadID_St	<= 0;
+			R_ThreadID_St	<= '0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_RCVID ) begin
 			R_ThreadID_St	<= I_Instr_St;
@@ -162,7 +167,7 @@ module ThrreadMem_MPU
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length_St		<= 0;
+			R_Length_St		<= '0;
 		end
 		else if ( FSM_Instr_St == FSM_INSTR_ST_CHECK ) begin
 			R_Length_St		<= I_Instr_St;
@@ -249,8 +254,6 @@ module ThrreadMem_MPU
 
 
 	//// Module: Ring-Buffer Controller
-	assign We				= I_Req_St & ( FSM_Instr_St == FSM_INSTR_ST_LOOKUP );
-	assign Re				= R_Req;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			NUM_ENTRY_ID_MEM		)
 	) IMemMan

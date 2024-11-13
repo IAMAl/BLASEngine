@@ -50,6 +50,11 @@ module HazardCheck_MPU
 	mpu_tab_hazard_t			ThreadID		[NUM_ENTRY_HAZARD-1:0];
 
 
+	//// Window Control
+	assign We					= I_Req & ~Full;
+	assign Re					= Issueable & ~Empty;
+
+
 	//// Issue Sequence
 	assign O_Req_Issue			= R_Req_Issue;
 	assign O_ThreadID_S			= ThreadID[ Issue_No ].ID;
@@ -152,8 +157,6 @@ module HazardCheck_MPU
 
 
 	//// Module: Ring-Buffer Controller
-	assign We					= I_Req & ~Full;
-	assign Re					= Issueable & ~Empty;
 	RingBuffCTRL #(
 		.NUM_ENTRY(			NUM_ENTRY_HAZARD		)
 	) HazardTab_Ptr
