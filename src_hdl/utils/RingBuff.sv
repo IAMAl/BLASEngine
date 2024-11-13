@@ -32,7 +32,9 @@ module RingBuff
 	logic	[WIDTH_ENTRY-1:0]	WPtr;
 	logic	[WIDTH_ENTRY-1:0]	RPtr;
 
+
 	assign O_Data				= ( I_Re ) ? Data[ RPtr ] : '0;
+
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin

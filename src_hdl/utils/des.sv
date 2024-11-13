@@ -39,10 +39,11 @@ module Des
 
 	assign Valid				= Count == COUNT_VAL;
 
+	assign Shift_Data			= I_Data << ( WIDTH_INPUT << Count );
+
+
 	assign O_Valud				= Valid;
 	assign O_Data				= ( Valid ) ? Data : '0;
-
-	assign Shift_Data			= I_Data << ( WIDTH_INPUT << Count );
 
 
 	always_ff @( posedge clock ) begin
