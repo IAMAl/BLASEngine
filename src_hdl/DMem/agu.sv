@@ -29,8 +29,6 @@ module agu
 
 	logic						R_Run;
 
-	logic						R_We;
-	logic						R_Req;
 	address_t					R_Length;
 	stride_t					R_Stride;
 	address_t					R_Address;

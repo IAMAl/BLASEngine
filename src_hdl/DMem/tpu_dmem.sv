@@ -175,7 +175,7 @@ module DMem_Body
 	assign St_Data				= (   St_Grant1 ) ?	I_St_Data1 :
 									( St_Grant2 ) ?	I_St_Data2 :
 									( St_Grant3 ) ?	Extern_St_Data :
-													0;
+													'0;
 
 
 	assign Stall_St				= ~St_Valid | I_Stall;
@@ -189,9 +189,9 @@ module DMem_Body
 	assign Extern_Ld_Grant		= Ld_Grant3 & ~I_Stall;
 
 
-	assign O_Ld_Data1			= ( Ld_Grant1 ) ?	Ld_Data : 0;
-	assign O_Ld_Data2			= ( Ld_Grant2 ) ?	Ld_Data : 0;
-	assign Extern_Ld_Data		= ( Ld_Grant3 ) ?	Ld_Data : 0;
+	assign O_Ld_Data1			= ( Ld_Grant1 ) ?	Ld_Data : '0;
+	assign O_Ld_Data2			= ( Ld_Grant2 ) ?	Ld_Data : '0;
+	assign Extern_Ld_Data		= ( Ld_Grant3 ) ?	Ld_Data : '0;
 
 
 	assign O_St_Grant1			= St_Grant1;

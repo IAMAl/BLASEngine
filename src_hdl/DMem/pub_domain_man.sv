@@ -86,6 +86,7 @@ module pub_domain_man
 	address_t					TabBAddr	[NUM_ENTRY-1:0];
 
 
+	// Access Sync Control
 	assign Event_St_Grant1		= ~R_St_Grant1 & I_St_Grant1 & ~I_Stall;
 	assign Event_St_Grant2		= ~R_St_Grant2 & I_St_Grant2 & ~I_Stall;
 	assign Event_St_Grant3		= ~R_St_Grant3 & I_St_Grant3 & ~I_Stall;
@@ -94,12 +95,10 @@ module pub_domain_man
 	assign Event_Ld_Grant2		= ~R_Ld_Grant2 & I_Ld_Grant2 & ~I_Stall;
 	assign Event_Ld_Grant3		= ~R_Ld_Grant3 & I_Ld_Grant3 & ~I_Stall;
 
-	assign Hit_St				= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St ) & ~I_Stall;
-	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant3 ) & ( |is_Hit_Ld ) & ~I_Stall;
-
 	assign Set_St				= I_St_End & ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ~( |is_Hit_St ) & ~I_Stall;
 	assign Clr_Ld				= I_Ld_End & Hit_Ld & ~I_Stall;
 
+	// Ready Signal to Ld/St Unit in Exec UNit
 	assign Ready_St				= ~R_Stored[ SetNo ];
 	assign Ready_Ld				=  R_Stored[ ClrNo ];
 
@@ -111,6 +110,9 @@ module pub_domain_man
 	assign O_Ld_Ready2			= ( I_GrantNo_Ld == 2'h1 ) & I_GrantVld_Ld & Ready_Ld;
 	assign O_Ld_Ready3			= ( I_GrantNo_Ld == 2'h2 ) & I_GrantVld_Ld & Ready_Ld;
 
+	// Set Configfuration for Memory Access
+	assign Hit_St				= ( Event_St_Grant1 | Event_St_Grant2 | Event_St_Grant3 ) & ( |is_Hit_St ) & ~I_Stall;
+	assign Hit_Ld				= ( Event_Ld_Grant1 | Event_Ld_Grant2 | Event_Ld_Grant3 ) & ( |is_Hit_Ld ) & ~I_Stall;
 
 	assign O_Set_Config_St		= Hit_St;
 	assign O_Set_Config_Ld		= Hit_Ld;

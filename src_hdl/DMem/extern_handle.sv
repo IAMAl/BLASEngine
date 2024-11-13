@@ -111,24 +111,26 @@ module extern_handle
 	logic	[WIDTH_BUFF:0]		Num_Stored;
 
 
-	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_RUN;
-	assign is_FSM_Extern_Recv_Stride= FSM_Extern_Serv == FSM_EXTERN_RECV_STRIDE;
-	assign is_FSM_Extern_Recv_Length= FSM_Extern_Serv == FSM_EXTERN_RECV_LENGTH;
-	assign is_FSM_Extern_Recv_Base	= FSM_Extern_Serv == FSM_EXTERN_RECV_BASE;
+	// FSM for Control
+	assign is_FSM_Extern_Run			= FSM_Extern_Serv == FSM_EXTERN_RUN;
+	assign is_FSM_Extern_Recv_Stride	= FSM_Extern_Serv == FSM_EXTERN_RECV_STRIDE;
+	assign is_FSM_Extern_Recv_Length	= FSM_Extern_Serv == FSM_EXTERN_RECV_LENGTH;
+	assign is_FSM_Extern_Recv_Base		= FSM_Extern_Serv == FSM_EXTERN_RECV_BASE;
 
-	assign is_FSM_Extern_St_Buff	= FSM_Extern_St == FSM_EXTERN_ST_BUFF;
-	assign is_FSM_Extern_St_Notify	= FSM_Extern_St == FSM_EXTERN_ST_NOTIFY;
-	assign is_FSM_Extern_St_Run		= FSM_Extern_St == FSM_EXTERN_ST_RUN;
+	assign is_FSM_Extern_St_Buff		= FSM_Extern_St == FSM_EXTERN_ST_BUFF;
+	assign is_FSM_Extern_St_Notify		= FSM_Extern_St == FSM_EXTERN_ST_NOTIFY;
+	assign is_FSM_Extern_St_Run			= FSM_Extern_St == FSM_EXTERN_ST_RUN;
 
-	assign is_FSM_Extern_Ld_Run		= FSM_Extern_Ld == FSM_EXTERN_LD_RUN;
+	assign is_FSM_Extern_Ld_Run			= FSM_Extern_Ld == FSM_EXTERN_LD_RUN;
 
-	assign Run_St_Service		= St_Req & is_FSM_Extern_Run;
-	assign Run_Ld_Service		= Ld_Req & is_FSM_Extern_Run;
+	// Kick-Start Detection
+	assign Run_St_Service			= St_Req & is_FSM_Extern_Run;
+	assign Run_Ld_Service			= Ld_Req & is_FSM_Extern_Run;
 
-	assign is_Ld_Notified		= ( I_Ld_Data == NOTIFY_DATA ) & is_FSM_Extern_Ld_Run;
+	assign is_Ld_Notified			= ( I_Ld_Data == NOTIFY_DATA ) & is_FSM_Extern_Ld_Run;
 
-	assign Output_St_Config		= St_Req & ( FSM_Extern_Serv == FSM_EXTERN_RECV_SET );
-	assign Output_Ld_Config		= Ld_Req & ( FSM_Extern_Serv == FSM_EXTERN_RECV_SET );
+	assign Output_St_Config			= St_Req & ( FSM_Extern_Serv == FSM_EXTERN_RECV_SET );
+	assign Output_Ld_Config			= Ld_Req & ( FSM_Extern_Serv == FSM_EXTERN_RECV_SET );
 
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
@@ -161,23 +163,23 @@ module extern_handle
 
 	// Store Configuration
 	assign O_St_Req				= Output_St_Config | ( Load_Buff_St & ~Empty );
-	assign O_St_Length			= ( Output_St_Config ) ?		R_Length :				0;
-	assign O_St_Stride			= ( Output_St_Config ) ?		R_Stride :				0;
-	assign O_St_Base			= ( Output_St_Config ) ?		R_Base : 				0;
-	assign O_St_Data			= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :	0;
+	assign O_St_Length			= ( Output_St_Config ) ?		R_Length :				'0;
+	assign O_St_Stride			= ( Output_St_Config ) ?		R_Stride :				'0;
+	assign O_St_Base			= ( Output_St_Config ) ?		R_Base : 				'0;
+	assign O_St_Data			= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] :	'0;
 
 	// Load Configuration
 	assign O_Ld_Req				= Output_Ld_Config;
-	assign O_Ld_Length			= ( Output_Ld_Config ) ?	R_Length :	0;
-	assign O_Ld_Stride			= ( Output_Ld_Config ) ?	R_Stride :	0;
-	assign O_Ld_Base			= ( Output_Ld_Config ) ?	R_Base : 	0;
+	assign O_Ld_Length			= ( Output_Ld_Config ) ?		R_Length :				'0;
+	assign O_Ld_Stride			= ( Output_Ld_Config ) ?		R_Stride :				'0;
+	assign O_Ld_Base			= ( Output_Ld_Config ) ?		R_Base : 				'0;
 
 
 	// MPU (Router)
 	assign O_Req				= Load_Buff_Ld | is_FSM_Extern_St_Notify;
 	assign O_Data				= ( Load_Buff_Ld ) ?				I_Data :
 									( is_FSM_Extern_St_Notify ) ?	NOTIFY_DATA :
-																	0;
+																	'0;
 	assign O_Rls				= ( Load_Buff_Ld ) ?				I_Ld_Term :
 																	1'b0;
 
@@ -185,7 +187,7 @@ module extern_handle
 	// data-Memory Access-Configuration
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Stride		<= 0;
+			R_Stride		<= '0;
 		end
 		else if ( Store_Stride ) begin
 			R_Stride		<= { 1'b0, I_Data[WIDTH_DATA-2:0] };
@@ -194,7 +196,7 @@ module extern_handle
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Length		<= 0;
+			R_Length		<= '0;
 		end
 		else if ( Store_Length ) begin
 			R_Length		<= I_Data;
@@ -203,7 +205,7 @@ module extern_handle
 
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			R_Base			<= 0;
+			R_Base			<= '0;
 		end
 		else if ( Store_Base ) begin
 			R_Base			<= I_Data;
@@ -214,10 +216,10 @@ module extern_handle
 	// Counter
 	always_ff @( posedge clock ) begin
 		if ( reset ) begin
-			Counter_St		<= 0;
+			Counter_St		<= '0;
 		end
 		else if ( I_St_Term | I_Rls ) begin
-			Counter_St		<= 0;
+			Counter_St		<= '0;
 		end
 		else if ( I_Req & is_FSM_Extern_St_Run ) begin
 			Counter_St		<= Counter_St + 1'b1;

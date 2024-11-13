@@ -50,7 +50,7 @@ module req_handle
 	assign O_GrantNo 			= ( R_Grant1 ) ?	2'b01 :
 									( R_Grant2 ) ?	2'b10 :
 									( R_Grant3 ) ?	2'b11 :
-													2'b0;
+													2'b00;
 
 	assign O_Grant1				= R_Grant1;
 	assign O_Grant2				= R_Grant2;
@@ -61,15 +61,15 @@ module req_handle
 	assign O_Length				= ( R_Grant1 ) ?	I_Length1 :
 									( R_Grant2 ) ?	I_Length2 :
 									( R_Grant3 ) ?	I_Length3 :
-													0;
+													'0;
 	assign O_Stride				= ( R_Grant1 ) ?	I_Stride1 :
 									( R_Grant2 ) ?	I_Stride2 :
 									( R_Grant3 ) ?	I_Stride3 :
-													0;
+													'0;
 	assign O_Base_Addr			= ( R_Grant1 ) ?	I_Base_Addr1 :
 									( R_Grant2 ) ?	I_Base_Addr2 :
 									( R_Grant3 ) ?	I_Base_Addr3 :
-													0;
+													'0;
 
 
 	always_ff @( posedge clock ) begin

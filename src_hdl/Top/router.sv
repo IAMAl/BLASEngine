@@ -45,10 +45,7 @@ module Router
 
 	logic	[WIDTH_DATA/2:0]	ID;
 
-	//logic	[WIDTH_DATA-1:0]	BranchID;
-
 	logic						is_Matched;
-
 
 	logic						Req_A;
 	logic						Req_B;
@@ -66,20 +63,26 @@ module Router
 	logic						Run;
 	logic						R_is_Matched;
 
+
 	assign ID_Row				= ROW_ID;
 	assign ID_Clm				= CLM_ID;
 	assign ID					= { ID_Row, ID_Clm };
-	assign is_Matched			= I_Req & ( I_Data == ID );
 
+	// First Data is an ID
+	//	Branching to Path-B when the ID is matched
+	assign is_Matched			= I_Req & ( I_Data[WIDTH_DATA/2-1:0] == ID );
+
+	// Path-A
 	assign O_Req_A				= Req_A;
 	assign O_Rls_A				= Rls_A;
 	assign O_Data_A				= DataA;
 
+	// Path-B
 	assign O_Req_B				= Req_B;
 	assign O_Rls_B				= Rls_B;
 	assign O_Data_B				= DataB;
 
-
+	// Backward Path
 	assign O_Req				= Req;
 	assign O_Rls				= Rls;
 	assign O_Data				= Data;
