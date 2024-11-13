@@ -93,8 +93,8 @@ module Dispatch_MPU
 	assign O_Address			= R_Address;
 
 	// Send Thread (Instructions) to TPU
-	assign O_Instr.v			= R_LdD1;
-	assign O_Instr.instr		= R_Instr;
+	assign O_Instr.v			= R_Instr.v & R_LdD1;
+	assign O_Instr.instr		= R_Instr.instr;
 	assign O_Send_Thread		=   FSM_Dispatch == FSM_DPC_SEND_INSTRS;
 	assign O_End_Send			= ( FSM_Dispatch == FSM_DPC_SEND_INSTRS ) & End_Load;
 
@@ -116,7 +116,8 @@ module Dispatch_MPU
 			R_Instr			<= (  FSM_Dispatch == FSM_DPC_SEND_THREADID ) ?	R_ThreadID :
 								( FSM_Dispatch == FSM_DPC_SEND_ISSUENO ) ?	R_IssueNo :
 								( FSM_Dispatch == FSM_DPC_SEND_ILENGTH ) ?	R_TLength :
-																			I_Instr;
+								( I_Instr.v ) ?								I_Instr :
+																			'0;
 		end
 	end
 

@@ -79,8 +79,6 @@ module DataService_MPU
 
 
 	data_t						R_Length;
-	logic						R_Ld_Req;
-	logic						R_St_Req;
 
 	logic	[WIDTH_BUFF-1:0]	Counter_St;
 
@@ -153,32 +151,6 @@ module DataService_MPU
 		end
 		else if ( Store_Length ) begin
 			R_Length		<= I_Data;
-		end
-	end
-
-
-	// Service Flag
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_St_Req		<= 1'b0;
-		end
-		else if ( I_Ld_Rls ) begin
-			R_St_Req		<= 1'b0;
-		end
-		else if ( St_Req ) begin
-			R_St_Req		<= 1'b1;
-		end
-	end
-
-	always_ff @( posedge clock ) begin
-		if ( reset ) begin
-			R_Ld_Req		<= 1'b0;
-		end
-		else if ( I_Ld_Rls ) begin
-			R_Ld_Req		<= 1'b0;
-		end
-		else if ( Ld_Req ) begin
-			R_Ld_Req		<= 1'b1;
 		end
 	end
 

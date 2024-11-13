@@ -24,7 +24,6 @@ module Commit_MPU
 );
 
 
-	logic	[NUM_ENTRY_HAZARD-1:0]	Valid;
 	logic						Commit;
 
 	// Commit Table Handling
@@ -42,7 +41,7 @@ module Commit_MPU
 
 
 	// Check First Entry can be committed or not
-	assign Commit				= Valid[ RNo ] & IssueInfo[ RNo ].Commit;
+	assign Commit				= IssueInfo[ RNo ].Valid & IssueInfo[ RNo ].Commit;
 
 	// Commit Request
 	assign O_Req_Commit			= R_Commit;
@@ -76,9 +75,14 @@ module Commit_MPU
 				IssueInfo[ i ]		<= '0;
 			end
 		end
-		else if ( I_Req_Issue | I_Req_Commit ) begin
+		else if ( I_Req_Issue | I_Req_Commit | Commit ) begin
 			if ( I_Req_Commit ) begin
 				IssueInfo[ I_CommitNo ].Commit	<= 1'b1;
+			end
+
+			if ( Commit ) begin
+				IssueInfo[ RNo ].Valid			<= 1'b0;
+				IssueInfo[ RNo ].Commit			<= 1'b0;
 			end
 
 			if ( I_Req_Issue ) begin

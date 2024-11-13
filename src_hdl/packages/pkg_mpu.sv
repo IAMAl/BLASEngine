@@ -9,7 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 package pkg_mpu;
-	//import pkg_top::NUM_ROWS;
+	import pkg_tpu::instr_t;
 	//import pkg_top::NUM_CLMS;
 	import pkg_tpu::WIDTH_DATA;
 
@@ -56,10 +56,11 @@ package pkg_mpu;
 	typedef logic [WIDTH_THREADID-1:0]	id_t;
 
 	//Instruction Type
-	typedef logic [WIDTH_INSTR-1:0]		instr_t;
+	//typedef logic [WIDTH_INSTR-1:0]		instr_t;
 
 	//Thread's Issue Number
 	typedef logic [WIDTH_NUM_ISSUE-1:0]	mpu_issue_no_t;
+	typedef mpu_issue_no_t [NUM_ROWS*NUM_CLMS-1:0]	agg_issue_no_t;
 
 	// Single-bit Flag for All TPUs
 	typedef logic [NUM_CLMS-1:0]		tpu_clm_t;
@@ -68,8 +69,14 @@ package pkg_mpu;
 	//I/F Data Port
 	typedef struct packed {
 		logic							v;
+		instr_t							instr;
 		logic	[WIDTH_DATA-1:0]		data;
-	} mpu_if_t;
+	} mpu_in_t;
+
+	typedef struct packed {
+		logic							v;
+		logic	[WIDTH_DATA-1:0]		data;
+	} mpu_out_t;
 
 	//MapMan LookUp Table
 	typedef struct packed {

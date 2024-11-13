@@ -99,9 +99,6 @@ package pkg_tpu;
 	//	Status Data (cmp instr. result) Types
 	typedef logic	[WIDTH_STATE-1:0]		state_t;
 
-	//	Instruction Memory
-	typedef logic	[WIDTH_IMEM-1:0]		t_address_t;
-
 	//	Instruction Issue No
 	//		Used for Commit as clearing address the Hazard Check Table
 	typedef logic	[WIDTH_ENTRY_HAZARD-1:0]issue_no_t;
