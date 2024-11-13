@@ -17,8 +17,8 @@ module MPU
 	input							clock,
 	input							reset,
 	input							I_Req_IF,			//Request from External
-	input	mpu_if_t				I_Data_IF,			//Data from External
-	output	mpu_if_t				O_Data_IF,			//Data to External
+	input	mpu_in_t				I_Data_IF,			//Data from External
+	output	mpu_out_t				O_Data_IF,			//Data to External
 	output							O_Req,				//Issue Request
 	output	instr_t					O_Instr,			//Instruction Stream to TPU
 	output	mpu_issue_no_t			O_IssueNo,			//Issue No
@@ -26,7 +26,7 @@ module MPU
 	input	[WIDTH_NUM_ISSUE-1:0]	I_CommitNo,			//Commit No.
 	output	tpu_row_clm_t			O_TPU_Req,			//Request to Execute
 	output	tpu_row_clm_t			O_TPU_En_Exe,		//Enable to TPUs
-	output							I_Ld_Req,			//Request from Data Memory
+	input							I_Ld_Req,			//Request from Data Memory
 	input	data_t					I_Ld_Data,			//Data from Data Memory
 	input							I_Ld_Rls,			//Path Release
 	output							O_St_Req,			//Request Storing to Data Memory
@@ -39,15 +39,15 @@ module MPU
 
 	logic						Req_st;
 	id_t						ThreadID_S_St;
-	t_address_t					Length_St;
+	mpu_address_t				Length_St;
 	logic						Ack_St;
 	logic						No_ThMem;
 	logic						End_Send_Thread;
 	logic	[3:0]				IF_State;
 
-	t_address_t					Used_Size;
+	mpu_address_t				Used_Size;
 	logic						Req_Ld;
-	t_address_t					Address_Ld;
+	mpu_address_t				Address_Ld;
 	instr_t						Instr_Ld;
 
 	logic						Req_HazardCheck;
@@ -81,7 +81,9 @@ module MPU
 	assign O_TPU_Req			= |En_TPU;
 	assign O_TPU_En_Exe			= En_TPU;
 
-	assign No_ThMem				= Used_Size >= SIZE_THREAD_MEM;
+	assign O_Wait				= No_ThMem;
+
+	assign No_ThMem				= Used_Size >= (SIZE_THREAD_MEM-1);
 	assign O_Status.io			= IF_State;
 
 

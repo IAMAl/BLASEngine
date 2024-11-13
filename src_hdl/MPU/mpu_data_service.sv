@@ -90,8 +90,8 @@ module DataService_MPU
 
 
 	// States
-	assign is_FSM_Extern_Recv_Stride= FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_STRIDE;
 	assign is_FSM_Extern_Not_Init	= FSM_Extern_Serv != FSM_EXTERN_MPU_RECV_INIT;
+	assign is_FSM_Extern_Recv_Stride= FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_STRIDE;
 	assign is_FSM_Extern_Run		= FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_RUN;
 
 	assign is_FSM_Extern_St_Buff	= FSM_Extern_St == FSM_EXTERN_MPU_ST_BUFF;
@@ -102,10 +102,6 @@ module DataService_MPU
 	// Buffer sttus
 	assign Half_Data_Block_Stored	= Counter_St == { 1'b0, ( ( R_Length + 1 ) >> 1 ) };
 	assign Half_Buffer_Stored		= Counter_St == ( Num_Stored >> 1 );
-
-	// Memory Access Type Detection
-	assign Ld_Req				= is_FSM_Extern_Recv_Stride &  I_Ld_Req;
-	assign St_Req				= is_FSM_Extern_Recv_Stride & ~I_Ld_Req;
 
 
 	//// Buffer
@@ -122,7 +118,7 @@ module DataService_MPU
 
 	assign Buff_In_Data			= ( Store_Buff_St ) ?	I_Data :
 									( Store_Buff_Ld ) ?	I_Ld_Data :
-														0;
+														'0;
 
 	assign Store_Length			= I_Req & ( FSM_Extern_Serv == FSM_EXTERN_MPU_RECV_LENGTH );
 	assign Run_St_Service		= St_Req & is_FSM_Extern_Run;
@@ -131,7 +127,7 @@ module DataService_MPU
 
 	// IF
 	assign O_Req				= Load_Buff_St & ~Empty;
-	assign O_Data				= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : 0;
+	assign O_Data				= ( Load_Buff_St & ~Empty ) ?	Buff_Data[ Rd_Ptr ] : '0;
 
 	//Ack for Load Request
 	assign O_Ld_Grant			= FSM_Extern_Ld != FSM_EXTERN_MPU_LD_INIT;
@@ -143,6 +139,30 @@ module DataService_MPU
 																	0;
 	assign O_St_Rls				= Counter_St == R_Length;
 
+	// Memory Access Type Detection
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			Ld_Req			<= 1'b0;
+		end
+		else if ( is_FSM_Extern_Recv_Stride & I_Ld_Req ) begin
+			Ld_Req			<= 1'b1;
+		end
+		else if ( ~I_Req ) begin
+			Ld_Req			<= 1'b0;
+		end
+	end
+
+	always_ff @( posedge clock ) begin
+		if ( reset ) begin
+			St_Req			<= 1'b0;
+		end
+		else if ( is_FSM_Extern_Recv_Stride & ~I_Ld_Req ) begin
+			St_Req			<= 1'b1;
+		end
+		else if ( ~I_Req ) begin
+			St_Req			<= 1'b0;
+		end
+	end
 
 	// Capture Access-Length
 	always_ff @( posedge clock ) begin
@@ -304,7 +324,7 @@ module DataService_MPU
 				end
 			end
 			FSM_EXTERN_MPU_LD_RUN: begin
-				if ( is_Ld_Notified ) begin
+				if ( ~is_Ld_Notified ) begin
 					FSM_Extern_Ld	<= FSM_EXTERN_MPU_LD_NOTIFY;
 				end
 				else if ( I_Ld_Rls ) begin
