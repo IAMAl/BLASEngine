@@ -16,7 +16,7 @@ module Vector_Unit
 (
 	input						clock,
 	input						reset,
-	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
+	input	v_1b_t				I_En_Lane,				//Enable to Execution on Lane
 	input	id_t				I_ThreadID,				//SIMT Thread-ID
 	input	pipe_index_t		I_Command,				//Comamnd to Execute
 	input	data_t				I_Scalar_Data,			//Scalar Data
@@ -32,7 +32,7 @@ module Vector_Unit
 	output						O_Commit_Req,			//Commit Request
 	output	issue_no_t			O_Commit_No,			//Commit No
 	input	logic				I_Commit_Grant,			//Grant for Commit
-	output	v_ready_t			O_Status				//Status on Lane
+	output	v_1b_t				O_Status				//Status on Lane
 );
 
 
@@ -41,7 +41,7 @@ module Vector_Unit
 	lane_t						Lane_Data_Src3;
 	lane_t						Lane_Data_WB;
 
-	v_ready_t					Commit_Req;
+	v_1b_t						Commit_Req;
 	v_issue_no_t				Commit_No;
 
 	logic						Commit_Full;

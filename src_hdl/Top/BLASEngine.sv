@@ -167,7 +167,7 @@ module BLASEngine
 
 			RAM_V_LdSt[0][ clm ]				= '0;
 			RAM_V_St_Data[0][ clm ]				= '0;
-			
+
 			//	Bottom-Edge DMems
 			RAM_S_LdSt[NUM_ROWS][ clm ][0]		= '0;
 			RAM_S_St_Data[NUM_ROWS][ clm ][0]	= '0;

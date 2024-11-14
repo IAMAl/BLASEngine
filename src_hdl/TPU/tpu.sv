@@ -49,9 +49,9 @@ module TPU
 
 	state_t						S_Status;
 
-	v_ready_t					Lane_En;
+	v_1b_t						Lane_En;
 	pipe_index_t				V_Command;
-	v_ready_t					V_Status;
+	v_1b_t						V_Status;
 
 	logic						Commit_Req;
 	issue_no_t					Commit_No;

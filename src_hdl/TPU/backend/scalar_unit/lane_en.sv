@@ -18,7 +18,7 @@ module Lane_En
 	input	data_t				I_Data,					//Writing Lane-Enable
 	input						I_Re,					//Read-Enable
 	input						I_We_V_State,			//Write-Enable Vector Unit (Lanes) State
-	input	v_ready_t			I_V_State,				//Writing Vector Unit (Lanes) State
+	input	v_1b_t				I_V_State,				//Writing Vector Unit (Lanes) State
 	output	data_t				O_Data					//Read-out Register
 );
 

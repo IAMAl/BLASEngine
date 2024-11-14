@@ -36,8 +36,8 @@ module Scalar_Unit
 	input	tb_t				I_St_Grant,				//Flag: Grant
 	input	tb_t				I_End_Access,			//Flag: End of Access
 	output	pipe_index_t		O_V_Command,			//Command to Vector Unit
-	input	v_ready_t			I_V_State,				//Status from Vector Unit
-	output	v_ready_t			O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
+	input	v_1b_t				I_V_State,				//Status from Vector Unit
+	output	v_1b_t				O_Lane_En,				//Flag: Enable for Lanes in Vector Unit
 	output	state_t				O_Status,				//Scalar Unit Status
 	output						O_Term					//Flag: Termination
 );

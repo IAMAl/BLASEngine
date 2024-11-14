@@ -282,6 +282,10 @@ package pkg_tpu;
 	typedef data_t	[1:0]				s_ldst_data_t;
 	typedef s_ldst_data_t[NUM_LANES-1:0]v_ldst_data_t;
 
+
+	typedef	logic						ob_t;
+	typedef ob_t	[NUM_LANES-1:0]		v_1b_t;
+
 	typedef logic	[1:0]				tb_t;
 	typedef tb_t	[NUM_LANES-1:0]		v_2b_t;
 
@@ -358,8 +362,8 @@ package pkg_tpu;
 	typedef struct packed {
 		logic				v;
 		issue_no_t			issue_no;
-		v_ready_t			en_tpu;
-		v_ready_t			commit;
+		v_1b_t				en_tpu;
+		v_1b_t				commit;
 	} v_commit_agg_t;
 
 

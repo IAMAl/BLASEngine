@@ -18,10 +18,10 @@ module CommitAgg_Unit
 )(
 	input						clock,
 	input						reset,
-	input	v_ready_t			I_En_Lane,				//Enable to Execution on Lane
+	input	v_1b_t				I_En_Lane,				//Enable to Execution on Lane
 	input						I_Req,					//Issue Request
 	input	issue_no_t  		I_Issue_No,				//Issue Number
-	input	v_ready_t			I_Commit_Req,			//Commit Request from Scalar Unit
+	input	v_1b_t				I_Commit_Req,			//Commit Request from Scalar Unit
 	input	v_issue_no_t		I_Commit_No,			//Commit Number	from Scalar Unit
 	output						O_Commit_Req,			//Commit Request to Scalar Unit
 	output	issue_no_t  		O_Commit_No,			//Commit Number to Scalar Unit
