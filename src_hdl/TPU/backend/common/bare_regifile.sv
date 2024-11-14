@@ -61,6 +61,7 @@ module BareRegFile
 		end
 	end
 
+
 	//// Register File Body
 	always_ff @( posedge clock ) begin
 		if ( reset) begin

@@ -192,19 +192,20 @@ module IMem
 		endcase
 	end
 
+
 	RingBuffCTRL #(
-		.NUM_ENTRY(		2				)
+		.NUM_ENTRY(			2						)
 	) SelPtr
 	(
-		.clock(			clock			),
-		.reset(			reset			),
-		.I_We(			End_St			),
-		.I_Re(			End_Ld			),
-		.O_WAddr(		WPtr			),
-		.O_RAddr(		RPtr			),
-		.O_Full(		Full			),
-		.O_Empty(		Empty			),
-		.O_Num(			Num				)
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_We(				End_St					),
+		.I_Re(				End_Ld					),
+		.O_WAddr(			WPtr					),
+		.O_RAddr(			RPtr					),
+		.O_Full(			Full					),
+		.O_Empty(			Empty					),
+		.O_Num(				Num						)
 	);
 
 endmodule
