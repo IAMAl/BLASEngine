@@ -262,7 +262,7 @@ module BLASEngine
 				.O_Data(		Route_Bwd_Data[ row ][ clm ]	),
 				.I_Req_A(		Route_Bwd_Req[ row+1 ][ clm ]	),
 				.I_Req_B(		Route_Bwd_Req[ row ][ clm+1 ]	),
-				.I_Rls_A(		Route_Bwd_Req[ row+1 ][ clm ]	),
+				.I_Rls_A(		Route_Bwd_Rls[ row+1 ][ clm ]	),
 				.I_Rls_B(		Route_Bwd_Rls[ row ][ clm+1 ]	),
 				.I_Data_A(		Route_Bwd_Data[ row+1 ][ clm ]	),
 				.I_Data_B(		Route_Bwd_Data[ row ][ clm+1 ]	)
@@ -272,7 +272,7 @@ module BLASEngine
 
 
 	for ( genvar clm=0; clm<NUM_CLMS; ++clm ) begin
-		for ( genvar row=1; row<=NUM_ROWS; ++row ) begin
+		for ( genvar row=1; row<NUM_ROWS; ++row ) begin
 			DMem DMem_MD (
 				.clock(			clock							),
 				.reset(			reset							),

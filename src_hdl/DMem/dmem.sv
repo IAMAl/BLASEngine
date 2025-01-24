@@ -37,16 +37,53 @@ module DMem
 );
 
 
+	logic					Route_Fwd_Req_S;
+	logic					Route_Fwd_Rls_S;
+	data_t					Route_Fwd_Data_S;
+	logic					Route_Bwd_Req_S;
+	logic					Route_Bwd_Rls_S;
+	data_t					Route_Bwd_Data_S;
+
+	logic	[NUM_LANES:0]	Route_Fwd_Req_V		[1:0];
+	logic	[NUM_LANES:0]	Route_Fwd_Rls_V		[1:0];
+	data_t	[NUM_LANES:0]	Route_Fwd_Data_V	[1:0];
+	logic	[NUM_LANES:0]	Route_Bwd_Req_V		[1:0];
+	logic	[NUM_LANES:0]	Route_Bwd_Rls_V		[1:0];
+	data_t	[NUM_LANES:0]	Route_Bwd_Data_V	[1:0];
+
+	Router Router_S (
+		.clock(				clock					),
+		.reset(				reset					),
+		.I_Req(				I_Rt_Req				),
+		.I_Rls(				I_Rt_Rls				),
+		.I_Data(			I_Rt_Data				),
+		.O_Req_A(			Route_Fwd_Req_S			),
+		.O_Req_B(			Route_Fwd_Req_V[0]		),
+		.O_Data_A(			Route_Fwd_Data_S		),
+		.O_Data_B(			Route_Fwd_Data_V[0]		),
+		.O_Rls_A(			Route_Fwd_Rls_S			),
+		.O_Rls_B(			Route_Fwd_Rls_V[0]		),
+		.O_Req(				O_Rt_Req				),
+		.O_Rls(				O_Rt_Rls				),
+		.O_Data(			O_Rt_Data				),
+		.I_Req_A(			Route_Bwd_Req_S			),
+		.I_Req_B(			Route_Bwd_Req_V[0]		),
+		.I_Rls_A(			Route_Bwd_Rls_S			),
+		.I_Rls_B(			Route_Bwd_Rls_V[0]		),
+		.I_Data_A(			Route_Bwd_Data_S		),
+		.I_Data_B(			Route_Bwd_Data_V[0]		)
+	);
+
 	DMem_Body DMem_S (
 		.clock(				clock					),
 		.reset(				reset					),
 		.I_Stall(			'0						),
-		.I_Rt_Req(			I_Rt_Req				),
-		.I_Rt_Data(			I_Rt_Data				),
-		.I_Rt_Rls(			I_Rt_Rls				),
-		.O_Rt_Req(			O_Rt_Req				),
-		.O_Rt_Data(			O_Rt_Data				),
-		.O_Rt_Rls(			O_Rt_Rls				),
+		.I_Rt_Req(			Route_Fwd_Req_S			),
+		.I_Rt_Data(			Route_Fwd_Data_S		),
+		.I_Rt_Rls(			Route_Fwd_Rls_S			),
+		.O_Rt_Req(			Route_Bwd_Req_S			),
+		.O_Rt_Data(			Route_Bwd_Data_S		),
+		.O_Rt_Rls(			Route_Bwd_Rls_S			),
 		.I_St_Req1(			I_S_LdSt[0].st.req		),
 		.I_St_Req2(			I_S_LdSt[1].st.req		),
 		.I_Ld_Req1(			I_S_LdSt[0].ld.req		),
@@ -83,16 +120,40 @@ module DMem
 
 
 	for ( genvar i=0; i<NUM_LANES; ++i ) begin
+
+		Router Router_V (
+			.clock(				clock					),
+			.reset(				reset					),
+			.I_Req(				Route_Fwd_Req_V{i}		),
+			.I_Rls(				Route_Fwd_Rls_V{i}		),
+			.I_Data(			Route_Fwd_Data_V{i}		),
+			.O_Req_A(			Route_Fwd_Req_V[ i+1 ]	),
+			.O_Req_B(			Route_Fwd_Req_V[i]		),
+			.O_Data_A(			Route_Fwd_Data_V[ i+1 ]	),
+			.O_Data_B(			Route_Fwd_Data_V[i]		),
+			.O_Rls_A(			Route_Fwd_Rls_V[ i+1 ]	),
+			.O_Rls_B(			Route_Fwd_Rls_V[i]		),
+			.O_Req(				Route_Bwd_Req_V[i]		),
+			.O_Rls(				Route_Bwd_Rls_V[i]		),
+			.O_Data(			Route_Bwd_Data_V[i]		),
+			.I_Req_A(			Route_Bwd_Req_V[i]		),
+			.I_Req_B(			Route_Bwd_Req_V[ i+1 ]	),
+			.I_Rls_A(			Route_Bwd_Rls_V[i]		),
+			.I_Rls_B(			Route_Bwd_Rls_V[ i+1 ]	),
+			.I_Data_A(			Route_Bwd_Data_V[i]		),
+			.I_Data_B(			Route_Bwd_Data_V[ i+1 ]	)
+		);
+
 		DMem_Body DMem_V (
 			.clock(				clock					),
 			.reset(				reset					),
 			.I_Stall(			'0						),
-			.I_Rt_Req(			I_Rt_Req				),
-			.I_Rt_Data(			I_Rt_Data				),
-			.I_Rt_Rls(			I_Rt_Rls				),
-			.O_Rt_Req(			/*O_Rt_Req*/			),
-			.O_Rt_Data(			/*O_Rt_Data*/			),
-			.O_Rt_Rls(			/*O_Rt_Rls*/			),
+			.I_Rt_Req(			Route_Fwd_Req_V[1]		),
+			.I_Rt_Data(			Route_Fwd_Data_V[1]		),
+			.I_Rt_Rls(			Route_Fwd_Rls_V[1]		),
+			.O_Rt_Req(			Route_Bwd_Req_V[1]		),
+			.O_Rt_Data(			Route_Bwd_Data_V[1]		),
+			.O_Rt_Rls(			Route_Bwd_Rls_V[1]		),
 			.I_St_Req1(			I_V_LdSt[i][0].st.req	),
 			.I_St_Req2(			I_V_LdSt[i][1].st.req	),
 			.I_Ld_Req1(			I_V_LdSt[i][0].ld.req	),
