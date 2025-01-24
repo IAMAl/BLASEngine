@@ -43,6 +43,10 @@ module DMem
 	logic	[NUM_LANES:0]	Route_Bwd_Rls		[1:0];
 	data_t	[NUM_LANES:0]	Route_Bwd_Data		[1:0];
 
+	assign Route_Bwd_Req[NUM_LANES][1]		= '0;
+	assign Route_Bwd_Rls[NUM_LANES][1]		= '0;
+	assign Route_Bwd_Data[NUM_LANES][1]		= '0;
+
 	Router Router_S (
 		.clock(				clock					),
 		.reset(				reset					),
